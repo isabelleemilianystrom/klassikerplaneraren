@@ -73,6 +73,7 @@ src/
   ics.ts         programobjekt -> .ics
   ui/            rendering och händelsehantering
   variants.ts    de fyra varianterna och deras distanser (ren domändata)
+  race-schedule.ts  kommande loppdatum som förslag (uppdateras för hand)
   types.ts       delade typer (Program, Vecka, Pass, Gren, Nivå ...)
   main.ts        startpunkt: kopplar ihop UI, generator och storage
 ```
@@ -92,6 +93,7 @@ Lägg nya moduler i det lager de hör till. Om något känns svårt att placera:
 
 - Fyra grenar, fyra loppdatum. Varje lopp har en egen topp — programmet är inte en enda lång uppbyggnad.
 - **Varianten styr distanserna.** Programmet tränar mot distansen i användarens variant, aldrig mot en hårdkodad distans.
+- **Loppdatum föreslås, hämtas inte.** `race-schedule.ts` innehåller kommande loppdatum som användaren kan fylla i med en knapp. Datumen ligger i koden: appen har ingen backend, och webbläsaren får inte läsa arrangörernas sidor (CORS). Listan måste uppdateras för hand varje år, och `SCHEDULE_CHECKED` ska sättas om samtidigt. **Lägg aldrig in ett datum du inte kunnat belägga** — saknas det lämnas fältet tomt, och UI:t säger att användaren får fylla i själv.
 - **Loppdatum ligger framåt i tiden.** Ett lopp som redan varit går inte att träna mot, och ett passerat datum är nästan alltid fel årtal. Formuläret spärrar det med `min`, generatorn kontrollerar samma sak som skyddsnät. Loppet samma dag som i dag räknas som framåt.
 - **Tolvmånadersregeln.** Alla fyra loppen måste ligga inom en tolvmånadersperiod för att räknas som en klassiker. Datum som inte gör det är ogiltig indata — generatorn avvisar dem med ett tydligt fel istället för att generera ett program som inte räknas.
 - Nedtrappning före lopp och återhämtning efter lopp är obligatoriska faser, också när nästa lopp ligger nära.

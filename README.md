@@ -79,6 +79,31 @@ börja med vilken gren du vill.
 Det finns ingen server och ingen databas. Allt körs i användarens webbläsare, och programmet
 lämnar aldrig datorn.
 
+## Loppdatum
+
+Formuläret har en knapp som fyller i kommande loppdatum åt dig. Datumen ligger i
+`src/race-schedule.ts` och hämtas **inte** live från arrangörernas sidor — appen har ingen
+backend, och webbläsaren tillåts inte läsa andra webbplatser direkt. Listan uppdateras alltså för
+hand, och `SCHEDULE_CHECKED` säger när den senast stämdes av.
+
+Bara datum som gått att belägga finns med. Saknas ett lopp lämnas fältet tomt och appen säger
+till — ett gissat datum vore sämre än inget, eftersom du skulle tro att det var kontrollerat.
+
+Kontrollerat 2026-10-13:
+
+| Lopp | Datum | Gäller |
+| --- | --- | --- |
+| Vasaloppet 90 km | 2027-03-07 | Hela |
+| Vätternrundan 315 km | 2027-06-18 | Hela |
+| Vansbrosimningen 3 km | 2027-07-10 | Hela |
+| TCS Lidingöloppet 30 km | 2027-09-25 | Hela |
+| Tjejvasan 30 km | 2027-02-27 | Korta, Tjej |
+| Vansbro Halvsim 1,5 km | 2027-07-04 | Halva |
+| Vansbro Kortsim 1 km | 2027-07-04 | Korta, Tjej |
+
+Vätternrundan startar fredag kväll och avslutas under lördagen; vi föreslår startdagen, eftersom
+det är då du ska vara i form. Stäm alltid av mot arrangören innan du anmäler dig.
+
 ## Så är koden uppdelad
 
 ```
@@ -88,6 +113,7 @@ src/
   ics.ts         program -> .ics
   ui/            rendering, formulär och all svensk text
   variants.ts    de fyra varianterna och deras distanser
+  race-schedule.ts  kommande loppdatum som förslag
   types.ts       delade typer
   main.ts        startpunkt: kopplar ihop UI, generator och lagring
 ```
