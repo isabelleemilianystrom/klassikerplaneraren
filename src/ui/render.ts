@@ -2,18 +2,33 @@
  * Rendering och händelsehantering. Allt DOM-beroende bor här.
  * Ingen genereringslogik och ingen lagring i den här filen.
  */
-import { DISCIPLINES, type Discipline, type Level, type PlanInput, type Program, type Week } from '../types';
 import {
+  DISCIPLINES,
+  type ClassicVariant,
+  type Discipline,
+  type Level,
+  type PlanInput,
+  type Program,
+  type Week,
+} from '../types';
+import { VARIANTS } from '../variants';
+import {
+  CLASSIC_WINDOW_HELP,
   DISCIPLINE_LABEL,
   DISCLAIMER,
   LEVEL_LABEL,
+  MONTH_LABEL,
   PHASE_LABEL,
   PURPOSE_LABEL,
   RACE_LABEL,
+  SNOW_SEASON_HELP,
   SUBSTITUTE_LABEL,
+  VARIANT_LABEL,
+  VARIANT_SUMMARY,
 } from './texts';
 
 const LEVELS: readonly Level[] = ['beginner', 'intermediate', 'advanced'];
+const MONTHS: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 /** Ritar formuläret och kopplar submit till `onSubmit`. */
 export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) => void): void {
@@ -21,16 +36,19 @@ export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) 
   form.className = 'plan-form';
   form.noValidate = false;
 
-  const fieldset = document.createElement('fieldset');
-  const legend = document.createElement('legend');
-  legend.textContent = 'Dina lopp och din nivå';
-  fieldset.append(legend);
+  form.append(variantFieldset());
+
+  const races = document.createElement('fieldset');
+  const racesLegend = document.createElement('legend');
+  racesLegend.textContent = 'Dina lopp och din nivå';
+  races.append(racesLegend, help(CLASSIC_WINDOW_HELP));
 
   for (const discipline of DISCIPLINES) {
-    fieldset.append(raceRow(discipline));
+    races.append(raceRow(discipline));
   }
-  form.append(fieldset);
+  form.append(races);
 
+  form.append(snowSeasonFieldset());
   form.append(hoursRow());
 
   const submit = document.createElement('button');
@@ -44,6 +62,85 @@ export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) 
   });
 
   container.append(form);
+}
+
+/**
+ * Varianten väljs med radioknappar, inte rullgardin, så att distanserna syns
+ * utan att användaren behöver öppna något. Valet avgör vad programmet tränar mot.
+ */
+function variantFieldset(): HTMLElement {
+  const fieldset = document.createElement('fieldset');
+  const legend = document.createElement('legend');
+  legend.textContent = 'Vilken klassiker gör du?';
+  fieldset.append(legend);
+
+  for (const [index, variant] of VARIANTS.entries()) {
+    fieldset.append(variantChoice(variant, index === 0));
+  }
+  return fieldset;
+}
+
+function variantChoice(variant: ClassicVariant, checked: boolean): HTMLElement {
+  const choice = document.createElement('label');
+  choice.className = 'choice';
+
+  const input = document.createElement('input');
+  input.type = 'radio';
+  input.name = 'variant';
+  input.value = variant;
+  input.checked = checked;
+
+  const name = document.createElement('span');
+  name.className = 'choice-name';
+  name.textContent = VARIANT_LABEL[variant];
+
+  const summary = document.createElement('span');
+  summary.className = 'choice-summary';
+  summary.textContent = VARIANT_SUMMARY[variant];
+
+  choice.append(input, name, summary);
+  return choice;
+}
+
+function snowSeasonFieldset(): HTMLElement {
+  const fieldset = document.createElement('fieldset');
+  const legend = document.createElement('legend');
+  legend.textContent = 'Din snöperiod';
+  fieldset.append(legend, help(SNOW_SEASON_HELP));
+
+  const row = document.createElement('div');
+  row.className = 'row';
+  // December till mars som standard: täcker Vasaloppet i början av mars.
+  row.append(monthField('snowStart', 'Snö från och med', 12));
+  row.append(monthField('snowEnd', 'Till och med', 3));
+  fieldset.append(row);
+
+  return fieldset;
+}
+
+function monthField(name: string, labelText: string, selected: number): HTMLElement {
+  const label = document.createElement('label');
+  label.textContent = labelText;
+
+  const select = document.createElement('select');
+  select.name = name;
+  for (const month of MONTHS) {
+    const option = document.createElement('option');
+    option.value = String(month);
+    option.textContent = MONTH_LABEL[month - 1] ?? String(month);
+    option.selected = month === selected;
+    select.append(option);
+  }
+
+  label.append(select);
+  return label;
+}
+
+function help(text: string): HTMLElement {
+  const paragraph = document.createElement('p');
+  paragraph.className = 'help';
+  paragraph.textContent = text;
+  return paragraph;
 }
 
 function raceRow(discipline: Discipline): HTMLElement {
@@ -105,9 +202,14 @@ function readForm(form: HTMLFormElement): PlanInput {
   }
 
   return {
+    variant: String(data.get('variant') ?? 'full') as ClassicVariant,
     races,
     levels,
     hoursPerWeek: Number(data.get('hoursPerWeek') ?? 0),
+    snowSeason: {
+      startMonth: Number(data.get('snowStart') ?? 12),
+      endMonth: Number(data.get('snowEnd') ?? 3),
+    },
   };
 }
 

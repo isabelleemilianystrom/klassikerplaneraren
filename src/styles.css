@@ -150,3 +150,39 @@ button:hover {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+.help {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.choice {
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.choice + .choice {
+  border-top: 1px solid var(--border);
+}
+
+.choice input {
+  flex: 0 0 auto;
+}
+
+.choice-name {
+  font-weight: 600;
+}
+
+.choice-summary {
+  flex: 1 1 100%;
+  padding-left: 1.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
