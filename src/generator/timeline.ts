@@ -29,20 +29,31 @@ export function lastRaceDate(races: RaceDates): IsoDate {
  */
 export function buildTimeline(races: RaceDates, today: IsoDate): IsoDate[] {
   const start = startOfWeek(requireIsoDate(today, 'Dagens datum'));
-  const lastRace = lastRaceDate(races);
+  requireFutureRaces(races, today);
 
-  if (daysBetween(today, lastRace) < 0) {
-    throw new Error(
-      `Det sista loppet (${lastRace}) har redan varit. Programmet behöver loppdatum som ligger framåt i tiden.`,
-    );
-  }
-
-  const end = startOfWeek(lastRace);
+  const end = startOfWeek(lastRaceDate(races));
   const weeks: IsoDate[] = [];
   for (let monday = start; monday <= end; monday = addWeeks(monday, 1)) {
     weeks.push(monday);
   }
   return weeks;
+}
+
+/**
+ * Kastar om något loppdatum redan har varit.
+ *
+ * Det går inte att träna mot ett lopp som är över, och ett passerat datum är
+ * nästan alltid ett skrivfel — fel år är det vanligaste. Loppet samma dag som
+ * i dag räknas som framåt: det har inte sprungits än.
+ */
+export function requireFutureRaces(races: RaceDates, today: IsoDate): void {
+  const passed = raceDates(races).filter((date) => daysBetween(today, date) < 0);
+  if (passed.length > 0) {
+    throw new Error(
+      `Loppdatum som redan har varit går inte att planera mot: ${passed.sort().join(', ')}. ` +
+        'Kontrollera att du angett rätt årtal.',
+    );
+  }
 }
 
 /** Veckan ett lopp ligger i, som index i tidslinjen. */

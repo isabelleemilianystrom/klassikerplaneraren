@@ -96,6 +96,8 @@ export const SNOW_SEASON_HELP =
   'När har du tillgång till snö? Utanför perioden byts skidpassen mot stakmaskin eller ' +
   'rullskidor — de försvinner aldrig ur programmet.';
 
+export const PAST_DATE_HELP = 'Loppet måste ligga framåt i tiden — kontrollera årtalet.';
+
 export const CLASSIC_WINDOW_HELP =
   'Alla fyra loppen ska ligga inom tolv månader för att räknas som en klassiker. ' +
   'Du får börja med vilken gren du vill.';

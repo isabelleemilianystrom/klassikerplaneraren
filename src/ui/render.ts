@@ -6,6 +6,7 @@ import {
   DISCIPLINES,
   type ClassicVariant,
   type Discipline,
+  type IsoDate,
   type Level,
   type PlanInput,
   type Program,
@@ -20,6 +21,7 @@ import {
   ENGELBREKTSLOPPET_LABEL,
   LEVEL_LABEL,
   MONTH_LABEL,
+  PAST_DATE_HELP,
   PHASE_LABEL,
   PURPOSE_LABEL,
   RACE_LABEL,
@@ -32,8 +34,17 @@ import {
 const LEVELS: readonly Level[] = ['beginner', 'intermediate', 'advanced'];
 const MONTHS: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-/** Ritar formuläret och kopplar submit till `onSubmit`. */
-export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) => void): void {
+/**
+ * Ritar formuläret och kopplar submit till `onSubmit`.
+ *
+ * `today` skickas in och hämtas inte här, så att rendering och logik utgår från
+ * samma datum — och så att vyn går att rita upp för vilket datum som helst.
+ */
+export function renderForm(
+  container: HTMLElement,
+  today: IsoDate,
+  onSubmit: (input: PlanInput) => void,
+): void {
   const form = document.createElement('form');
   form.className = 'plan-form';
   form.noValidate = false;
@@ -46,7 +57,7 @@ export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) 
   races.append(racesLegend, help(CLASSIC_WINDOW_HELP));
 
   for (const discipline of DISCIPLINES) {
-    races.append(raceRow(discipline));
+    races.append(raceRow(discipline, today));
   }
   form.append(races);
 
@@ -176,7 +187,7 @@ function help(text: string): HTMLElement {
   return paragraph;
 }
 
-function raceRow(discipline: Discipline): HTMLElement {
+function raceRow(discipline: Discipline, today: IsoDate): HTMLElement {
   const row = document.createElement('div');
   row.className = 'row';
 
@@ -193,6 +204,10 @@ function raceRow(discipline: Discipline): HTMLElement {
   date.type = 'date';
   date.name = `race-${discipline}`;
   date.required = true;
+  // Ett lopp som redan varit går inte att träna mot. Webbläsaren spärrar både
+  // kalendern och submit; generatorn kontrollerar samma sak som skyddsnät.
+  date.min = today;
+  date.title = PAST_DATE_HELP;
   dateLabel.append(date);
 
   const levelLabel = document.createElement('label');

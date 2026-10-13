@@ -92,6 +92,7 @@ Lägg nya moduler i det lager de hör till. Om något känns svårt att placera:
 
 - Fyra grenar, fyra loppdatum. Varje lopp har en egen topp — programmet är inte en enda lång uppbyggnad.
 - **Varianten styr distanserna.** Programmet tränar mot distansen i användarens variant, aldrig mot en hårdkodad distans.
+- **Loppdatum ligger framåt i tiden.** Ett lopp som redan varit går inte att träna mot, och ett passerat datum är nästan alltid fel årtal. Formuläret spärrar det med `min`, generatorn kontrollerar samma sak som skyddsnät. Loppet samma dag som i dag räknas som framåt.
 - **Tolvmånadersregeln.** Alla fyra loppen måste ligga inom en tolvmånadersperiod för att räknas som en klassiker. Datum som inte gör det är ogiltig indata — generatorn avvisar dem med ett tydligt fel istället för att generera ett program som inte räknas.
 - Nedtrappning före lopp och återhämtning efter lopp är obligatoriska faser, också när nästa lopp ligger nära.
 - Veckovolymen får aldrig överstiga användarens angivna timmar per vecka.

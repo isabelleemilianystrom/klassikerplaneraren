@@ -18,7 +18,7 @@ function main(): void {
   const disclaimerRoot = requireElement('disclaimer-root');
 
   renderDisclaimer(disclaimerRoot);
-  renderForm(formRoot, (input) => handleSubmit(input, programRoot));
+  renderForm(formRoot, todayIso(), (input) => handleSubmit(input, programRoot));
 
   const saved = loadProgram();
   if (saved) {
