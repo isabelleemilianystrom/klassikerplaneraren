@@ -186,3 +186,8 @@ button:hover {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+.distance {
+  color: var(--text);
+  font-weight: 600;
+}

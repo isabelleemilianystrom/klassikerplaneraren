@@ -11,7 +11,7 @@ import {
   type Program,
   type Week,
 } from '../types';
-import { VARIANTS } from '../variants';
+import { raceDistanceKm, VARIANTS } from '../variants';
 import {
   CLASSIC_WINDOW_HELP,
   DISCIPLINE_LABEL,
@@ -61,7 +61,30 @@ export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) 
     onSubmit(readForm(form));
   });
 
+  // Distanserna i loppraderna ska alltid visa vald variant.
+  form.addEventListener('change', (event) => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement && target.name === 'variant') {
+      showDistances(form, target.value as ClassicVariant);
+    }
+  });
+
   container.append(form);
+  showDistances(form, VARIANTS[0] ?? 'full');
+}
+
+/** Skriver variantens distans i varje lopprad. */
+function showDistances(form: HTMLFormElement, variant: ClassicVariant): void {
+  for (const discipline of DISCIPLINES) {
+    const field = form.querySelector(`[data-distance-for="${discipline}"]`);
+    if (field instanceof HTMLElement) {
+      field.textContent = formatKm(raceDistanceKm(variant, discipline));
+    }
+  }
+}
+
+function formatKm(km: number): string {
+  return `${km.toLocaleString('sv-SE')} km`;
 }
 
 /**
@@ -148,7 +171,13 @@ function raceRow(discipline: Discipline): HTMLElement {
   row.className = 'row';
 
   const dateLabel = document.createElement('label');
-  dateLabel.textContent = `${RACE_LABEL[discipline]} (${DISCIPLINE_LABEL[discipline].toLowerCase()})`;
+  dateLabel.append(`${DISCIPLINE_LABEL[discipline]} — `);
+  // Distansen beror på varianten och skrivs om när användaren byter variant.
+  const distance = document.createElement('span');
+  distance.className = 'distance';
+  distance.dataset['distanceFor'] = discipline;
+  dateLabel.append(distance);
+
   const date = document.createElement('input');
   date.type = 'date';
   date.name = `race-${discipline}`;

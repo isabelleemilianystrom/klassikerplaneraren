@@ -29,11 +29,16 @@ export const DISCIPLINE_LABEL: Record<Discipline, string> = {
   running: 'Löpning',
 };
 
+/**
+ * Loppet i en gren, utan namn. Vilket lopp det faktiskt är beror på varianten
+ * — skidloppet kan vara Vasaloppet, Halvvasan eller Tjejvasan — så vi skriver
+ * aldrig ut ett loppnamn som bara stämmer för en variant.
+ */
 export const RACE_LABEL: Record<Discipline, string> = {
-  skiing: 'Vasaloppet',
-  cycling: 'Vätternrundan',
-  swimming: 'Vansbrosimningen',
-  running: 'Lidingöloppet',
+  skiing: 'skidloppet',
+  cycling: 'cykelloppet',
+  swimming: 'simloppet',
+  running: 'löparloppet',
 };
 
 export const PHASE_LABEL: Record<Phase, string> = {
