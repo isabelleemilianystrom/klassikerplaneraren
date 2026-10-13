@@ -25,7 +25,8 @@ Distanserna bor i `src/variants.ts` med källa och kontrolldatum. Att veta:
 
 - **Varje gren har flera godkända lopp** (skidor i `short` har sex alternativ), men distansen är densamma inom varianten. Vi modellerar distans, inte loppnamn — träningen styrs av distansen.
 - **`short` och `women` har identiska distanser.** Programmen blir därför likadana. Båda finns ändå som val, så att användaren känner igen sin egen utmaning.
-- **Undantag vi inte modellerar än:** i `full` godkänns Engelbrektsloppet 60 km istället för Vasaloppets 90 km. Vi räknar på 90 km. Ändra inte det utan att fråga.
+- **Engelbrektsloppet är ett undantag med egen kryssruta.** I `full` godkänns Engelbrektsloppet 60 km istället för Vasaloppets 90 km, så användaren kan kryssa i att hon åker det. Standard är 90 km. I övriga varianter har Engelbrektsloppet samma distans som de andra skidloppen — då är kryssrutan dold och valet ignoreras i `readForm`.
+- **Vätternrundan är 315 km**, inte 300. Distansen ändrades 2020 och arrangörens marknadsföring släpar efter på sina håll.
 - **Namnen har bytts.** Det heter inte längre "Halvklassikern" och "Tjejklassikern". Använd de officiella namnen i UI.
 
 ## MVP — detta och inget mer

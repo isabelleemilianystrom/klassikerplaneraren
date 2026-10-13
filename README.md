@@ -56,6 +56,10 @@ Nattvasan 30, Vasaloppet 30, Öppet Spår måndag 30, Kristinaloppet eller Engel
 men distansen är densamma inom varianten. Appen planerar därför mot distansen, inte mot ett
 loppnamn.
 
+I den hela klassikern godkänns Engelbrektsloppet 60 km istället för Vasaloppets 90 km. Åker du
+det kryssar du i rutan under skidloppet, så tränar programmet mot 60 km. I de kortare varianterna
+har Engelbrektsloppet samma distans som de andra skidloppen, och då visas ingen ruta.
+
 Korta och Tjej har identiska distanser och ger samma program. Båda finns med för att du ska känna
 igen din egen utmaning. Distanserna ligger i `src/variants.ts`, med källa och kontrolldatum.
 

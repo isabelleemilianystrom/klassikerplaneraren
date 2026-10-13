@@ -59,6 +59,11 @@ export type RaceDates = Record<Discipline, IsoDate>;
 export interface PlanInput {
   /** Vilken klassiker som ska genomföras. Avgör distanserna att träna mot. */
   variant: ClassicVariant;
+  /**
+   * Användaren åker Engelbrektsloppet som sitt skidlopp. Spelar bara roll i den
+   * hela klassikern, där det är 60 km istället för Vasaloppets 90 km.
+   */
+  engelbrektsloppet: boolean;
   races: RaceDates;
   levels: Record<Discipline, Level>;
   hoursPerWeek: number;

@@ -36,8 +36,9 @@ export const VARIANTS: readonly ClassicVariant[] = ['full', 'half', 'short', 'wo
  * - **Vätternrundan är 315 km**, inte 300. Distansen ändrades 2020. Arrangörens
  *   marknadsföring säger fortfarande "300 km" på sina håll — gå på 315.
  * - **Engelbrektsloppet 60 km** godkänns i den hela klassikern istället för
- *   Vasaloppets 90 km. Vi räknar på 90, alltså det tyngre, eftersom tre av fyra
- *   godkända skidlopp är 90 km. Ändra inte utan att fråga användaren.
+ *   Vasaloppets 90 km. Standard är 90, eftersom tre av fyra godkända skidlopp är
+ *   90 km, men användaren kan kryssa i att hon åker Engelbrektsloppet — se
+ *   `raceDistanceKm` nedan.
  *
  * 'short' och 'women' har identiska distanser och samma skidlopp. Skillnaden är
  * vilka cykel- och simlopp som räknas, vilket inte påverkar träningen — båda
@@ -56,7 +57,28 @@ export const VARIANT_DISTANCES_KM: Record<ClassicVariant, Record<Discipline, num
  */
 export const CLASSIC_WINDOW_MONTHS = 12;
 
-/** Distansen användaren ska klara i en gren, givet sin variant. */
-export function raceDistanceKm(variant: ClassicVariant, discipline: Discipline): number {
+/** Engelbrektsloppets distans i den hela klassikern. */
+export const ENGELBREKTSLOPPET_FULL_KM = 60;
+
+/**
+ * Distansen användaren ska träna mot i en gren.
+ *
+ * `engelbrektsloppet` ändrar bara något i den hela klassikern, där loppet är
+ * 60 km istället för Vasaloppets 90 km. I övriga varianter har Engelbrektsloppet
+ * samma distans som de andra godkända skidloppen, så valet saknar betydelse där.
+ */
+export function raceDistanceKm(
+  variant: ClassicVariant,
+  discipline: Discipline,
+  engelbrektsloppet = false,
+): number {
+  if (discipline === 'skiing' && variant === 'full' && engelbrektsloppet) {
+    return ENGELBREKTSLOPPET_FULL_KM;
+  }
   return VARIANT_DISTANCES_KM[variant][discipline];
+}
+
+/** Sant när valet av Engelbrektsloppet påverkar distansen, alltså bara i `full`. */
+export function engelbrektsloppetMatters(variant: ClassicVariant): boolean {
+  return variant === 'full';
 }

@@ -11,11 +11,13 @@ import {
   type Program,
   type Week,
 } from '../types';
-import { raceDistanceKm, VARIANTS } from '../variants';
+import { engelbrektsloppetMatters, raceDistanceKm, VARIANTS } from '../variants';
 import {
   CLASSIC_WINDOW_HELP,
   DISCIPLINE_LABEL,
   DISCLAIMER,
+  ENGELBREKTSLOPPET_HELP,
+  ENGELBREKTSLOPPET_LABEL,
   LEVEL_LABEL,
   MONTH_LABEL,
   PHASE_LABEL,
@@ -61,24 +63,32 @@ export function renderForm(container: HTMLElement, onSubmit: (input: PlanInput) 
     onSubmit(readForm(form));
   });
 
-  // Distanserna i loppraderna ska alltid visa vald variant.
-  form.addEventListener('change', (event) => {
-    const target = event.target;
-    if (target instanceof HTMLInputElement && target.name === 'variant') {
-      showDistances(form, target.value as ClassicVariant);
-    }
-  });
+  // Formuläret visar alltid distanserna för det som är valt just nu.
+  form.addEventListener('change', () => showDistances(form));
 
   container.append(form);
-  showDistances(form, VARIANTS[0] ?? 'full');
+  showDistances(form);
 }
 
-/** Skriver variantens distans i varje lopprad. */
-function showDistances(form: HTMLFormElement, variant: ClassicVariant): void {
+/**
+ * Skriver vald distans i varje lopprad och visar bara de fält som betyder något
+ * för den valda varianten.
+ */
+function showDistances(form: HTMLFormElement): void {
+  const data = new FormData(form);
+  const variant = String(data.get('variant') ?? 'full') as ClassicVariant;
+  const engelbrektsloppet = data.get('engelbrektsloppet') !== null;
+
   for (const discipline of DISCIPLINES) {
     const field = form.querySelector(`[data-distance-for="${discipline}"]`);
     if (field instanceof HTMLElement) {
-      field.textContent = formatKm(raceDistanceKm(variant, discipline));
+      field.textContent = formatKm(raceDistanceKm(variant, discipline, engelbrektsloppet));
+    }
+  }
+
+  for (const field of form.querySelectorAll('[data-only-for-variant]')) {
+    if (field instanceof HTMLElement) {
+      field.hidden = field.dataset['onlyForVariant'] !== variant;
     }
   }
 }
@@ -171,6 +181,7 @@ function raceRow(discipline: Discipline): HTMLElement {
   row.className = 'row';
 
   const dateLabel = document.createElement('label');
+  dateLabel.className = 'race-field';
   dateLabel.append(`${DISCIPLINE_LABEL[discipline]} — `);
   // Distansen beror på varianten och skrivs om när användaren byter variant.
   const distance = document.createElement('span');
@@ -197,7 +208,35 @@ function raceRow(discipline: Discipline): HTMLElement {
   levelLabel.append(level);
 
   row.append(dateLabel, levelLabel);
+  if (discipline === 'skiing') {
+    row.append(engelbrektsloppetField());
+  }
   return row;
+}
+
+/**
+ * Kryssrutan visas bara i den hela klassikern, där Engelbrektsloppets 60 km
+ * skiljer sig från Vasaloppets 90. I övriga varianter betyder valet ingenting.
+ */
+function engelbrektsloppetField(): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'race-option';
+  wrapper.dataset['onlyForVariant'] = 'full';
+
+  const label = document.createElement('label');
+  label.className = 'choice';
+
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.name = 'engelbrektsloppet';
+
+  const name = document.createElement('span');
+  name.className = 'choice-name';
+  name.textContent = ENGELBREKTSLOPPET_LABEL;
+
+  label.append(input, name);
+  wrapper.append(label, help(ENGELBREKTSLOPPET_HELP));
+  return wrapper;
 }
 
 function hoursRow(): HTMLElement {
@@ -230,8 +269,13 @@ function readForm(form: HTMLFormElement): PlanInput {
     levels[discipline] = String(data.get(`level-${discipline}`) ?? 'beginner') as Level;
   }
 
+  const variant = String(data.get('variant') ?? 'full') as ClassicVariant;
+
   return {
-    variant: String(data.get('variant') ?? 'full') as ClassicVariant,
+    variant,
+    // Kryssrutan är dold i varianter där den inte betyder något. Den får inte
+    // smyga med ett gammalt kryss därifrån.
+    engelbrektsloppet: engelbrektsloppetMatters(variant) && data.get('engelbrektsloppet') !== null,
     races,
     levels,
     hoursPerWeek: Number(data.get('hoursPerWeek') ?? 0),

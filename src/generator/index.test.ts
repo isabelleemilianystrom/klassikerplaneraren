@@ -4,6 +4,7 @@ import type { PlanInput } from '../types';
 
 const input: PlanInput = {
   variant: 'full',
+  engelbrektsloppet: false,
   races: {
     skiing: '2027-03-07',
     cycling: '2026-06-19',

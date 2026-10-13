@@ -86,6 +86,12 @@ export const MONTH_LABEL: readonly string[] = [
   'december',
 ];
 
+export const ENGELBREKTSLOPPET_LABEL = 'Jag åker Engelbrektsloppet (60 km)';
+
+export const ENGELBREKTSLOPPET_HELP =
+  'Engelbrektsloppet godkänns istället för Vasaloppet i den hela klassikern, men är 60 km ' +
+  'i stället för 90. Kryssa i rutan så tränar programmet mot rätt distans.';
+
 export const SNOW_SEASON_HELP =
   'När har du tillgång till snö? Utanför perioden byts skidpassen mot stakmaskin eller ' +
   'rullskidor — de försvinner aldrig ur programmet.';

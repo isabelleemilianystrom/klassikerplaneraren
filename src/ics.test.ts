@@ -7,6 +7,7 @@ const program: Program = {
   createdAt: '2026-01-05',
   input: {
     variant: 'full',
+    engelbrektsloppet: false,
     races: {
       skiing: '2027-03-07',
       cycling: '2026-06-19',
