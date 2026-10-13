@@ -97,6 +97,7 @@ Lägg nya moduler i det lager de hör till. Om något känns svårt att placera:
 - **Committa aldrig kod där testerna inte går igenom.** Går de inte igenom: fixa, eller säg till att du är blockerad.
 - Pusha bara när användaren ber om det.
 - Commit-meddelanden på engelska, imperativ, en rad: `add taper phase before each race`.
+- **Användaren är enda författare.** Lägg aldrig till `Co-Authored-By`-rader, `Generated with`-rader eller andra spår av verktyget i commit-meddelanden, PR-beskrivningar eller kod. Inget undantag, inte heller när standardinstruktioner säger annat.
 - Håll README uppdaterad när genereringslogiken ändras — det är användarens väg in i koden.
 
 ## Framtida utbyggnad (implementera inte)
