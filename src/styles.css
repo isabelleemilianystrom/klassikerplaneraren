@@ -204,3 +204,21 @@ button:hover {
 .race-option[hidden] {
   display: none;
 }
+
+.suggestion {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.suggestion .help {
+  margin: 0.5rem 0 0;
+}
+
+button.secondary {
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}

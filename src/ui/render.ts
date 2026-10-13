@@ -13,6 +13,7 @@ import {
   type Week,
 } from '../types';
 import { engelbrektsloppetMatters, raceDistanceKm, VARIANTS } from '../variants';
+import { SCHEDULE_CHECKED, upcomingSuggestions } from '../race-schedule';
 import {
   CLASSIC_WINDOW_HELP,
   DISCIPLINE_LABEL,
@@ -27,6 +28,10 @@ import {
   RACE_LABEL,
   SNOW_SEASON_HELP,
   SUBSTITUTE_LABEL,
+  SUGGEST_DATES_LABEL,
+  SUGGEST_DATES_NONE,
+  suggestionNote,
+  suggestionResult,
   VARIANT_LABEL,
   VARIANT_SUMMARY,
 } from './texts';
@@ -59,6 +64,7 @@ export function renderForm(
   for (const discipline of DISCIPLINES) {
     races.append(raceRow(discipline, today));
   }
+  races.append(suggestionRow(form, today));
   form.append(races);
 
   form.append(snowSeasonFieldset());
@@ -185,6 +191,61 @@ function help(text: string): HTMLElement {
   paragraph.className = 'help';
   paragraph.textContent = text;
   return paragraph;
+}
+
+/**
+ * Knappen som fyller i kommande loppdatum.
+ *
+ * Datumen är inlagda i koden, inte hämtade live — webbläsaren kommer inte åt
+ * arrangörernas sidor. Därför skriver vi ut när de senast kontrollerades och
+ * ber användaren stämma av mot arrangören.
+ */
+function suggestionRow(form: HTMLFormElement, today: IsoDate): HTMLElement {
+  const row = document.createElement('div');
+  row.className = 'suggestion';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'secondary';
+  button.textContent = SUGGEST_DATES_LABEL;
+
+  const note = help(suggestionNote(SCHEDULE_CHECKED));
+  row.append(button, note);
+
+  button.addEventListener('click', () => {
+    const variant = selectedVariant(form);
+    const upcoming = upcomingSuggestions(variant, today);
+    const filled = fillDates(form, upcoming);
+    note.textContent =
+      filled === 0 ? SUGGEST_DATES_NONE : suggestionResult(filled, missingCount(upcoming));
+  });
+
+  return row;
+}
+
+/** Fyller i datumfälten och returnerar hur många som sattes. */
+function fillDates(
+  form: HTMLFormElement,
+  dates: Partial<Record<Discipline, IsoDate>>,
+): number {
+  let filled = 0;
+  for (const discipline of DISCIPLINES) {
+    const date = dates[discipline];
+    const field = form.querySelector(`input[name="race-${discipline}"]`);
+    if (date !== undefined && field instanceof HTMLInputElement) {
+      field.value = date;
+      filled += 1;
+    }
+  }
+  return filled;
+}
+
+function missingCount(dates: Partial<Record<Discipline, IsoDate>>): number {
+  return DISCIPLINES.length - Object.keys(dates).length;
+}
+
+function selectedVariant(form: HTMLFormElement): ClassicVariant {
+  return String(new FormData(form).get('variant') ?? 'full') as ClassicVariant;
 }
 
 function raceRow(discipline: Discipline, today: IsoDate): HTMLElement {

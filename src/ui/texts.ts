@@ -96,6 +96,26 @@ export const SNOW_SEASON_HELP =
   'När har du tillgång till snö? Utanför perioden byts skidpassen mot stakmaskin eller ' +
   'rullskidor — de försvinner aldrig ur programmet.';
 
+export const SUGGEST_DATES_LABEL = 'Fyll i kommande loppdatum';
+
+/** Datumen ligger i koden och kan ha hunnit ändras hos arrangören. */
+export function suggestionNote(checked: string): string {
+  return `Förslagen är hämtade från arrangörernas sidor ${checked} och fylls i åt dig. Stäm alltid av mot arrangören innan du anmäler dig.`;
+}
+
+export function suggestionResult(filled: number, missing: number): string {
+  const base = filled === 1 ? 'Ett datum ifyllt.' : `${filled} datum ifyllda.`;
+  if (missing === 0) return `${base} Kontrollera dem mot arrangörens sida.`;
+  const rest =
+    missing === 1
+      ? 'Ett lopp saknar belagt datum — fyll i det själv.'
+      : `${missing} lopp saknar belagda datum — fyll i dem själv.`;
+  return `${base} ${rest}`;
+}
+
+export const SUGGEST_DATES_NONE =
+  'Förslagen i appen har passerat och behöver uppdateras. Fyll i datumen själv så länge.';
+
 export const PAST_DATE_HELP = 'Loppet måste ligga framåt i tiden — kontrollera årtalet.';
 
 export const CLASSIC_WINDOW_HELP =
