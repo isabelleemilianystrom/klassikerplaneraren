@@ -51,9 +51,14 @@ describe('buildTimeline', () => {
     expect(buildTimeline(races, today)[0]).toBe('2026-10-12');
   });
 
-  it('slutar på måndagen i veckan som innehåller det sista loppet', () => {
-    // 2027-09-25 är en lördag, i veckan som börjar 2027-09-20.
-    expect(buildTimeline(races, today).at(-1)).toBe('2027-09-20');
+  it('slutar på en återhämtningsvecka efter det sista loppet', () => {
+    // 2027-09-25 är en lördag, i veckan som börjar 2027-09-20. Veckan efter
+    // finns med för återhämtning.
+    expect(buildTimeline(races, today).at(-1)).toBe('2027-09-27');
+  });
+
+  it('innehåller det sista loppets vecka', () => {
+    expect(buildTimeline(races, today)).toContain('2027-09-20');
   });
 
   it('ger bara måndagar', () => {
@@ -75,7 +80,7 @@ describe('buildTimeline', () => {
   });
 
   it('täcker hela perioden fram till det sista loppet', () => {
-    expect(buildTimeline(races, today)).toHaveLength(50);
+    expect(buildTimeline(races, today)).toHaveLength(51);
   });
 
   it('ger en enda vecka när alla lopp ligger i samma vecka som i dag', () => {
@@ -85,7 +90,7 @@ describe('buildTimeline', () => {
       swimming: '2026-10-16',
       running: '2026-10-17',
     };
-    expect(buildTimeline(sameWeek, today)).toEqual(['2026-10-12']);
+    expect(buildTimeline(sameWeek, today)).toEqual(['2026-10-12', '2026-10-19']);
   });
 
   it('tar med loppveckan även när loppet är i dag', () => {
@@ -95,7 +100,7 @@ describe('buildTimeline', () => {
       swimming: today,
       running: today,
     };
-    expect(buildTimeline(allToday, today)).toEqual(['2026-10-12']);
+    expect(buildTimeline(allToday, today)).toEqual(['2026-10-12', '2026-10-19']);
   });
 
   it('kastar när ett lopp redan har varit', () => {
@@ -110,7 +115,7 @@ describe('buildTimeline', () => {
 describe('weekIndexOf', () => {
   it('hittar veckan ett lopp ligger i', () => {
     const timeline = buildTimeline(races, today);
-    expect(weekIndexOf(timeline, '2027-09-25')).toBe(timeline.length - 1);
+    expect(weekIndexOf(timeline, '2027-09-25')).toBe(timeline.length - 2);
     expect(weekIndexOf(timeline, today)).toBe(0);
     expect(weekIndexOf(timeline, '2027-03-07')).toBe(20);
   });
