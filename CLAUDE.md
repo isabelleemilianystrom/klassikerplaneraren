@@ -16,7 +16,7 @@ Det finns fyra officiella varianter. Vilken användaren valt avgör distanserna 
 
 | Variant (`ClassicVariant`) | Officiellt namn | Skidor | Cykel | Simning | Löpning |
 | --- | --- | --- | --- | --- | --- |
-| `full` | En Svensk Klassiker | 90 km | 300 km | 3 km | 30 km |
+| `full` | En Svensk Klassiker | 90 km | 315 km | 3 km | 30 km |
 | `half` | En Svensk Klassiker – Halva | 45 km | 150 km | 1,5 km | 15 km |
 | `short` | En Svensk Klassiker – Korta | 30 km | 100 km | 1 km | 10 km |
 | `women` | En Svensk Klassiker – Tjej | 30 km | 100 km | 1 km | 10 km |

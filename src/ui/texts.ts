@@ -16,7 +16,7 @@ export const VARIANT_LABEL: Record<ClassicVariant, string> = {
 
 /** Distanserna i varje variant, för att hjälpa användaren att välja rätt. */
 export const VARIANT_SUMMARY: Record<ClassicVariant, string> = {
-  full: '90 km skidor · 300 km cykel · 3 km simning · 30 km löpning',
+  full: '90 km skidor · 315 km cykel · 3 km simning · 30 km löpning',
   half: '45 km skidor · 150 km cykel · 1,5 km simning · 15 km löpning',
   short: '30 km skidor · 100 km cykel · 1 km simning · 10 km löpning',
   women: '30 km skidor · 100 km cykel · 1 km simning · 10 km löpning',

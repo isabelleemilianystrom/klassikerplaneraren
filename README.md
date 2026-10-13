@@ -46,7 +46,7 @@ väljer i formuläret.
 
 | Variant | Skidor | Cykel | Simning | Löpning |
 | --- | --- | --- | --- | --- |
-| En Svensk Klassiker | 90 km | 300 km | 3 km | 30 km |
+| En Svensk Klassiker | 90 km | 315 km | 3 km | 30 km |
 | En Svensk Klassiker – Halva | 45 km | 150 km | 1,5 km | 15 km |
 | En Svensk Klassiker – Korta | 30 km | 100 km | 1 km | 10 km |
 | En Svensk Klassiker – Tjej | 30 km | 100 km | 1 km | 10 km |
