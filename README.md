@@ -11,13 +11,14 @@ finns till exempel inte snö året runt eller överallt.
 
 ## Status
 
-Grundstommen står: projektet bygger, testerna går igenom och sidan går att köra. Två delar är
-medvetet tomma och väntar på implementation:
+Formuläret och domänmodellen är klara. Av genereringen är steg 1 byggt:
 
-- `src/generator/` — själva programgenereringen
-- `src/ics.ts` — exporten till kalenderfil
+- `src/generator/dates.ts` — datumaritmetik på ISO-strängar ✔
+- `src/generator/timeline.ts` — vilka veckor programmet omfattar ✔
+- faser, pass och säsongsanpassning — kvar
+- `src/ics.ts` — exporten till kalenderfil, kvar
 
-Kravspecen för generatorn ligger som `it.todo`-rader i `src/generator/index.test.ts`.
+Kravspecen för resten ligger som `it.todo`-rader i `src/generator/index.test.ts`.
 
 ## Kom igång
 
@@ -106,7 +107,9 @@ Tre regler håller det här begripligt:
 Genereringen går från loppdatum till färdigt program i fyra steg:
 
 1. **Tidslinjen läggs ut.** Perioden från dagens datum till det sista loppet delas i veckor, en
-   per måndag.
+   per måndag. Första veckan är den du är i nu — du börjar träna i dag, inte nästa måndag — och
+   sista veckan är den loppet ligger i, så att loppveckan själv ingår. Allt räknas i UTC, annars
+   hoppar dygnen fel vid sommartidsskiftena.
 2. **Varje vecka får en fas.** Fasen avgörs av avståndet till nästa lopp:
    `uppbyggnad` längst bort, sedan `toppning`, `nedtrappning` den sista veckan före loppet och
    `återhämtning` veckan efter. Nedtrappning och återhämtning är obligatoriska — de stryks inte
