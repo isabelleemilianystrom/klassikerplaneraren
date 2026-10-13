@@ -8,13 +8,14 @@
 import type { IsoDate, PlanInput, Program } from '../types';
 import { buildTimeline } from './timeline';
 
-export { buildTimeline, lastRaceDate, weekIndexOf } from './timeline';
+export { assignPhases, type PhasedWeek } from './phases';
+export { buildTimeline, lastRaceDate, requireFutureRaces, weekIndexOf } from './timeline';
 
 /**
  * Genererar ett komplett träningsprogram.
  *
- * TODO: inte implementerad än. Steg 1, tidslinjen, finns i `./timeline` och
- * anropas nedan — det som saknas är faser, pass och säsongsanpassning.
+ * TODO: inte implementerad än. Steg 1 (tidslinjen, `./timeline`) och steg 2
+ * (faserna, `./phases`) finns — det som saknas är pass och säsongsanpassning.
  *
  * Reglerna som ska gälla (se CLAUDE.md):
  *  - Fyra grenar, fyra loppdatum. Varje lopp får sin egen topp.
