@@ -17,6 +17,25 @@ export const DISCIPLINES: readonly Discipline[] = ['skiing', 'cycling', 'swimmin
 /** Användarens nuvarande nivå i en gren. */
 export type Level = 'beginner' | 'intermediate' | 'advanced';
 
+/**
+ * De fyra officiella varianterna av En Svensk Klassiker.
+ * 'women' = En Svensk Klassiker – Tjej. Distanserna bor i src/variants.ts.
+ */
+export type ClassicVariant = 'full' | 'half' | 'short' | 'women';
+
+/** Månad 1–12. Snöperioden återkommer varje år och hör inte till ett årtal. */
+export type Month = number;
+
+/**
+ * Månaderna då användaren har tillgång till snö, båda inklusive.
+ * Perioden får gå över nyår, alltså `startMonth` senare i året än `endMonth`
+ * (december till mars är `{ startMonth: 12, endMonth: 3 }`).
+ */
+export interface SnowSeason {
+  startMonth: Month;
+  endMonth: Month;
+}
+
 /** Fas i periodiseringen mot ett lopp. */
 export type Phase = 'base' | 'build' | 'peak' | 'taper' | 'recovery';
 
@@ -38,9 +57,13 @@ export type RaceDates = Record<Discipline, IsoDate>;
 
 /** Allt användaren matar in. */
 export interface PlanInput {
+  /** Vilken klassiker som ska genomföras. Avgör distanserna att träna mot. */
+  variant: ClassicVariant;
   races: RaceDates;
   levels: Record<Discipline, Level>;
   hoursPerWeek: number;
+  /** När skidträning kan ske på snö. Utanför perioden ersätts skidpassen. */
+  snowSeason: SnowSeason;
 }
 
 export interface Session {

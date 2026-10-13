@@ -6,6 +6,7 @@ const program: Program = {
   version: 1,
   createdAt: '2026-01-05',
   input: {
+    variant: 'full',
     races: {
       skiing: '2027-03-07',
       cycling: '2026-06-19',
@@ -19,6 +20,7 @@ const program: Program = {
       running: 'advanced',
     },
     hoursPerWeek: 6,
+    snowSeason: { startMonth: 12, endMonth: 3 },
   },
   weeks: [],
 };
