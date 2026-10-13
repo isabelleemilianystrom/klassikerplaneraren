@@ -1,0 +1,51 @@
+/**
+ * Tidslinjen: vilka veckor programmet spänner över.
+ *
+ * Steg 1 av genereringen. Här finns inga pass och ingen periodisering — bara
+ * svaret på frågan "vilka veckor ska planeras?". Rena funktioner, dagens datum
+ * skickas in.
+ */
+import { DISCIPLINES, type IsoDate, type RaceDates } from '../types';
+import { addWeeks, daysBetween, latest, requireIsoDate, startOfWeek } from './dates';
+
+/** Loppdatumen validerade och i en lista. */
+export function raceDates(races: RaceDates): IsoDate[] {
+  return DISCIPLINES.map((discipline) =>
+    requireIsoDate(races[discipline], `Loppdatumet för ${discipline}`),
+  );
+}
+
+/** Datumet för det sista loppet. */
+export function lastRaceDate(races: RaceDates): IsoDate {
+  return latest(raceDates(races));
+}
+
+/**
+ * Veckorna programmet omfattar, som måndagsdatum i ordning.
+ *
+ * Första veckan är den som innehåller `today` — man börjar träna i dag, inte
+ * nästa måndag. Sista veckan är den som innehåller det sista loppet, så att
+ * loppveckan själv ingår i programmet.
+ */
+export function buildTimeline(races: RaceDates, today: IsoDate): IsoDate[] {
+  const start = startOfWeek(requireIsoDate(today, 'Dagens datum'));
+  const lastRace = lastRaceDate(races);
+
+  if (daysBetween(today, lastRace) < 0) {
+    throw new Error(
+      `Det sista loppet (${lastRace}) har redan varit. Programmet behöver loppdatum som ligger framåt i tiden.`,
+    );
+  }
+
+  const end = startOfWeek(lastRace);
+  const weeks: IsoDate[] = [];
+  for (let monday = start; monday <= end; monday = addWeeks(monday, 1)) {
+    weeks.push(monday);
+  }
+  return weeks;
+}
+
+/** Veckan ett lopp ligger i, som index i tidslinjen. */
+export function weekIndexOf(timeline: readonly IsoDate[], date: IsoDate): number {
+  return timeline.indexOf(startOfWeek(date));
+}
