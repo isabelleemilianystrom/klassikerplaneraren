@@ -15,7 +15,8 @@ Formuläret och domänmodellen är klara. Av genereringen är steg 1 byggt:
 
 - `src/generator/dates.ts` — datumaritmetik på ISO-strängar ✔
 - `src/generator/timeline.ts` — vilka veckor programmet omfattar ✔
-- faser, pass och säsongsanpassning — kvar
+- `src/generator/phases.ts` — vilken roll varje vecka har ✔
+- pass och säsongsanpassning — kvar
 - `src/ics.ts` — exporten till kalenderfil, kvar
 
 Kravspecen för resten ligger som `it.todo`-rader i `src/generator/index.test.ts`.
@@ -136,10 +137,15 @@ Genereringen går från loppdatum till färdigt program i fyra steg:
    per måndag. Första veckan är den du är i nu — du börjar träna i dag, inte nästa måndag — och
    sista veckan är den loppet ligger i, så att loppveckan själv ingår. Allt räknas i UTC, annars
    hoppar dygnen fel vid sommartidsskiftena.
-2. **Varje vecka får en fas.** Fasen avgörs av avståndet till nästa lopp:
-   `uppbyggnad` längst bort, sedan `toppning`, `nedtrappning` den sista veckan före loppet och
-   `återhämtning` veckan efter. Nedtrappning och återhämtning är obligatoriska — de stryks inte
-   även om nästa lopp ligger nära.
+2. **Varje vecka får en fas.** Avståndet till nästa lopp avgör: `uppbyggnad` längst bort,
+   `bygge` inom åtta veckor, `toppning` de tre sista veckorna, `nedtrappning` den vecka loppet
+   går och `återhämtning` veckan efter. Var fjärde vecka läggs dessutom en lugnare vecka in mitt
+   i en uppbyggnad — kroppen blir starkare när den vilar, inte när den tränar.
+
+   Ligger två lopp så tätt att veckan efter det ena är det andras loppvecka vinner nedtrappningen,
+   för du ska prestera i helgen. Veckan flaggas då som `followsRace` så att passplaneringen kan
+   göra den extra lätt. Med bara två veckor mellan loppen hinner formen inte toppas alls, och det
+   är avsiktligt.
 3. **Veckan fylls med pass.** Fasen och användarens nivå bestämmer fördelningen mellan grenarna
    och vad passen har för syfte. Summan av veckans pass får aldrig överstiga de angivna timmarna.
 4. **Säsongen anpassar grenarna.** Skidpass utanför användarens snöperiod byts till stakmaskin
@@ -147,6 +153,17 @@ Genereringen går från loppdatum till färdigt program i fyra steg:
 
 Varje steg är en egen funktion som tar ett värde och returnerar ett nytt. Inget steg ändrar
 något som ett tidigare steg har byggt.
+
+## Träningsmodellen
+
+Programmet bygger på vedertagen uthållighetsmetodik:
+
+- **Trappan: uppbyggnad → bygge → toppning.** Tränar du likadant varje vecka stannar utvecklingen av.
+- **Polariserad intensitet:** ungefär 70–80 % lugnt och 20–30 % hårt. Lätt plus hårt slår medelmåttigt hela tiden.
+- **Tre till fyra nyckelpass i veckan:** ett kvalitetspass, ett långpass, ett till två lugna pass, plus styrka. Måste något strykas är det ett lugnt pass.
+- **Volymen ökar högst cirka 10 % per vecka**, och var fjärde vecka dras den ner.
+- **Nedtrappning sänker volymen men behåller intensiteten** — utvilad utan att tappa skärpa.
+- **Ett pass kan bytas mot en annan gren i samma intensitet.** Det är precis det som gör säsongsanpassningen möjlig: skidpasset blir stakmaskin eller rullskidor utanför snöperioden.
 
 ## Deploy
 

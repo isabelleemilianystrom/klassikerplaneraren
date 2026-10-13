@@ -89,6 +89,18 @@ Lägg nya moduler i det lager de hör till. Om något känns svårt att placera:
 - **Funktioner gör en sak** och har beskrivande namn. Hellre fler små funktioner än en stor.
 - **Inga `any`.** Typa indata och utdata explicit. Modellera grenar och faser som unionstyper, inte lösa strängar.
 
+## Träningsmodell
+
+Genereringen vilar på allmänt vedertagen uthållighetsmetodik. Principerna nedan styr hur veckor och pass byggs — ändra dem inte utan att fråga användaren.
+
+- **Trappan: uppbyggnad → bygge → toppning.** Att träna likadant vecka efter vecka ger ingen utveckling. Fasen sätter fokus för alla pass under perioden.
+- **Polariserad intensitet.** Ungefär 70–80 % av tiden lugnt (prattempo), 20–30 % hårt (tröskel och intervaller). Mittemellan hela tiden ger sämre resultat än lätt + hårt.
+- **Veckan har tre till fyra nyckelpass:** ett kvalitetspass (intervaller eller tröskel), ett långpass, ett till två lugna pass, och styrka som komplement. Måste något prioriteras bort är det de lugna passen — kvalitetspasset och långpasset är de som bygger formen.
+- **Progression med tak.** Volymen ökar högst cirka 10 % per vecka.
+- **Återhämtning är träning.** Var fjärde vecka dras volymen ner även mitt i en uppbyggnad (`DELOAD_EVERY`), och minst en till två vilodagar per vecka.
+- **Nedtrappning sänker volymen men behåller intensiteten.** Målet är att vara utvilad utan att tappa skärpa.
+- **Pass kan bytas mot annan gren i motsvarande intensitet.** Det är grunden för säsongsanpassningen: ett skidpass utanför snöperioden blir samma intensitet på stakmaskin eller rullskidor.
+
 ## Domänregler att respektera
 
 - Fyra grenar, fyra loppdatum. Varje lopp har en egen topp — programmet är inte en enda lång uppbyggnad.
