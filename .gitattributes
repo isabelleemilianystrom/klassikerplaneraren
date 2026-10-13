@@ -1,0 +1,10 @@
+# Normalisera radbrytningar: LF i repot, oavsett att Windows checkar ut CRLF.
+# Krävs för att GitHub Actions (Linux) ska se samma filer som utvecklingsmiljön.
+* text=auto eol=lf
+
+# Binärt - rör inte
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
