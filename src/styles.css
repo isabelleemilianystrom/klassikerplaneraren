@@ -1,0 +1,152 @@
+/* Vanlig CSS, inga ramverk. Färger och mått som variabler. */
+:root {
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --text: #1c1a17;
+  --muted: #5d574f;
+  --border: #e2ddd5;
+  --accent: #1f5c3d;
+  --radius: 8px;
+  --gap: 1rem;
+  --measure: 46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171614;
+    --surface: #211f1c;
+    --text: #f2efea;
+    --muted: #a8a096;
+    --border: #35322d;
+    --accent: #6cc295;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.lead {
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem 1.25rem;
+  margin: 0 0 var(--gap);
+  background: var(--surface);
+}
+
+legend {
+  padding: 0 0.5rem;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin-bottom: 0.75rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 12rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+input,
+select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.6rem;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+.weeks {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: grid;
+  gap: var(--gap);
+}
+
+.week {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.week h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.week-meta {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.week ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.message {
+  margin: 1.5rem 0 0;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.disclaimer {
+  margin: 3rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.85rem;
+}

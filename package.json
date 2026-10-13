@@ -1,0 +1,24 @@
+{
+  "name": "klassikerplaneraren",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Genererar ett personligt träningsprogram för En svensk klassiker.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test:run"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
+  }
+}
