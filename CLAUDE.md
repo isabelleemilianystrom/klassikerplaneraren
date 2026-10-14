@@ -35,7 +35,7 @@ Distanserna bor i `src/variants.ts` med källa och kontrolldatum. Att veta:
 2. Generering av program vecka för vecka, periodiserat mot varje lopp: uppbyggnad, toppning, nedtrappning inför lopp, återhämtning efter.
 3. Säsongsanpassning: skidträning ersätts med alternativ (stakmaskin, rullskidor) utanför användarens snöperiod.
 4. Tydlig vy per vecka, grupperad i block.
-5. Export till .ics för kalender.
+5. Export till .ics för kalender: ett pass per heldagshändelse, loppen som egna händelser.
 6. Programmet sparas i webbläsaren och finns kvar efter omladdning.
 7. Kort friskrivning: programmet ersätter inte medicinsk rådgivning.
 
@@ -71,7 +71,7 @@ src/
   generator/     ren genereringslogik — inga sidoeffekter, ingen DOM
                  dates, timeline, phases, blocks, schedule, sessions, season
   storage.ts     all läsning/skrivning av sparat program
-  ics.ts         programobjekt -> .ics
+  ics.ts         programobjekt -> .ics (tar emot texter, äger inget språk)
   ui/            rendering och händelsehantering
   variants.ts    de fyra varianterna och deras distanser (ren domändata)
   race-schedule.ts  kommande loppdatum som förslag (uppdateras för hand)

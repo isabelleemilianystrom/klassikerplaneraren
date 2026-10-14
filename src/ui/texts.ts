@@ -247,3 +247,11 @@ export const OPEN_WATER_HELP =
 
 export const OPEN_WATER_START_LABEL = 'Öppet vatten från och med';
 export const OPEN_WATER_END_LABEL = 'Till och med';
+
+export const EXPORT_LABEL = 'Ladda ner till kalendern (.ics)';
+
+export const EXPORT_HELP =
+  'Varje pass blir en heldagshändelse med upplägg och intensitet, och loppen läggs in som egna ' +
+  'händelser. Filen skapas i din webbläsare och skickas inte någonstans.';
+
+export const ICS_FILENAME = 'klassikerplaneraren.ics';

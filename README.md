@@ -11,7 +11,7 @@ finns till exempel inte snö året runt eller överallt.
 
 ## Status
 
-Genereringen är klar och appen fungerar från formulär till färdigt program:
+MVP:n är färdig. Appen fungerar från formulär till färdigt program och kalenderfil:
 
 - `src/generator/dates.ts` — datumaritmetik på ISO-strängar ✔
 - `src/generator/timeline.ts` — vilka veckor programmet omfattar ✔
@@ -20,7 +20,7 @@ Genereringen är klar och appen fungerar från formulär till färdigt program:
 - `src/generator/schedule.ts` — vilken veckodag varje pass hamnar på ✔
 - `src/generator/sessions.ts` — vilka pass veckan innehåller ✔
 - `src/generator/season.ts` — skidpass utanför snöperioden ✔
-- `src/ics.ts` — exporten till kalenderfil, kvar
+- `src/ics.ts` — exporten till kalenderfil ✔
 
 Hela programmet täcks av egenskapstester: veckotimmarna håller sig inom budgeten, varje lopp får
 nedtrappning och återhämtning, inga skidpass ligger på snö utanför snöperioden, och samma indata
@@ -81,7 +81,9 @@ börja med vilken gren du vill.
 2. `generateProgram()` tar den indatan och returnerar ett **program**: en lista veckor, där varje
    vecka har en fas, ett lopp den är periodiserad mot och ett antal pass.
 3. Programmet sparas i webbläsaren och ritas upp vecka för vecka.
-4. Programmet kan exporteras som `.ics` och läsas in i en kalender.
+4. Programmet kan laddas ner som `.ics` och läsas in i en kalender. Varje pass blir en
+   heldagshändelse med upplägg och intensitet i beskrivningen, och loppen läggs in som egna
+   händelser. Filen byggs i webbläsaren och skickas aldrig någonstans.
 
 Det finns ingen server och ingen databas. Allt körs i användarens webbläsare, och programmet
 lämnar aldrig datorn.
@@ -206,6 +208,21 @@ Programmet bygger på vedertagen uthållighetsmetodik:
 - **Varje pass har zon och upplägg**, inte bara "intervaller 1 h". Du ska veta vad du ska göra när du står där.
 - **Simningen flyttar ut i öppet vatten** under din säsong före simloppet, med våtdräkt och siktträning. Går det inte att få in några sådana pass säger appen till.
 - **Ett pass kan bytas mot en annan gren i samma intensitet.** Det är precis det som gör säsongsanpassningen möjlig: skidpasset blir stakmaskin eller rullskidor utanför snöperioden.
+
+## Kalenderexporten
+
+`programToIcs` tar programmet och en uppsättning etiketter och returnerar en `.ics`-fil som text.
+Tre val är värda att känna till:
+
+- **Heldagshändelser, inte klockslag.** Programmet vet vilken dag passet ligger, inte när på dagen
+  du tränar. Att hitta på "18:00" vore att låtsas veta något vi inte vet. Längden står i rubriken.
+- **Stabila UID.** Händelsens id bygger på datum och ordning, så en ny export uppdaterar
+  kalendern i stället för att lägga in allt en gång till.
+- **Ingen klocka inblandad.** Tidsstämpeln hämtas från programmets `createdAt`, vilket gör
+  exporten deterministisk: samma program ger alltid exakt samma fil, byte för byte.
+
+Modulen äger inga svenska texter — de skickas in från `src/ui/ics-labels.ts`. Det håller
+exporten testbar utan UI och gör den översättbar utan att formatkoden ändras.
 
 ## Deploy
 

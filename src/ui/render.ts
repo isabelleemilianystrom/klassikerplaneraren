@@ -17,6 +17,8 @@ import {
 } from '../types';
 import { engelbrektsloppetMatters, raceDistanceKm, VARIANTS } from '../variants';
 import { SCHEDULE_CHECKED, upcomingSuggestions } from '../race-schedule';
+import { programToIcs } from '../ics';
+import { ICS_LABELS } from './ics-labels';
 import {
   CLASSIC_WINDOW_HELP,
   DISCIPLINE_LABEL,
@@ -25,6 +27,9 @@ import {
   ENGELBREKTSLOPPET_LABEL,
   EQUIPMENT_HELP,
   EQUIPMENT_LABEL,
+  EXPORT_HELP,
+  EXPORT_LABEL,
+  ICS_FILENAME,
   GOAL_HELP,
   GOAL_LABEL,
   DAYS_PER_WEEK_LABEL,
@@ -541,7 +546,7 @@ export function renderProgram(container: HTMLElement, program: Program): void {
     return;
   }
 
-  container.append(summary(program));
+  container.append(summary(program), exportButton(program));
 
   // Veckorna grupperas i block. Fokuset står på blocket, inte på passen — det
   // ska gå att missa ett pass utan att känna att man missat loppet.
@@ -651,6 +656,38 @@ export function renderDisclaimer(container: HTMLElement): void {
 
 function formatHours(hours: number): string {
   return `${hours.toLocaleString('sv-SE')} h`;
+}
+
+/**
+ * Knappen som laddar ner programmet som kalenderfil.
+ *
+ * Filen byggs i webbläsaren och lämnar aldrig datorn — det finns ingen server
+ * att skicka den till.
+ */
+function exportButton(program: Program): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'export';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'secondary';
+  button.textContent = EXPORT_LABEL;
+  button.addEventListener('click', () => downloadIcs(program));
+
+  wrapper.append(button, help(EXPORT_HELP));
+  return wrapper;
+}
+
+function downloadIcs(program: Program): void {
+  const blob = new Blob([programToIcs(program, ICS_LABELS)], {
+    type: 'text/calendar;charset=utf-8',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = ICS_FILENAME;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 /** En rad överst i programmet: hur länge det pågår och hur mycket det är. */
