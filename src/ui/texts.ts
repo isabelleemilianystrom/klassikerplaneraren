@@ -146,13 +146,13 @@ export const WARNING_TEXT = {
     'ändå — det prioriterar nästa lopp och de grenar du är nybörjare i — men räkna med att ' +
     'behöva mer tid närmare loppen.',
   longSessionTooShort:
-    'Med dina timmar hinner l00e5ngpassen aldrig bli s00e5 l00e5nga som loppen kr00e4ver. Det 00e4r framf00f6r allt ' +
-    'de riktigt l00e5nga passen som f00f6rbereder kroppen p00e5 ett l00e5ngt lopp 2014 avs00e4tt g00e4rna en l00e5ng dag i ' +
-    'veckan n00e4rmare loppen, 00e4ven om veckan i 00f6vrigt 00e4r sig lik.',
+    'Med dina timmar hinner långpassen aldrig bli så långa som loppen kräver. Det är framför allt ' +
+    'de riktigt långa passen som förbereder kroppen på ett långt lopp — avsätt gärna en lång dag i ' +
+    'veckan närmare loppen, även om veckan i övrigt är sig lik.',
   noOpenWaterBeforeSwim:
-    'Programmet hinner inte lägga n00e5gra simpass i 00f6ppet vatten f00f6re simloppet. Att f00f6rsta g00e5ngen i ' +
-    'v00e5tdr00e4kt och kallt vatten blir p00e5 t00e4vlingsdagen 00e4r den vanligaste orsaken till att folk bryter. ' +
-    'F00f6rs00f6k f00e5 in minst tv00e5 simpass utomhus innan loppet.',
+    'Programmet hinner inte lägga några simpass i öppet vatten före simloppet. Att första gången i ' +
+    'våtdräkt och kallt vatten blir på tävlingsdagen är den vanligaste orsaken till att folk bryter. ' +
+    'Försök få in minst två simpass utomhus innan loppet.',
   noSkiSubstitute:
     'Du har varken stakmaskin eller rullskidor, så skidpassen utanför snöperioden blir stavgång ' +
     'och överkroppsstyrka. Får du tillgång till något av dem blir skidträningen klart bättre.',
