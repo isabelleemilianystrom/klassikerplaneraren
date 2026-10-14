@@ -4,30 +4,88 @@
  * Inga sidoeffekter här — ingen localStorage, ingen DOM, inget nätverk och
  * inget `new Date()`. Dagens datum skickas in som argument (`today`) så att
  * genereringen är deterministisk och testbar.
+ *
+ * Genereringen går i fyra steg:
+ *  1. `timeline` — vilka veckor programmet omfattar
+ *  2. `phases`   — vilken roll varje vecka har
+ *  3. `sessions` — vilka pass veckan innehåller
+ *  4. `season`   — skidpass byter form utanför snöperioden (inuti steg 3)
  */
-import type { IsoDate, PlanInput, Program } from '../types';
+import type { ClassicVariant, IsoDate, PlanInput, Program, ProgramWarning, Week } from '../types';
+import { startOfWeek } from './dates';
+import { assignPhases } from './phases';
+import { lacksSkiSubstitute } from './season';
+import { buildSessions } from './sessions';
 import { buildTimeline } from './timeline';
 
 export { assignPhases, type PhasedWeek } from './phases';
-export { buildTimeline, lastRaceDate, requireFutureRaces, weekIndexOf } from './timeline';
+export { isSnowMonth, isSnowWeek, skiSubstitute } from './season';
+export { activeDisciplines, buildSessions, weeklyHours } from './sessions';
+export {
+  buildTimeline,
+  lastRaceDate,
+  requireClassicWindow,
+  requireFutureRaces,
+  weekIndexOf,
+} from './timeline';
 
 /**
- * Genererar ett komplett träningsprogram.
+ * Timmar i veckan som behövs för ett program med både långpass, kvalitetspass
+ * och underhåll. Under det blir programmet tunt, och användaren ska få veta det
+ * i stället för att undra varför.
  *
- * TODO: inte implementerad än. Steg 1 (tidslinjen, `./timeline`) och steg 2
- * (faserna, `./phases`) finns — det som saknas är pass och säsongsanpassning.
- *
- * Reglerna som ska gälla (se CLAUDE.md):
- *  - Fyra grenar, fyra loppdatum. Varje lopp får sin egen topp.
- *  - Nedtrappning före varje lopp och återhämtning efter varje lopp är
- *    obligatoriska, även när nästa lopp ligger nära.
- *  - Veckovolymen överstiger aldrig input.hoursPerWeek.
- *  - Skidpass utanför vintersäsong ersätts med stakmaskin eller rullskidor,
- *    de tas aldrig bort.
- *  - Varje pass har gren, omfattning och ett syfte.
+ * Tröskeln följer varianten: 315 km på cykel kräver mer tid i sadeln än 100 km.
  */
+export const COMFORTABLE_HOURS_PER_WEEK: Record<ClassicVariant, number> = {
+  full: 7,
+  half: 5,
+  short: 4,
+  women: 4,
+};
+
+/** Genererar ett komplett träningsprogram. */
 export function generateProgram(input: PlanInput, today: IsoDate): Program {
-  // Validerar indatum och ger veckorna som ska fyllas. Kastar vid ogiltiga datum.
-  buildTimeline(input.races, today);
-  throw new Error('Genereringen är inte implementerad än.');
+  const timeline = buildTimeline(input.races, today);
+  const phased = assignPhases(timeline, input.races);
+
+  const weeks: Week[] = phased.map((week) => {
+    const sessions = buildSessions(week, input);
+    // Loppet självt hör till veckan, inte till passen: det är inte träning.
+    const raceThisWeek = input.races[week.targetRace];
+    const racing = startOfWeek(raceThisWeek) === week.startDate;
+    return {
+      startDate: week.startDate,
+      phase: week.phase,
+      targetRace: week.targetRace,
+      followsRace: week.followsRace,
+      ...(racing ? { raceDate: raceThisWeek } : {}),
+      totalHours: sessions.reduce((sum, session) => sum + session.hours, 0),
+      sessions,
+    };
+  });
+
+  return {
+    version: 1,
+    createdAt: today,
+    input,
+    weeks,
+    warnings: collectWarnings(input, weeks),
+  };
+}
+
+function collectWarnings(input: PlanInput, weeks: readonly Week[]): ProgramWarning[] {
+  const warnings: ProgramWarning[] = [];
+
+  if (input.hoursPerWeek < COMFORTABLE_HOURS_PER_WEEK[input.variant]) {
+    warnings.push('tightBudget');
+  }
+
+  const hasSubstitutedSkiing = weeks.some((week) =>
+    week.sessions.some((session) => session.substitute === 'polesAndStrength'),
+  );
+  if (hasSubstitutedSkiing && lacksSkiSubstitute(input.equipment)) {
+    warnings.push('noSkiSubstitute');
+  }
+
+  return warnings;
 }

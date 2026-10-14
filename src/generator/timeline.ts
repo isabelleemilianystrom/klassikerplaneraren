@@ -6,7 +6,7 @@
  * skickas in.
  */
 import { DISCIPLINES, type IsoDate, type RaceDates } from '../types';
-import { addWeeks, daysBetween, latest, requireIsoDate, startOfWeek } from './dates';
+import { addWeeks, daysBetween, earliest, latest, requireIsoDate, startOfWeek } from './dates';
 
 /** Loppdatumen validerade och i en lista. */
 export function raceDates(races: RaceDates): IsoDate[] {
@@ -38,6 +38,7 @@ export const RECOVERY_WEEKS_AFTER_LAST_RACE = 1;
 export function buildTimeline(races: RaceDates, today: IsoDate): IsoDate[] {
   const start = startOfWeek(requireIsoDate(today, 'Dagens datum'));
   requireFutureRaces(races, today);
+  requireClassicWindow(races);
 
   const end = addWeeks(startOfWeek(lastRaceDate(races)), RECOVERY_WEEKS_AFTER_LAST_RACE);
   const weeks: IsoDate[] = [];
@@ -62,6 +63,34 @@ export function requireFutureRaces(races: RaceDates, today: IsoDate): void {
         'Kontrollera att du angett rätt årtal.',
     );
   }
+}
+
+/**
+ * Kastar om loppen inte ryms inom en tolvmånadersperiod.
+ *
+ * Det är kravet för att det ska räknas som en klassiker. Fyra datum som spänner
+ * över fjorton månader ger ett program som inte leder till någon medalj, och det
+ * är nästan alltid fel årtal på ett av loppen.
+ */
+export function requireClassicWindow(races: RaceDates): void {
+  const dates = raceDates(races);
+  const first = earliest(dates);
+  const last = latest(dates);
+  const deadline = addYear(first);
+
+  if (last > deadline) {
+    throw new Error(
+      `Loppen måste rymmas inom tolv månader för att räknas som en klassiker. ` +
+        `Här är det ${first} till ${last}. Kontrollera årtalen.`,
+    );
+  }
+}
+
+/** Samma datum ett år senare. Skottdagen blir 28 februari. */
+function addYear(date: IsoDate): IsoDate {
+  const year = Number(date.slice(0, 4)) + 1;
+  const monthDay = date.slice(5);
+  return monthDay === '02-29' ? `${year}-02-28` : `${year}-${monthDay}`;
 }
 
 /** Veckan ett lopp ligger i, som index i tidslinjen. */

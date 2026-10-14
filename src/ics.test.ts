@@ -22,8 +22,10 @@ const program: Program = {
     },
     hoursPerWeek: 6,
     snowSeason: { startMonth: 12, endMonth: 3 },
+    equipment: { skiErgometer: true, rollerSkis: false, indoorTrainer: true },
   },
   weeks: [],
+  warnings: [],
 };
 
 describe('programToIcs', () => {
