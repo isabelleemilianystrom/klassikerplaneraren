@@ -16,6 +16,8 @@ Genereringen är klar och appen fungerar från formulär till färdigt program:
 - `src/generator/dates.ts` — datumaritmetik på ISO-strängar ✔
 - `src/generator/timeline.ts` — vilka veckor programmet omfattar ✔
 - `src/generator/phases.ts` — vilken roll varje vecka har ✔
+- `src/generator/blocks.ts` — hur programmet delas i block ✔
+- `src/generator/schedule.ts` — vilken veckodag varje pass hamnar på ✔
 - `src/generator/sessions.ts` — vilka pass veckan innehåller ✔
 - `src/generator/season.ts` — skidpass utanför snöperioden ✔
 - `src/ics.ts` — exporten till kalenderfil, kvar
@@ -73,8 +75,9 @@ börja med vilken gren du vill.
 
 ## Så fungerar appen
 
-1. Användaren väljer vilken klassiker hon gör, fyller i fyra loppdatum, sin nuvarande nivå per
-   gren, hur många timmar i veckan hon kan träna och när hon har tillgång till snö.
+1. Användaren väljer vilken klassiker hon gör, fyller i fyra loppdatum, sin nivå och sitt mål per
+   gren, hur många timmar och dagar i veckan hon kan träna, vilken dag långpasset ska ligga på,
+   vilka dagar som inte fungerar, när hon har tillgång till snö och vad hon har för utrustning.
 2. `generateProgram()` tar den indatan och returnerar ett **program**: en lista veckor, där varje
    vecka har en fas, ett lopp den är periodiserad mot och ett antal pass.
 3. Programmet sparas i webbläsaren och ritas upp vecka för vecka.
@@ -160,6 +163,33 @@ Genereringen går från loppdatum till färdigt program i fyra steg:
 
 Varje steg är en egen funktion som tar ett värde och returnerar ett nytt. Inget steg ändrar
 något som ett tidigare steg har byggt.
+
+## Så läses programmet
+
+Programmet är indelat i **block**. Ett block siktar mot ett lopp — eller mot två när de ligger
+närmare varandra än fem veckor, som Vätternrundan och Vansbrosimningen. Fokuset står på blocket:
+
+```
+Block 1 — fokus Skidloppet          21 veckor · 2026-10-12 till 2027-03-01
+Block 2 — fokus Cykelloppet och Simloppet   18 veckor
+Block 3 — fokus Löparloppet         12 veckor
+```
+
+Det enskilda passet säger däremot ingenting om vilket lopp det tränar mot. Det står bara om det är
+**kondition** eller **styrka**, vilken dag det ligger, hur långt det är och vad det går ut på:
+
+```
+Vecka 1 — Uppbyggnad                 Start 2026-10-12 · 6 h
+  KONDITION  tisdag · Längdskidor (stakmaskin) · 1,5 h · Uthållighet   Nyckelpass
+  KONDITION  torsdag · Simning · 1,5 h · Teknik                        Stödpass
+  KONDITION  lördag · Längdskidor (stakmaskin) · 3 h · Långpass        Nyckelpass
+```
+
+Det är medvetet. Står det "intervaller mot Vasaloppet" på varje rad känns ett missat pass som ett
+missat lopp — och du kommer att missa pass, för man blir sjuk och livet kommer emellan.
+
+**Nyckelpass och stödpass** säger vad du ska prioritera när veckan inte räcker till: behåll
+långpasset och kvalitetspasset, stryk resten. En vilodag är bättre än ett illa genomfört pass.
 
 ## Träningsmodellen
 

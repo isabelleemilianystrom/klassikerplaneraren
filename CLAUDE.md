@@ -31,10 +31,10 @@ Distanserna bor i `src/variants.ts` med källa och kontrolldatum. Att veta:
 
 ## MVP — detta och inget mer
 
-1. Formulär: variant, fyra loppdatum, nuvarande nivå per gren, tillgängliga timmar per vecka, användarens snöperiod.
+1. Formulär: variant, fyra loppdatum, nuvarande nivå och mål per gren, tillgängliga timmar och dagar per vecka, dag för långpass, dagar som inte fungerar, snöperiod och utrustning.
 2. Generering av program vecka för vecka, periodiserat mot varje lopp: uppbyggnad, toppning, nedtrappning inför lopp, återhämtning efter.
 3. Säsongsanpassning: skidträning ersätts med alternativ (stakmaskin, rullskidor) utanför användarens snöperiod.
-4. Tydlig vy per vecka.
+4. Tydlig vy per vecka, grupperad i block.
 5. Export till .ics för kalender.
 6. Programmet sparas i webbläsaren och finns kvar efter omladdning.
 7. Kort friskrivning: programmet ersätter inte medicinsk rådgivning.
@@ -69,7 +69,7 @@ npx tsc --noEmit   # typkontroll
 ```
 src/
   generator/     ren genereringslogik — inga sidoeffekter, ingen DOM
-                 dates, timeline, phases, sessions, season
+                 dates, timeline, phases, blocks, schedule, sessions, season
   storage.ts     all läsning/skrivning av sparat program
   ics.ts         programobjekt -> .ics
   ui/            rendering och händelsehantering
@@ -102,9 +102,19 @@ Genereringen vilar på allmänt vedertagen uthållighetsmetodik. Principerna ned
 - **Nedtrappning sänker volymen men behåller intensiteten.** Målet är att vara utvilad utan att tappa skärpa.
 - **Pass kan bytas mot annan gren i motsvarande intensitet.** Det är grunden för säsongsanpassningen: ett skidpass utanför snöperioden blir samma intensitet på stakmaskin eller rullskidor.
 
+## Så presenteras programmet
+
+Hur programmet skrivs ut är en del av produkten, inte bara formgivning. Tre regler:
+
+- **Fokuset sitter på blocket, aldrig på passet.** Blocket säger "fokus Skidloppet"; passet säger bara kondition eller styrka, längd och syfte. Skriver vi "intervaller mot Vasaloppet" på varje pass känns ett missat pass som ett missat lopp. Folk blir sjuka och livet kommer emellan.
+- **Varje pass märks som nyckelpass eller stödpass.** Räcker inte veckan till ska det vara uppenbart vad som ska strykas: långpasset och kvalitetspasset står kvar, resten får gå. Det står utskrivet en gång per vecka.
+- **Passen har en veckodag.** Användaren anger hur många dagar hon kan träna, vilken dag långpasset ska ligga på och vilka dagar som är omöjliga. Programmet respekterar det.
+
 ## Domänregler att respektera
 
 - Fyra grenar, fyra loppdatum. Varje lopp har en egen topp — programmet är inte en enda lång uppbyggnad.
+- **Målet per lopp styr intensiteten.** Den som vill ta sig runt får mer volym och vana, den som har ett tidsmål mer fartträning. Andelen kvalitet hålls inom 20–35 % av tiden mot nästa lopp.
+- **Programmet delas i block.** Ett block siktar mot ett lopp, eller mot två när de ligger närmare än fem veckor — då går det inte att bygga form mot dem var för sig.
 - **Varianten styr distanserna.** Programmet tränar mot distansen i användarens variant, aldrig mot en hårdkodad distans.
 - **Loppdatum föreslås, hämtas inte.** `race-schedule.ts` innehåller kommande loppdatum som användaren kan fylla i med en knapp. Datumen ligger i koden: appen har ingen backend, och webbläsaren får inte läsa arrangörernas sidor (CORS). Listan måste uppdateras för hand varje år, och `SCHEDULE_CHECKED` ska sättas om samtidigt. **Lägg aldrig in ett datum du inte kunnat belägga** — saknas det lämnas fältet tomt, och UI:t säger att användaren får fylla i själv.
 - **Loppdatum ligger framåt i tiden.** Ett lopp som redan varit går inte att träna mot, och ett passerat datum är nästan alltid fel årtal. Formuläret spärrar det med `min`, generatorn kontrollerar samma sak som skyddsnät. Loppet samma dag som i dag räknas som framåt.
