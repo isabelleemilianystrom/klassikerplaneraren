@@ -13,12 +13,15 @@
  */
 import type { ClassicVariant, IsoDate, PlanInput, Program, ProgramWarning, Week } from '../types';
 import { startOfWeek } from './dates';
+import { buildBlocks } from './blocks';
 import { assignPhases } from './phases';
 import { lacksSkiSubstitute } from './season';
 import { buildSessions } from './sessions';
 import { buildTimeline } from './timeline';
 
+export { buildBlocks, groupRacesIntoBlocks } from './blocks';
 export { assignPhases, type PhasedWeek } from './phases';
+export { availableDays, preferredLongDay, trainingDaysOfWeek } from './schedule';
 export { isSnowMonth, isSnowWeek, skiSubstitute } from './season';
 export { activeDisciplines, buildSessions, weeklyHours } from './sessions';
 export {
@@ -47,8 +50,9 @@ export const COMFORTABLE_HOURS_PER_WEEK: Record<ClassicVariant, number> = {
 export function generateProgram(input: PlanInput, today: IsoDate): Program {
   const timeline = buildTimeline(input.races, today);
   const phased = assignPhases(timeline, input.races);
+  const { blocks, blockOfWeek } = buildBlocks(timeline, input.races);
 
-  const weeks: Week[] = phased.map((week) => {
+  const weeks: Week[] = phased.map((week, index) => {
     const sessions = buildSessions(week, input);
     // Loppet självt hör till veckan, inte till passen: det är inte träning.
     const raceThisWeek = input.races[week.targetRace];
@@ -58,6 +62,7 @@ export function generateProgram(input: PlanInput, today: IsoDate): Program {
       phase: week.phase,
       targetRace: week.targetRace,
       followsRace: week.followsRace,
+      block: blockOfWeek[index] ?? 0,
       ...(racing ? { raceDate: raceThisWeek } : {}),
       totalHours: sessions.reduce((sum, session) => sum + session.hours, 0),
       sessions,
@@ -68,6 +73,7 @@ export function generateProgram(input: PlanInput, today: IsoDate): Program {
     version: 1,
     createdAt: today,
     input,
+    blocks,
     weeks,
     warnings: collectWarnings(input, weeks),
   };

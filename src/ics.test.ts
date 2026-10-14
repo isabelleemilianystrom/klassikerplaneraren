@@ -23,7 +23,10 @@ const program: Program = {
     hoursPerWeek: 6,
     snowSeason: { startMonth: 12, endMonth: 3 },
     equipment: { skiErgometer: true, rollerSkis: false, indoorTrainer: true },
+    goals: { skiing: 'finish', cycling: 'improve', swimming: 'finish', running: 'time' },
+    trainingDays: { daysPerWeek: 4, longSessionDay: 7, unavailableDays: [] },
   },
+  blocks: [],
   weeks: [],
   warnings: [],
 };

@@ -25,6 +25,8 @@ const baseInput: PlanInput = {
   hoursPerWeek: 8,
   snowSeason: { startMonth: 12, endMonth: 3 },
   equipment: { skiErgometer: true, rollerSkis: false, indoorTrainer: true },
+  goals: { skiing: 'finish', cycling: 'improve', swimming: 'finish', running: 'time' },
+  trainingDays: { daysPerWeek: 4, longSessionDay: 7, unavailableDays: [] },
 };
 
 function program(overrides: Partial<PlanInput> = {}): Program {
@@ -199,3 +201,99 @@ function substitutes(result: Program): string[] {
   }
   return [...found];
 }
+
+describe('mål, dagar och prioritering', () => {
+  it('lägger långpasset på den önskade dagen', () => {
+    const result = program({
+      trainingDays: { daysPerWeek: 4, longSessionDay: 6, unavailableDays: [] },
+    });
+    for (const week of result.weeks) {
+      const long = week.sessions.find((session) => session.purpose === 'longSession');
+      if (long !== undefined) expect(long.day).toBe(6);
+    }
+  });
+
+  it('lägger aldrig ett pass på en dag användaren inte kan träna', () => {
+    const result = program({
+      trainingDays: { daysPerWeek: 4, longSessionDay: 7, unavailableDays: [1, 2, 3] },
+    });
+    for (const week of result.weeks) {
+      for (const session of week.sessions) {
+        expect([1, 2, 3]).not.toContain(session.day);
+      }
+    }
+  });
+
+  it('håller sig inom antalet träningsdagar per vecka', () => {
+    for (const daysPerWeek of [2, 3, 5]) {
+      const result = program({
+        trainingDays: { daysPerWeek, longSessionDay: 7, unavailableDays: [] },
+      });
+      for (const week of result.weeks) {
+        const days = new Set(week.sessions.map((session) => session.day));
+        expect(days.size).toBeLessThanOrEqual(daysPerWeek);
+      }
+    }
+  });
+
+  it('lägger högst ett pass per dag', () => {
+    for (const week of program().weeks) {
+      const days = week.sessions.map((session) => session.day);
+      expect(new Set(days).size).toBe(days.length);
+    }
+  });
+
+  it('märker varje pass som kondition eller styrka', () => {
+    for (const week of program().weeks) {
+      for (const session of week.sessions) {
+        expect(['endurance', 'strength']).toContain(session.kind);
+      }
+    }
+  });
+
+  it('gör långpasset och kvalitetspasset till nyckelpass', () => {
+    const week = program().weeks[0];
+    const keys = week?.sessions.filter((session) => session.priority === 'key') ?? [];
+    expect(keys.length).toBeGreaterThan(0);
+    expect(keys.length).toBeLessThanOrEqual(2);
+  });
+
+  it('gör styrka och underhåll till stödpass', () => {
+    for (const week of program().weeks) {
+      for (const session of week.sessions) {
+        if (session.kind === 'strength') expect(session.priority).toBe('supporting');
+      }
+    }
+  });
+
+  it('ger mer kvalitetstid åt den som har ett tidsmål', () => {
+    const goalFinish = { ...baseInput.goals, skiing: 'finish' } as const;
+    const goalTime = { ...baseInput.goals, skiing: 'time' } as const;
+    const quality = (result: Program): number =>
+      result.weeks
+        .filter((week) => week.targetRace === 'skiing')
+        .flatMap((week) => week.sessions)
+        .filter((session) => session.purpose === 'intervals')
+        .reduce((sum, session) => sum + session.hours, 0);
+
+    expect(quality(program({ goals: goalTime }))).toBeGreaterThan(
+      quality(program({ goals: goalFinish })),
+    );
+  });
+
+  it('delar in programmet i block med fokus på ett eller två lopp', () => {
+    const result = program();
+    expect(result.blocks.length).toBeGreaterThan(0);
+    for (const block of result.blocks) {
+      expect(block.focus.length).toBeGreaterThanOrEqual(1);
+      expect(block.focus.length).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('placerar varje vecka i ett block som finns', () => {
+    const result = program();
+    for (const week of result.weeks) {
+      expect(result.blocks[week.block]).toBeDefined();
+    }
+  });
+});
