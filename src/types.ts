@@ -23,6 +23,40 @@ export type Level = 'beginner' | 'intermediate' | 'advanced';
  */
 export type ClassicVariant = 'full' | 'half' | 'short' | 'women';
 
+/** Veckodag enligt ISO: 1 = måndag, 7 = söndag. */
+export type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+export const WEEKDAYS: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 7];
+
+/**
+ * Vad användaren vill med ett lopp. Styr hur stor del av träningen som är hård.
+ * Den som vill ta sig runt behöver volym och vana; den som har ett tidsmål
+ * behöver mer kvalitet.
+ */
+export type Goal = 'finish' | 'improve' | 'time';
+
+/** Pass delas i kondition och styrka — inte i vilket lopp de tränar mot. */
+export type SessionKind = 'endurance' | 'strength';
+
+/**
+ * Hur viktigt passet är den vecka det ligger.
+ *
+ * `key` är veckans bärande pass: långpasset och kvalitetspasset. `supporting`
+ * är de som får stryka på foten när livet kommer emellan. Att skriva ut det
+ * gör det lättare att missa ett pass utan dåligt samvete.
+ */
+export type SessionPriority = 'key' | 'supporting';
+
+/** När och hur ofta användaren kan träna. */
+export interface TrainingDays {
+  /** Antal dagar i veckan användaren kan träna. */
+  daysPerWeek: number;
+  /** Dagen användaren helst lägger långpasset på. */
+  longSessionDay: Weekday;
+  /** Dagar som aldrig får användas. */
+  unavailableDays: Weekday[];
+}
+
 /** Månad 1–12. Snöperioden återkommer varje år och hör inte till ett årtal. */
 export type Month = number;
 
@@ -88,14 +122,37 @@ export interface PlanInput {
   snowSeason: SnowSeason;
   /** Vad användaren kommer åt. Styr vilken form ersättningspassen tar. */
   equipment: Equipment;
+  /** Vad användaren vill med varje lopp. */
+  goals: Record<Discipline, Goal>;
+  /** När användaren kan träna. */
+  trainingDays: TrainingDays;
 }
 
 export interface Session {
   discipline: Discipline;
   /** Satt när passet ersätter grenen utanför dess säsong. */
   substitute?: Substitute;
+  kind: SessionKind;
+  priority: SessionPriority;
+  /** Veckodagen passet ligger på. */
+  day: Weekday;
   hours: number;
   purpose: SessionPurpose;
+}
+
+/**
+ * Ett block är den sammanhängande perioden fram till ett eller två lopp.
+ *
+ * Blocket bär fokuset, inte det enskilda passet. Ligger två lopp nära varandra
+ * — som Vätternrundan och Vansbrosimningen — delar de block.
+ */
+export interface Block {
+  /** Loppen blocket siktar mot, i datumordning. */
+  focus: Discipline[];
+  /** Måndagen i blockets första vecka. */
+  startDate: IsoDate;
+  /** Måndagen i blockets sista vecka. */
+  endDate: IsoDate;
 }
 
 export interface Week {
@@ -106,6 +163,8 @@ export interface Week {
   targetRace: Discipline;
   /** Veckan ligger direkt efter ett lopp och ska vara lättare än fasen kräver. */
   followsRace: boolean;
+  /** Index i programmets blocklista. */
+  block: number;
   /** Satt när ett lopp går den här veckan. Loppet är veckans huvudhändelse. */
   raceDate?: IsoDate;
   totalHours: number;
@@ -117,6 +176,7 @@ export interface Program {
   version: 1;
   createdAt: IsoDate;
   input: PlanInput;
+  blocks: Block[];
   weeks: Week[];
   /** Sådant användaren bör känna till om sitt program. Nycklar, inte text. */
   warnings: ProgramWarning[];
