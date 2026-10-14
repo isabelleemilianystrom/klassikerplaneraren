@@ -49,8 +49,25 @@ export type SessionPurpose =
   | 'strength'
   | 'rest';
 
-/** Ersättningsform när grenen inte går att utöva i säsong. */
-export type Substitute = 'skiErgometer' | 'rollerSkis';
+/**
+ * Ersättningsform när grenen inte går att utöva i säsong.
+ * `polesAndStrength` är fallbacken för den som varken har stakmaskin eller
+ * rullskidor: stavgång i backe plus överkroppsstyrka.
+ */
+export type Substitute = 'skiErgometer' | 'rollerSkis' | 'polesAndStrength' | 'indoorTrainer';
+
+/**
+ * Utrustning användaren kommer åt. Styr vilken form skidträningen tar utanför
+ * snöperioden, och om cykelträning kan ske inomhus på vintern.
+ */
+export interface Equipment {
+  skiErgometer: boolean;
+  rollerSkis: boolean;
+  indoorTrainer: boolean;
+}
+
+/** Sådant programmet vill varna för, som UI översätter till svensk text. */
+export type ProgramWarning = 'tightBudget' | 'noSkiSubstitute';
 
 /** Ett loppdatum per gren. */
 export type RaceDates = Record<Discipline, IsoDate>;
@@ -69,6 +86,8 @@ export interface PlanInput {
   hoursPerWeek: number;
   /** När skidträning kan ske på snö. Utanför perioden ersätts skidpassen. */
   snowSeason: SnowSeason;
+  /** Vad användaren kommer åt. Styr vilken form ersättningspassen tar. */
+  equipment: Equipment;
 }
 
 export interface Session {
@@ -85,6 +104,10 @@ export interface Week {
   phase: Phase;
   /** Loppet veckan är periodiserad mot. */
   targetRace: Discipline;
+  /** Veckan ligger direkt efter ett lopp och ska vara lättare än fasen kräver. */
+  followsRace: boolean;
+  /** Satt när ett lopp går den här veckan. Loppet är veckans huvudhändelse. */
+  raceDate?: IsoDate;
   totalHours: number;
   sessions: Session[];
 }
@@ -95,4 +118,6 @@ export interface Program {
   createdAt: IsoDate;
   input: PlanInput;
   weeks: Week[];
+  /** Sådant användaren bör känna till om sitt program. Nycklar, inte text. */
+  warnings: ProgramWarning[];
 }
