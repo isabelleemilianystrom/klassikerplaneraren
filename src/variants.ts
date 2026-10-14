@@ -82,3 +82,43 @@ export function raceDistanceKm(
 export function engelbrektsloppetMatters(variant: ClassicVariant): boolean {
   return variant === 'full';
 }
+
+/**
+ * Ungefärlig tid en motionär är ute i loppet, timmar per kilometer.
+ *
+ * Siffrorna är grova men storleksordningen är det som spelar roll: loppet är
+ * veckans största belastning och måste räknas som träning, annars planerar
+ * programmet in pass ovanpå nio mil skidor.
+ *
+ * Kalibrerat mot vanliga måltider för en motionär: Vasaloppet 90 km ≈ 7 h,
+ * Vätternrundan 315 km ≈ 11 h, Vansbrosimningen 3 km ≈ 1 h,
+ * Lidingöloppet 30 km ≈ 3,5 h.
+ */
+const HOURS_PER_KM: Record<Discipline, number> = {
+  skiing: 0.078,
+  cycling: 0.035,
+  swimming: 0.33,
+  running: 0.117,
+};
+
+/** Lopp som tar så här lång tid kräver två veckors återhämtning, inte en. */
+export const LONG_RACE_HOURS = 5;
+
+/** Uppskattad tid i loppet, avrundad till halvtimmar. */
+export function estimatedRaceHours(
+  variant: ClassicVariant,
+  discipline: Discipline,
+  engelbrektsloppet = false,
+): number {
+  const km = raceDistanceKm(variant, discipline, engelbrektsloppet);
+  return Math.round(km * HOURS_PER_KM[discipline] * 2) / 2;
+}
+
+/** Antal återhämtningsveckor loppet kräver efteråt. */
+export function recoveryWeeksAfter(
+  variant: ClassicVariant,
+  discipline: Discipline,
+  engelbrektsloppet = false,
+): number {
+  return estimatedRaceHours(variant, discipline, engelbrektsloppet) >= LONG_RACE_HOURS ? 2 : 1;
+}

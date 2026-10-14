@@ -101,7 +101,7 @@ export interface Equipment {
 }
 
 /** Sådant programmet vill varna för, som UI översätter till svensk text. */
-export type ProgramWarning = 'tightBudget' | 'noSkiSubstitute';
+export type ProgramWarning = 'tightBudget' | 'noSkiSubstitute' | 'longSessionTooShort';
 
 /** Ett loppdatum per gren. */
 export type RaceDates = Record<Discipline, IsoDate>;

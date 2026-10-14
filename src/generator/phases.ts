@@ -27,6 +27,14 @@ export const BUILD_WEEKS = 8;
 /** Så ofta en lugnare vecka läggs in i en lång uppbyggnad. */
 export const DELOAD_EVERY = 4;
 
+/** En vecka efter varje lopp, om anroparen inte säger annat. */
+const DEFAULT_RECOVERY_WEEKS: Record<Discipline, number> = {
+  skiing: 1,
+  cycling: 1,
+  swimming: 1,
+  running: 1,
+};
+
 /** En vecka med sin roll och sitt mål, innan passen fylls i. */
 export interface PhasedWeek {
   startDate: IsoDate;
@@ -43,6 +51,13 @@ export interface PhasedWeek {
    * återhämtningen inte tappas bort bara för att fasen heter något annat.
    */
   followsRace: boolean;
+  /**
+   * Veckor kvar till nästa lopp. 0 betyder att loppet går den här veckan, och
+   * Infinity att inget lopp återstår. Styr både stegring och långpassets längd.
+   */
+  weeksUntilRace: number;
+  /** Satt när ett lopp går den här veckan. */
+  raceDate?: IsoDate;
 }
 
 /** Loppen sorterade i datumordning. */
@@ -62,6 +77,11 @@ function racesInOrder(races: RaceDates): { discipline: Discipline; date: IsoDate
 export function assignPhases(
   timeline: readonly IsoDate[],
   races: RaceDates,
+  /**
+   * Antal återhämtningsveckor varje lopp kräver efter sig. Nio mil skidor
+   * kräver två veckor, en kilometer simning klarar sig med en.
+   */
+  recoveryWeeks: Record<Discipline, number> = DEFAULT_RECOVERY_WEEKS,
 ): PhasedWeek[] {
   const ordered = racesInOrder(races);
   const raceWeeks = new Map<IsoDate, Discipline>();
@@ -75,34 +95,70 @@ export function assignPhases(
 
   return timeline.map((startDate, index) => {
     const target = targetRaceFor(ordered, startDate);
-    const previous = timeline[index - 1];
-    const followsRace = previous !== undefined && raceWeeks.has(previous);
+    // Hur många veckor sedan ett lopp gick, och hur länge det loppet kräver vila.
+    let weeksSinceRace = 0;
+    let recoveryNeeded = 0;
+    for (let back = 1; back <= index; back += 1) {
+      const earlier = timeline[index - back];
+      const raced = earlier === undefined ? undefined : raceWeeks.get(earlier);
+      if (raced !== undefined) {
+        weeksSinceRace = back;
+        recoveryNeeded = recoveryWeeks[raced];
+        break;
+      }
+    }
+    const followsRace = weeksSinceRace > 0 && weeksSinceRace <= recoveryNeeded;
     const racingThisWeek = raceWeeks.get(startDate);
+    const weeksLeft = weeksUntilRace(timeline, startDate, ordered);
 
     // Loppveckan vinner alltid. Ligger den direkt efter ett annat lopp bär
     // followsRace informationen om att veckan också är återhämtning.
     if (racingThisWeek !== undefined) {
       sinceDeload = 0;
-      return { startDate, phase: 'taper', targetRace: racingThisWeek, followsRace };
+      return {
+        startDate,
+        phase: 'taper',
+        targetRace: racingThisWeek,
+        followsRace,
+        weeksUntilRace: 0,
+        raceDate: races[racingThisWeek],
+      };
     }
 
     if (followsRace) {
       sinceDeload = 0;
-      return { startDate, phase: 'recovery', targetRace: target, followsRace };
+      return {
+        startDate,
+        phase: 'recovery',
+        targetRace: target,
+        followsRace,
+        weeksUntilRace: weeksLeft,
+      };
     }
 
-    const weeksLeft = weeksUntilRace(timeline, startDate, ordered);
     sinceDeload += 1;
 
     // Toppningen får inte brytas av en nedtrappningsvecka — den är redan lugnare
     // i volym, och veckorna närmast loppet ska vara skarpa.
     if (weeksLeft <= PEAK_WEEKS) {
-      return { startDate, phase: 'peak', targetRace: target, followsRace };
+      return {
+        startDate,
+        phase: 'peak',
+        targetRace: target,
+        followsRace,
+        weeksUntilRace: weeksLeft,
+      };
     }
 
     if (sinceDeload >= DELOAD_EVERY) {
       sinceDeload = 0;
-      return { startDate, phase: 'recovery', targetRace: target, followsRace };
+      return {
+        startDate,
+        phase: 'recovery',
+        targetRace: target,
+        followsRace,
+        weeksUntilRace: weeksLeft,
+      };
     }
 
     return {
@@ -110,6 +166,7 @@ export function assignPhases(
       phase: weeksLeft <= BUILD_WEEKS ? 'build' : 'base',
       targetRace: target,
       followsRace,
+      weeksUntilRace: weeksLeft,
     };
   });
 }

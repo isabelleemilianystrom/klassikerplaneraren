@@ -97,7 +97,11 @@ Genereringen vilar på allmänt vedertagen uthållighetsmetodik. Principerna ned
 - **Trappan: uppbyggnad → bygge → toppning.** Att träna likadant vecka efter vecka ger ingen utveckling. Fasen sätter fokus för alla pass under perioden.
 - **Polariserad intensitet.** Ungefär 70–80 % av tiden lugnt (prattempo), 20–30 % hårt (tröskel och intervaller). Mittemellan hela tiden ger sämre resultat än lätt + hårt.
 - **Veckan har tre till fyra nyckelpass:** ett kvalitetspass (intervaller eller tröskel), ett långpass, ett till två lugna pass, och styrka som komplement. Måste något prioriteras bort är det de lugna passen — kvalitetspasset och långpasset är de som bygger formen.
-- **Progression med tak.** Volymen ökar högst cirka 10 % per vecka.
+- **Progression med tak.** Volymen ökar högst cirka 10 % per vecka, och långpasset byggs upp separat mot loppet — det är det enda som förbereder kroppen på elva timmar i sadeln.
+- **Loppet är träning.** Loppets uppskattade tid räknas av från loppveckans budget, annars planeras pass in ovanpå nio mil skidor. Långa lopp (över fem timmar) kräver två veckors återhämtning, inte en.
+- **Passens längd begränsas av grenen, inte av budgeten.** Simning max 1,5 h, löpning 2,5 h, skidor 4 h, cykel 8 h. Timmar som inte får plats fördelas på fler pass.
+- **Loppdagen är fredad.** Inga pass på loppdagen, och dagen före bara ett kort öppningspass.
+- **Styrka delar dag med ett konditionspass.** Den ska inte kosta en träningsdag — då blir den bortvald.
 - **Återhämtning är träning.** Var fjärde vecka dras volymen ner även mitt i en uppbyggnad (`DELOAD_EVERY`), och minst en till två vilodagar per vecka.
 - **Nedtrappning sänker volymen men behåller intensiteten.** Målet är att vara utvilad utan att tappa skärpa.
 - **Pass kan bytas mot annan gren i motsvarande intensitet.** Det är grunden för säsongsanpassningen: ett skidpass utanför snöperioden blir samma intensitet på stakmaskin eller rullskidor.

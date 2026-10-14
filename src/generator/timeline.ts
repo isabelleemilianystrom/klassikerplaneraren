@@ -24,7 +24,8 @@ export function lastRaceDate(races: RaceDates): IsoDate {
  * Veckor som läggs till efter det sista loppet, för återhämtning.
  *
  * Återhämtning efter lopp är en obligatorisk fas. Slutade programmet på
- * loppveckan skulle sista loppet bli det enda utan den.
+ * loppveckan skulle sista loppet bli det enda utan den. Långa lopp kräver två
+ * veckor — anroparen skickar in hur många.
  */
 export const RECOVERY_WEEKS_AFTER_LAST_RACE = 1;
 
@@ -35,12 +36,16 @@ export const RECOVERY_WEEKS_AFTER_LAST_RACE = 1;
  * nästa måndag. Sedan följer veckorna fram till och med det sista loppets
  * vecka, plus en återhämtningsvecka efter det.
  */
-export function buildTimeline(races: RaceDates, today: IsoDate): IsoDate[] {
+export function buildTimeline(
+  races: RaceDates,
+  today: IsoDate,
+  recoveryWeeks: number = RECOVERY_WEEKS_AFTER_LAST_RACE,
+): IsoDate[] {
   const start = startOfWeek(requireIsoDate(today, 'Dagens datum'));
   requireFutureRaces(races, today);
   requireClassicWindow(races);
 
-  const end = addWeeks(startOfWeek(lastRaceDate(races)), RECOVERY_WEEKS_AFTER_LAST_RACE);
+  const end = addWeeks(startOfWeek(lastRaceDate(races)), Math.max(1, recoveryWeeks));
   const weeks: IsoDate[] = [];
   for (let monday = start; monday <= end; monday = addWeeks(monday, 1)) {
     weeks.push(monday);

@@ -198,7 +198,9 @@ Programmet bygger på vedertagen uthållighetsmetodik:
 - **Trappan: uppbyggnad → bygge → toppning.** Tränar du likadant varje vecka stannar utvecklingen av.
 - **Polariserad intensitet:** ungefär 70–80 % lugnt och 20–30 % hårt. Lätt plus hårt slår medelmåttigt hela tiden.
 - **Tre till fyra nyckelpass i veckan:** ett kvalitetspass, ett långpass, ett till två lugna pass, plus styrka. Måste något strykas är det ett lugnt pass.
-- **Volymen ökar högst cirka 10 % per vecka**, och var fjärde vecka dras den ner.
+- **Volymen ökar högst cirka 10 % per vecka**, och var fjärde vecka dras den ner. Långpasset byggs upp för sig: det växer mot loppet, för det är den enskilt viktigaste förberedelsen inför ett långt lopp.
+- **Loppet räknas som träning.** Vasaloppet tar omkring sju timmar, och de dras av från loppveckans budget. Loppveckan innehåller därför nästan ingen planerad träning, och efter ett långt lopp följer två återhämtningsveckor.
+- **Inga pass på loppdagen**, och dagen före bara ett kort öppningspass.
 - **Nedtrappning sänker volymen men behåller intensiteten** — utvilad utan att tappa skärpa.
 - **Ett pass kan bytas mot en annan gren i samma intensitet.** Det är precis det som gör säsongsanpassningen möjlig: skidpasset blir stakmaskin eller rullskidor utanför snöperioden.
 

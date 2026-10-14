@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { Discipline, PlanInput, Program } from '../types';
 import { DISCIPLINES } from '../types';
-import { isMonday, startOfWeek } from './dates';
+import { isMonday, startOfWeek, weekdayOf } from './dates';
 import { generateProgram } from './index';
+import { MAX_SESSION_HOURS } from './sessions';
 import { isSnowWeek } from './season';
 
 const today = '2026-10-13';
@@ -236,10 +237,18 @@ describe('mål, dagar och prioritering', () => {
     }
   });
 
-  it('lägger högst ett pass per dag', () => {
+  it('lägger högst två pass per dag, och då är det ena styrka', () => {
+    // Styrka får dela dag med ett konditionspass — så gör folk i praktiken.
+    // Två konditionspass samma dag är däremot alltid fel.
     for (const week of program().weeks) {
-      const days = week.sessions.map((session) => session.day);
-      expect(new Set(days).size).toBe(days.length);
+      const byDay = new Map<number, string[]>();
+      for (const session of week.sessions) {
+        byDay.set(session.day, [...(byDay.get(session.day) ?? []), session.kind]);
+      }
+      for (const kinds of byDay.values()) {
+        expect(kinds.length).toBeLessThanOrEqual(2);
+        if (kinds.length === 2) expect(kinds).toContain('strength');
+      }
     }
   });
 
@@ -295,5 +304,104 @@ describe('mål, dagar och prioritering', () => {
     for (const week of result.weeks) {
       expect(result.blocks[week.block]).toBeDefined();
     }
+  });
+});
+
+describe('loppbelastning och återhämtning', () => {
+  it('lägger aldrig ett träningspass på loppdagen', () => {
+    const result = program();
+    for (const week of result.weeks) {
+      if (week.raceDate === undefined) continue;
+      const raceDay = weekdayOf(week.raceDate);
+      for (const session of week.sessions) {
+        expect(session.day).not.toBe(raceDay);
+      }
+    }
+  });
+
+  it('ger högst ett kort öppningspass dagen före loppet', () => {
+    const result = program();
+    for (const week of result.weeks) {
+      if (week.raceDate === undefined) continue;
+      const raceDay = weekdayOf(week.raceDate);
+      const dayBefore = raceDay === 1 ? 7 : raceDay - 1;
+      for (const session of week.sessions.filter((s) => s.day === dayBefore)) {
+        expect(session.hours).toBeLessThanOrEqual(0.5);
+      }
+    }
+  });
+
+  it('räknar loppet som belastning och planerar nästan ingen träning i loppveckan', () => {
+    const skiWeek = program().weeks.find((week) => week.raceDate === baseInput.races.skiing);
+    // Vasaloppet tar omkring sju timmar. Veckan ska inte innehålla fyra timmar till.
+    expect(skiWeek?.totalHours).toBeLessThanOrEqual(1);
+  });
+
+  it('ger två återhämtningsveckor efter ett långt lopp', () => {
+    const weeks = program().weeks;
+    const index = weeks.findIndex((week) => week.raceDate === baseInput.races.skiing);
+    expect(weeks[index + 1]?.followsRace).toBe(true);
+    expect(weeks[index + 2]?.followsRace).toBe(true);
+  });
+
+  it('ger en återhämtningsvecka efter ett kort lopp', () => {
+    const weeks = program().weeks;
+    const index = weeks.findIndex((week) => week.raceDate === baseInput.races.swimming);
+    expect(weeks[index + 1]?.followsRace).toBe(true);
+    expect(weeks[index + 2]?.followsRace).toBe(false);
+  });
+});
+
+describe('passlängder och stegring', () => {
+  it('planerar aldrig längre pass än grenen tål', () => {
+    for (const week of program({ hoursPerWeek: 20 }).weeks) {
+      for (const session of week.sessions) {
+        expect(session.hours).toBeLessThanOrEqual(MAX_SESSION_HOURS[session.discipline]);
+      }
+    }
+  });
+
+  it('planerar aldrig simpass längre än en och en halv timme', () => {
+    const swims = program({ hoursPerWeek: 20 })
+      .weeks.flatMap((week) => week.sessions)
+      .filter((session) => session.discipline === 'swimming');
+    expect(Math.max(...swims.map((s) => s.hours))).toBeLessThanOrEqual(1.5);
+  });
+
+  it('bygger upp långpasset mot loppet i stället för att hålla det konstant', () => {
+    const cycling = program({ hoursPerWeek: 12 })
+      .weeks.filter((week) => week.targetRace === 'cycling' && week.phase !== 'recovery')
+      .map((week) =>
+        Math.max(
+          0,
+          ...week.sessions.filter((s) => s.discipline === 'cycling').map((s) => s.hours),
+        ),
+      )
+      .filter((hours) => hours > 0);
+
+    const first = cycling[0] as number;
+    const longest = Math.max(...cycling);
+    expect(longest).toBeGreaterThan(first);
+  });
+
+  it('planerar styrkepass, och delar dag med ett konditionspass', () => {
+    const weeks = program().weeks;
+    const withStrength = weeks.filter((week) =>
+      week.sessions.some((session) => session.kind === 'strength'),
+    );
+    expect(withStrength.length).toBeGreaterThan(weeks.length / 2);
+  });
+
+  it('lägger aldrig två konditionspass på samma dag', () => {
+    for (const week of program().weeks) {
+      const days = week.sessions
+        .filter((session) => session.kind === 'endurance')
+        .map((session) => session.day);
+      expect(new Set(days).size).toBe(days.length);
+    }
+  });
+
+  it('varnar när långpassen aldrig hinner bli långa nog för loppen', () => {
+    expect(program({ hoursPerWeek: 5 }).warnings).toContain('longSessionTooShort');
   });
 });

@@ -145,6 +145,10 @@ export const WARNING_TEXT = {
     'Med så få timmar i veckan blir programmet tunt för en hel klassiker. Du får ett program ' +
     'ändå — det prioriterar nästa lopp och de grenar du är nybörjare i — men räkna med att ' +
     'behöva mer tid närmare loppen.',
+  longSessionTooShort:
+    'Med dina timmar hinner l00e5ngpassen aldrig bli s00e5 l00e5nga som loppen kr00e4ver. Det 00e4r framf00f6r allt ' +
+    'de riktigt l00e5nga passen som f00f6rbereder kroppen p00e5 ett l00e5ngt lopp 2014 avs00e4tt g00e4rna en l00e5ng dag i ' +
+    'veckan n00e4rmare loppen, 00e4ven om veckan i 00f6vrigt 00e4r sig lik.',
   noSkiSubstitute:
     'Du har varken stakmaskin eller rullskidor, så skidpassen utanför snöperioden blir stavgång ' +
     'och överkroppsstyrka. Får du tillgång till något av dem blir skidträningen klart bättre.',

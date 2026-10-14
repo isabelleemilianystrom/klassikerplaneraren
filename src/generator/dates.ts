@@ -90,3 +90,9 @@ function pick(dates: readonly IsoDate[], better: (a: IsoDate, b: IsoDate) => boo
   if (first === undefined) throw new Error('Listan med datum är tom.');
   return rest.reduce((best, candidate) => (better(candidate, best) ? candidate : best), first);
 }
+
+/** Veckodag enligt ISO: 1 = måndag, 7 = söndag. */
+export function weekdayOf(date: IsoDate): 1 | 2 | 3 | 4 | 5 | 6 | 7 {
+  const day = parse(date).getUTCDay();
+  return (day === 0 ? 7 : day) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
+}
