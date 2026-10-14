@@ -202,6 +202,9 @@ Programmet bygger på vedertagen uthållighetsmetodik:
 - **Loppet räknas som träning.** Vasaloppet tar omkring sju timmar, och de dras av från loppveckans budget. Loppveckan innehåller därför nästan ingen planerad träning, och efter ett långt lopp följer två återhämtningsveckor.
 - **Inga pass på loppdagen**, och dagen före bara ett kort öppningspass.
 - **Nedtrappning sänker volymen men behåller intensiteten** — utvilad utan att tappa skärpa.
+- **Teknik före fart på skidor och i vattnet.** Är du inte rutinerad får du teknikpass i båda — Vasaloppet avgörs i stakningen och Vansbro i crawltekniken, inte i syreupptaget.
+- **Varje pass har zon och upplägg**, inte bara "intervaller 1 h". Du ska veta vad du ska göra när du står där.
+- **Simningen flyttar ut i öppet vatten** under din säsong före simloppet, med våtdräkt och siktträning. Går det inte att få in några sådana pass säger appen till.
 - **Ett pass kan bytas mot en annan gren i samma intensitet.** Det är precis det som gör säsongsanpassningen möjlig: skidpasset blir stakmaskin eller rullskidor utanför snöperioden.
 
 ## Deploy

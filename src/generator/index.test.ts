@@ -25,6 +25,7 @@ const baseInput: PlanInput = {
   },
   hoursPerWeek: 8,
   snowSeason: { startMonth: 12, endMonth: 3 },
+  openWaterSeason: { startMonth: 6, endMonth: 8 },
   equipment: { skiErgometer: true, rollerSkis: false, indoorTrainer: true },
   goals: { skiing: 'finish', cycling: 'improve', swimming: 'finish', running: 'time' },
   trainingDays: { daysPerWeek: 4, longSessionDay: 7, unavailableDays: [] },
@@ -403,5 +404,120 @@ describe('passlängder och stegring', () => {
 
   it('varnar när långpassen aldrig hinner bli långa nog för loppen', () => {
     expect(program({ hoursPerWeek: 5 }).warnings).toContain('longSessionTooShort');
+  });
+});
+
+describe('teknik, intensitet och öppet vatten', () => {
+  it('ger teknikpass för klassisk skidåkning när användaren inte är rutinerad', () => {
+    const skiTechnique = program()
+      .weeks.flatMap((week) => week.sessions)
+      .filter((session) => session.discipline === 'skiing' && session.purpose === 'technique');
+    expect(skiTechnique.length).toBeGreaterThan(0);
+  });
+
+  it('hoppar över teknikpass för den som är rutinerad i grenen', () => {
+    const advanced = program({
+      levels: { ...baseInput.levels, skiing: 'advanced' },
+    })
+      .weeks.flatMap((week) => week.sessions)
+      .filter((session) => session.discipline === 'skiing' && session.purpose === 'technique');
+    expect(advanced).toHaveLength(0);
+  });
+
+  it('ger varje pass en intensitet och ett upplägg', () => {
+    for (const week of program().weeks) {
+      for (const session of week.sessions) {
+        expect(['easy', 'moderate', 'threshold', 'interval']).toContain(session.intensity);
+        expect(session.structure).toBeTruthy();
+      }
+    }
+  });
+
+  it('kör långpass och teknikpass lugnt, och intervaller hårt', () => {
+    for (const week of program().weeks) {
+      for (const session of week.sessions) {
+        if (session.purpose === 'longSession' || session.purpose === 'technique') {
+          expect(session.intensity).toBe('easy');
+        }
+        if (session.purpose === 'intervals') {
+          expect(['threshold', 'interval']).toContain(session.intensity);
+        }
+      }
+    }
+  });
+
+  it('håller sig till den polariserade fördelningen: mest lugnt, lite hårt', () => {
+    const sessions = program()
+      .weeks.flatMap((week) => week.sessions)
+      .filter((session) => session.kind === 'endurance');
+    const hard = sessions.filter((session) =>
+      ['threshold', 'interval'].includes(session.intensity),
+    );
+    const hardShare = hard.reduce((sum, s) => sum + s.hours, 0) /
+      sessions.reduce((sum, s) => sum + s.hours, 0);
+    expect(hardShare).toBeLessThan(0.35);
+  });
+
+  it('lägger simpassen i öppet vatten under säsongen före simloppet', () => {
+    const openWater = program()
+      .weeks.flatMap((week) => week.sessions)
+      .filter((session) => session.openWater === true);
+    expect(openWater.length).toBeGreaterThanOrEqual(2);
+    for (const session of openWater) {
+      expect(session.discipline).toBe('swimming');
+    }
+  });
+
+  it('ger siktträning i öppet vatten-passen', () => {
+    const skills = program()
+      .weeks.flatMap((week) => week.sessions)
+      .filter((session) => session.structure === 'openWaterSkills');
+    expect(skills.length).toBeGreaterThan(0);
+  });
+
+  it('varnar när öppet vatten aldrig hinns med före simloppet', () => {
+    // Öppet vatten bara i augusti, men simloppet går i början av juli: augusti
+    // infaller först efter loppet, så användaren möter våtdräkten först då.
+    const warnings = program({ openWaterSeason: { startMonth: 8, endMonth: 8 } }).warnings;
+    expect(warnings).toContain('noOpenWaterBeforeSwim');
+  });
+});
+
+describe('nivå och variant påverkar programmet', () => {
+  it('ger den rutinerade mer hård träning än nybörjaren', () => {
+    const hardHours = (level: 'beginner' | 'advanced'): number =>
+      program({ levels: { ...baseInput.levels, cycling: level } })
+        .weeks.filter((week) => week.targetRace === 'cycling')
+        .flatMap((week) => week.sessions)
+        .filter((session) => session.purpose === 'intervals')
+        .reduce((sum, session) => sum + session.hours, 0);
+
+    expect(hardHours('advanced')).toBeGreaterThan(hardHours('beginner'));
+  });
+
+  it('ger längre långpass i den hela klassikern än i den korta', () => {
+    const longest = (variant: 'full' | 'short'): number =>
+      Math.max(
+        0,
+        ...program({ variant, hoursPerWeek: 12 })
+          .weeks.flatMap((week) => week.sessions)
+          .filter((session) => session.discipline === 'cycling')
+          .map((session) => session.hours),
+      );
+
+    expect(longest('full')).toBeGreaterThan(longest('short'));
+  });
+
+  it('ger kortare långpass på skidor när användaren åker Engelbrektsloppet', () => {
+    const longest = (engelbrektsloppet: boolean): number =>
+      Math.max(
+        0,
+        ...program({ engelbrektsloppet, hoursPerWeek: 12 })
+          .weeks.flatMap((week) => week.sessions)
+          .filter((session) => session.discipline === 'skiing')
+          .map((session) => session.hours),
+      );
+
+    expect(longest(true)).toBeLessThanOrEqual(longest(false));
   });
 });

@@ -16,13 +16,14 @@
 import type {
   Discipline,
   Goal,
-  IsoDate,
+  Intensity,
   Level,
   PlanInput,
   Phase,
   Session,
   SessionPriority,
   SessionPurpose,
+  SessionStructure,
   TrainingDays,
   Weekday,
 } from '../types';
@@ -31,7 +32,7 @@ import { estimatedRaceHours } from '../variants';
 import { weekdayOf } from './dates';
 import type { PhasedWeek } from './phases';
 import { trainingDaysOfWeek, preferredLongDay } from './schedule';
-import { isSnowWeek, skiSubstitute } from './season';
+import { isSeasonWeek, isSnowWeek, skiSubstitute } from './season';
 
 /** Hur stor del av timbudgeten en fas använder. */
 const PHASE_LOAD: Record<Phase, number> = {
@@ -56,6 +57,39 @@ const QUALITY_SHARE: Record<Goal, number> = {
   improve: 0.3,
   time: 0.35,
 };
+
+/**
+ * Nivån justerar hur stor del av tiden som är hård.
+ *
+ * En nybörjare utvecklas av volym och vana och tål mindre hård träning. Den
+ * rutinerade har redan basen och behöver intensiteten för att flytta sig.
+ */
+const LEVEL_QUALITY_ADJUSTMENT: Record<Level, number> = {
+  beginner: -0.05,
+  intermediate: 0,
+  advanced: 0.05,
+};
+
+/**
+ * Var långpassets uppbyggnad startar, som andel av målet.
+ *
+ * Den rutinerade kan börja högre upp — hon har redan långpassen i kroppen.
+ */
+const LEVEL_LONG_FLOOR: Record<Level, number> = {
+  beginner: 0.3,
+  intermediate: 0.4,
+  advanced: 0.5,
+};
+
+/**
+ * Hur stor del av loppets längd det längsta passet byggs upp till.
+ *
+ * Man behöver inte träna hela Vätternrundan i förväg, men kroppen måste ha
+ * varit ute tillräckligt länge för att veta vad som väntar. Det är också här
+ * varianten får betydelse: 30 km Tjejvasan och 90 km Vasaloppet kräver olika
+ * långa pass.
+ */
+const LONG_SHARE_OF_RACE = 0.6;
 
 /**
  * Längsta vettiga enskilda pass per gren, i timmar.
@@ -87,9 +121,6 @@ const MAX_LONG_SHARE = 0.7;
  * elva timmar i sadeln är att successivt ha suttit fem, sex och sju.
  */
 const LONG_RAMP_WEEKS = 14;
-
-/** Långpassets kortaste andel av sitt tak, längst bort från loppet. */
-const LONG_RAMP_FLOOR = 0.4;
 
 /** Styrkepassets längd och hur många som ryms i en vecka. */
 const STRENGTH_HOURS = 0.75;
@@ -151,13 +182,23 @@ export function activeDisciplines(
 /**
  * Längsta långpass som får planeras i en gren den här veckan.
  *
- * Taket växer mot loppet: längst bort är det 40 procent av grenens maxpass, de
- * sista veckorna före loppet är det fullt.
+ * Målet är en andel av hur länge loppet tar — därför ger 90 km Vasaloppet ett
+ * längre mål än 30 km Tjejvasan. Taket växer mot loppet, och var uppbyggnaden
+ * startar beror på användarens nivå.
  */
-export function longSessionCeiling(discipline: Discipline, weeksUntilRace: number): number {
-  const cap = MAX_SESSION_HOURS[discipline];
-  const share = LONG_RAMP_FLOOR + (1 - LONG_RAMP_FLOOR) * rampProgress(weeksUntilRace);
-  return roundDown(cap * share);
+export function longSessionCeiling(
+  discipline: Discipline,
+  weeksUntilRace: number,
+  raceHoursForDiscipline: number,
+  level: Level = 'intermediate',
+): number {
+  const target = Math.min(
+    MAX_SESSION_HOURS[discipline],
+    Math.max(MIN_SESSION_HOURS, raceHoursForDiscipline * LONG_SHARE_OF_RACE),
+  );
+  const floor = LEVEL_LONG_FLOOR[level];
+  const share = floor + (1 - floor) * rampProgress(weeksUntilRace);
+  return Math.max(MIN_SESSION_HOURS, roundDown(target * share));
 }
 
 /** Ett pass innan det fått dag och säsongsform. */
@@ -191,7 +232,7 @@ export function buildSessions(week: PhasedWeek, input: PlanInput): Session[] {
   const placed = assignDays(planned, schedule, slots);
   if (opener !== undefined) placed.push(openerSession(week, opener));
 
-  return placed.map((session) => withSeason(session, week.startDate, input));
+  return placed.map((session) => withSeason(session, week, input));
 }
 
 /** Uppskattad tid i loppet, som belastning i loppveckan. */
@@ -245,7 +286,7 @@ function planWeek(
     week,
     forEndurance - maintenanceHours,
     budget,
-    input.goals[week.targetRace],
+    input,
     Math.max(0, slots - maintenanceSlots),
   );
 
@@ -305,17 +346,23 @@ function targetSessions(
   week: PhasedWeek,
   hours: number,
   weekBudget: number,
-  goal: Goal,
+  input: PlanInput,
   slots: number,
 ): PlannedSession[] {
   if (hours < MIN_SESSION_HOURS || slots < 1) return [];
 
   const discipline = week.targetRace;
-  const quality = slots < 2 ? 0 : capped(discipline, roundDown(hours * QUALITY_SHARE[goal]));
+  const level = input.levels[discipline];
+  const share = Math.max(
+    0.15,
+    QUALITY_SHARE[input.goals[discipline]] + LEVEL_QUALITY_ADJUSTMENT[level],
+  );
+  const quality = slots < 2 ? 0 : capped(discipline, roundDown(hours * share));
+
   // Långpasset mäts mot hela veckan, inte mot det som råkar bli över. Annars
   // blir det aldrig långt nog för ett lopp på 315 km.
   const ceiling = Math.min(
-    longSessionCeiling(discipline, week.weeksUntilRace),
+    longSessionCeiling(discipline, week.weeksUntilRace, raceHours(input, discipline), level),
     Math.max(MIN_SESSION_HOURS, roundDown(weekBudget * MAX_LONG_SHARE)),
   );
   const long = Math.min(capped(discipline, roundDown(hours - quality)), ceiling);
@@ -325,7 +372,7 @@ function targetSessions(
     {
       discipline,
       hours: quality,
-      purpose: qualityPurpose(week.phase),
+      purpose: qualityPurpose(week.phase, discipline, level),
       priority: 'key',
       long: false,
     },
@@ -360,10 +407,27 @@ function longPurpose(phase: Phase): SessionPurpose {
   return phase === 'taper' || phase === 'recovery' ? 'easy' : 'longSession';
 }
 
-function qualityPurpose(phase: Phase): SessionPurpose {
+/**
+ * Grenar där tekniken avgör mer än motorn.
+ *
+ * Klassisk skidåkning och crawl i öppet vatten går inte att träna bort med
+ * kondition. För en ovan åkare avgörs Vasaloppet mer av stakteknik i stigning
+ * än av syreupptag, och den som inte kan simma blir inte snabbare av att orka
+ * längre.
+ */
+function isTechniqueSensitive(discipline: Discipline): boolean {
+  return discipline === 'skiing' || discipline === 'swimming';
+}
+
+function needsTechnique(discipline: Discipline, level: Level): boolean {
+  return isTechniqueSensitive(discipline) && level !== 'advanced';
+}
+
+function qualityPurpose(phase: Phase, discipline: Discipline, level: Level): SessionPurpose {
   switch (phase) {
     case 'base':
-      return 'endurance';
+      // I uppbyggnaden går tekniken före farten i de tekniska grenarna.
+      return needsTechnique(discipline, level) ? 'technique' : 'endurance';
     case 'recovery':
       return 'easy';
     default:
@@ -371,12 +435,10 @@ function qualityPurpose(phase: Phase): SessionPurpose {
   }
 }
 
-/** Nybörjare behöver teknik före volym. Simning framför allt. */
+/** Teknikgrenar underhålls med teknik, inte med mer distans. */
 function maintenancePurpose(discipline: Discipline, level: Level): SessionPurpose {
-  if (level === 'beginner') {
-    return discipline === 'swimming' ? 'technique' : 'easy';
-  }
-  return 'endurance';
+  if (needsTechnique(discipline, level)) return 'technique';
+  return level === 'beginner' ? 'easy' : 'endurance';
 }
 
 /**
@@ -430,23 +492,87 @@ function previousDay(day: Weekday): Weekday {
   return (day === 1 ? 7 : day - 1) as Weekday;
 }
 
-/** Byter skidpass mot ersättningsform utanför snöperioden. */
+/**
+ * Ger passet säsongsform, intensitet och upplägg.
+ *
+ * Skidpass utanför snöperioden byter form. Simpass i öppet vatten-säsong före
+ * simloppet flyttas ut i vattnet — med våtdräkt och siktträning, eftersom det
+ * är de sakerna som fäller folk i Vansbro, inte konditionen.
+ */
 function withSeason(
   session: PlannedSession & { day: Weekday },
-  weekStart: IsoDate,
+  week: PhasedWeek,
   input: PlanInput,
 ): Session {
+  const openWater = isOpenWaterSession(session.discipline, week, input);
+  const structure = structureFor(session, week, openWater);
+
   const base: Session = {
     discipline: session.discipline,
     kind: session.purpose === 'strength' ? 'strength' : 'endurance',
     priority: session.priority,
+    intensity: intensityFor(session.purpose, week.phase),
+    structure,
     day: session.day,
     hours: session.hours,
     purpose: session.purpose,
+    ...(openWater ? { openWater: true as const } : {}),
   };
 
-  if (session.discipline !== 'skiing' || isSnowWeek(weekStart, input.snowSeason)) {
+  if (session.discipline !== 'skiing' || isSnowWeek(week.startDate, input.snowSeason)) {
     return base;
   }
   return { ...base, substitute: skiSubstitute(input.equipment, session.long) };
+}
+
+/**
+ * Simpasset sker i öppet vatten när säsongen tillåter och simloppet återstår.
+ *
+ * Efter loppet spelar det ingen roll, och utanför säsongen går det inte.
+ */
+function isOpenWaterSession(
+  discipline: Discipline,
+  week: PhasedWeek,
+  input: PlanInput,
+): boolean {
+  if (discipline !== 'swimming') return false;
+  if (week.startDate > input.races.swimming) return false;
+  return isSeasonWeek(week.startDate, input.openWaterSeason);
+}
+
+/** Hur hårt passet ska köras. */
+function intensityFor(purpose: SessionPurpose, phase: Phase): Intensity {
+  switch (purpose) {
+    case 'intervals':
+      return phase === 'peak' ? 'interval' : 'threshold';
+    case 'endurance':
+      return 'moderate';
+    case 'strength':
+      return 'moderate';
+    case 'longSession':
+    case 'easy':
+    case 'technique':
+    case 'rest':
+      return 'easy';
+  }
+}
+
+/** Passets upplägg, som nyckel. UI skriver ut vad det betyder. */
+function structureFor(
+  session: PlannedSession,
+  week: PhasedWeek,
+  openWater: boolean,
+): SessionStructure {
+  if (session.purpose === 'strength') return 'strengthCircuit';
+  if (session.purpose === 'technique') return openWater ? 'openWaterSkills' : 'techniqueDrills';
+  if (session.long) return 'longSteady';
+
+  if (session.purpose === 'intervals') {
+    // Lidingöloppet avgörs i backarna, så löpningens kvalitetspass går i backe
+    // under uppbyggnaden och blir skarpare intervaller när loppet närmar sig.
+    if (session.discipline === 'running' && week.phase === 'build') return 'hills';
+    return week.phase === 'peak' ? 'shortIntervals' : 'thresholdBlocks';
+  }
+
+  return 'steady';
 }

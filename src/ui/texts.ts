@@ -149,6 +149,10 @@ export const WARNING_TEXT = {
     'Med dina timmar hinner l00e5ngpassen aldrig bli s00e5 l00e5nga som loppen kr00e4ver. Det 00e4r framf00f6r allt ' +
     'de riktigt l00e5nga passen som f00f6rbereder kroppen p00e5 ett l00e5ngt lopp 2014 avs00e4tt g00e4rna en l00e5ng dag i ' +
     'veckan n00e4rmare loppen, 00e4ven om veckan i 00f6vrigt 00e4r sig lik.',
+  noOpenWaterBeforeSwim:
+    'Programmet hinner inte lägga n00e5gra simpass i 00f6ppet vatten f00f6re simloppet. Att f00f6rsta g00e5ngen i ' +
+    'v00e5tdr00e4kt och kallt vatten blir p00e5 t00e4vlingsdagen 00e4r den vanligaste orsaken till att folk bryter. ' +
+    'F00f6rs00f6k f00e5 in minst tv00e5 simpass utomhus innan loppet.',
   noSkiSubstitute:
     'Du har varken stakmaskin eller rullskidor, så skidpassen utanför snöperioden blir stavgång ' +
     'och överkroppsstyrka. Får du tillgång till något av dem blir skidträningen klart bättre.',
@@ -202,3 +206,44 @@ export const PRIORITY_HELP =
 export function blockHeading(index: number, focus: string[]): string {
   return `Block ${index + 1} — fokus ${focus.join(' och ')}`;
 }
+
+/** Hur hårt passet ska köras, med zon och upplevd ansträngning. */
+export const INTENSITY_LABEL = {
+  easy: 'Lugnt · zon 1–2 · du kan prata obehindrat',
+  moderate: 'Medel · zon 3 · ansträngande men kontrollerat',
+  threshold: 'Tröskel · zon 4 · du kan säga korta meningar',
+  interval: 'Hårt · zon 4–5 · bara enstaka ord',
+} as const;
+
+/** Kort version till passraden. */
+export const INTENSITY_SHORT = {
+  easy: 'zon 1–2',
+  moderate: 'zon 3',
+  threshold: 'zon 4',
+  interval: 'zon 4–5',
+} as const;
+
+/** Vad passet går ut på rent praktiskt. */
+export const STRUCTURE_LABEL = {
+  steady: 'Jämnt tempo hela passet.',
+  longSteady: 'Långt och jämnt. Ta med dryck och energi — öva på det du tänkt äta i loppet.',
+  thresholdBlocks: '4 × 8 min i tröskeltempo, 3 min lugnt emellan. 10 min uppvärmning och nedvarvning.',
+  shortIntervals: '2 × 10 × 30 sek hårt / 30 sek vila, 3 min mellan serierna.',
+  hills: '6–8 backintervaller på 1–2 min, lugn jogg ner. Bygger den styrka terrängen kräver.',
+  techniqueDrills: 'Teknikpass: korta repetitioner med fokus på rörelsen, inte på farten.',
+  openWaterSkills:
+    'Öppet vatten med våtdräkt. Öva att sikta mot ett fast märke var sjätte till tionde ' +
+    'simtag, och att starta i ett sällskap.',
+  strengthCircuit: 'Helkroppsstyrka: knäböj, marklyft, rodd, press och bål. 3–4 set per övning.',
+} as const;
+
+export const OPEN_WATER_TAG = 'öppet vatten';
+
+export const OPEN_WATER_LEGEND = 'Öppet vatten';
+
+export const OPEN_WATER_HELP =
+  'När kan du simma utomhus? Vansbrosimningen simmas i våtdräkt, medströms och utan linjer att ' +
+  'följa. Programmet lägger simpassen utomhus under den här perioden, med siktträning.';
+
+export const OPEN_WATER_START_LABEL = 'Öppet vatten från och med';
+export const OPEN_WATER_END_LABEL = 'Till och med';

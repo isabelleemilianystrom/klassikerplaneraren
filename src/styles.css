@@ -307,3 +307,10 @@ button.secondary {
   padding-top: 1rem;
   border-top: 1px solid var(--border);
 }
+
+.session-structure {
+  flex: 1 1 100%;
+  margin-left: 6rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

@@ -35,6 +35,31 @@ export const WEEKDAYS: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 7];
  */
 export type Goal = 'finish' | 'improve' | 'time';
 
+/**
+ * Hur hårt passet ska köras.
+ *
+ * Utan detta blir den polariserade fördelningen en siffra i dokumentationen i
+ * stället för något användaren utför. De flesta motionärer kör sina lugna pass
+ * för hårt och sina hårda för löst.
+ */
+export type Intensity = 'easy' | 'moderate' | 'threshold' | 'interval';
+
+/**
+ * Passets upplägg. Nycklar, inte text — UI översätter till svenska.
+ *
+ * "Intervaller 0,5 h" säger ingenting till den som inte redan vet vad hon ska
+ * göra. Strukturen säger det.
+ */
+export type SessionStructure =
+  | 'steady'
+  | 'longSteady'
+  | 'thresholdBlocks'
+  | 'shortIntervals'
+  | 'hills'
+  | 'techniqueDrills'
+  | 'openWaterSkills'
+  | 'strengthCircuit';
+
 /** Pass delas i kondition och styrka — inte i vilket lopp de tränar mot. */
 export type SessionKind = 'endurance' | 'strength';
 
@@ -101,7 +126,11 @@ export interface Equipment {
 }
 
 /** Sådant programmet vill varna för, som UI översätter till svensk text. */
-export type ProgramWarning = 'tightBudget' | 'noSkiSubstitute' | 'longSessionTooShort';
+export type ProgramWarning =
+  | 'tightBudget'
+  | 'noSkiSubstitute'
+  | 'longSessionTooShort'
+  | 'noOpenWaterBeforeSwim';
 
 /** Ett loppdatum per gren. */
 export type RaceDates = Record<Discipline, IsoDate>;
@@ -120,6 +149,14 @@ export interface PlanInput {
   hoursPerWeek: number;
   /** När skidträning kan ske på snö. Utanför perioden ersätts skidpassen. */
   snowSeason: SnowSeason;
+  /**
+   * När användaren kommer åt öppet vatten.
+   *
+   * Vansbrosimningen simmas i våtdräkt, medströms, utan linjer att följa. Den
+   * som bara simmat i bassäng möter kallt vatten, en dräkt som trycker över
+   * bröstet och ingen möjlighet att sikta — allt samtidigt, på loppdagen.
+   */
+  openWaterSeason: SnowSeason;
   /** Vad användaren kommer åt. Styr vilken form ersättningspassen tar. */
   equipment: Equipment;
   /** Vad användaren vill med varje lopp. */
@@ -134,6 +171,10 @@ export interface Session {
   substitute?: Substitute;
   kind: SessionKind;
   priority: SessionPriority;
+  intensity: Intensity;
+  structure: SessionStructure;
+  /** Passet sker i öppet vatten med våtdräkt, inte i bassäng. */
+  openWater?: true;
   /** Veckodagen passet ligger på. */
   day: Weekday;
   hours: number;

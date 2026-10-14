@@ -29,9 +29,16 @@ import {
   GOAL_LABEL,
   DAYS_PER_WEEK_LABEL,
   LONG_DAY_LABEL,
+  INTENSITY_SHORT,
+  OPEN_WATER_END_LABEL,
+  OPEN_WATER_HELP,
+  OPEN_WATER_LEGEND,
+  OPEN_WATER_START_LABEL,
+  OPEN_WATER_TAG,
   PRIORITY_HELP,
   PRIORITY_LABEL,
   SESSION_KIND_LABEL,
+  STRUCTURE_LABEL,
   TRAINING_DAYS_HELP,
   TRAINING_DAYS_LEGEND,
   UNAVAILABLE_DAYS_LABEL,
@@ -86,6 +93,7 @@ export function renderForm(
   form.append(races);
 
   form.append(snowSeasonFieldset());
+  form.append(openWaterFieldset());
   form.append(trainingDaysFieldset());
   form.append(equipmentFieldset());
   form.append(hoursRow());
@@ -193,6 +201,27 @@ function snowSeasonFieldset(): HTMLElement {
  * saknar både stakmaskin och rullskidor får veta att programmet blir sämre.
  * Frågorna är få med flit — bara där programmet annars måste gissa.
  */
+/**
+ * När användaren kommer åt öppet vatten.
+ *
+ * Samma form som snöperioden: ett månadsintervall. Simning i bassäng förbereder
+ * inte för våtdräkt, kallt vatten och att sikta utan linjer.
+ */
+function openWaterFieldset(): HTMLElement {
+  const fieldset = document.createElement('fieldset');
+  const legend = document.createElement('legend');
+  legend.textContent = OPEN_WATER_LEGEND;
+  fieldset.append(legend, help(OPEN_WATER_HELP));
+
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.append(monthField('openWaterStart', OPEN_WATER_START_LABEL, 6));
+  row.append(monthField('openWaterEnd', OPEN_WATER_END_LABEL, 8));
+  fieldset.append(row);
+
+  return fieldset;
+}
+
 /** När användaren kan träna: antal dagar, långpassdag och omöjliga dagar. */
 function trainingDaysFieldset(): HTMLElement {
   const fieldset = document.createElement('fieldset');
@@ -478,6 +507,10 @@ function readForm(form: HTMLFormElement): PlanInput {
       startMonth: Number(data.get('snowStart') ?? 12),
       endMonth: Number(data.get('snowEnd') ?? 3),
     },
+    openWaterSeason: {
+      startMonth: Number(data.get('openWaterStart') ?? 6),
+      endMonth: Number(data.get('openWaterEnd') ?? 8),
+    },
     equipment: {
       skiErgometer: data.get('equipment-skiErgometer') !== null,
       rollerSkis: data.get('equipment-rollerSkis') !== null,
@@ -574,16 +607,23 @@ function weekItem(week: Week, number: number): HTMLElement {
       ? `${DISCIPLINE_LABEL[session.discipline]} (${SUBSTITUTE_LABEL[session.substitute]})`
       : DISCIPLINE_LABEL[session.discipline];
 
+    const openWater = session.openWater === true ? ` (${OPEN_WATER_TAG})` : '';
+    // Zon på ett styrkepass säger ingenting — den hör till konditionsträning.
+    const zone = session.kind === 'strength' ? '' : ` · ${INTENSITY_SHORT[session.intensity]}`;
     const text = document.createElement('span');
     text.textContent =
-      `${WEEKDAY_LABEL[session.day] ?? ''} · ${what} · ${formatHours(session.hours)} · ` +
-      `${PURPOSE_LABEL[session.purpose]}`;
+      `${WEEKDAY_LABEL[session.day] ?? ''} · ${what}${openWater} · ${formatHours(session.hours)} · ` +
+      `${PURPOSE_LABEL[session.purpose]}${zone}`;
+
+    const structure = document.createElement('span');
+    structure.className = 'session-structure';
+    structure.textContent = STRUCTURE_LABEL[session.structure];
 
     const priority = document.createElement('span');
     priority.className = 'session-priority';
     priority.textContent = PRIORITY_LABEL[session.priority];
 
-    row.append(tag, text, priority);
+    row.append(tag, text, priority, structure);
     sessions.append(row);
   }
 

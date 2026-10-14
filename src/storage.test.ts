@@ -52,6 +52,7 @@ function emptyProgram(): Program {
       },
       hoursPerWeek: 6,
       snowSeason: { startMonth: 12, endMonth: 3 },
+      openWaterSeason: { startMonth: 6, endMonth: 8 },
       equipment: { skiErgometer: true, rollerSkis: false, indoorTrainer: true },
       goals: { skiing: 'finish', cycling: 'improve', swimming: 'finish', running: 'time' },
       trainingDays: { daysPerWeek: 4, longSessionDay: 7, unavailableDays: [] },

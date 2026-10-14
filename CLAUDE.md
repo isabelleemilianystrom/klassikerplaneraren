@@ -104,6 +104,10 @@ Genereringen vilar på allmänt vedertagen uthållighetsmetodik. Principerna ned
 - **Styrka delar dag med ett konditionspass.** Den ska inte kosta en träningsdag — då blir den bortvald.
 - **Återhämtning är träning.** Var fjärde vecka dras volymen ner även mitt i en uppbyggnad (`DELOAD_EVERY`), och minst en till två vilodagar per vecka.
 - **Nedtrappning sänker volymen men behåller intensiteten.** Målet är att vara utvilad utan att tappa skärpa.
+- **Teknik före fart i teknikgrenarna.** Klassisk skidåkning och crawl avgörs mer av teknik än av motor för den som inte är rutinerad. Skidor och simning får därför teknikpass så länge nivån inte är `advanced`.
+- **Varje pass har en intensitet och ett upplägg.** Zon och en konkret struktur ("4 × 8 min tröskel, 3 min lugnt emellan"). Utan det blir 70/30-fördelningen en siffra i dokumentationen i stället för något användaren utför.
+- **Öppet vatten är ett eget krav.** Simpassen flyttas ut i vattnet med våtdräkt under användarens öppet vatten-period före simloppet, med siktträning. Hinner inga sådana pass med varnar programmet — att möta våtdräkt och kallt vatten första gången på loppdagen är den vanligaste orsaken till att folk bryter i Vansbro.
+- **Nivån och varianten styr dosen.** Nivån justerar andelen hård träning och var långpassets uppbyggnad startar. Långpassets mål är en andel av loppets uppskattade tid, så 90 km Vasaloppet ger längre pass än 30 km Tjejvasan.
 - **Pass kan bytas mot annan gren i motsvarande intensitet.** Det är grunden för säsongsanpassningen: ett skidpass utanför snöperioden blir samma intensitet på stakmaskin eller rullskidor.
 
 ## Så presenteras programmet

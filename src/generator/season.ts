@@ -55,3 +55,13 @@ export function skiSubstitute(equipment: Equipment, longSession: boolean): Subst
 export function lacksSkiSubstitute(equipment: Equipment): boolean {
   return !equipment.skiErgometer && !equipment.rollerSkis;
 }
+
+/**
+ * Sant när veckan ligger i den angivna säsongen.
+ *
+ * Samma logik som snöperioden, men används också för öppet vatten — båda är
+ * månadsintervall som får gå över nyår.
+ */
+export function isSeasonWeek(weekStart: IsoDate, season: SnowSeason): boolean {
+  return isSnowMonth(monthOf(weekStart), season);
+}

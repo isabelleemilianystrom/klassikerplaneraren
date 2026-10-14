@@ -35,6 +35,13 @@ export {
 } from './timeline';
 
 /**
+ * Minsta antal simpass i öppet vatten före simloppet.
+ *
+ * Två pass räcker för att möta våtdräkten, kylan och siktandet innan det gäller.
+ */
+export const MIN_OPEN_WATER_SESSIONS = 2;
+
+/**
  * Timmar i veckan som behövs för ett program med både långpass, kvalitetspass
  * och underhåll. Under det blir programmet tunt, och användaren ska få veta det
  * i stället för att undra varför.
@@ -122,6 +129,15 @@ function collectWarnings(input: PlanInput, weeks: readonly Week[]): ProgramWarni
 
   if (input.hoursPerWeek < COMFORTABLE_HOURS_PER_WEEK[input.variant]) {
     warnings.push('tightBudget');
+  }
+
+  // Första gången i våtdräkt och kallt vatten ska inte vara på tävlingsdagen.
+  const openWaterSwims = weeks
+    .filter((week) => week.startDate <= input.races.swimming)
+    .flatMap((week) => week.sessions)
+    .filter((session) => session.discipline === 'swimming' && session.openWater === true);
+  if (openWaterSwims.length < MIN_OPEN_WATER_SESSIONS) {
+    warnings.push('noOpenWaterBeforeSwim');
   }
 
   const hasSubstitutedSkiing = weeks.some((week) =>
