@@ -11,15 +11,18 @@ finns till exempel inte snö året runt eller överallt.
 
 ## Status
 
-Formuläret och domänmodellen är klara. Av genereringen är steg 1 byggt:
+Genereringen är klar och appen fungerar från formulär till färdigt program:
 
 - `src/generator/dates.ts` — datumaritmetik på ISO-strängar ✔
 - `src/generator/timeline.ts` — vilka veckor programmet omfattar ✔
 - `src/generator/phases.ts` — vilken roll varje vecka har ✔
-- pass och säsongsanpassning — kvar
+- `src/generator/sessions.ts` — vilka pass veckan innehåller ✔
+- `src/generator/season.ts` — skidpass utanför snöperioden ✔
 - `src/ics.ts` — exporten till kalenderfil, kvar
 
-Kravspecen för resten ligger som `it.todo`-rader i `src/generator/index.test.ts`.
+Hela programmet täcks av egenskapstester: veckotimmarna håller sig inom budgeten, varje lopp får
+nedtrappning och återhämtning, inga skidpass ligger på snö utanför snöperioden, och samma indata
+ger alltid samma program.
 
 ## Kom igång
 
@@ -146,10 +149,14 @@ Genereringen går från loppdatum till färdigt program i fyra steg:
    för du ska prestera i helgen. Veckan flaggas då som `followsRace` så att passplaneringen kan
    göra den extra lätt. Med bara två veckor mellan loppen hinner formen inte toppas alls, och det
    är avsiktligt.
-3. **Veckan fylls med pass.** Fasen och användarens nivå bestämmer fördelningen mellan grenarna
-   och vad passen har för syfte. Summan av veckans pass får aldrig överstiga de angivna timmarna.
-4. **Säsongen anpassar grenarna.** Skidpass utanför användarens snöperiod byts till stakmaskin
-   eller rullskidor. Grenen försvinner aldrig ur programmet — bara formen ändras.
+3. **Veckan fylls med pass.** Nästa lopps gren får långpasset och kvalitetspasset — det är den
+   som ska toppas. Grenar där du är nybörjare hålls igång med ett pass i veckan hela året, för
+   teknikgrenar går inte att komma ikapp på slutet: kan du inte simma i dag hjälper det inte att
+   börja åtta veckor före Vansbro. Grenar du redan behärskar vilar tills de blir nästa lopp.
+   Summan av veckans pass överstiger aldrig dina timmar.
+4. **Säsongen anpassar grenarna.** Skidpass utanför din snöperiod byts mot det du har tillgång
+   till: rullskidor för långpass, stakmaskin för intervaller, annars stavgång och överkroppsstyrka.
+   Grenen försvinner aldrig ur programmet — bara formen ändras.
 
 Varje steg är en egen funktion som tar ett värde och returnerar ett nytt. Inget steg ändrar
 något som ett tidigare steg har byggt.

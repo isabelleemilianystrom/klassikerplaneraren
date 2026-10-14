@@ -69,6 +69,7 @@ npx tsc --noEmit   # typkontroll
 ```
 src/
   generator/     ren genereringslogik — inga sidoeffekter, ingen DOM
+                 dates, timeline, phases, sessions, season
   storage.ts     all läsning/skrivning av sparat program
   ics.ts         programobjekt -> .ics
   ui/            rendering och händelsehantering
