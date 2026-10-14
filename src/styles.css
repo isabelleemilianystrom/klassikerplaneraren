@@ -222,3 +222,29 @@ button.secondary {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
 }
+
+.warning {
+  margin: 1.5rem 0 0;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+.summary {
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+}
+
+.race-day {
+  margin: 0 0 0.5rem;
+  padding: 0.4rem 0.7rem;
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+}

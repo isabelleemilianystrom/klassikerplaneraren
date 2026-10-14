@@ -62,6 +62,8 @@ export const PURPOSE_LABEL: Record<SessionPurpose, string> = {
 export const SUBSTITUTE_LABEL: Record<Substitute, string> = {
   skiErgometer: 'stakmaskin',
   rollerSkis: 'rullskidor',
+  polesAndStrength: 'stavgång och styrka',
+  indoorTrainer: 'trainer inomhus',
 };
 
 export const LEVEL_LABEL = {
@@ -125,3 +127,25 @@ export const CLASSIC_WINDOW_HELP =
 export const DISCLAIMER =
   'Programmet är ett automatiskt förslag och ersätter inte medicinsk rådgivning. ' +
   'Rådgör med läkare innan du börjar träna hårt, särskilt vid sjukdom, skada eller graviditet.';
+
+/** Utrustning vi frågar om, i den ordning den visas. */
+export const EQUIPMENT_LABEL = {
+  skiErgometer: 'Stakmaskin (SkiErg)',
+  rollerSkis: 'Rullskidor',
+  indoorTrainer: 'Trainer eller inomhuscykel',
+} as const;
+
+export const EQUIPMENT_HELP =
+  'Styr vad skidpassen blir när det inte finns snö. Har du varken stakmaskin eller rullskidor ' +
+  'blir de stavgång och överkroppsstyrka — det fungerar, men ger mindre skidspecifik träning.';
+
+/** Varningar om programmet. Nycklarna kommer från generatorn. */
+export const WARNING_TEXT = {
+  tightBudget:
+    'Med så få timmar i veckan blir programmet tunt för en hel klassiker. Du får ett program ' +
+    'ändå — det prioriterar nästa lopp och de grenar du är nybörjare i — men räkna med att ' +
+    'behöva mer tid närmare loppen.',
+  noSkiSubstitute:
+    'Du har varken stakmaskin eller rullskidor, så skidpassen utanför snöperioden blir stavgång ' +
+    'och överkroppsstyrka. Får du tillgång till något av dem blir skidträningen klart bättre.',
+} as const;

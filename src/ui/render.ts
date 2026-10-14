@@ -20,6 +20,8 @@ import {
   DISCLAIMER,
   ENGELBREKTSLOPPET_HELP,
   ENGELBREKTSLOPPET_LABEL,
+  EQUIPMENT_HELP,
+  EQUIPMENT_LABEL,
   LEVEL_LABEL,
   MONTH_LABEL,
   PAST_DATE_HELP,
@@ -34,6 +36,7 @@ import {
   suggestionResult,
   VARIANT_LABEL,
   VARIANT_SUMMARY,
+  WARNING_TEXT,
 } from './texts';
 
 const LEVELS: readonly Level[] = ['beginner', 'intermediate', 'advanced'];
@@ -68,6 +71,7 @@ export function renderForm(
   form.append(races);
 
   form.append(snowSeasonFieldset());
+  form.append(equipmentFieldset());
   form.append(hoursRow());
 
   const submit = document.createElement('button');
@@ -166,6 +170,39 @@ function snowSeasonFieldset(): HTMLElement {
   fieldset.append(row);
 
   return fieldset;
+}
+
+/**
+ * Utrustningen avgör vad ett skidpass blir utanför snöperioden, och den som
+ * saknar både stakmaskin och rullskidor får veta att programmet blir sämre.
+ * Frågorna är få med flit — bara där programmet annars måste gissa.
+ */
+function equipmentFieldset(): HTMLElement {
+  const fieldset = document.createElement('fieldset');
+  const legend = document.createElement('legend');
+  legend.textContent = 'Vad har du tillgång till?';
+  fieldset.append(legend, help(EQUIPMENT_HELP));
+
+  for (const [name, label] of Object.entries(EQUIPMENT_LABEL)) {
+    fieldset.append(checkbox(`equipment-${name}`, label));
+  }
+  return fieldset;
+}
+
+function checkbox(name: string, labelText: string): HTMLElement {
+  const label = document.createElement('label');
+  label.className = 'choice';
+
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.name = name;
+
+  const text = document.createElement('span');
+  text.className = 'choice-name';
+  text.textContent = labelText;
+
+  label.append(input, text);
+  return label;
 }
 
 function monthField(name: string, labelText: string, selected: number): HTMLElement {
@@ -359,6 +396,11 @@ function readForm(form: HTMLFormElement): PlanInput {
       startMonth: Number(data.get('snowStart') ?? 12),
       endMonth: Number(data.get('snowEnd') ?? 3),
     },
+    equipment: {
+      skiErgometer: data.get('equipment-skiErgometer') !== null,
+      rollerSkis: data.get('equipment-rollerSkis') !== null,
+      indoorTrainer: data.get('equipment-indoorTrainer') !== null,
+    },
   };
 }
 
@@ -366,10 +408,19 @@ function readForm(form: HTMLFormElement): PlanInput {
 export function renderProgram(container: HTMLElement, program: Program): void {
   container.replaceChildren();
 
+  for (const warning of program.warnings) {
+    const note = document.createElement('p');
+    note.className = 'warning';
+    note.textContent = WARNING_TEXT[warning];
+    container.append(note);
+  }
+
   if (program.weeks.length === 0) {
     container.append(message('Programmet innehåller inga veckor än.'));
     return;
   }
+
+  container.append(summary(program));
 
   const list = document.createElement('ol');
   list.className = 'weeks';
@@ -390,6 +441,13 @@ function weekItem(week: Week, number: number): HTMLElement {
   meta.className = 'week-meta';
   meta.textContent = `Start ${week.startDate} · ${formatHours(week.totalHours)}`;
 
+  // Loppet är veckans huvudhändelse och ska synas tydligare än passen.
+  const raceNote = document.createElement('p');
+  if (week.raceDate !== undefined) {
+    raceNote.className = 'race-day';
+    raceNote.textContent = `${raceLabel(week.targetRace)} ${week.raceDate}`;
+  }
+
   const sessions = document.createElement('ul');
   for (const session of week.sessions) {
     const row = document.createElement('li');
@@ -400,7 +458,9 @@ function weekItem(week: Week, number: number): HTMLElement {
     sessions.append(row);
   }
 
-  item.append(heading, meta, sessions);
+  item.append(heading, meta);
+  if (week.raceDate !== undefined) item.append(raceNote);
+  item.append(sessions);
   return item;
 }
 
@@ -422,4 +482,22 @@ export function renderDisclaimer(container: HTMLElement): void {
 
 function formatHours(hours: number): string {
   return `${hours.toLocaleString('sv-SE')} h`;
+}
+
+/** En rad överst i programmet: hur länge det pågår och hur mycket det är. */
+function summary(program: Program): HTMLElement {
+  const weeks = program.weeks.length;
+  const hours = program.weeks.reduce((sum, week) => sum + week.totalHours, 0);
+  const paragraph = document.createElement('p');
+  paragraph.className = 'summary';
+  paragraph.textContent =
+    `${weeks} veckor, totalt ${hours.toLocaleString('sv-SE')} timmar. ` +
+    `Första veckan börjar ${program.weeks[0]?.startDate ?? ''}.`;
+  return paragraph;
+}
+
+/** "Skidloppet" med stor bokstav, för loppraden i veckovyn. */
+function raceLabel(discipline: Discipline): string {
+  const label = RACE_LABEL[discipline];
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }
