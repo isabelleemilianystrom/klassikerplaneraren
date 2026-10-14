@@ -11,12 +11,13 @@
  *  3. `sessions` — vilka pass veckan innehåller
  *  4. `season`   — skidpass byter form utanför snöperioden (inuti steg 3)
  */
-import type { ClassicVariant, IsoDate, PlanInput, Program, ProgramWarning, Week } from '../types';
+import type { IsoDate, PlanInput, Program, ProgramWarning, Week } from '../types';
 import { buildBlocks } from './blocks';
 import { assignPhases } from './phases';
 import { lacksSkiSubstitute } from './season';
 import { buildSessions } from './sessions';
 import { buildTimeline } from './timeline';
+import { longSessionTarget, recommendedHours } from '../recommendations';
 import { estimatedRaceHours, recoveryWeeksAfter } from '../variants';
 import { MAX_SESSION_HOURS } from './sessions';
 import { DISCIPLINES, type Discipline } from '../types';
@@ -41,19 +42,7 @@ export {
  */
 export const MIN_OPEN_WATER_SESSIONS = 2;
 
-/**
- * Timmar i veckan som behövs för ett program med både långpass, kvalitetspass
- * och underhåll. Under det blir programmet tunt, och användaren ska få veta det
- * i stället för att undra varför.
- *
- * Tröskeln följer varianten: 315 km på cykel kräver mer tid i sadeln än 100 km.
- */
-export const COMFORTABLE_HOURS_PER_WEEK: Record<ClassicVariant, number> = {
-  full: 7,
-  half: 5,
-  short: 4,
-  women: 4,
-};
+
 
 /** Genererar ett komplett träningsprogram. */
 export function generateProgram(input: PlanInput, today: IsoDate): Program {
@@ -119,7 +108,11 @@ function collectWarnings(input: PlanInput, weeks: readonly Week[]): ProgramWarni
     );
     const needed = Math.min(
       MAX_SESSION_HOURS[discipline],
-      estimatedRaceHours(input.variant, discipline, input.engelbrektsloppet) * 0.6,
+      longSessionTarget(
+        estimatedRaceHours(input.variant, discipline, input.engelbrektsloppet),
+        input.goals[discipline],
+        MAX_SESSION_HOURS[discipline],
+      ),
     );
     if (longest > 0 && longest < needed) {
       warnings.push('longSessionTooShort');
@@ -127,7 +120,9 @@ function collectWarnings(input: PlanInput, weeks: readonly Week[]): ProgramWarni
     }
   }
 
-  if (input.hoursPerWeek < COMFORTABLE_HOURS_PER_WEEK[input.variant]) {
+  // Riktmärket följer både varianten och målet. Den som vill ta sig runt en
+  // kort klassiker ska inte få en varning för att hon inte tränar som en elitist.
+  if (input.hoursPerWeek < recommendedHours(input.variant, input.goals).min) {
     warnings.push('tightBudget');
   }
 

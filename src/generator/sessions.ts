@@ -28,6 +28,7 @@ import type {
   Weekday,
 } from '../types';
 import { DISCIPLINES } from '../types';
+import { longSessionTarget } from '../recommendations';
 import { estimatedRaceHours } from '../variants';
 import { weekdayOf } from './dates';
 import type { PhasedWeek } from './phases';
@@ -81,17 +82,13 @@ const LEVEL_LONG_FLOOR: Record<Level, number> = {
   advanced: 0.5,
 };
 
-/**
- * Hur stor del av loppets längd det längsta passet byggs upp till.
- *
- * Man behöver inte träna hela Vätternrundan i förväg, men kroppen måste ha
- * varit ute tillräckligt länge för att veta vad som väntar. Det är också här
- * varianten får betydelse: 30 km Tjejvasan och 90 km Vasaloppet kräver olika
- * långa pass.
- */
-const LONG_SHARE_OF_RACE = 0.6;
+
 
 /**
+ * Hur långt långpasset byggs upp beror på målet och på loppet — se
+ * `LONG_SHARE_BY_GOAL` i src/recommendations.ts. Den som vill ta sig runt
+ * behöver kortare långpass än den som jagar en tid.
+ *
  * Längsta vettiga enskilda pass per gren, i timmar.
  *
  * Utan tak delar budgeten ut orimliga pass: tre och en halv timmes simning
@@ -121,6 +118,15 @@ const MAX_LONG_SHARE = 0.7;
  * elva timmar i sadeln är att successivt ha suttit fem, sex och sju.
  */
 const LONG_RAMP_WEEKS = 14;
+
+/**
+ * Hur många veckor före loppet det längsta passet ligger.
+ *
+ * Det sista riktigt långa passet ska ligga några veckor före loppet, inte
+ * veckan innan — då hinner kroppen ta igen sig. Utan det här avståndet toppar
+ * uppbyggnaden aldrig, eftersom nedtrappningen hinner före.
+ */
+const LONG_RAMP_PEAK_WEEKS = 3;
 
 /** Styrkepassets längd och hur många som ryms i en vecka. */
 const STRENGTH_HOURS = 0.75;
@@ -162,7 +168,8 @@ function progression(weeksUntilRace: number): number {
 /** Hur långt uppbyggnaden hunnit: 0 längst bort från loppet, 1 närmast. */
 function rampProgress(weeksUntilRace: number): number {
   if (!Number.isFinite(weeksUntilRace)) return 0;
-  const done = (LONG_RAMP_WEEKS - weeksUntilRace) / LONG_RAMP_WEEKS;
+  const span = LONG_RAMP_WEEKS - LONG_RAMP_PEAK_WEEKS;
+  const done = (LONG_RAMP_WEEKS - weeksUntilRace) / span;
   return Math.min(1, Math.max(0, done));
 }
 
@@ -191,10 +198,11 @@ export function longSessionCeiling(
   weeksUntilRace: number,
   raceHoursForDiscipline: number,
   level: Level = 'intermediate',
+  goal: Goal = 'improve',
 ): number {
-  const target = Math.min(
-    MAX_SESSION_HOURS[discipline],
-    Math.max(MIN_SESSION_HOURS, raceHoursForDiscipline * LONG_SHARE_OF_RACE),
+  const target = Math.max(
+    MIN_SESSION_HOURS,
+    longSessionTarget(raceHoursForDiscipline, goal, MAX_SESSION_HOURS[discipline]),
   );
   const floor = LEVEL_LONG_FLOOR[level];
   const share = floor + (1 - floor) * rampProgress(weeksUntilRace);
@@ -256,49 +264,83 @@ function planWeek(
 ): PlannedSession[] {
   if (budget < MIN_SESSION_HOURS || slots < 1) return [];
 
-  const others = activeDisciplines(week.targetRace, input.levels).filter(
-    (discipline) => discipline !== week.targetRace,
+  const discipline = week.targetRace;
+  const level = input.levels[discipline];
+  const goal = input.goals[discipline];
+  const others = activeDisciplines(discipline, input.levels).filter(
+    (other) => other !== discipline,
   );
 
-  // Styrkan tar timmar men ingen egen dag — den läggs på en dag som redan har
-  // ett konditionspass, vilket är så folk faktiskt gör det.
-  const strengthSlots = Math.min(
-    strengthCount(week.phase),
-    MAX_STRENGTH_SESSIONS,
-    Math.floor((budget * MAX_STRENGTH_SHARE) / STRENGTH_HOURS),
+  // 1. Långpasset först. Det är det som förbereder för loppet, och lägger vi
+  //    det sist i kön blir det alltid för kort — allt annat hinner ta sitt.
+  const long = Math.min(
+    longSessionCeiling(discipline, week.weeksUntilRace, raceHours(input, discipline), level, goal),
+    roundDown(budget * MAX_LONG_SHARE),
+    capped(discipline, roundDown(budget)),
   );
-  const strengthHours = Math.max(0, strengthSlots) * STRENGTH_HOURS;
-  const forEndurance = budget - strengthHours;
 
-  const keySlots = Math.min(2, slots);
-  const maintenanceSlots = Math.min(others.length, Math.max(0, slots - keySlots));
+  // 2. Kvalitetspasset, mätt mot hela veckan och inte mot det som blivit över.
+  const share = Math.max(0.15, QUALITY_SHARE[goal] + LEVEL_QUALITY_ADJUSTMENT[level]);
+  const quality =
+    slots < 2 ? 0 : capped(discipline, roundDown(Math.min(budget * share, budget - long)));
 
-  const maintenance: PlannedSession[] = others.slice(0, maintenanceSlots).map((discipline) => ({
-    discipline,
-    hours: capped(discipline, roundDown(Math.min(forEndurance * MAINTENANCE_SHARE, 1.5))),
-    purpose: maintenancePurpose(discipline, input.levels[discipline]),
+  let left = roundDown(budget - long - quality);
+
+  // 3. Underhåll för grenar som ska hållas igång.
+  const maintenanceSlots = Math.min(others.length, Math.max(0, slots - 2));
+  const maintenance: PlannedSession[] = others.slice(0, maintenanceSlots).map((other) => ({
+    discipline: other,
+    hours: capped(other, roundDown(Math.min(left * MAINTENANCE_SHARE, 1.5))),
+    purpose: maintenancePurpose(other, input.levels[other]),
     priority: 'supporting',
     long: false,
   }));
-  const maintenanceHours = maintenance.reduce((sum, session) => sum + session.hours, 0);
+  left = roundDown(left - maintenance.reduce((sum, session) => sum + session.hours, 0));
 
-  const target = targetSessions(
-    week,
-    forEndurance - maintenanceHours,
-    budget,
-    input,
-    Math.max(0, slots - maintenanceSlots),
+  // 4. Styrkan tar timmar men ingen egen dag — den delar dag med ett
+  //    konditionspass, vilket är så folk faktiskt gör det.
+  const strengthSlots = Math.max(
+    0,
+    Math.min(
+      strengthCount(week.phase),
+      MAX_STRENGTH_SESSIONS,
+      Math.floor(Math.min(left, budget * MAX_STRENGTH_SHARE) / STRENGTH_HOURS),
+    ),
   );
-
-  const strength: PlannedSession[] = Array.from({ length: Math.max(0, strengthSlots) }, () => ({
-    discipline: week.targetRace,
+  const strength: PlannedSession[] = Array.from({ length: strengthSlots }, () => ({
+    discipline,
     hours: STRENGTH_HOURS,
     purpose: 'strength' as const,
     priority: 'supporting' as const,
     long: false,
   }));
+  left = roundDown(left - strengthSlots * STRENGTH_HOURS);
 
-  return [...target, ...maintenance, ...strength].filter(
+  const key: PlannedSession[] = [
+    { discipline, hours: long, purpose: longPurpose(week.phase), priority: 'key', long: true },
+    {
+      discipline,
+      hours: quality,
+      purpose: qualityPurpose(week.phase, discipline, level),
+      priority: 'key',
+      long: false,
+    },
+  ];
+
+  // 5. Resten blir lugna pass, ett per dag som är kvar, aldrig längre än
+  //    långpasset.
+  const extra: PlannedSession[] = [];
+  let free = slots - key.filter((session) => session.hours >= MIN_SESSION_HOURS).length -
+    maintenance.length;
+  while (left >= MIN_SESSION_HOURS && free > 0) {
+    const hours = Math.min(long, capped(discipline, free === 1 ? left : roundDown(left / free)));
+    if (hours < MIN_SESSION_HOURS) break;
+    extra.push({ discipline, hours, purpose: 'easy', priority: 'supporting', long: false });
+    left = roundDown(left - hours);
+    free -= 1;
+  }
+
+  return [...key, ...maintenance, ...extra, ...strength].filter(
     (session) => session.hours >= MIN_SESSION_HOURS,
   );
 }
@@ -342,62 +384,6 @@ function strengthCount(phase: Phase): number {
  * uppbyggnaden hunnit. Timmar som inte får plats läggs i ett extra lugnt pass i
  * samma gren i stället för att blåsa upp ett pass till orimlig längd.
  */
-function targetSessions(
-  week: PhasedWeek,
-  hours: number,
-  weekBudget: number,
-  input: PlanInput,
-  slots: number,
-): PlannedSession[] {
-  if (hours < MIN_SESSION_HOURS || slots < 1) return [];
-
-  const discipline = week.targetRace;
-  const level = input.levels[discipline];
-  const share = Math.max(
-    0.15,
-    QUALITY_SHARE[input.goals[discipline]] + LEVEL_QUALITY_ADJUSTMENT[level],
-  );
-  const quality = slots < 2 ? 0 : capped(discipline, roundDown(hours * share));
-
-  // Långpasset mäts mot hela veckan, inte mot det som råkar bli över. Annars
-  // blir det aldrig långt nog för ett lopp på 315 km.
-  const ceiling = Math.min(
-    longSessionCeiling(discipline, week.weeksUntilRace, raceHours(input, discipline), level),
-    Math.max(MIN_SESSION_HOURS, roundDown(weekBudget * MAX_LONG_SHARE)),
-  );
-  const long = Math.min(capped(discipline, roundDown(hours - quality)), ceiling);
-
-  const sessions: PlannedSession[] = [
-    { discipline, hours: long, purpose: longPurpose(week.phase), priority: 'key', long: true },
-    {
-      discipline,
-      hours: quality,
-      purpose: qualityPurpose(week.phase, discipline, level),
-      priority: 'key',
-      long: false,
-    },
-  ];
-
-  // Timmar som inte fick plats i långpasset blir egna lugna pass, ett per dag
-  // som är kvar. Timmarna ska inte försvinna bara för att taket slog i.
-  let leftover = roundDown(hours - long - quality);
-  let free = slots - sessions.length;
-  while (leftover >= MIN_SESSION_HOURS && free > 0) {
-    const hoursForSession = capped(discipline, free === 1 ? leftover : roundDown(leftover / free));
-    sessions.push({
-      discipline,
-      hours: hoursForSession,
-      purpose: 'easy',
-      priority: 'supporting',
-      long: false,
-    });
-    leftover = roundDown(leftover - hoursForSession);
-    free -= 1;
-  }
-
-  return sessions.filter((session) => session.hours >= MIN_SESSION_HOURS);
-}
-
 /** Aldrig längre än vad grenen tål. */
 function capped(discipline: Discipline, hours: number): number {
   return Math.min(hours, MAX_SESSION_HOURS[discipline]);
@@ -564,7 +550,10 @@ function structureFor(
   openWater: boolean,
 ): SessionStructure {
   if (session.purpose === 'strength') return 'strengthCircuit';
-  if (session.purpose === 'technique') return openWater ? 'openWaterSkills' : 'techniqueDrills';
+  // Siktning övas i varje pass i öppet vatten, inte bara i teknikpassen. Annars
+  // försvinner den precis i veckorna före loppet, när det är som viktigast.
+  if (openWater && !session.long) return 'openWaterSkills';
+  if (session.purpose === 'technique') return 'techniqueDrills';
   if (session.long) return 'longSteady';
 
   if (session.purpose === 'intervals') {

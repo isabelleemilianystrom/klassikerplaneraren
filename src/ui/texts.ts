@@ -142,13 +142,15 @@ export const EQUIPMENT_HELP =
 /** Varningar om programmet. Nycklarna kommer från generatorn. */
 export const WARNING_TEXT = {
   tightBudget:
-    'Med så få timmar i veckan blir programmet tunt för en hel klassiker. Du får ett program ' +
-    'ändå — det prioriterar nästa lopp och de grenar du är nybörjare i — men räkna med att ' +
-    'behöva mer tid närmare loppen.',
+    'Du har angett färre timmar än riktmärket för din klassiker och ditt mål. Programmet är gjort ' +
+    'för de timmar du har och prioriterar det som ger mest: långpasset och kvalitetspasset. Går ' +
+    'det att lägga till en halvtimme här och där närmare loppen gör det skillnad — men många tar ' +
+    'sig runt på mindre än riktmärket.',
   longSessionTooShort:
-    'Med dina timmar hinner långpassen aldrig bli så långa som loppen kräver. Det är framför allt ' +
-    'de riktigt långa passen som förbereder kroppen på ett långt lopp — avsätt gärna en lång dag i ' +
-    'veckan närmare loppen, även om veckan i övrigt är sig lik.',
+    'Dina längsta pass blir kortare än vad loppen brukar kräva. Du kan ta dig runt ändå, det gör ' +
+    'många — men ett riktigt långt pass då och då gör loppdagen betydligt lättare, för kroppen ' +
+    'vet då vad som väntar. Kan du avsätta en längre dag i helgen någon gång i månaden räcker det ' +
+    'långt. Kommer det inte att gå: sänk tempot i loppet och planera för fler stopp.',
   noOpenWaterBeforeSwim:
     'Programmet hinner inte lägga några simpass i öppet vatten före simloppet. Att första gången i ' +
     'våtdräkt och kallt vatten blir på tävlingsdagen är den vanligaste orsaken till att folk bryter. ' +
@@ -255,3 +257,13 @@ export const EXPORT_HELP =
   'händelser. Filen skapas i din webbläsare och skickas inte någonstans.';
 
 export const ICS_FILENAME = 'klassikerplaneraren.ics';
+
+/** Riktmärket för veckotimmar, som visas vid timfältet. */
+export function hoursRecommendation(min: number, comfortable: number): string {
+  const format = (hours: number): string => hours.toLocaleString('sv-SE');
+  return (
+    `Riktmärke för din klassiker och ditt mål: ${format(min)}–${format(comfortable)} timmar i ` +
+    'veckan. Det är ett riktmärke, inte ett krav — många tar sig runt på mindre, och programmet ' +
+    'anpassar sig efter de timmar du faktiskt har.'
+  );
+}

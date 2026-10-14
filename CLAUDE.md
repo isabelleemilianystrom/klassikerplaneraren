@@ -75,6 +75,7 @@ src/
   ui/            rendering och händelsehantering
   variants.ts    de fyra varianterna och deras distanser (ren domändata)
   race-schedule.ts  kommande loppdatum som förslag (uppdateras för hand)
+  recommendations.ts  riktmärken för veckotimmar och långpass
   types.ts       delade typer (Program, Vecka, Pass, Gren, Nivå ...)
   main.ts        startpunkt: kopplar ihop UI, generator och storage
 ```
@@ -107,6 +108,9 @@ Genereringen vilar på allmänt vedertagen uthållighetsmetodik. Principerna ned
 - **Teknik före fart i teknikgrenarna.** Klassisk skidåkning och crawl avgörs mer av teknik än av motor för den som inte är rutinerad. Skidor och simning får därför teknikpass så länge nivån inte är `advanced`.
 - **Varje pass har en intensitet och ett upplägg.** Zon och en konkret struktur ("4 × 8 min tröskel, 3 min lugnt emellan"). Utan det blir 70/30-fördelningen en siffra i dokumentationen i stället för något användaren utför.
 - **Öppet vatten är ett eget krav.** Simpassen flyttas ut i vattnet med våtdräkt under användarens öppet vatten-period före simloppet, med siktträning. Hinner inga sådana pass med varnar programmet — att möta våtdräkt och kallt vatten första gången på loppdagen är den vanligaste orsaken till att folk bryter i Vansbro.
+- **Appen är byggd för folk med jobb.** Riktmärket för veckotimmar följer variant *och* mål: att ta sig runt en hel klassiker är 6 timmar i veckan, ett tidsmål 9. Varningarna mäts mot det riktmärket, aldrig mot vad en elitsatsande skulle göra. En varning ska betyda "det här når inte ditt mål", inte "du tränar för lite".
+- **Långpasset får sin del av veckan först.** Allt annat — kvalitet, underhåll, styrka — tar av det som blir kvar. Läggs långpasset sist i kön blir det alltid för kort, eftersom det är den post som är lättast att knapra på.
+- **Riktmärke och varning räknas av samma funktion** (`longSessionTarget` i src/recommendations.ts). Räknar de olika kan appen varna för något den själv aldrig kan planera fram.
 - **Nivån och varianten styr dosen.** Nivån justerar andelen hård träning och var långpassets uppbyggnad startar. Långpassets mål är en andel av loppets uppskattade tid, så 90 km Vasaloppet ger längre pass än 30 km Tjejvasan.
 - **Pass kan bytas mot annan gren i motsvarande intensitet.** Det är grunden för säsongsanpassningen: ett skidpass utanför snöperioden blir samma intensitet på stakmaskin eller rullskidor.
 

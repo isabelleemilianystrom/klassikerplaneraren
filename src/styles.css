@@ -322,3 +322,12 @@ button.secondary {
 .export .help {
   margin: 0.5rem 0 0;
 }
+
+.row.hours {
+  flex-direction: column;
+  gap: 0;
+}
+
+.row.hours .help {
+  margin: 0.5rem 0 0;
+}

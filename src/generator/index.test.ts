@@ -154,12 +154,21 @@ describe('generateProgram', () => {
     expect(program()).toEqual(program());
   });
 
-  it('varnar när timbudgeten är för liten för varianten', () => {
-    expect(program({ hoursPerWeek: 3 }).warnings).toContain('tightBudget');
-    expect(program({ hoursPerWeek: 10 }).warnings).not.toContain('tightBudget');
+  it('varnar när timbudgeten är för liten för varianten och målet', () => {
+    const finish = {
+      skiing: 'finish',
+      cycling: 'finish',
+      swimming: 'finish',
+      running: 'finish',
+    } as const;
+
+    expect(program({ hoursPerWeek: 3, goals: finish }).warnings).toContain('tightBudget');
+    expect(program({ hoursPerWeek: 10, goals: finish }).warnings).not.toContain('tightBudget');
     // Fyra timmar räcker för Korta men inte för hela klassikern.
-    expect(program({ hoursPerWeek: 4, variant: 'short' }).warnings).not.toContain('tightBudget');
-    expect(program({ hoursPerWeek: 4 }).warnings).toContain('tightBudget');
+    expect(
+      program({ hoursPerWeek: 4, variant: 'short', goals: finish }).warnings,
+    ).not.toContain('tightBudget');
+    expect(program({ hoursPerWeek: 4, goals: finish }).warnings).toContain('tightBudget');
   });
 
   it('varnar när skidersättning saknas helt', () => {
@@ -519,5 +528,35 @@ describe('nivå och variant påverkar programmet', () => {
       );
 
     expect(longest(true)).toBeLessThanOrEqual(longest(false));
+  });
+});
+
+describe('riktmärke och varningar följer målet', () => {
+  const allGoals = (goal: 'finish' | 'improve' | 'time'): PlanInput['goals'] => ({
+    skiing: goal,
+    cycling: goal,
+    swimming: goal,
+    running: goal,
+  });
+
+  it('varnar inte för knappa timmar när målet bara är att ta sig runt', () => {
+    // Sex timmar i veckan och målet "ta mig runt" är ett fullt rimligt upplägg
+    // för någon som jobbar. Det ska inte ge en varning.
+    const warnings = program({ hoursPerWeek: 6, goals: allGoals('finish') }).warnings;
+    expect(warnings).not.toContain('tightBudget');
+  });
+
+  it('varnar för samma timmar när användaren har ett tidsmål', () => {
+    const warnings = program({ hoursPerWeek: 6, goals: allGoals('time') }).warnings;
+    expect(warnings).toContain('tightBudget');
+  });
+
+  it('kräver kortare långpass av den som vill ta sig runt', () => {
+    const forGoal = (goal: 'finish' | 'time'): boolean =>
+      program({ hoursPerWeek: 8, goals: allGoals(goal) }).warnings.includes('longSessionTooShort');
+
+    // Samma timmar, men bara tidsmålet ska få varningen om för korta långpass.
+    expect(forGoal('finish')).toBe(false);
+    expect(forGoal('time')).toBe(true);
   });
 });

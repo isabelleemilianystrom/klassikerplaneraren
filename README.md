@@ -123,6 +123,7 @@ src/
   ui/            rendering, formulär och all svensk text
   variants.ts    de fyra varianterna och deras distanser
   race-schedule.ts  kommande loppdatum som förslag
+  recommendations.ts  riktmärken för veckotimmar och långpass
   types.ts       delade typer
   main.ts        startpunkt: kopplar ihop UI, generator och lagring
 ```
@@ -192,6 +193,23 @@ missat lopp — och du kommer att missa pass, för man blir sjuk och livet komme
 
 **Nyckelpass och stödpass** säger vad du ska prioritera när veckan inte räcker till: behåll
 långpasset och kvalitetspasset, stryk resten. En vilodag är bättre än ett illa genomfört pass.
+
+## Hur mycket tid behövs?
+
+Formuläret visar ett riktmärke som följer både din variant och ditt mål:
+
+| | Ta mig runt | God marginal | Tidsmål |
+| --- | --- | --- | --- |
+| En Svensk Klassiker | 6–8 h/vecka | 7,5–10 h | 9–11,5 h |
+| Halva | 4,5–6 h | 5,5–7,5 h | 7–9 h |
+| Korta och Tjej | 3,5–4,5 h | 4,5–6 h | 5,5–7 h |
+
+Siffrorna utgår från vanliga motionärer med jobb och familj. **Att ta sig runt en hel klassiker på
+sex timmar i veckan är fullt rimligt** — det är tidsmålen som kostar timmar.
+
+Riktmärket är inte ett krav. Programmet anpassar sig efter de timmar du faktiskt har, och appen
+varnar bara när upplägget inte når det mål *du* har satt — aldrig för att du tränar mindre än
+någon annan skulle göra.
 
 ## Träningsmodellen
 

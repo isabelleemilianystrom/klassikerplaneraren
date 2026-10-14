@@ -18,6 +18,7 @@ import {
 import { engelbrektsloppetMatters, raceDistanceKm, VARIANTS } from '../variants';
 import { SCHEDULE_CHECKED, upcomingSuggestions } from '../race-schedule';
 import { programToIcs } from '../ics';
+import { recommendedHours } from '../recommendations';
 import { ICS_LABELS } from './ics-labels';
 import {
   CLASSIC_WINDOW_HELP,
@@ -29,6 +30,7 @@ import {
   EQUIPMENT_LABEL,
   EXPORT_HELP,
   EXPORT_LABEL,
+  hoursRecommendation,
   ICS_FILENAME,
   GOAL_HELP,
   GOAL_LABEL,
@@ -114,10 +116,14 @@ export function renderForm(
   });
 
   // Formuläret visar alltid distanserna för det som är valt just nu.
-  form.addEventListener('change', () => showDistances(form));
+  form.addEventListener('change', () => {
+    showDistances(form);
+    showHoursRecommendation(form);
+  });
 
   container.append(form);
   showDistances(form);
+  showHoursRecommendation(form);
 }
 
 /**
@@ -468,7 +474,7 @@ function engelbrektsloppetField(): HTMLElement {
 
 function hoursRow(): HTMLElement {
   const row = document.createElement('div');
-  row.className = 'row';
+  row.className = 'row hours';
 
   const label = document.createElement('label');
   label.textContent = 'Timmar du kan träna per vecka';
@@ -483,7 +489,29 @@ function hoursRow(): HTMLElement {
   label.append(hours);
 
   row.append(label);
+
+  // Riktmärket skrivs om när variant eller mål ändras.
+  const note = help('');
+  note.dataset['hoursRecommendation'] = 'true';
+  row.append(note);
+
   return row;
+}
+
+/** Skriver riktmärket för veckotimmar utifrån vald variant och valda mål. */
+function showHoursRecommendation(form: HTMLFormElement): void {
+  const field = form.querySelector('[data-hours-recommendation]');
+  if (!(field instanceof HTMLElement)) return;
+
+  const data = new FormData(form);
+  const variant = String(data.get('variant') ?? 'full') as ClassicVariant;
+  const goals = {} as Record<Discipline, Goal>;
+  for (const discipline of DISCIPLINES) {
+    goals[discipline] = String(data.get(`goal-${discipline}`) ?? 'finish') as Goal;
+  }
+
+  const { min, comfortable } = recommendedHours(variant, goals);
+  field.textContent = hoursRecommendation(min, comfortable);
 }
 
 function readForm(form: HTMLFormElement): PlanInput {
