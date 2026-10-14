@@ -248,3 +248,62 @@ button.secondary {
   font-weight: 600;
   font-size: 0.9rem;
 }
+
+.block-heading {
+  margin: 2.5rem 0 0.25rem;
+  font-size: 1.2rem;
+}
+
+.block-span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.field-label {
+  margin: 0.5rem 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.row.days {
+  gap: 0.25rem 1rem;
+}
+
+.row.days .choice {
+  flex: 0 0 auto;
+  border: 0;
+  padding: 0.25rem 0;
+}
+
+.session {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.session-kind {
+  flex: 0 0 5.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.session-priority {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.session.key .session-priority {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.priority-note {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}

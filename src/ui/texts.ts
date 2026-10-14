@@ -149,3 +149,52 @@ export const WARNING_TEXT = {
     'Du har varken stakmaskin eller rullskidor, så skidpassen utanför snöperioden blir stavgång ' +
     'och överkroppsstyrka. Får du tillgång till något av dem blir skidträningen klart bättre.',
 } as const;
+
+export const GOAL_LABEL = {
+  finish: 'Ta mig runt',
+  improve: 'Klara det med god marginal',
+  time: 'Jag har ett tidsmål',
+} as const;
+
+export const GOAL_HELP =
+  'Målet styr hur hård träningen blir. Vill du ta dig runt bygger programmet mest volym och ' +
+  'vana. Har du ett tidsmål läggs mer tid på fartträning.';
+
+export const WEEKDAY_LABEL: Record<number, string> = {
+  1: 'måndag',
+  2: 'tisdag',
+  3: 'onsdag',
+  4: 'torsdag',
+  5: 'fredag',
+  6: 'lördag',
+  7: 'söndag',
+};
+
+export const TRAINING_DAYS_LEGEND = 'Din träningsvecka';
+
+export const TRAINING_DAYS_HELP =
+  'Programmet lägger passen på de dagar du faktiskt kan träna. Långpasset hamnar på din ' +
+  'önskade dag, och det hårda passet så långt från det som veckan tillåter.';
+
+export const DAYS_PER_WEEK_LABEL = 'Dagar i veckan du kan träna';
+export const LONG_DAY_LABEL = 'Dag för långpass';
+export const UNAVAILABLE_DAYS_LABEL = 'Dagar du inte kan träna';
+
+export const SESSION_KIND_LABEL = {
+  endurance: 'Kondition',
+  strength: 'Styrka',
+} as const;
+
+export const PRIORITY_LABEL = {
+  key: 'Nyckelpass',
+  supporting: 'Stödpass',
+} as const;
+
+/** Står en gång per vecka, så att det går att missa ett pass utan ångest. */
+export const PRIORITY_HELP =
+  'Räcker inte veckan till: behåll nyckelpassen och stryk stödpassen. En vilodag är bättre än ' +
+  'ett illa genomfört pass — bli du sjuk eller trött, hoppa över och fortsätt nästa vecka.';
+
+export function blockHeading(index: number, focus: string[]): string {
+  return `Block ${index + 1} — fokus ${focus.join(' och ')}`;
+}

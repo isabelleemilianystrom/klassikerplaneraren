@@ -4,6 +4,9 @@
  */
 import {
   DISCIPLINES,
+  WEEKDAYS,
+  type Goal,
+  type Weekday,
   type ClassicVariant,
   type Discipline,
   type IsoDate,
@@ -22,6 +25,18 @@ import {
   ENGELBREKTSLOPPET_LABEL,
   EQUIPMENT_HELP,
   EQUIPMENT_LABEL,
+  GOAL_HELP,
+  GOAL_LABEL,
+  DAYS_PER_WEEK_LABEL,
+  LONG_DAY_LABEL,
+  PRIORITY_HELP,
+  PRIORITY_LABEL,
+  SESSION_KIND_LABEL,
+  TRAINING_DAYS_HELP,
+  TRAINING_DAYS_LEGEND,
+  UNAVAILABLE_DAYS_LABEL,
+  WEEKDAY_LABEL,
+  blockHeading,
   LEVEL_LABEL,
   MONTH_LABEL,
   PAST_DATE_HELP,
@@ -62,7 +77,7 @@ export function renderForm(
   const races = document.createElement('fieldset');
   const racesLegend = document.createElement('legend');
   racesLegend.textContent = 'Dina lopp och din nivå';
-  races.append(racesLegend, help(CLASSIC_WINDOW_HELP));
+  races.append(racesLegend, help(CLASSIC_WINDOW_HELP), help(GOAL_HELP));
 
   for (const discipline of DISCIPLINES) {
     races.append(raceRow(discipline, today));
@@ -71,6 +86,7 @@ export function renderForm(
   form.append(races);
 
   form.append(snowSeasonFieldset());
+  form.append(trainingDaysFieldset());
   form.append(equipmentFieldset());
   form.append(hoursRow());
 
@@ -177,6 +193,58 @@ function snowSeasonFieldset(): HTMLElement {
  * saknar både stakmaskin och rullskidor får veta att programmet blir sämre.
  * Frågorna är få med flit — bara där programmet annars måste gissa.
  */
+/** När användaren kan träna: antal dagar, långpassdag och omöjliga dagar. */
+function trainingDaysFieldset(): HTMLElement {
+  const fieldset = document.createElement('fieldset');
+  const legend = document.createElement('legend');
+  legend.textContent = TRAINING_DAYS_LEGEND;
+  fieldset.append(legend, help(TRAINING_DAYS_HELP));
+
+  const row = document.createElement('div');
+  row.className = 'row';
+
+  const daysLabel = document.createElement('label');
+  daysLabel.textContent = DAYS_PER_WEEK_LABEL;
+  const days = document.createElement('input');
+  days.type = 'number';
+  days.name = 'daysPerWeek';
+  days.min = '2';
+  days.max = '7';
+  days.step = '1';
+  days.value = '4';
+  days.required = true;
+  daysLabel.append(days);
+
+  const longLabel = document.createElement('label');
+  longLabel.textContent = LONG_DAY_LABEL;
+  const long = document.createElement('select');
+  long.name = 'longSessionDay';
+  for (const day of WEEKDAYS) {
+    const option = document.createElement('option');
+    option.value = String(day);
+    option.textContent = WEEKDAY_LABEL[day] ?? String(day);
+    option.selected = day === 7;
+    long.append(option);
+  }
+  longLabel.append(long);
+
+  row.append(daysLabel, longLabel);
+  fieldset.append(row);
+
+  const unavailable = document.createElement('div');
+  unavailable.className = 'row days';
+  const unavailableLabel = document.createElement('p');
+  unavailableLabel.className = 'field-label';
+  unavailableLabel.textContent = UNAVAILABLE_DAYS_LABEL;
+  fieldset.append(unavailableLabel);
+  for (const day of WEEKDAYS) {
+    unavailable.append(checkbox(`unavailable-${day}`, WEEKDAY_LABEL[day] ?? String(day)));
+  }
+  fieldset.append(unavailable);
+
+  return fieldset;
+}
+
 function equipmentFieldset(): HTMLElement {
   const fieldset = document.createElement('fieldset');
   const legend = document.createElement('legend');
@@ -320,7 +388,19 @@ function raceRow(discipline: Discipline, today: IsoDate): HTMLElement {
   }
   levelLabel.append(level);
 
-  row.append(dateLabel, levelLabel);
+  const goalLabel = document.createElement('label');
+  goalLabel.textContent = 'Ditt mål';
+  const goal = document.createElement('select');
+  goal.name = `goal-${discipline}`;
+  for (const [value, text] of Object.entries(GOAL_LABEL)) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = text;
+    goal.append(option);
+  }
+  goalLabel.append(goal);
+
+  row.append(dateLabel, levelLabel, goalLabel);
   if (discipline === 'skiing') {
     row.append(engelbrektsloppetField());
   }
@@ -377,9 +457,11 @@ function readForm(form: HTMLFormElement): PlanInput {
   const races = {} as PlanInput['races'];
   const levels = {} as PlanInput['levels'];
 
+  const goals = {} as PlanInput['goals'];
   for (const discipline of DISCIPLINES) {
     races[discipline] = String(data.get(`race-${discipline}`) ?? '');
     levels[discipline] = String(data.get(`level-${discipline}`) ?? 'beginner') as Level;
+    goals[discipline] = String(data.get(`goal-${discipline}`) ?? 'finish') as Goal;
   }
 
   const variant = String(data.get('variant') ?? 'full') as ClassicVariant;
@@ -400,6 +482,12 @@ function readForm(form: HTMLFormElement): PlanInput {
       skiErgometer: data.get('equipment-skiErgometer') !== null,
       rollerSkis: data.get('equipment-rollerSkis') !== null,
       indoorTrainer: data.get('equipment-indoorTrainer') !== null,
+    },
+    goals,
+    trainingDays: {
+      daysPerWeek: Number(data.get('daysPerWeek') ?? 4),
+      longSessionDay: Number(data.get('longSessionDay') ?? 7) as Weekday,
+      unavailableDays: WEEKDAYS.filter((day) => data.get(`unavailable-${day}`) !== null),
     },
   };
 }
@@ -422,12 +510,36 @@ export function renderProgram(container: HTMLElement, program: Program): void {
 
   container.append(summary(program));
 
-  const list = document.createElement('ol');
-  list.className = 'weeks';
-  for (const [index, week] of program.weeks.entries()) {
-    list.append(weekItem(week, index + 1));
+  // Veckorna grupperas i block. Fokuset står på blocket, inte på passen — det
+  // ska gå att missa ett pass utan att känna att man missat loppet.
+  for (const [index, block] of program.blocks.entries()) {
+    const weeks = program.weeks.filter((week) => week.block === index);
+    if (weeks.length === 0) continue;
+
+    const heading = document.createElement('h2');
+    heading.className = 'block-heading';
+    heading.textContent = blockHeading(
+      index,
+      block.focus.map((discipline) => raceLabel(discipline)),
+    );
+
+    const span = document.createElement('p');
+    span.className = 'block-span';
+    span.textContent = `${weeks.length} veckor · ${block.startDate} till ${block.endDate}`;
+
+    const list = document.createElement('ol');
+    list.className = 'weeks';
+    for (const week of weeks) {
+      list.append(weekItem(week, program.weeks.indexOf(week) + 1));
+    }
+
+    container.append(heading, span, list);
   }
-  container.append(list);
+
+  const priorityNote = document.createElement('p');
+  priorityNote.className = 'help priority-note';
+  priorityNote.textContent = PRIORITY_HELP;
+  container.append(priorityNote);
 }
 
 function weekItem(week: Week, number: number): HTMLElement {
@@ -435,7 +547,7 @@ function weekItem(week: Week, number: number): HTMLElement {
   item.className = 'week';
 
   const heading = document.createElement('h3');
-  heading.textContent = `Vecka ${number} — ${PHASE_LABEL[week.phase]} mot ${RACE_LABEL[week.targetRace]}`;
+  heading.textContent = `Vecka ${number} — ${PHASE_LABEL[week.phase]}`;
 
   const meta = document.createElement('p');
   meta.className = 'week-meta';
@@ -449,12 +561,29 @@ function weekItem(week: Week, number: number): HTMLElement {
   }
 
   const sessions = document.createElement('ul');
-  for (const session of week.sessions) {
+  const byDay = [...week.sessions].sort((a, b) => a.day - b.day);
+  for (const session of byDay) {
     const row = document.createElement('li');
+    row.className = session.priority === 'key' ? 'session key' : 'session';
+
+    const tag = document.createElement('span');
+    tag.className = 'session-kind';
+    tag.textContent = SESSION_KIND_LABEL[session.kind];
+
     const what = session.substitute
       ? `${DISCIPLINE_LABEL[session.discipline]} (${SUBSTITUTE_LABEL[session.substitute]})`
       : DISCIPLINE_LABEL[session.discipline];
-    row.textContent = `${what} · ${formatHours(session.hours)} · ${PURPOSE_LABEL[session.purpose]}`;
+
+    const text = document.createElement('span');
+    text.textContent =
+      `${WEEKDAY_LABEL[session.day] ?? ''} · ${what} · ${formatHours(session.hours)} · ` +
+      `${PURPOSE_LABEL[session.purpose]}`;
+
+    const priority = document.createElement('span');
+    priority.className = 'session-priority';
+    priority.textContent = PRIORITY_LABEL[session.priority];
+
+    row.append(tag, text, priority);
     sessions.append(row);
   }
 
