@@ -51,6 +51,12 @@ import {
   UNAVAILABLE_DAYS_LABEL,
   WEEKDAY_LABEL,
   blockHeading,
+  BLOCK_NAV_LABEL,
+  CURRENT_WEEK_LABEL,
+  hoursUsage,
+  pastWeeksSummary,
+  RESET_HELP,
+  RESET_LABEL,
   LEVEL_LABEL,
   MONTH_LABEL,
   PAST_DATE_HELP,
@@ -77,11 +83,15 @@ const MONTHS: readonly number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
  * `today` skickas in och hämtas inte här, så att rendering och logik utgår från
  * samma datum — och så att vyn går att rita upp för vilket datum som helst.
  */
-export function renderForm(
-  container: HTMLElement,
-  today: IsoDate,
-  onSubmit: (input: PlanInput) => void,
-): void {
+export interface FormOptions {
+  onSubmit: (input: PlanInput) => void;
+  onReset: () => void;
+  /** Svaren som gav det sparade programmet, om det finns ett. */
+  input?: PlanInput;
+}
+
+export function renderForm(container: HTMLElement, today: IsoDate, options: FormOptions): void {
+  const { onSubmit, onReset, input } = options;
   const form = document.createElement('form');
   form.className = 'plan-form';
   form.noValidate = false;
@@ -115,15 +125,80 @@ export function renderForm(
     onSubmit(readForm(form));
   });
 
+  form.append(resetRow(onReset, input !== undefined));
+
   // Formuläret visar alltid distanserna för det som är valt just nu.
   form.addEventListener('change', () => {
     showDistances(form);
     showHoursRecommendation(form);
   });
 
+  if (input !== undefined) applyInput(form, input);
+
   container.append(form);
   showDistances(form);
   showHoursRecommendation(form);
+}
+
+/**
+ * Fyller formuläret med svaren från ett sparat program.
+ *
+ * Utan det här visar appen ett sparat program bredvid ett tomt formulär, och
+ * en liten ändring skriver över hela året med standardvärden.
+ */
+function applyInput(form: HTMLFormElement, input: PlanInput): void {
+  setChecked(form, `input[name="variant"][value="${input.variant}"]`, true);
+  setChecked(form, 'input[name="engelbrektsloppet"]', input.engelbrektsloppet);
+
+  for (const discipline of DISCIPLINES) {
+    setValue(form, `input[name="race-${discipline}"]`, input.races[discipline]);
+    setValue(form, `select[name="level-${discipline}"]`, input.levels[discipline]);
+    setValue(form, `select[name="goal-${discipline}"]`, input.goals[discipline]);
+  }
+
+  setValue(form, 'input[name="hoursPerWeek"]', String(input.hoursPerWeek));
+  setValue(form, 'select[name="snowStart"]', String(input.snowSeason.startMonth));
+  setValue(form, 'select[name="snowEnd"]', String(input.snowSeason.endMonth));
+  setValue(form, 'select[name="openWaterStart"]', String(input.openWaterSeason.startMonth));
+  setValue(form, 'select[name="openWaterEnd"]', String(input.openWaterSeason.endMonth));
+  setValue(form, 'input[name="daysPerWeek"]', String(input.trainingDays.daysPerWeek));
+  setValue(form, 'select[name="longSessionDay"]', String(input.trainingDays.longSessionDay));
+
+  for (const day of WEEKDAYS) {
+    setChecked(form, `input[name="unavailable-${day}"]`, input.trainingDays.unavailableDays.includes(day));
+  }
+  for (const name of Object.keys(EQUIPMENT_LABEL)) {
+    const key = name as keyof typeof EQUIPMENT_LABEL;
+    setChecked(form, `input[name="equipment-${name}"]`, input.equipment[key]);
+  }
+}
+
+function setValue(form: HTMLFormElement, selector: string, value: string): void {
+  const field = form.querySelector(selector);
+  if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+    field.value = value;
+  }
+}
+
+function setChecked(form: HTMLFormElement, selector: string, checked: boolean): void {
+  const field = form.querySelector(selector);
+  if (field instanceof HTMLInputElement) field.checked = checked;
+}
+
+/** Knappen som kastar det sparade programmet och börjar om. */
+function resetRow(onReset: () => void, hasSaved: boolean): HTMLElement {
+  const row = document.createElement('div');
+  row.className = 'reset';
+  if (!hasSaved) return row;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'link';
+  button.textContent = RESET_LABEL;
+  button.addEventListener('click', onReset);
+
+  row.append(button, help(RESET_HELP));
+  return row;
 }
 
 /**
@@ -559,7 +634,7 @@ function readForm(form: HTMLFormElement): PlanInput {
 }
 
 /** Ritar programmet vecka för vecka. */
-export function renderProgram(container: HTMLElement, program: Program): void {
+export function renderProgram(container: HTMLElement, program: Program, today: IsoDate): void {
   container.replaceChildren();
 
   for (const warning of program.warnings) {
@@ -576,6 +651,8 @@ export function renderProgram(container: HTMLElement, program: Program): void {
 
   container.append(summary(program), exportButton(program));
 
+  container.append(blockNav(program));
+
   // Veckorna grupperas i block. Fokuset står på blocket, inte på passen — det
   // ska gå att missa ett pass utan att känna att man missat loppet.
   for (const [index, block] of program.blocks.entries()) {
@@ -584,6 +661,7 @@ export function renderProgram(container: HTMLElement, program: Program): void {
 
     const heading = document.createElement('h2');
     heading.className = 'block-heading';
+    heading.id = blockId(index);
     heading.textContent = blockHeading(
       index,
       block.focus.map((discipline) => raceLabel(discipline)),
@@ -593,13 +671,23 @@ export function renderProgram(container: HTMLElement, program: Program): void {
     span.className = 'block-span';
     span.textContent = `${weeks.length} veckor · ${block.startDate} till ${block.endDate}`;
 
-    const list = document.createElement('ol');
-    list.className = 'weeks';
-    for (const week of weeks) {
-      list.append(weekItem(week, program.weeks.indexOf(week) + 1));
-    }
+    container.append(heading, span);
 
-    container.append(heading, span, list);
+    // Veckor som varit fälls ihop. Femtioen likadana kort är ingen plan att
+    // följa — det som gäller nu ska ligga överst.
+    const past = weeks.filter((week) => isPast(week, today));
+    const ahead = weeks.filter((week) => !isPast(week, today));
+
+    if (past.length > 0) {
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = pastWeeksSummary(past.length);
+      details.append(summary, weekList(past, program, today));
+      container.append(details);
+    }
+    if (ahead.length > 0) {
+      container.append(weekList(ahead, program, today));
+    }
   }
 
   const priorityNote = document.createElement('p');
@@ -608,9 +696,16 @@ export function renderProgram(container: HTMLElement, program: Program): void {
   container.append(priorityNote);
 }
 
-function weekItem(week: Week, number: number): HTMLElement {
+function weekItem(week: Week, number: number, today: IsoDate): HTMLElement {
   const item = document.createElement('li');
-  item.className = 'week';
+  item.className = isCurrent(week, today) ? 'week current' : 'week';
+  if (isCurrent(week, today)) {
+    item.setAttribute('aria-current', 'date');
+    const badge = document.createElement('p');
+    badge.className = 'current-badge';
+    badge.textContent = CURRENT_WEEK_LABEL;
+    item.append(badge);
+  }
 
   const heading = document.createElement('h3');
   heading.textContent = `Vecka ${number} — ${PHASE_LABEL[week.phase]}`;
@@ -686,6 +781,63 @@ function formatHours(hours: number): string {
   return `${hours.toLocaleString('sv-SE')} h`;
 }
 
+function weekList(weeks: readonly Week[], program: Program, today: IsoDate): HTMLElement {
+  const list = document.createElement('ol');
+  list.className = 'weeks';
+  for (const week of weeks) {
+    list.append(weekItem(week, program.weeks.indexOf(week) + 1, today));
+  }
+  return list;
+}
+
+/** Sant när veckan redan är avklarad. */
+function isPast(week: Week, today: IsoDate): boolean {
+  return weekEnd(week.startDate) < today;
+}
+
+/** Sant när dagens datum ligger i veckan. */
+function isCurrent(week: Week, today: IsoDate): boolean {
+  return week.startDate <= today && today <= weekEnd(week.startDate);
+}
+
+function weekEnd(startDate: IsoDate): IsoDate {
+  const end = new Date(`${startDate}T00:00:00Z`);
+  end.setUTCDate(end.getUTCDate() + 6);
+  return end.toISOString().slice(0, 10);
+}
+
+function blockId(index: number): string {
+  return `block-${index + 1}`;
+}
+
+/** Genvägar till blocken, så att ett år går att överblicka. */
+function blockNav(program: Program): HTMLElement {
+  const nav = document.createElement('nav');
+  nav.className = 'block-nav';
+  nav.setAttribute('aria-label', BLOCK_NAV_LABEL);
+
+  const list = document.createElement('ul');
+  for (const [index, block] of program.blocks.entries()) {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = `#${blockId(index)}`;
+    link.textContent = block.focus.map((discipline) => raceLabel(discipline)).join(' och ');
+    item.append(link);
+    list.append(item);
+  }
+
+  nav.append(list);
+  return nav;
+}
+
+/** Skrollar till veckan användaren är i just nu. */
+export function scrollToCurrentWeek(container: HTMLElement): void {
+  const current = container.querySelector('.week.current');
+  if (current instanceof HTMLElement) {
+    current.scrollIntoView({ block: 'center' });
+  }
+}
+
 /**
  * Knappen som laddar ner programmet som kalenderfil.
  *
@@ -724,9 +876,10 @@ function summary(program: Program): HTMLElement {
   const hours = program.weeks.reduce((sum, week) => sum + week.totalHours, 0);
   const paragraph = document.createElement('p');
   paragraph.className = 'summary';
+  const average = weeks === 0 ? 0 : hours / weeks;
   paragraph.textContent =
     `${weeks} veckor, totalt ${hours.toLocaleString('sv-SE')} timmar. ` +
-    `Första veckan börjar ${program.weeks[0]?.startDate ?? ''}.`;
+    hoursUsage(average, program.input.hoursPerWeek);
   return paragraph;
 }
 

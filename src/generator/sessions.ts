@@ -17,6 +17,7 @@ import type {
   Discipline,
   Goal,
   Intensity,
+  IsoDate,
   Level,
   PlanInput,
   Phase,
@@ -35,13 +36,19 @@ import type { PhasedWeek } from './phases';
 import { trainingDaysOfWeek, preferredLongDay } from './schedule';
 import { isSeasonWeek, isSnowWeek, skiSubstitute } from './season';
 
-/** Hur stor del av timbudgeten en fas använder. */
+/**
+ * Hur stor del av timbudgeten en fas använder.
+ *
+ * Användaren anger vad hon *kan* träna, och en normal träningsvecka ska ligga
+ * nära det. Lägger vi oss för långt under ser programmet ut att ignorera svaret
+ * — det är bara nedtrappning och återhämtning som ska kännas tomma.
+ */
 const PHASE_LOAD: Record<Phase, number> = {
-  base: 0.8,
+  base: 0.85,
   build: 1,
-  peak: 0.9,
+  peak: 0.95,
   taper: 0.5,
-  recovery: 0.6,
+  recovery: 0.65,
 };
 
 /** Veckan efter ett lopp är lättare än fasen annars kräver. */
@@ -162,7 +169,9 @@ export function weeklyHours(week: PhasedWeek, hoursPerWeek: number): number {
  * nedtrappnings- och återhämtningsveckor genom fasens egen faktor.
  */
 function progression(weeksUntilRace: number): number {
-  return 0.85 + 0.15 * rampProgress(weeksUntilRace);
+  // Smal spännvidd med flit: stegringen ska märkas, men inte göra de första
+  // veckorna så tunna att användaren undrar vart hennes timmar tog vägen.
+  return 0.92 + 0.08 * rampProgress(weeksUntilRace);
 }
 
 /** Hur långt uppbyggnaden hunnit: 0 längst bort från loppet, 1 närmast. */
@@ -286,9 +295,13 @@ function planWeek(
 
   let left = roundDown(budget - long - quality);
 
-  // 3. Underhåll för grenar som ska hållas igång.
+  // 3. Underhåll för grenar som ska hållas igång. Vilka som får plats roterar
+  //    mellan veckorna — annars hamnar samma gren alltid sist i listan och
+  //    tränas aldrig, vilket är precis vad den som är nybörjare i den behöver.
   const maintenanceSlots = Math.min(others.length, Math.max(0, slots - 2));
-  const maintenance: PlannedSession[] = others.slice(0, maintenanceSlots).map((other) => ({
+  const maintenance: PlannedSession[] = rotate(others, weekNumber(week.startDate))
+    .slice(0, maintenanceSlots)
+    .map((other) => ({
     discipline: other,
     hours: capped(other, roundDown(Math.min(left * MAINTENANCE_SHARE, 1.5))),
     purpose: maintenancePurpose(other, input.levels[other]),
@@ -340,9 +353,71 @@ function planWeek(
     free -= 1;
   }
 
-  return [...key, ...maintenance, ...extra, ...strength].filter(
+  const planned = [...key, ...maintenance, ...extra, ...strength].filter(
     (session) => session.hours >= MIN_SESSION_HOURS,
   );
+
+  return fillUpTo(planned, budget, longCeiling(week, input));
+}
+
+/**
+ * Fördelar timmar som blivit över på de pass som redan finns.
+ *
+ * Tar dagarna slut innan timmarna gör det ska passen bli längre, inte
+ * timmarna försvinna. Användaren har sagt hur mycket tid hon har, och ett
+ * program som bara använder halva den tiden ser ut att ha räknat fel.
+ *
+ * Varje pass har fortfarande sitt tak: långpasset sitt uppbyggnadstak, övriga
+ * grenens maxlängd.
+ */
+function fillUpTo(
+  sessions: PlannedSession[],
+  budget: number,
+  ceiling: number,
+): PlannedSession[] {
+  let left = roundDown(budget - sessions.reduce((sum, session) => sum + session.hours, 0));
+
+  while (left >= MIN_SESSION_HOURS) {
+    let added = false;
+    for (const session of sessions) {
+      if (left < MIN_SESSION_HOURS) break;
+      if (session.purpose === 'strength') continue;
+      const cap = session.long ? ceiling : MAX_SESSION_HOURS[session.discipline];
+      if (session.hours + MIN_SESSION_HOURS > cap) continue;
+      session.hours = roundDown(session.hours + MIN_SESSION_HOURS);
+      left = roundDown(left - MIN_SESSION_HOURS);
+      added = true;
+    }
+    if (!added) break;
+  }
+
+  return sessions;
+}
+
+/** Långpassets tak för veckan, så att påfyllningen respekterar uppbyggnaden. */
+function longCeiling(week: PhasedWeek, input: PlanInput): number {
+  const discipline = week.targetRace;
+  return longSessionCeiling(
+    discipline,
+    week.weeksUntilRace,
+    raceHours(input, discipline),
+    input.levels[discipline],
+    input.goals[discipline],
+  );
+}
+
+/** Veckonummer räknat från en fast måndag, för deterministisk rotation. */
+function weekNumber(weekStart: IsoDate): number {
+  const start = Date.UTC(1970, 0, 5);
+  const current = new Date(`${weekStart}T00:00:00Z`).getTime();
+  return Math.round((current - start) / (7 * 24 * 60 * 60 * 1000));
+}
+
+/** Samma lista, roterad så att en annan gren hamnar först. */
+function rotate<T>(items: readonly T[], offset: number): T[] {
+  if (items.length === 0) return [];
+  const start = ((offset % items.length) + items.length) % items.length;
+  return [...items.slice(start), ...items.slice(0, start)];
 }
 
 /** Öppningspassets dag, när ett lopp går och dagen före är möjlig. */

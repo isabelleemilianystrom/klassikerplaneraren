@@ -242,6 +242,17 @@ Tre val är värda att känna till:
 Modulen äger inga svenska texter — de skickas in från `src/ui/ics-labels.ts`. Det håller
 exporten testbar utan UI och gör den översättbar utan att formatkoden ändras.
 
+## Att följa planen
+
+Programmet är långt — ett helt år, ofta femtio veckor. Tre saker gör det följbart:
+
+- **Genvägar till blocken** högst upp, så att året går att överblicka.
+- **Veckan du är i nu är markerad** och sidan skrollar dit när du kommer tillbaka.
+- **Veckor som varit fälls ihop.** Det som gäller nu ligger överst.
+
+Programmet sparas i webbläsaren, och formuläret fylls med samma svar nästa gång du kommer
+tillbaka. Vill du börja om finns en knapp för det under formuläret.
+
 ## Deploy
 
 Push till `main` bygger sidan och publicerar den på GitHub Pages via GitHub Actions

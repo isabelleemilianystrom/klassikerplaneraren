@@ -267,3 +267,32 @@ export function hoursRecommendation(min: number, comfortable: number): string {
     'anpassar sig efter de timmar du faktiskt har.'
   );
 }
+
+export const RESET_LABEL = 'Börja om med nya förutsättningar';
+
+export const RESET_HELP =
+  'Rensar det sparade programmet och återställer formuläret. Du kan också bara ändra ett svar ' +
+  'ovan och skapa programmet på nytt.';
+
+export const BLOCK_NAV_LABEL = 'Hoppa till block';
+
+export const CURRENT_WEEK_LABEL = 'Den här veckan';
+
+export const SOMETHING_WENT_WRONG = 'Något gick fel när programmet skulle skapas.';
+
+export function programCreated(weeks: number, firstWeek: string): string {
+  return `Programmet är klart: ${weeks} veckor, med start ${firstWeek}. Det sparas i din webbläsare.`;
+}
+
+export function pastWeeksSummary(count: number): string {
+  return count === 1 ? 'Visa 1 vecka som varit' : `Visa ${count} veckor som varit`;
+}
+
+/** Hur mycket av den angivna tiden programmet faktiskt använder. */
+export function hoursUsage(average: number, stated: number): string {
+  const format = (hours: number): string => hours.toLocaleString('sv-SE', { maximumFractionDigits: 1 });
+  return (
+    `I snitt ${format(average)} av dina ${format(stated)} timmar i veckan. ` +
+    'Nedtrappnings- och återhämtningsveckor drar ner snittet med flit.'
+  );
+}

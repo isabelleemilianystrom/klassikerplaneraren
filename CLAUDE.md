@@ -122,6 +122,13 @@ Hur programmet skrivs ut är en del av produkten, inte bara formgivning. Tre reg
 - **Varje pass märks som nyckelpass eller stödpass.** Räcker inte veckan till ska det vara uppenbart vad som ska strykas: långpasset och kvalitetspasset står kvar, resten får gå. Det står utskrivet en gång per vecka.
 - **Passen har en veckodag.** Användaren anger hur många dagar hon kan träna, vilken dag långpasset ska ligga på och vilka dagar som är omöjliga. Programmet respekterar det.
 
+## Tillgänglighet och återbesök
+
+- **Bara statusraden läses upp automatiskt.** `#status` har `role="status"` och får fokus efter generering. Sätt aldrig `aria-live` på programlistan — den innehåller femtioen veckor och skulle läsas upp i sin helhet.
+- **Formuläret fylls från det sparade programmet.** Ett sparat program bredvid ett tomt formulär betyder att en liten ändring skriver över hela året med standardvärden.
+- **Den som kommer tillbaka ska se sin vecka.** Innevarande vecka markeras med `aria-current="date"` och skrollas fram; veckor som varit fälls ihop i `<details>`.
+- **Veckovolymen ska ligga nära det användaren angett.** Hon har sagt vad hon *kan* träna. Timmar som inte får plats fördelas på befintliga pass i stället för att försvinna — bara nedtrappning och återhämtning ska kännas tomma.
+
 ## Domänregler att respektera
 
 - Fyra grenar, fyra loppdatum. Varje lopp har en egen topp — programmet är inte en enda lång uppbyggnad.
