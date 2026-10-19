@@ -86,6 +86,8 @@ Lägg nya moduler i det lager de hör till. Om något känns svårt att placera:
 
 - **Genereringen är ren.** `src/generator/` tar indata och returnerar ett program. Inga anrop till `localStorage`, `document`, `Date.now()` eller nätverk — behövs dagens datum skickas det in som argument. Logiken ska vara helt frikopplad från UI och testbar utan DOM.
 - **Programmet är ett serialiserbart dataobjekt.** Rena JSON-vänliga värden: inga `Date`-instanser, `Map`, `Set` eller klasser i programobjektet. Datum som ISO-strängar (`YYYY-MM-DD`).
+- **Höj `version` i programobjektet varje gång formatet ändras.** Versionen finns för att gamla sparade program ska kunna avvisas i stället för att läsas in och krascha appen. Formatet ändrades fem gånger under version 1, och resultatet blev en vit sida för alla som hade ett sparat program. `storage.ts` validerar nu de fält rendering och export faktiskt läser, och rensar det som inte går att använda.
+- **Rendering av sparat program ska aldrig kunna ta ner formuläret.** `main.ts` ritar formuläret i ett eget `try`-block. Utan formulär finns ingen väg ut för användaren.
 - **All lagring går via `storage.ts`.** Resten av koden anropar aldrig `localStorage` direkt. Modulen exponerar ett litet interface (t.ex. `sparaProgram`/`laddaProgram`/`rensaProgram`) så att backend kan ersätta localStorage senare utan att övrig kod ändras. Versionera det sparade objektet (t.ex. fältet `version`) så format kan migreras.
 - **Inga globala variabler.** Inget delat muterbart tillstånd på modulnivå. Tillstånd skickas som argument eller returneras.
 - **Funktioner gör en sak** och har beskrivande namn. Hellre fler små funktioner än en stor.

@@ -6,7 +6,7 @@ import { generateProgram } from './generator';
 import { clearProgram, loadProgram, saveProgram } from './storage';
 import type { PlanInput } from './types';
 import { renderDisclaimer, renderForm, renderProgram, scrollToCurrentWeek } from './ui/render';
-import { programCreated, SOMETHING_WENT_WRONG } from './ui/texts';
+import { DISCARDED_PROGRAM, programCreated, SOMETHING_WENT_WRONG } from './ui/texts';
 import './styles.css';
 
 function todayIso(): string {
@@ -23,18 +23,41 @@ function main(): void {
 
   // Finns ett sparat program fylls formuläret med samma svar som gav det.
   // Annars kan en liten ändring skriva över hela året med standardvärden.
-  const saved = loadProgram();
+  const { program: saved, discarded } = loadProgram();
 
-  renderForm(formRoot, todayIso(), {
-    onSubmit: (input) => handleSubmit(input, programRoot, statusRoot),
-    onReset: () => resetAll(),
-    ...(saved === null ? {} : { input: saved.input }),
-  });
+  // Formuläret ritas först och i ett eget försök. Ett trasigt sparat program
+  // ska aldrig kunna ta ner hela sidan — utan formulär finns ingen väg ut.
+  try {
+    renderForm(formRoot, todayIso(), {
+      onSubmit: (input) => handleSubmit(input, programRoot, statusRoot),
+      onReset: () => resetAll(),
+      ...(saved === null ? {} : { input: saved.input }),
+    });
+  } catch {
+    clearProgram();
+    renderForm(formRoot, todayIso(), {
+      onSubmit: (input) => handleSubmit(input, programRoot, statusRoot),
+      onReset: () => resetAll(),
+    });
+    announce(statusRoot, DISCARDED_PROGRAM, true);
+    return;
+  }
+
+  if (discarded) {
+    announce(statusRoot, DISCARDED_PROGRAM, true);
+    return;
+  }
 
   if (saved !== null) {
-    renderProgram(programRoot, saved, todayIso());
-    // Den som kommer tillbaka vill se veckan hon är i, inte vecka ett.
-    scrollToCurrentWeek(programRoot);
+    try {
+      renderProgram(programRoot, saved, todayIso());
+      // Den som kommer tillbaka vill se veckan hon är i, inte vecka ett.
+      scrollToCurrentWeek(programRoot);
+    } catch {
+      clearProgram();
+      programRoot.replaceChildren();
+      announce(statusRoot, DISCARDED_PROGRAM, true);
+    }
   }
 }
 

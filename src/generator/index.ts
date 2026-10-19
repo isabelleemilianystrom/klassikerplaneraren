@@ -42,6 +42,14 @@ export {
  */
 export const MIN_OPEN_WATER_SESSIONS = 2;
 
+/**
+ * Så stor andel tomma veckor innan programmet kallas tomt.
+ *
+ * Enstaka tomma veckor är rimliga — nedtrappning och återhämtning kan landa
+ * där. Är en tredjedel tomma räcker timmarna helt enkelt inte.
+ */
+export const MOSTLY_EMPTY_SHARE = 1 / 3;
+
 
 
 /** Genererar ett komplett träningsprogram. */
@@ -70,7 +78,7 @@ export function generateProgram(input: PlanInput, today: IsoDate): Program {
   });
 
   return {
-    version: 1,
+    version: 2,
     createdAt: today,
     input,
     blocks,
@@ -124,6 +132,13 @@ function collectWarnings(input: PlanInput, weeks: readonly Week[]): ProgramWarni
   // kort klassiker ska inte få en varning för att hon inte tränar som en elitist.
   if (input.hoursPerWeek < recommendedHours(input.variant, input.goals).min) {
     warnings.push('tightBudget');
+  }
+
+  // Ett program där de flesta veckorna är tomma är inte ett program. Det ska
+  // sägas rakt ut i stället för att användaren bläddrar genom femtio tomma kort.
+  const empty = weeks.filter((week) => week.sessions.length === 0).length;
+  if (weeks.length > 0 && empty > weeks.length * MOSTLY_EMPTY_SHARE) {
+    warnings.push('mostlyEmpty');
   }
 
   // Första gången i våtdräkt och kallt vatten ska inte vara på tävlingsdagen.

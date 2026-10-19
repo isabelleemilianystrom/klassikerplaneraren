@@ -192,7 +192,7 @@ describe('generateProgram', () => {
 
   it('sparar indata och dagens datum i programmet', () => {
     const result = program();
-    expect(result.version).toBe(1);
+    expect(result.version).toBe(2);
     expect(result.createdAt).toBe(today);
     expect(result.input).toEqual(baseInput);
   });
@@ -558,5 +558,22 @@ describe('riktmärke och varningar följer målet', () => {
     // Samma timmar, men bara tidsmålet ska få varningen om för korta långpass.
     expect(forGoal('finish')).toBe(false);
     expect(forGoal('time')).toBe(true);
+  });
+});
+
+describe('nästan tomma program', () => {
+  it('varnar när de flesta veckorna saknar pass', () => {
+    const warnings = program({ hoursPerWeek: 1 }).warnings;
+    expect(warnings).toContain('mostlyEmpty');
+  });
+
+  it('varnar inte när veckorna har innehåll', () => {
+    expect(program({ hoursPerWeek: 10 }).warnings).not.toContain('mostlyEmpty');
+  });
+
+  it('ger fortfarande ett program, inte ett fel, vid få timmar', () => {
+    const result = program({ hoursPerWeek: 1 });
+    expect(result.weeks.length).toBeGreaterThan(0);
+    expect(result.blocks.length).toBeGreaterThan(0);
   });
 });

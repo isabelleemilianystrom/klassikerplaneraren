@@ -141,6 +141,10 @@ export const EQUIPMENT_HELP =
 
 /** Varningar om programmet. Nycklarna kommer från generatorn. */
 export const WARNING_TEXT = {
+  mostlyEmpty:
+    'De flesta veckorna i programmet blir helt tomma med så få timmar. Ett pass i veckan räcker ' +
+    'inte för att bygga en klassiker — öka timmarna, eller välj en kortare variant så blir ' +
+    'programmet meningsfullt.',
   tightBudget:
     'Du har angett färre timmar än riktmärket för din klassiker och ditt mål. Programmet är gjort ' +
     'för de timmar du har och prioriterar det som ger mest: långpasset och kvalitetspasset. Går ' +
@@ -296,3 +300,15 @@ export function hoursUsage(average: number, stated: number): string {
     'Nedtrappnings- och återhämtningsveckor drar ner snittet med flit.'
   );
 }
+
+export const EMPTY_WEEK = 'Inga planerade pass den här veckan — vila eller rör på dig som du vill.';
+
+export const PROGRAM_DONE_HEADING = 'Programmet är genomfört';
+
+export const PROGRAM_DONE_TEXT =
+  'Alla veckor i planen ligger bakom dig. Grattis — det är en klassiker. Vill du planera om för ' +
+  'nästa år fyller du i nya loppdatum i formuläret ovan.';
+
+export const DISCARDED_PROGRAM =
+  'Ditt tidigare sparade program kunde inte läsas och har rensats. Det berodde på att appen har ' +
+  'ändrats sedan du skapade det. Fyll i formuläret så skapas ett nytt.';

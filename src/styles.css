@@ -431,3 +431,26 @@ button.link {
 .reset .help {
   margin: 0.4rem 0 0;
 }
+
+.done {
+  margin: 2rem 0 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+}
+
+.done h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.done p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.week .help {
+  margin: 0;
+}

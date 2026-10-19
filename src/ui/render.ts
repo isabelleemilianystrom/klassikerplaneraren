@@ -53,6 +53,9 @@ import {
   blockHeading,
   BLOCK_NAV_LABEL,
   CURRENT_WEEK_LABEL,
+  EMPTY_WEEK,
+  PROGRAM_DONE_HEADING,
+  PROGRAM_DONE_TEXT,
   hoursUsage,
   pastWeeksSummary,
   RESET_HELP,
@@ -651,6 +654,12 @@ export function renderProgram(container: HTMLElement, program: Program, today: I
 
   container.append(summary(program), exportButton(program));
 
+  // Är hela planen genomförd ska det sägas, annars möts användaren bara av
+  // ihopfällda veckor och undrar vart programmet tog vägen.
+  if (program.weeks.length > 0 && program.weeks.every((week) => isPast(week, today))) {
+    container.append(donePanel());
+  }
+
   container.append(blockNav(program));
 
   // Veckorna grupperas i block. Fokuset står på blocket, inte på passen — det
@@ -721,6 +730,12 @@ function weekItem(week: Week, number: number, today: IsoDate): HTMLElement {
     raceNote.textContent = `${raceLabel(week.targetRace)} ${week.raceDate}`;
   }
 
+  if (week.sessions.length === 0) {
+    // En vecka utan pass ska säga det. Ett kort med bara "0 h" ser ut som ett fel.
+    item.append(heading, meta, help(EMPTY_WEEK));
+    return item;
+  }
+
   const sessions = document.createElement('ul');
   const byDay = [...week.sessions].sort((a, b) => a.day - b.day);
   for (const session of byDay) {
@@ -788,6 +803,21 @@ function weekList(weeks: readonly Week[], program: Program, today: IsoDate): HTM
     list.append(weekItem(week, program.weeks.indexOf(week) + 1, today));
   }
   return list;
+}
+
+/** Visas när alla veckor i planen ligger bakom användaren. */
+function donePanel(): HTMLElement {
+  const panel = document.createElement('div');
+  panel.className = 'done';
+
+  const heading = document.createElement('h2');
+  heading.textContent = PROGRAM_DONE_HEADING;
+
+  const text = document.createElement('p');
+  text.textContent = PROGRAM_DONE_TEXT;
+
+  panel.append(heading, text);
+  return panel;
 }
 
 /** Sant när veckan redan är avklarad. */

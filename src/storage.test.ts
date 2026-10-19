@@ -33,7 +33,7 @@ class FakeStorage implements Storage {
 
 function emptyProgram(): Program {
   return {
-    version: 1,
+    version: 2,
     createdAt: '2026-01-05',
     input: {
       variant: 'full',
@@ -74,33 +74,80 @@ describe('storage', () => {
   it('sparar och läser tillbaka samma program', () => {
     const program = emptyProgram();
     expect(saveProgram(program)).toBe(true);
-    expect(loadProgram()).toEqual(program);
+    expect(loadProgram()).toEqual({ program, discarded: false });
   });
 
-  it('ger null när inget är sparat', () => {
-    expect(loadProgram()).toBeNull();
+  it('säger att inget finns när inget är sparat', () => {
+    expect(loadProgram()).toEqual({ program: null, discarded: false });
   });
 
-  it('ger null när innehållet inte är giltig JSON', () => {
+  it('kastar innehåll som inte är giltig JSON', () => {
     fake.setItem('klassikerplaneraren.program', '{trasigt');
-    expect(loadProgram()).toBeNull();
+    expect(loadProgram()).toEqual({ program: null, discarded: true });
   });
 
-  it('ger null när versionen är okänd', () => {
+  it('kastar program med okänd version', () => {
     fake.setItem('klassikerplaneraren.program', JSON.stringify({ version: 99, weeks: [] }));
-    expect(loadProgram()).toBeNull();
+    expect(loadProgram().program).toBeNull();
+  });
+
+  /**
+   * Programobjektet bytte form fem gånger medan versionen stod kvar på 1.
+   * Resultatet var att gamla program lästes in som om de vore nya och tog ner
+   * hela appen. De här testerna låser fast att det inte kan hända igen.
+   */
+  it('kastar program från en äldre version av formatet', () => {
+    const gammalt = { ...emptyProgram(), version: 1 };
+    fake.setItem('klassikerplaneraren.program', JSON.stringify(gammalt));
+    expect(loadProgram()).toEqual({ program: null, discarded: true });
+  });
+
+  it('kastar program där input saknas helt', () => {
+    fake.setItem(
+      'klassikerplaneraren.program',
+      JSON.stringify({ version: 2, createdAt: '2026-01-05', weeks: [], blocks: [], warnings: [] }),
+    );
+    expect(loadProgram().discarded).toBe(true);
+  });
+
+  it('kastar program där input är null', () => {
+    fake.setItem(
+      'klassikerplaneraren.program',
+      JSON.stringify({ version: 2, createdAt: '2026-01-05', input: null, weeks: [], blocks: [], warnings: [] }),
+    );
+    expect(loadProgram().discarded).toBe(true);
+  });
+
+  it('kastar program där en gren saknas i indata', () => {
+    const program = emptyProgram();
+    const utanSimning = { ...program, input: { ...program.input, goals: { skiing: 'finish', cycling: 'finish', running: 'finish' } } };
+    fake.setItem('klassikerplaneraren.program', JSON.stringify(utanSimning));
+    expect(loadProgram().discarded).toBe(true);
+  });
+
+  it('kastar program som saknar blocks eller warnings', () => {
+    const program = emptyProgram() as unknown as Record<string, unknown>;
+    delete program['blocks'];
+    fake.setItem('klassikerplaneraren.program', JSON.stringify(program));
+    expect(loadProgram().discarded).toBe(true);
+  });
+
+  it('rensar det som kastats, så att felet inte upprepas vid varje besök', () => {
+    fake.setItem('klassikerplaneraren.program', '{trasigt');
+    loadProgram();
+    expect(fake.getItem('klassikerplaneraren.program')).toBeNull();
   });
 
   it('tar bort sparat program', () => {
     saveProgram(emptyProgram());
     clearProgram();
-    expect(loadProgram()).toBeNull();
+    expect(loadProgram().program).toBeNull();
   });
 
   it('kraschar inte när lagring saknas', () => {
     Object.defineProperty(globalThis, 'localStorage', { value: undefined, configurable: true });
     expect(saveProgram(emptyProgram())).toBe(false);
-    expect(loadProgram()).toBeNull();
+    expect(loadProgram()).toEqual({ program: null, discarded: false });
     expect(() => clearProgram()).not.toThrow();
   });
 });

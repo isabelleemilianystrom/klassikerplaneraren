@@ -127,6 +127,7 @@ export interface Equipment {
 
 /** Sådant programmet vill varna för, som UI översätter till svensk text. */
 export type ProgramWarning =
+  | 'mostlyEmpty'
   | 'tightBudget'
   | 'noSkiSubstitute'
   | 'longSessionTooShort'
@@ -213,8 +214,12 @@ export interface Week {
 }
 
 export interface Program {
-  /** Höjs när formatet ändras, så sparade program kan migreras. */
-  version: 1;
+  /**
+   * Höjs när formatet ändras, så att gamla sparade program kan avvisas i
+   * stället för att läsas in och krascha appen. Se SUPPORTED_VERSION i
+   * storage.ts.
+   */
+  version: 2;
   createdAt: IsoDate;
   input: PlanInput;
   blocks: Block[];
