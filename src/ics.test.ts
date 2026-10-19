@@ -91,7 +91,7 @@ describe('programToIcs', () => {
 
   it('skapar ett VEVENT per pass plus ett per lopp', () => {
     const sessions = program.weeks.reduce((sum, week) => sum + week.sessions.length, 0);
-    const races = program.weeks.filter((week) => week.raceDate !== undefined).length;
+    const races = program.weeks.reduce((sum, week) => sum + week.races.length, 0);
     const events = lines.filter((line) => line === 'BEGIN:VEVENT').length;
     expect(events).toBe(sessions + races);
     expect(lines.filter((line) => line === 'END:VEVENT').length).toBe(events);
@@ -120,7 +120,7 @@ describe('programToIcs', () => {
   });
 
   it('lägger loppen i kalendern', () => {
-    expect(lines).toContain('UID:2027-03-07-race@klassikerplaneraren');
+    expect(lines).toContain('UID:2027-03-07-skiing-race@klassikerplaneraren');
     expect(lines.some((line) => line.includes('Skidloppet'))).toBe(true);
   });
 

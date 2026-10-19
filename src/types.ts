@@ -188,6 +188,12 @@ export interface Session {
  * Blocket bär fokuset, inte det enskilda passet. Ligger två lopp nära varandra
  * — som Vätternrundan och Vansbrosimningen — delar de block.
  */
+/** Ett lopp på ett bestämt datum. */
+export interface RaceOnDate {
+  discipline: Discipline;
+  date: IsoDate;
+}
+
 export interface Block {
   /** Loppen blocket siktar mot, i datumordning. */
   focus: Discipline[];
@@ -207,8 +213,14 @@ export interface Week {
   followsRace: boolean;
   /** Index i programmets blocklista. */
   block: number;
-  /** Satt när ett lopp går den här veckan. Loppet är veckans huvudhändelse. */
-  raceDate?: IsoDate;
+  /**
+   * Loppen som går den här veckan, i datumordning. Tom lista för vanliga veckor.
+   *
+   * Flera lopp kan hamna i samma vecka — Vätternrundan på fredagen och ett
+   * simlopp på söndagen. Bar veckan bara ett loppdatum försvann det andra
+   * loppet tyst ur planen.
+   */
+  races: RaceOnDate[];
   totalHours: number;
   sessions: Session[];
 }
@@ -219,7 +231,7 @@ export interface Program {
    * stället för att läsas in och krascha appen. Se SUPPORTED_VERSION i
    * storage.ts.
    */
-  version: 2;
+  version: 3;
   createdAt: IsoDate;
   input: PlanInput;
   blocks: Block[];

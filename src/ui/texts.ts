@@ -312,3 +312,5 @@ export const PROGRAM_DONE_TEXT =
 export const DISCARDED_PROGRAM =
   'Ditt tidigare sparade program kunde inte läsas och har rensats. Det berodde på att appen har ' +
   'ändrats sedan du skapade det. Fyll i formuläret så skapas ett nytt.';
+
+export const EXPORT_WORKING = 'Skapar kalenderfil…';

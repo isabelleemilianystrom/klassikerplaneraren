@@ -64,21 +64,20 @@ export function generateProgram(input: PlanInput, today: IsoDate): Program {
 
   const weeks: Week[] = phased.map((week, index) => {
     const sessions = buildSessions(week, input);
-    const racing = week.raceDate !== undefined;
     return {
       startDate: week.startDate,
       phase: week.phase,
       targetRace: week.targetRace,
       followsRace: week.followsRace,
       block: blockOfWeek[index] ?? 0,
-      ...(racing ? { raceDate: week.raceDate as IsoDate } : {}),
+      races: week.races,
       totalHours: sessions.reduce((sum, session) => sum + session.hours, 0),
       sessions,
     };
   });
 
   return {
-    version: 2,
+    version: 3,
     createdAt: today,
     input,
     blocks,

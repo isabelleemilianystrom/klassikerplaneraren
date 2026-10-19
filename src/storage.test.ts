@@ -33,7 +33,7 @@ class FakeStorage implements Storage {
 
 function emptyProgram(): Program {
   return {
-    version: 2,
+    version: 3,
     createdAt: '2026-01-05',
     input: {
       variant: 'full',

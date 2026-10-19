@@ -16,7 +16,7 @@ const STORAGE_KEY = 'klassikerplaneraren.program';
  * inte finns — vilket är precis vad som hände när version 1 fick behålla sitt
  * nummer genom fem formatändringar.
  */
-const SUPPORTED_VERSION = 2;
+const SUPPORTED_VERSION = 3;
 
 /** Den delmängd av Storage vi använder. Gör modulen testbar utan DOM. */
 type StorageLike = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;

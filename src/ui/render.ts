@@ -30,6 +30,7 @@ import {
   EQUIPMENT_LABEL,
   EXPORT_HELP,
   EXPORT_LABEL,
+  EXPORT_WORKING,
   hoursRecommendation,
   ICS_FILENAME,
   GOAL_HELP,
@@ -723,16 +724,19 @@ function weekItem(week: Week, number: number, today: IsoDate): HTMLElement {
   meta.className = 'week-meta';
   meta.textContent = `Start ${week.startDate} · ${formatHours(week.totalHours)}`;
 
-  // Loppet är veckans huvudhändelse och ska synas tydligare än passen.
-  const raceNote = document.createElement('p');
-  if (week.raceDate !== undefined) {
-    raceNote.className = 'race-day';
-    raceNote.textContent = `${raceLabel(week.targetRace)} ${week.raceDate}`;
-  }
+  // Loppen är veckans huvudhändelser och ska synas tydligare än passen.
+  const raceNotes = week.races.map((race) => {
+    const note = document.createElement('p');
+    note.className = 'race-day';
+    note.textContent = `${raceLabel(race.discipline)} ${race.date}`;
+    return note;
+  });
 
   if (week.sessions.length === 0) {
     // En vecka utan pass ska säga det. Ett kort med bara "0 h" ser ut som ett fel.
-    item.append(heading, meta, help(EMPTY_WEEK));
+    // Loppen hör ändå hemma här — en loppvecka kan sakna planerad träning.
+    item.append(heading, meta, ...raceNotes);
+    if (week.races.length === 0) item.append(help(EMPTY_WEEK));
     return item;
   }
 
@@ -770,9 +774,7 @@ function weekItem(week: Week, number: number, today: IsoDate): HTMLElement {
     sessions.append(row);
   }
 
-  item.append(heading, meta);
-  if (week.raceDate !== undefined) item.append(raceNote);
-  item.append(sessions);
+  item.append(heading, meta, ...raceNotes, sessions);
   return item;
 }
 
@@ -882,7 +884,20 @@ function exportButton(program: Program): HTMLElement {
   button.type = 'button';
   button.className = 'secondary';
   button.textContent = EXPORT_LABEL;
-  button.addEventListener('click', () => downloadIcs(program));
+  button.addEventListener('click', () => {
+    // Filbygget sker synkront och kan ta en stund på en långsam telefon.
+    // Knappen måste hinna ritas om innan arbetet börjar, annars ser den död ut.
+    button.disabled = true;
+    button.textContent = EXPORT_WORKING;
+    setTimeout(() => {
+      try {
+        downloadIcs(program);
+      } finally {
+        button.disabled = false;
+        button.textContent = EXPORT_LABEL;
+      }
+    }, 0);
+  });
 
   wrapper.append(button, help(EXPORT_HELP));
   return wrapper;

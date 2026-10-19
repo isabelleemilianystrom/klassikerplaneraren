@@ -192,7 +192,7 @@ describe('generateProgram', () => {
 
   it('sparar indata och dagens datum i programmet', () => {
     const result = program();
-    expect(result.version).toBe(2);
+    expect(result.version).toBe(3);
     expect(result.createdAt).toBe(today);
     expect(result.input).toEqual(baseInput);
   });
@@ -321,8 +321,8 @@ describe('loppbelastning och återhämtning', () => {
   it('lägger aldrig ett träningspass på loppdagen', () => {
     const result = program();
     for (const week of result.weeks) {
-      if (week.raceDate === undefined) continue;
-      const raceDay = weekdayOf(week.raceDate);
+      if (week.races.length === 0) continue;
+      const raceDay = weekdayOf((week.races[0] as { date: string }).date);
       for (const session of week.sessions) {
         expect(session.day).not.toBe(raceDay);
       }
@@ -332,8 +332,8 @@ describe('loppbelastning och återhämtning', () => {
   it('ger högst ett kort öppningspass dagen före loppet', () => {
     const result = program();
     for (const week of result.weeks) {
-      if (week.raceDate === undefined) continue;
-      const raceDay = weekdayOf(week.raceDate);
+      if (week.races.length === 0) continue;
+      const raceDay = weekdayOf((week.races[0] as { date: string }).date);
       const dayBefore = raceDay === 1 ? 7 : raceDay - 1;
       for (const session of week.sessions.filter((s) => s.day === dayBefore)) {
         expect(session.hours).toBeLessThanOrEqual(0.5);
@@ -342,21 +342,21 @@ describe('loppbelastning och återhämtning', () => {
   });
 
   it('räknar loppet som belastning och planerar nästan ingen träning i loppveckan', () => {
-    const skiWeek = program().weeks.find((week) => week.raceDate === baseInput.races.skiing);
+    const skiWeek = program().weeks.find((week) => week.races.some((r) => r.date === baseInput.races.skiing));
     // Vasaloppet tar omkring sju timmar. Veckan ska inte innehålla fyra timmar till.
     expect(skiWeek?.totalHours).toBeLessThanOrEqual(1);
   });
 
   it('ger två återhämtningsveckor efter ett långt lopp', () => {
     const weeks = program().weeks;
-    const index = weeks.findIndex((week) => week.raceDate === baseInput.races.skiing);
+    const index = weeks.findIndex((week) => week.races.some((r) => r.date === baseInput.races.skiing));
     expect(weeks[index + 1]?.followsRace).toBe(true);
     expect(weeks[index + 2]?.followsRace).toBe(true);
   });
 
   it('ger en återhämtningsvecka efter ett kort lopp', () => {
     const weeks = program().weeks;
-    const index = weeks.findIndex((week) => week.raceDate === baseInput.races.swimming);
+    const index = weeks.findIndex((week) => week.races.some((r) => r.date === baseInput.races.swimming));
     expect(weeks[index + 1]?.followsRace).toBe(true);
     expect(weeks[index + 2]?.followsRace).toBe(false);
   });
@@ -575,5 +575,65 @@ describe('nästan tomma program', () => {
     const result = program({ hoursPerWeek: 1 });
     expect(result.weeks.length).toBeGreaterThan(0);
     expect(result.blocks.length).toBeGreaterThan(0);
+  });
+});
+
+describe('flera lopp samma vecka', () => {
+  /** Cykelloppet fredag och simloppet söndag i samma vecka. */
+  const sameWeek: PlanInput['races'] = {
+    skiing: '2027-03-07',
+    cycling: '2027-06-18',
+    swimming: '2027-06-20',
+    running: '2027-09-25',
+  };
+
+  it('tappar inte det andra loppet ur planen', () => {
+    const weeks = program({ races: sameWeek }).weeks;
+    const alla = weeks.flatMap((week) => week.races.map((race) => race.date));
+    for (const date of Object.values(sameWeek)) {
+      expect(alla).toContain(date);
+    }
+  });
+
+  it('lägger båda loppen i samma vecka', () => {
+    const week = program({ races: sameWeek }).weeks.find((w) => w.races.length > 1);
+    expect(week?.races.map((race) => race.discipline)).toEqual(['cycling', 'swimming']);
+  });
+
+  it('räknar båda loppen som belastning, inte bara det första', () => {
+    // Simloppet och löparloppet samma vecka. Två små lopp med flit: ett stort
+    // lopp nollar veckan på egen hand, och då går skillnaden inte att mäta.
+    const simOchLöpning: PlanInput['races'] = {
+      skiing: '2027-03-07',
+      cycling: '2027-06-18',
+      swimming: '2027-07-03',
+      running: '2027-07-04',
+    };
+
+    const tvåLopp = program({ races: simOchLöpning, hoursPerWeek: 20 }).weeks.find(
+      (w) => w.races.length > 1,
+    );
+    const ettLopp = program({ hoursPerWeek: 20 }).weeks.find(
+      (w) => w.races.length === 1 && w.races[0]?.discipline === 'swimming',
+    );
+
+    expect(tvåLopp?.races).toHaveLength(2);
+    expect(tvåLopp?.totalHours).toBeLessThan(ettLopp?.totalHours ?? Infinity);
+  });
+
+  it('tränar inte på någon av loppdagarna', () => {
+    const week = program({ races: sameWeek }).weeks.find((w) => w.races.length > 1);
+    const loppdagar = week?.races.map((race) => weekdayOf(race.date)) ?? [];
+    for (const session of week?.sessions ?? []) {
+      expect(loppdagar).not.toContain(session.day);
+    }
+  });
+
+  it('ger återhämtning efter det längsta av loppen', () => {
+    const weeks = program({ races: sameWeek }).weeks;
+    const index = weeks.findIndex((w) => w.races.length > 1);
+    // Vätternrundan kräver två veckor, simloppet en. Det längre styr.
+    expect(weeks[index + 1]?.followsRace).toBe(true);
+    expect(weeks[index + 2]?.followsRace).toBe(true);
   });
 });

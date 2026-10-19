@@ -229,17 +229,21 @@ interface PlannedSession {
 
 /** Passen i en vecka, med dag och eventuell ersättningsform. */
 export function buildSessions(week: PhasedWeek, input: PlanInput): Session[] {
-  const raceLoad = week.raceDate === undefined ? 0 : raceHours(input, week.targetRace);
+  // Alla lopp under veckan räknas som belastning, inte bara det första.
+  const raceLoad = week.races.reduce(
+    (sum, race) => sum + raceHours(input, race.discipline),
+    0,
+  );
   const budget = roundDown(Math.max(0, weeklyHours(week, input.hoursPerWeek) - raceLoad));
 
-  const raceDay = week.raceDate === undefined ? undefined : weekdayOf(week.raceDate);
+  const raceDays = week.races.map((race) => weekdayOf(race.date));
   const schedule = {
     ...input.trainingDays,
-    unavailableDays: [...input.trainingDays.unavailableDays, ...blockedDays(raceDay)],
+    unavailableDays: [...input.trainingDays.unavailableDays, ...blockedDays(raceDays)],
   };
 
-  // Öppningspasset dagen före loppet tar en av veckans träningsdagar.
-  const opener = openerDay(raceDay, input);
+  // Öppningspasset dagen före första loppet tar en av veckans träningsdagar.
+  const opener = openerDay(raceDays, input);
   const slots = Math.max(
     0,
     Math.min(input.trainingDays.daysPerWeek - (opener === undefined ? 0 : 1), trainingDaysOfWeek(schedule, 7).length),
@@ -420,10 +424,17 @@ function rotate<T>(items: readonly T[], offset: number): T[] {
   return [...items.slice(start), ...items.slice(0, start)];
 }
 
-/** Öppningspassets dag, när ett lopp går och dagen före är möjlig. */
-function openerDay(raceDay: Weekday | undefined, input: PlanInput): Weekday | undefined {
-  if (raceDay === undefined) return undefined;
-  const dayBefore = previousDay(raceDay);
+/**
+ * Öppningspassets dag: dagen före veckans första lopp.
+ *
+ * Är den dagen själv en loppdag — två lopp två dagar i rad — blir det inget
+ * öppningspass alls.
+ */
+function openerDay(raceDays: readonly Weekday[], input: PlanInput): Weekday | undefined {
+  const first = [...raceDays].sort((a, b) => a - b)[0];
+  if (first === undefined) return undefined;
+  const dayBefore = previousDay(first);
+  if (raceDays.includes(dayBefore)) return undefined;
   return input.trainingDays.unavailableDays.includes(dayBefore) ? undefined : dayBefore;
 }
 
@@ -544,9 +555,9 @@ function assignDays(
   return placed;
 }
 
-/** Loppdagen och dagen före är inte träningsdagar. */
-function blockedDays(raceDay: Weekday | undefined): Weekday[] {
-  return raceDay === undefined ? [] : [raceDay, previousDay(raceDay)];
+/** Loppdagarna och dagarna före är inte träningsdagar. */
+function blockedDays(raceDays: readonly Weekday[]): Weekday[] {
+  return raceDays.flatMap((day) => [day, previousDay(day)]);
 }
 
 function previousDay(day: Weekday): Weekday {

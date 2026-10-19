@@ -234,6 +234,7 @@ Tre val är värda att känna till:
 
 - **Heldagshändelser, inte klockslag.** Programmet vet vilken dag passet ligger, inte när på dagen
   du tränar. Att hitta på "18:00" vore att låtsas veta något vi inte vet. Längden står i rubriken.
+- **Ett lopp kan dela vecka med ett annat.** Varje lopp blir en egen händelse, och grenen ingår i id:t så att två lopp samma dag inte krockar.
 - **Stabila UID.** Händelsens id bygger på datum och ordning, så en ny export uppdaterar
   kalendern i stället för att lägga in allt en gång till.
 - **Ingen klocka inblandad.** Tidsstämpeln hämtas från programmets `createdAt`, vilket gör

@@ -15,7 +15,14 @@
  *  4. Belastningen behöver pausas regelbundet. Var fjärde vecka dras volymen
  *     ner även mitt i en uppbyggnad.
  */
-import { DISCIPLINES, type Discipline, type IsoDate, type Phase, type RaceDates } from '../types';
+import {
+  DISCIPLINES,
+  type Discipline,
+  type IsoDate,
+  type Phase,
+  type RaceDates,
+  type RaceOnDate,
+} from '../types';
 import { startOfWeek } from './dates';
 
 /** Veckor med toppningsfokus närmast före loppveckan. */
@@ -56,12 +63,12 @@ export interface PhasedWeek {
    * Infinity att inget lopp återstår. Styr både stegring och långpassets längd.
    */
   weeksUntilRace: number;
-  /** Satt när ett lopp går den här veckan. */
-  raceDate?: IsoDate;
+  /** Loppen som går den här veckan, i datumordning. Tom för vanliga veckor. */
+  races: RaceOnDate[];
 }
 
 /** Loppen sorterade i datumordning. */
-function racesInOrder(races: RaceDates): { discipline: Discipline; date: IsoDate }[] {
+function racesInOrder(races: RaceDates): RaceOnDate[] {
   return DISCIPLINES.map((discipline) => ({ discipline, date: races[discipline] })).sort((a, b) =>
     a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
   );
@@ -84,11 +91,12 @@ export function assignPhases(
   recoveryWeeks: Record<Discipline, number> = DEFAULT_RECOVERY_WEEKS,
 ): PhasedWeek[] {
   const ordered = racesInOrder(races);
-  const raceWeeks = new Map<IsoDate, Discipline>();
-  for (const { discipline, date } of ordered) {
-    const week = startOfWeek(date);
-    // Två lopp samma vecka: det första loppet äger veckan.
-    if (!raceWeeks.has(week)) raceWeeks.set(week, discipline);
+
+  // En vecka kan bära flera lopp. Det första styr fasen, men alla ska med.
+  const raceWeeks = new Map<IsoDate, RaceOnDate[]>();
+  for (const race of ordered) {
+    const week = startOfWeek(race.date);
+    raceWeeks.set(week, [...(raceWeeks.get(week) ?? []), race]);
   }
 
   let sinceDeload = 0;
@@ -101,27 +109,29 @@ export function assignPhases(
     for (let back = 1; back <= index; back += 1) {
       const earlier = timeline[index - back];
       const raced = earlier === undefined ? undefined : raceWeeks.get(earlier);
-      if (raced !== undefined) {
+      if (raced !== undefined && raced.length > 0) {
         weeksSinceRace = back;
-        recoveryNeeded = recoveryWeeks[raced];
+        // Gick flera lopp den veckan styr det som kräver längst återhämtning.
+        recoveryNeeded = Math.max(...raced.map((race) => recoveryWeeks[race.discipline]));
         break;
       }
     }
     const followsRace = weeksSinceRace > 0 && weeksSinceRace <= recoveryNeeded;
-    const racingThisWeek = raceWeeks.get(startDate);
+    const racingThisWeek = raceWeeks.get(startDate) ?? [];
     const weeksLeft = weeksUntilRace(timeline, startDate, ordered);
 
     // Loppveckan vinner alltid. Ligger den direkt efter ett annat lopp bär
     // followsRace informationen om att veckan också är återhämtning.
-    if (racingThisWeek !== undefined) {
+    if (racingThisWeek.length > 0) {
       sinceDeload = 0;
       return {
         startDate,
         phase: 'taper',
-        targetRace: racingThisWeek,
+        // Veckans första lopp styr nedtrappningen.
+        targetRace: (racingThisWeek[0] as RaceOnDate).discipline,
         followsRace,
         weeksUntilRace: 0,
-        raceDate: races[racingThisWeek],
+        races: racingThisWeek,
       };
     }
 
@@ -133,6 +143,7 @@ export function assignPhases(
         targetRace: target,
         followsRace,
         weeksUntilRace: weeksLeft,
+        races: [],
       };
     }
 
@@ -147,6 +158,7 @@ export function assignPhases(
         targetRace: target,
         followsRace,
         weeksUntilRace: weeksLeft,
+        races: [],
       };
     }
 
@@ -158,6 +170,7 @@ export function assignPhases(
         targetRace: target,
         followsRace,
         weeksUntilRace: weeksLeft,
+        races: [],
       };
     }
 
@@ -167,6 +180,7 @@ export function assignPhases(
       targetRace: target,
       followsRace,
       weeksUntilRace: weeksLeft,
+      races: [],
     };
   });
 }

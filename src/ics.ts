@@ -13,6 +13,7 @@ import type {
   Intensity,
   IsoDate,
   Program,
+  RaceOnDate,
   Session,
   SessionPurpose,
   SessionStructure,
@@ -66,8 +67,9 @@ export function programToIcs(program: Program, labels: IcsLabels): string {
   ];
 
   for (const week of program.weeks) {
-    if (week.raceDate !== undefined) {
-      lines.push(...raceEvent(week, week.raceDate, stamp, labels));
+    // Flera lopp kan ligga i samma vecka och ska då få var sin händelse.
+    for (const race of week.races) {
+      lines.push(...raceEvent(race, stamp, labels));
     }
     for (const [index, session] of sortedSessions(week).entries()) {
       lines.push(...sessionEvent(week, session, index, stamp, labels));
@@ -108,19 +110,15 @@ function sessionEvent(
   ];
 }
 
-function raceEvent(
-  week: Week,
-  raceDate: IsoDate,
-  stamp: string,
-  labels: IcsLabels,
-): string[] {
+function raceEvent(race: RaceOnDate, stamp: string, labels: IcsLabels): string[] {
   return [
     'BEGIN:VEVENT',
-    `UID:${raceDate}-race@${UID_DOMAIN}`,
+    // Grenen ingår i UID, annars krockar två lopp samma dag.
+    `UID:${race.date}-${race.discipline}-race@${UID_DOMAIN}`,
     `DTSTAMP:${stamp}`,
-    `DTSTART;VALUE=DATE:${compact(raceDate)}`,
-    `DTEND;VALUE=DATE:${compact(addDays(raceDate, 1))}`,
-    `SUMMARY:${escapeText(capitalise(labels.race[week.targetRace]))}`,
+    `DTSTART;VALUE=DATE:${compact(race.date)}`,
+    `DTEND;VALUE=DATE:${compact(addDays(race.date, 1))}`,
+    `SUMMARY:${escapeText(capitalise(labels.race[race.discipline]))}`,
     `DESCRIPTION:${escapeText(labels.disclaimer)}`,
     'END:VEVENT',
   ];
@@ -196,15 +194,17 @@ export function escapeText(text: string): string {
  * mellanslag, och vi delar aldrig mitt i ett tecken.
  */
 export function fold(line: string): string {
-  const encoder = new TextEncoder();
-  if (encoder.encode(line).length <= MAX_OCTETS) return line;
+  // Snabbvägen: är varje tecken ett ASCII-tecken räcker längden som mått, och
+  // de flesta raderna i filen är rena ASCII och korta.
+  if (line.length <= MAX_OCTETS && isAscii(line)) return line;
+  if (octetLength(line) <= MAX_OCTETS) return line;
 
   const parts: string[] = [];
   let current = '';
   let octets = 0;
 
   for (const character of line) {
-    const size = encoder.encode(character).length;
+    const size = characterOctets(character);
     // Fortsättningsrader börjar med ett mellanslag som också räknas.
     const limit = parts.length === 0 ? MAX_OCTETS : MAX_OCTETS - 1;
     if (octets + size > limit) {
@@ -218,4 +218,31 @@ export function fold(line: string): string {
   if (current !== '') parts.push(current);
 
   return parts.map((part, index) => (index === 0 ? part : ` ${part}`)).join(CRLF);
+}
+
+function isAscii(line: string): boolean {
+  for (let i = 0; i < line.length; i += 1) {
+    if (line.charCodeAt(i) > 0x7f) return false;
+  }
+  return true;
+}
+
+/**
+ * Antal byte tecknet tar i UTF-8, räknat direkt ur kodpunkten.
+ *
+ * Att koda varje tecken med `TextEncoder` ger samma svar men är storleksordningar
+ * långsammare, och exporten anropar det här en gång per tecken i filen.
+ */
+function characterOctets(character: string): number {
+  const code = character.codePointAt(0) ?? 0;
+  if (code < 0x80) return 1;
+  if (code < 0x800) return 2;
+  if (code < 0x10000) return 3;
+  return 4;
+}
+
+function octetLength(line: string): number {
+  let total = 0;
+  for (const character of line) total += characterOctets(character);
+  return total;
 }
