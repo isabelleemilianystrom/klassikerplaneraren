@@ -28,7 +28,7 @@ Den här fliken är den enda källan till vad som ska byggas i v1.0. Bygg exakt 
 
 **Så ställer du frågor.** Samla frågorna och numrera dem. Ge för varje fråga 2–3 alternativ, din rekommendation och vad som är blockerat tills svaret kommer. Fortsätt under tiden med uppgifter som inte är blockerade.
 
-**Konventioner.** Kod, namn och kommentarer på engelska; all text i gränssnittet på svenska. TypeScript i strikt läge. Inga hemligheter i repot: API-nyckeln ligger i `.env.local` och i Vercels miljövariabler, och `.env*` finns i `.gitignore`.
+**Konventioner.** Kod, namn och kommentarer på engelska; all text i gränssnittet på svenska. TypeScript i strikt läge. Inga hemligheter i repot — v1.0 behöver inga nycklar alls, eftersom appen inte anropar någon tjänst i körtid.
 
 **För Isabelle.** Exportera den här fliken som Markdown till `docs/kravspec-v1.md` i repot och skriv i CLAUDE.md att Claude Code ska följa den.
 
@@ -43,7 +43,7 @@ v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär 
 | Klar för demon 19 nov | Appen är live på Vercel och fungerar i mobilen |
 | Programmen är rimliga | Alla regler i avsnitt 5 följs och verifieras av tester; referensprofilerna P1–P5 ger planer som Isabelle godkänner |
 | Snabbt att komma igång | Från startsida till färdigt program på under 2 minuter |
-| AI gör nytta | AI skriver förklaringen till varje fas; finns inget AI-svar visas en reservtext |
+| AI gör nytta | AI skriver förklaringarna till faserna under utvecklingen; Isabelle granskar dem och de följer med i appen |
 | Grund för senare versioner | Regelmotorn är en fristående modul med tester; lopp, regler och pass ligger i konfigurationsfiler |
 
 **Ingår i v1.0**
@@ -51,7 +51,7 @@ v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär 
 - Startsida med förklaring, betatext och ansvarsfriskrivning
 - Formulär i tre steg: lopp och datum, nivå per sport, tid och utrustning
 - Regelmotor som skapar programmet enligt avsnitt 5
-- AI-förklaringar per fas med reservtexter
+- Förklaringar per fas, förgenererade med AI och granskade
 - Översikt över alla veckor och en veckovy med pass per dag
 - Varningar och säkerhetstexter
 - Den senaste planen sparas i webbläsaren
@@ -114,10 +114,10 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-02 | Steg 1: välj minst ett av de fyra loppen och ange datum för varje valt lopp; startdatum är idag men kan ändras | Måste | Inget lopp valt eller ett loppdatum före startdatumet ger ett felmeddelande vid fältet, och jag kommer inte vidare |
 | K-03 | Steg 2: nivå per sport som ingår i valda lopp – Ny, Van eller Erfaren – med beskrivningarna i avsnitt 5 | Måste | Varje sport har exakt en vald nivå innan jag kommer vidare; förvalt är "Van" |
 | K-04 | Steg 3: timmar per vecka (3–15, heltal) och utrustning: snö eller rullskidor, stakmaskin, simhall, landsvägscykel eller trainer (ja/nej för varje) | Måste | Alla fält har standardvärden (6 timmar, nej på utrustning); värden utanför 3–15 kan inte väljas |
-| K-05 | Generering: regelmotorn skapar planen direkt; AI-förklaringarna hämtas efteråt och ersätter reservtexterna när de kommer | Måste | Planen visas inom 2 s efter att jag skickat formuläret; om AI-svaret dröjer mer än 15 s eller misslyckas, står reservtexterna kvar utan felmeddelande |
+| K-05 | Generering: regelmotorn skapar planen direkt, med förklaringarna på plats från början | Måste | Planen med sina förklaringar visas inom 2 s efter att jag skickat formuläret, utan att något laddas i efterhand |
 | K-06 | Översikt: alla veckor från start till sista lopp med veckonummer, datumintervall, fas, total tid och markering av loppveckor | Måste | Antalet veckor stämmer med perioden; varje loppvecka är markerad med loppets namn |
 | K-07 | Veckovy: sju dagar med pass; varje pass visar sport, typ, minuter, intensitet i vardagsspråk och zon samt en kort instruktion; vilodagar visas som vila | Måste | Varje dag i veckan visas; intensitet visas som t.ex. "Lugnt – du ska kunna prata hela meningar (zon 2)" |
-| K-08 | Förklaring per fas: varje sammanhängande fas har en kort förklaring (AI eller reservtext), och planen har en kort sammanfattning överst | Måste | Varje fas i översikten har en förklaring; texten är högst 300 tecken |
+| K-08 | Förklaring per fas: varje sammanhängande fas har en kort förklaring, och planen har en kort sammanfattning överst | Måste | Varje fas i översikten har en förklaring; texten är högst 300 tecken |
 | K-09 | Varningar enligt avsnitt 5 visas överst i planen; planen skapas ändå | Måste | Givet Vasaloppet om 6 veckor, när planen skapas, så visas varningen om kort förberedelsetid och en plan |
 | K-10 | Den senaste planen sparas i webbläsaren och visas vid återbesök, med knappen "Gör en ny plan" | Måste | Efter omladdning visas samma plan; fungerar inte lagringen visas planen ändå utan fel |
 | K-11 | Säkerhetstexter från avsnitt 8: ansvarsfriskrivning, röda flaggor, smärtregel och sjukdomsregel i planen; säkerhetstext på varje pass i öppet vatten | Måste | Varje pass i öppet vatten har säkerhetstexten; övriga texter syns i planen |
@@ -202,36 +202,38 @@ Datum enligt fråga 1.
 
 **Sjukdom och missade pass.** Hanteras i v1.0 bara som fast text (avsnitt 8), inte som logik i motorn.
 
-## 6. AI-lagret
+## 6. Förklaringar
 
-I v1.0 skriver AI:n bara förklarande text. Regelmotorn bestämmer hela planen, och AI:n kan aldrig ändra den.
+Förklaringarna skrivs med hjälp av AI **under utvecklingen**, granskas av Isabelle och sparas i appen. Appen gör inga anrop till någon AI-tjänst när användaren skapar sin plan. Regelmotorn bestämmer hela planen; förklaringarna beskriver den, aldrig tvärtom.
 
-**AI:n gör**
+Det här är ett medvetet val framför ett körtidsanrop (fråga 3). Det ger noll kostnad, ingen API-nyckel, inget missbruksskydd att bygga, inga data som lämnar webbläsaren — och framför allt: varje mening är läst av en människa innan en användare ser den. Ett riktigt körtidsanrop kan läggas till i en senare version.
+
+**Texterna innehåller**
 
 - En sammanfattning av planen överst, högst 500 tecken
-- En förklaring per sammanhängande fas, högst 300 tecken: varför fasen finns och vad den bygger upp
+- En förklaring per fas, högst 300 tecken: varför fasen finns och vad den bygger upp
 - Allt på svenska i klarspråk, peppande men ärligt
 
-**AI:n gör inte**
+**Texterna innehåller inte**
 
-- Ändrar pass, tider, intensitet eller datum
-- Anger egna siffror eller fakta som inte finns i indata
-- Ger medicinska råd eller lovar att planen förebygger skador
+- Siffror, datum eller fakta som rör den enskilda planen — texten väljs utifrån fas och lopp, inte utifrån användarens svar
+- Medicinska råd eller löften om att planen förebygger skador
+- Påståenden om tider, resultat eller vad användaren kommer att klara
 
 **Krav**
 
 | ID | Krav | Prio |
 | --- | --- | --- |
-| A-01 | Ett enda anrop per plan, från serverkod (Next.js route handler `/api/explanations`); API-nyckeln finns bara på servern | Måste |
-| A-02 | Indata är bara strukturerad plandata: lopp, datum, faser med veckor, veckotid, sportfördelning och nivåer – inga personuppgifter | Måste |
-| A-03 | Svaret är JSON som valideras med Zod: `{ summary: string, phases: { phaseId: string, text: string }[] }`; texter längre än gränserna kortas inte, utan räknas som ogiltiga | Måste |
-| A-04 | Ogiltigt svar eller fel ger ett nytt försök; misslyckas det också används reservtexterna i `config/fallback-texts.json` | Måste |
-| A-05 | Tidsgräns 15 s, låg temperatur och ett tak för antal tokens | Måste |
-| A-06 | Prompten ligger i `prompts/phase-explanations.v1.md`; promptversionen sparas i planen | Måste |
-| A-07 | Enkel begränsning av antal anrop per besökare (förslag: 10 per timme); fråga om lösningen innan den byggs | Måste |
-| A-08 | Texterna märks i gränssnittet med "Förklaringarna är skrivna med hjälp av AI." | Måste |
+| A-01 | Texterna ligger i `config/explanations.json` och valideras med Zod vid start och i ett test | Måste |
+| A-02 | Biblioteket täcker varje kombination av fas och lopp som motorn kan producera — 4 faser × 4 lopp = 16 texter. Saknas en kombination är det ett testfel, inte ett tomt fält | Måste |
+| A-03 | Nivåvariation läggs till bara där nivån ändrar budskapet, och då som egna poster. Börja utan den | Bra att ha |
+| A-04 | Sammanfattningen väljs utifrån vilka lopp planen innehåller; högst 500 tecken | Måste |
+| A-05 | Längdgränserna kontrolleras i test. En för lång text är ogiltig och kortas inte automatiskt | Måste |
+| A-06 | Prompten som användes för att skriva texterna ligger i `prompts/phase-explanations.v1.md`, och versionen sparas i planen som `promptVersion` | Måste |
+| A-07 | Texterna märks i gränssnittet med "Förklaringarna är skrivna med hjälp av AI." | Måste |
+| A-08 | Appen anropar ingen AI-tjänst i körtid. Anthropics SDK finns inte bland beroendena | Måste |
 
-**Modell.** Enligt fråga 3. Claude Code kontrollerar modellnamn och SDK-användning i Anthropics aktuella dokumentation innan anropet skrivs.
+**Om `source` i datamodellen.** Fältet `explanations.source` behålls oförändrat och sätts alltid till `'ai'` i v1.0 — texterna *är* skrivna med AI, bara vid ett annat tillfälle. Fältet finns kvar för en framtida version med körtidsanrop och reservläge.
 
 ## 7. Teknik, arkitektur och datamodell
 
@@ -245,7 +247,6 @@ En Next.js-app utan databas, där regelmotorn är en ren TypeScript-modul utan b
 | Gränssnitt | Tailwind CSS |
 | Scheman och validering | Zod |
 | Datum | date-fns |
-| AI | Anthropics TypeScript-SDK |
 | Test | Vitest |
 | Pakethanterare | npm |
 | Drift | Vercel, kopplat till GitHub-repot |
@@ -254,11 +255,10 @@ En Next.js-app utan databas, där regelmotorn är en ren TypeScript-modul utan b
 **Mappstruktur**
 
 ```text
-config/            races.json, rules.json, sessions.json, fallback-texts.json
-prompts/           phase-explanations.v1.md
+config/            races.json, rules.json, sessions.json, explanations.json
+prompts/           phase-explanations.v1.md – prompten som texterna skrevs med
 src/engine/        generatePlan(input): Plan – ren funktion, ingen Next.js, ingen AI
-src/ai/            anrop till Claude, Zod-schema och reservlogik
-src/app/           sidor och route handler /api/explanations
+src/app/           sidor
 src/components/    gränssnittskomponenter
 tests/             enhets-, invariant- och datumtester
 docs/              kravspec-v1.md (den här fliken som Markdown)
@@ -328,7 +328,7 @@ interface Plan {
 
 ## 8. Säkerhet, dataskydd och icke-funktionella krav
 
-v1.0 samlar inga personuppgifter: ingen databas, inga konton, inga hälsofrågor, inga kakor och ingen analys. Det enda som lämnar webbläsaren är strukturerad plandata till AI-anropet.
+v1.0 samlar inga personuppgifter: ingen databas, inga konton, inga hälsofrågor, inga kakor och ingen analys. **Ingenting lämnar webbläsaren** — appen gör inga anrop till någon tjänst i körtid.
 
 **Fasta texter** (används ordagrant; ändras inte utan att fråga)
 
@@ -354,11 +354,11 @@ v1.0 samlar inga personuppgifter: ingen databas, inga konton, inga hälsofrågor
 | Område | Krav |
 | --- | --- |
 | Mobil | Fungerar från 360 px bredd; testas i Safari på iOS och Chrome på Android |
-| Prestanda | Planen visas inom 2 s; AI-texterna inom 15 s eller reservtext |
+| Prestanda | Planen med förklaringar visas inom 2 s |
 | Tillgänglighet | Semantisk HTML, går att använda med tangentbord, god kontrast, sporter visas med både färg och text |
-| Säkerhet | API-nyckeln finns bara på servern; inga hemligheter i repot |
+| Säkerhet | Inga API-nycklar och inga hemligheter i repot; inga anrop till tredje part i körtid |
 | Kvalitet | TypeScript strikt, lint utan fel, alla tester gröna innan commit |
-| Kostnad | Högst ett AI-anrop per plan; gratisnivåer hos Vercel |
+| Kostnad | Inga AI-anrop i körtid, alltså noll rörlig kostnad; gratisnivåer hos Vercel |
 | Språk | Svenska i hela gränssnittet |
 
 ## 9. Test och definition of done
@@ -391,7 +391,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - P4 ger varningen i R-22, P3 varningen i R-23 och P4 varningen i R-24
 - P5 följer blocklogiken i R-03
 - Datum: ISO-vecka 53 och årsskiftet 2026–2027, sommartid 28 mars 2027, skottår behövs inte i v1.0
-- AI: inspelade svar för giltigt svar, ogiltig JSON, för långa texter och tidsgräns; de tre senare ska ge reservtexter
+- Förklaringar: varje kombination av fas och lopp har en text, ingen text överskrider sin längdgräns, och ingen plan saknar förklaring
 - Konfiguration: alla filer i `config/` validerar mot sina scheman
 
 **Definition of done per uppgift**
@@ -405,7 +405,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - [ ] Alla Måste-krav är klara och testade
 - [ ] Appen är live på Vercel och fungerar i Safari på iOS och Chrome på Android
 - [ ] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna
-- [ ] Reservtexterna fungerar när AI-anropet misslyckas
+- [ ] Varje kombination av fas och lopp har en granskad förklaring
 - [ ] README beskriver idé, hur man kör projektet och var kravspecen finns
 
 ## 10. Backlog i ordning
@@ -423,9 +423,9 @@ Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, efters
 | T-07 | Varningar och säkerhetstexter i planen | Tester för R-22–R-24 och öppet vatten gröna | R-22–R-24, K-11 | 1 h |  |
 | T-08 | Invarianttester, datumtester och `scripts/print-profiles.ts` | Alla invarianter gröna för P1–P5; skriptet skriver ut planerna som läsbar text | Avsnitt 9 | 1,5 h | **M1 Motorn klar** – Isabelle granskar P1–P5 |
 | T-09 | Formulär i tre steg | Acceptanskriterierna för K-02–K-04 uppfyllda | K-02–K-04 | 2 h |  |
-| T-10 | Planvy: översikt och veckovy | Acceptanskriterierna för K-05–K-09 uppfyllda (med reservtexter) | K-05–K-09 | 2,5 h |  |
+| T-10 | Planvy: översikt och veckovy | Acceptanskriterierna för K-05–K-09 uppfyllda | K-05–K-09 | 2,5 h |  |
 | T-11 | Spara i webbläsaren | Acceptanskriteriet för K-10 uppfyllt | K-10 | 0,5 h | **M2 Appen live utan AI** – Isabelle testar i mobilen |
-| T-12 | AI-förklaringar: route handler, prompt, schema, reservlogik och tester med inspelade svar | Acceptanskriterierna för K-05, K-08 och A-01–A-08 uppfyllda | A-01–A-08 | 2,5 h |  |
+| T-12 | Förklaringar: skriv de 16 texterna med AI, Isabelle granskar, lägg dem i `config/explanations.json` med schema och tester | Acceptanskriterierna för K-08 och A-01–A-08 uppfyllda; alla 16 texter granskade | A-01–A-08 | 2 h + Isabelles granskningstid |  |
 | T-13 | Startsida och fasta texter | Acceptanskriterierna för K-01 och K-11 uppfyllda; texterna ordagrant enligt avsnitt 8 | K-01, K-11 | 1 h |  |
 | T-14 | Genomgång i mobil och av tillgänglighet | K-12 uppfyllt; kraven för tillgänglighet i avsnitt 8 kontrollerade | K-12 | 1 h |  |
 | T-15 | Ändra svar (Bra att ha) | Acceptanskriteriet för K-13 uppfyllt | K-13 | 0,5 h |  |
@@ -446,18 +446,18 @@ Regelmotorn är klar och granskad efter första arbetsveckan; därefter byggs gr
 
 1. Stryk T-16 Utskrift och T-15 Ändra svar
 2. Förenkla översikten (K-06) till en lista utan fasförklaringar i varje rad
-3. Visa bara reservtexter och vänta med AI-anropet till efter demon – fråga Isabelle först, eftersom AI är en del av kursen
+3. Minska textbiblioteket: skriv en förklaring per fas i stället för en per fas och lopp, så att granskningen blir fyra texter i stället för sexton
 
 **Demomanus** (justeras efter fråga 6)
 
 1. Visa startsidan i mobilen och berätta problemet: fyra lopp, fyra sporter, ett år
 2. Fyll i profil P1 live – under en minut
 3. Visa översikten med faser och lopp, och öppna en vecka
-4. Visa en fasförklaring skriven av AI och en säkerhetstext
+4. Visa en fasförklaring och en säkerhetstext, och berätta att förklaringarna är skrivna med AI och granskade i förväg
 5. Visa kort i koden att regelmotorn är fristående och testad
 6. Avsluta med vägen framåt (avsnitt 12)
 
-**Reserv för demon.** Ta skärmdumpar av P1 i förväg. Reservtexterna gör att planen fungerar även om AI-anropet misslyckas under demon.
+**Reserv för demon.** Ta skärmdumpar av P1 i förväg. Appen gör inga nätverksanrop när planen skapas, så den fungerar även utan uppkoppling.
 
 ## 12. Utanför v1.0: framtida versioner
 
@@ -468,8 +468,9 @@ Troliga nästa steg efter betan, i föreslagen ordning:
 1. Kalenderexport och delbar länk, så att planen går att följa i vardagen
 2. Strukturerad hälsoscreening i webbläsaren, smärtknappen och fler säkerhetsregler
 3. Databas med pseudonymiserad lagring, radering och integritetspolicy
-4. Fritext tolkad av AI, med samtycke
-5. Zonkalibrering, full belastningsmodell, styrkedel och delklassiker
-6. Konton, loggning av pass och adaptiv plan
+4. AI-förklaringar i körtid, skrivna för den enskilda planen, med reservtexter när anropet misslyckas
+5. Fritext tolkad av AI, med samtycke
+6. Zonkalibrering, full belastningsmodell, styrkedel och delklassiker
+7. Konton, loggning av pass och adaptiv plan
 
 Grunden i v1.0 är byggd för det här: motorn är fristående, reglerna ligger i konfiguration och planen har `schemaVersion`, `rulesVersion` och stabila id:n på passen.
