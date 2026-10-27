@@ -71,12 +71,30 @@ v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär 
 
 Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett svar; saknas ett svar som behövs, fråga.
 
-- [ ] **1. Loppdatum 2027.** Vilka datum ska vara förifyllda för Vasaloppet, Vätternrundan, Vansbrosimningen och Lidingöloppet? Alternativ: Isabelle anger datumen, eller användaren skriver alltid in dem själv. Claude Code får inte hitta på datum. Blockerar T-02.
-- [ ] **2. Distanser.** Bara fulla distanser i v1.0 (förslag), eller även Öppet Spår och Halvvättern? Blockerar T-02.
-- [ ] **3. AI-modell och nyckel.** Vilken Claude-modell ska användas, och finns en API-nyckel? Förslag: en mindre, snabb modell; Claude Code kontrollerar aktuellt modellnamn i Anthropics dokumentation och frågar innan den väljer. Blockerar T-12.
-- [ ] **4. Konton.** Finns ett GitHub-repo och ett Vercel-konto? Ska repot vara publikt? Blockerar T-01.
+- [x] **1. Loppdatum 2027.** Besvarad 2026-10-27: använd de belagda datumen — Vasaloppet **2027-03-07**, Vätternrundan **2027-06-18**, Vansbrosimningen **2027-07-10**, Lidingöloppet **2027-09-25**. Kontrollerade mot arrangörernas sidor i oktober 2026; `config/races.json` ska bära källa och kontrolldatum.
+- [x] **2. Distanser.** Besvarad 2026-10-27: **bara de fyra fulla distanserna** i v1.0, enligt lopptabellen i avsnitt 5. Användaren väljer vilka av de fyra hon gör. Öppet Spår, Halvvättern och övriga varianter ligger utanför v1.0 — motorn byggs så att fler lopp bara blir rader i `config/races.json`.
+- [x] **3. AI-modell och nyckel.** Besvarad 2026-10-27: **inga AI-anrop i körtid.** Förklaringarna förgenereras under utvecklingen med hjälp av AI, granskas av Isabelle och sparas i appen. Ingen API-nyckel, ingen kostnad, inget missbruksskydd och inga data som lämnar webbläsaren. Ett riktigt AI-anrop kan läggas till i en senare version. Se noten nedan om vad det innebär för avsnitt 6, 7 och T-12.
+- [x] **4. Konton.** Besvarad 2026-10-27: GitHub-repot finns och är publikt. **Vercel-konto saknas ännu** och skapas senare — senast till M2, eftersom den milstolpen kräver att appen går att testa i mobilen. T-01 byggs och testas lokalt tills dess.
 - [ ] **5. Granskning av träningsreglerna.** Vem granskar reglerna i avsnitt 5 före demon? Förslag: en tränare eller kunnig bekant; om ingen hinner visas betatexten tydligt. Blockerar M1-granskningen.
 - [ ] **6. Demon.** Hur lång är demon och vad ska den visa? Påverkar demomanuset i avsnitt 11.
+
+### Not till fråga 3: vad beslutet ändrar
+
+Beslutet att förgenerera förklaringarna gör appen **helt statisk** — den behöver ingen server. Följande i kravspecen påverkas och ska bekräftas innan T-12 byggs:
+
+| Krav | Följd |
+| --- | --- |
+| A-01 route handler, A-02 indata, A-04 omförsök, A-05 tidsgräns, A-07 anropsbegränsning | Utgår — det finns inget körtidsanrop att skydda |
+| A-03 Zod-validering av AI-svaret | Blir i stället validering av textbiblioteket i `config/` |
+| A-06 prompt i `prompts/` och promptversion i planen | Behålls — prompten används vid bygget och versionen sparas |
+| A-08 AI-märkning | Behålls ordagrant. Texterna är skrivna med hjälp av AI och granskade av en människa |
+| K-05 "AI-förklaringarna hämtas efteråt" | Utgår. Texterna finns direkt, så tvåsekunderskravet uppfylls alltid |
+| K-08 förklaring per fas, högst 300 tecken | Oförändrat |
+| Avsnitt 7, Anthropics SDK | Behövs inte i körtid |
+| Avsnitt 8, nyckeln bara på servern | Utgår — ingen nyckel finns |
+| T-12 | Byts från route handler och reservlogik till att skriva och granska textbiblioteket |
+
+Målet i avsnitt 2 — "AI skriver förklaringen till varje fas; finns inget AI-svar visas en reservtext" — uppfylls på ett annat sätt än beskrivet: AI:n skriver texterna, men vid bygget. Det finns inget reservläge, eftersom det inte finns något som kan misslyckas.
 
 ## 4. Användarflöde och funktionella krav
 
