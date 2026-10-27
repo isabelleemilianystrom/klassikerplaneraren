@@ -183,7 +183,7 @@ Datum enligt fråga 1.
 - **R-12** Passlängd 20–300 minuter.
 - **R-13** Ett långpass per vecka i loppets sport under specifik fas, på lördag eller söndag. Det växer jämnt genom fasen upp till: skidor 240 min, cykel 300 min, löpning 150 min, simning 75 min.
 - **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
-- **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. Biblioteket täcker varje passtyp; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält.
+- **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält.
 - **R-14** Löptak: total löptid får öka högst 10 % från en vecka till nästa (veckor efter avlastning undantagna). Nivå Ny i löpning har aldrig löppass två dagar i rad.
 
 **Intensitet**
@@ -239,9 +239,9 @@ Det här är ett medvetet val framför ett körtidsanrop (fråga 3). Det ger nol
 | ID | Krav | Prio |
 | --- | --- | --- |
 | A-01 | Texterna ligger i `config/explanations.json` och valideras med Zod vid start och i ett test | Måste |
-| A-02 | Biblioteket täcker varje kombination av fas och lopp som motorn kan producera — 4 faser × 4 lopp = 16 texter. Saknas en kombination är det ett testfel, inte ett tomt fält | Måste |
-| A-03 | Nivåvariation läggs till bara där nivån ändrar budskapet, och då som egna poster. Börja utan den | Bra att ha |
-| A-04 | Sammanfattningen väljs utifrån vilka lopp planen innehåller; högst 500 tecken | Måste |
+| A-02 | Biblioteket täcker varje fas motorn kan producera — **en text per fas, 4 totalt** *(krympt från 16 den 2026-10-27)*. Saknas en fas är det ett testfel, inte ett tomt fält | Måste |
+| A-03 | Variation per lopp eller nivå läggs till bara där den ändrar budskapet, och då som egna poster. Börja utan den | Bra att ha |
+| A-04 | En sammanfattning, högst 500 tecken, skriven så att den fungerar oavsett vilka lopp planen innehåller | Måste |
 | A-05 | Längdgränserna kontrolleras i test. En för lång text är ogiltig och kortas inte automatiskt | Måste |
 | A-06 | Prompten som användes för att skriva texterna ligger i `prompts/phase-explanations.v1.md`, och versionen sparas i planen som `promptVersion` | Måste |
 | A-07 | Texterna märks i gränssnittet med "Förklaringarna är skrivna med hjälp av AI." | Måste |
@@ -437,7 +437,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, eftersom allt annat vilar på den.
 
-**Tiderna höjdes 2026-10-27** när reglerna R-25 till R-30 och kraven K-15 till K-17 lades till. Totalt cirka **30,5 timmar** mot tidigare 25. Se avsnitt 11 om vad det betyder för tidsplanen.
+**Tiderna höjdes 2026-10-27** när reglerna R-25 till R-30 och kraven K-15 till K-17 lades till. Totalt cirka **30 timmar** mot tidigare 25, efter att textbiblioteken krympts den 2026-10-27. Se avsnitt 11 om vad det betyder för tidsplanen.
 
 | ID | Uppgift | Klart när | Krav | Tid | Milstolpe |
 | --- | --- | --- | --- | --- | --- |
@@ -452,7 +452,7 @@ Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, efters
 | T-09 | Formulär i tre steg | Acceptanskriterierna för K-02–K-04 uppfyllda | K-02–K-04 | 2 h |  |
 | T-10 | Planvy: översikt, veckovy och markering av innevarande vecka | Acceptanskriterierna för K-05–K-09 och K-16 uppfyllda | K-05–K-09, K-16 | 3 h |  |
 | T-11 | Spara i webbläsaren, med validering av det som läses in | Acceptanskriterierna för K-10 och K-15 uppfyllda | K-10, K-15 | 1,5 h | **M2 Appen live utan AI** – Isabelle testar i mobilen |
-| T-12 | Förklaringar: skriv de 16 texterna med AI, Isabelle granskar, lägg dem i `config/explanations.json` med schema och tester | Acceptanskriterierna för K-08 och A-01–A-08 uppfyllda; alla 16 texter granskade | A-01–A-08 | 2 h + Isabelles granskningstid |  |
+| T-12 | Förklaringar: skriv de 4 fastexterna och sammanfattningen med AI, Isabelle granskar, lägg dem i `config/explanations.json` med schema och tester | Acceptanskriterierna för K-08 och A-01–A-08 uppfyllda; alla texter granskade | A-01–A-08 | 1,5 h |  |
 | T-13 | Startsida och fasta texter | Acceptanskriterierna för K-01 och K-11 uppfyllda; texterna ordagrant enligt avsnitt 8 | K-01, K-11 | 1 h |  |
 | T-14 | Genomgång i mobil och av tillgänglighet | K-12 uppfyllt; kraven för tillgänglighet i avsnitt 8 kontrollerade | K-12 | 1 h |  |
 | T-15 | Ändra svar — **nu Måste**, eftersom ett tomt formulär bredvid en sparad plan kan radera den | Acceptanskriteriet för K-13 uppfyllt | K-13 | 0,5 h |  |
@@ -466,10 +466,11 @@ Tiderna avser Isabelles tid med Claude Code och har en osäkerhet på ungefär �
 
 Demon är den 19 november 2026. Kapaciteten fram dit är cirka 20–27 timmar.
 
-**Backlogen rymmes inte längre.** Efter tilläggen 2026-10-27 är den cirka **30,5 timmar** mot en kapacitet på 20–27. Att stryka Bra att ha-uppgifterna räcker inte — de är tillsammans 1,25 timmar. Något av följande måste väljas, och beslutet bör tas innan T-02:
+**Backlogen är fortfarande större än kapaciteten.** Efter tilläggen 2026-10-27 är den cirka **30 timmar** mot en kapacitet på 20–27.
 
-1. **Krymp textbiblioteken.** En förklaring per fas i stället för per fas och lopp ger fyra texter i stället för sexton, och en instruktion per passtyp i stället för per typ och sport. Sparar mest av Isabelles granskningstid, som är den verkliga flaskhalsen.
-2. **Stryk ett lopp ur v1.0.** Tre lopp i stället för fyra minskar både regelarbetet och antalet texter, och demon fungerar lika bra.
+**Beslut 2026-10-27: textbiblioteken krymptes** — fyra fasförklaringar i stället för sexton, åtta passinstruktioner i stället för trettiotvå. Det sparar framför allt Isabelles granskningstid, som är den verkliga flaskhalsen, men bara ungefär en halvtimme av byggtiden. Gapet mot kapaciteten kvarstår, och något av följande kan behövas:
+
+1. **Stryk ett lopp ur v1.0.** Tre lopp i stället för fyra minskar både regelarbetet och antalet texter, och demon fungerar lika bra.
 3. **Flytta K-16 och K-17 efter demon.** Navigering i en lång plan är viktigt i vardagen men syns knappt i en demo på några minuter.
 4. **Utöka tiden.** Fem timmar till över tre veckor är ungefär tjugo minuter om dagen.
 
