@@ -119,11 +119,14 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-07 | Veckovy: sju dagar med pass; varje pass visar sport, typ, minuter, intensitet i vardagsspråk och zon samt en kort instruktion; vilodagar visas som vila | Måste | Varje dag i veckan visas; intensitet visas som t.ex. "Lugnt – du ska kunna prata hela meningar (zon 2)" |
 | K-08 | Förklaring per fas: varje sammanhängande fas har en kort förklaring, och planen har en kort sammanfattning överst | Måste | Varje fas i översikten har en förklaring; texten är högst 300 tecken |
 | K-09 | Varningar enligt avsnitt 5 visas överst i planen; planen skapas ändå | Måste | Givet Vasaloppet om 6 veckor, när planen skapas, så visas varningen om kort förberedelsetid och en plan |
-| K-10 | Den senaste planen sparas i webbläsaren och visas vid återbesök, med knappen "Gör en ny plan" | Måste | Efter omladdning visas samma plan; fungerar inte lagringen visas planen ändå utan fel |
+| K-10 | Den senaste planen sparas i webbläsaren och visas vid återbesök, med knappen "Gör en ny plan". Formuläret står aldrig tomt bredvid en sparad plan *(förtydligad 2026-10-27)* | Måste | Efter omladdning visas samma plan; fungerar inte lagringen visas planen ändå utan fel; en ändring i formuläret kan aldrig radera planen oavsiktligt |
 | K-11 | Säkerhetstexter från avsnitt 8: ansvarsfriskrivning, röda flaggor, smärtregel och sjukdomsregel i planen; säkerhetstext på varje pass i öppet vatten | Måste | Varje pass i öppet vatten har säkerhetstexten; övriga texter syns i planen |
 | K-12 | Fungerar i mobil från 360 px bredd | Måste | Ingen vågrät scroll och alla knappar går att trycka på vid 360 px |
-| K-13 | Ändra svar: tillbaka till formuläret med tidigare svar ifyllda | Bra att ha | Givet en sparad plan, när jag trycker "Ändra svar", så är formuläret ifyllt med mina svar |
+| K-13 | Ändra svar: tillbaka till formuläret med tidigare svar ifyllda | **Måste** *(höjd från Bra att ha 2026-10-27)* | Givet en sparad plan, när jag trycker "Ändra svar", så är formuläret ifyllt med mina svar |
 | K-14 | Utskrift: planen går att skriva ut snyggt via webbläsarens utskrift | Bra att ha | Utskriften visar översikt och alla veckor utan knappar och menyer |
+| K-15 | Sparad plan valideras vid inläsning. Går den inte att använda kastas den, lagringen rensas och användaren får veta varför. Formuläret ritas alltid, även om planen är trasig | Måste *(tillagd 2026-10-27)* | Givet en sparad plan från en äldre version, när jag öppnar appen, så ser jag formuläret och ett meddelande om att den gamla planen inte kunde läsas — aldrig en tom sida |
+| K-16 | Innevarande vecka är markerad i översikten, och vyn visar den när jag kommer tillbaka | Måste *(tillagd 2026-10-27)* | Givet en sparad plan där några veckor passerat, när jag öppnar appen, så är veckan jag är i markerad och syns utan att jag letar |
+| K-17 | Är alla veckor passerade visas ett avslut i stället för en tom lista | Bra att ha *(tillagd 2026-10-27)* | Givet att sista loppet varit, när jag öppnar planen, så står det att programmet är genomfört och hur jag planerar om |
 
 ## 5. Träningsregler för regelmotorn
 
@@ -131,12 +134,16 @@ Reglerna nedan är förslag som granskas enligt fråga 5. Claude Code implemente
 
 **Lopp** (`config/races.json`)
 
-| Lopp | Sport | Distans | Nedtrappning | Återhämtning efter | Specifik fas |
-| --- | --- | --- | --- | --- | --- |
-| Vasaloppet | Längdskidor | 90 km | 2 veckor | 1 vecka | 8 veckor |
-| Vätternrundan | Cykel | 315 km | 2 veckor | 1 vecka | 8 veckor |
-| Vansbrosimningen | Simning | 3 km | 1 vecka | Ingen | 6 veckor |
-| Lidingöloppet | Löpning | 30 km | 1 vecka | 1 vecka | 8 veckor |
+| Lopp | Sport | Distans | Uppskattad tid | Nedtrappning | Återhämtning efter | Specifik fas |
+| --- | --- | --- | --- | --- | --- | --- |
+| Vasaloppet | Längdskidor | 90 km | 7 h | 2 veckor | 2 veckor | 8 veckor |
+| Vätternrundan | Cykel | 315 km | 11 h | 2 veckor | 2 veckor | 8 veckor |
+| Vansbrosimningen | Simning | 3 km | 1 h | 1 vecka | 1 vecka | 6 veckor |
+| Lidingöloppet | Löpning | 30 km | 3,5 h | 1 vecka | 1 vecka | 8 veckor |
+
+**Uppskattad tid** (tillagd 2026-10-27) är hur länge en motionär är ute i loppet. Siffran är grov men storleksordningen avgör: loppet är veckans största belastning och måste räknas som träning. Se R-25.
+
+**Återhämtning efter** (ändrad 2026-10-27): Vansbrosimningen stod tidigare som "Ingen", vilket motsade R-02. Lopp som tar fem timmar eller mer kräver två veckor, kortare lopp en.
 
 Datum enligt fråga 1.
 
@@ -153,17 +160,20 @@ Datum enligt fråga 1.
 - **R-01** Planen går från måndagen i startdatumets vecka till söndagen i veckan med sista loppet. Veckor börjar på måndag.
 - **R-02** Varje vecka får en fas utifrån närmaste kommande lopp: Återhämtning (veckorna direkt efter ett lopp), Nedtrappning (sista veckorna före loppet), Specifik (veckorna före nedtrappningen) och Bas (övrig tid). Ordningen gäller i den prioriteten.
 - **R-03** Blocklogik: ligger två lopp mindre än 4 veckor isär, får det första loppet ingen återhämtningsvecka, nedtrappningen inför det andra blir 1 vecka och veckorna däremellan är specifik fas för det andra loppet.
-- **R-04** Loppdagen innehåller bara loppet.
+- **R-27** (tillagd 2026-10-27) Flera lopp samma vecka: alla lopp som infaller samma vecka hör till den veckan. Veckan är nedtrappning för det första av dem, men varje lopp markeras, räknas som belastning enligt R-25 och får sin säkerhetstext. Inget lopp får försvinna ur planen för att ett annat ligger samma vecka.
+- **R-04** Loppdagen innehåller bara loppet. Dagen före ett lopp innehåller högst ett kort öppningspass på 20–30 minuter i loppets sport, i zon 1–2, eller vila. *(utökad 2026-10-27)*
 
 **Veckotid** (T = valda timmar per vecka)
 
 - **R-05** Bas 75 % av T; Specifik 100 %; Nedtrappning 60 % första och 40 % andra veckan (50 % om den bara är en vecka); Återhämtning 50 %.
 - **R-06** Var fjärde vecka i bas- och specifik fas är en avlastningsvecka med 70 % av fasens tid.
 - **R-07** De två första veckorna i planen har högst 60 % av T.
+- **R-25** (tillagd 2026-10-27) Loppet räknas som belastning. Loppveckans budget är fasens tid minus loppets uppskattade tid enligt lopptabellen, aldrig mindre än noll. Vasaloppet tar sju timmar, och de ska inte planeras ovanpå en vecka på 60 % av T.
+- **R-29** (tillagd 2026-10-27) Minuter som inte får plats fördelas, de försvinner inte. Tar träningsdagarna slut innan veckans tid gjort det förlängs befintliga pass upp till sina tak i stället för att tiden stryks. Går tiden ändå inte att placera ska veckans faktiska tid visas för användaren, inte den planerade.
 
 **Fördelning mellan sporter**
 
-- **R-08** Specifik fas: 55 % till loppets sport, resten fördelat jämnt mellan övriga sporter i planen.
+- **R-08** Specifik fas: 55 % till loppets sport, resten fördelat jämnt mellan övriga sporter i planen. *(utökad 2026-10-27)* Innehåller planen bara en sport går 100 % dit. Innehåller den två sporter går 65 % till loppets sport och 35 % till den andra. Andelen får aldrig lämnas ofördelad — profil P4 har bara ett lopp, och 45 % hade annars ingenstans att ta vägen.
 - **R-09** Bas: jämn fördelning mellan sporterna i planen, med +10 procentenheter för sporter där nivån är Ny.
 - **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`.
 
@@ -172,6 +182,8 @@ Datum enligt fråga 1.
 - **R-11** Antal träningsdagar: T ≤ 5 ger 4 dagar, T 6–9 ger 5 dagar, T ≥ 10 ger 6 dagar. Minst en helt vilodag i veckan.
 - **R-12** Passlängd 20–300 minuter.
 - **R-13** Ett långpass per vecka i loppets sport under specifik fas, på lördag eller söndag. Det växer jämnt genom fasen upp till: skidor 240 min, cykel 300 min, löpning 150 min, simning 75 min.
+- **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
+- **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. Biblioteket täcker varje passtyp; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält.
 - **R-14** Löptak: total löptid får öka högst 10 % från en vecka till nästa (veckor efter avlastning undantagna). Nivå Ny i löpning har aldrig löppass två dagar i rad.
 
 **Intensitet**
@@ -199,6 +211,8 @@ Datum enligt fråga 1.
 - **R-22** Mindre än 8 veckor från start till första lopp: "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
 - **R-23** T under 4 timmar när Vasaloppet eller Vätternrundan ingår, eller under 3 timmar annars: "Den tid du har valt är i minsta laget för dina lopp."
 - **R-24** Vasaloppet med nivå Ny i skidor och varken snö, rullskidor eller stakmaskin: "Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet."
+
+- **R-26** (tillagd 2026-10-27) Spänner loppen över mer än tolv månader: "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader." Planen skapas ändå. Kontrollen är det som gör planen till en klassikerplan och inte bara ett träningsprogram.
 
 **Sjukdom och missade pass.** Hanteras i v1.0 bara som fast text (avsnitt 8), inte som logik i motorn.
 
@@ -385,6 +399,11 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Inget pass kräver utrustning som användaren saknar (R-17–R-20)
 - Varje pass i öppet vatten har säkerhetstexten (R-19)
 - Samma indata ger samma plan (determinism)
+- Varje pass är 20–300 minuter och har titel, instruktion och zon där zon gäller (R-12, R-30) *(tillagd 2026-10-27)*
+- Loppveckans budget är minskad med loppets uppskattade tid (R-25) *(tillagd 2026-10-27)*
+- Andelarna mellan sporterna summerar alltid till 100 %, även när planen har en eller två sporter (R-08) *(tillagd 2026-10-27)*
+- Planen överlever en rundtur genom lagringen: sparad och inläst plan är identisk med originalet *(tillagd 2026-10-27)*
+- Varje fas i planen har en förklaring, och varje passtyp en instruktion (A-02, R-30) *(tillagd 2026-10-27)*
 
 **Särskilda testfall**
 
@@ -393,6 +412,11 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Datum: ISO-vecka 53 och årsskiftet 2026–2027, sommartid 28 mars 2027, skottår behövs inte i v1.0
 - Förklaringar: varje kombination av fas och lopp har en text, ingen text överskrider sin längdgräns, och ingen plan saknar förklaring
 - Konfiguration: alla filer i `config/` validerar mot sina scheman
+- **Slumpad egenskapstestning** *(tillagd 2026-10-27)*: minst 200 slumpade men giltiga indata körs mot samtliga invarianter. Fem profiler räcker inte — i v0 var det slumptestningen som avslöjade att en gren aldrig tränades, vilket P1–P5 hade missat
+- Plan med ett enda lopp: hela veckotiden går till den sporten, ingen andel blir ofördelad (R-08)
+- Två lopp samma vecka: båda markeras, båda räknas som belastning, inget lopp försvinner (R-27)
+- Lopp som spänner över mer än tolv månader ger varningen i R-26 men ändå en plan
+- Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**
 
@@ -406,37 +430,50 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - [ ] Appen är live på Vercel och fungerar i Safari på iOS och Chrome på Android
 - [ ] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna
 - [ ] Varje kombination av fas och lopp har en granskad förklaring
+- [ ] Varje passtyp har en granskad instruktion
 - [ ] README beskriver idé, hur man kör projektet och var kravspecen finns
 
 ## 10. Backlog i ordning
 
-Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, eftersom allt annat vilar på den. Totalt cirka 25 timmar, varav Bra att ha-uppgifterna (T-15, T-16) stryks först om tiden inte räcker.
+Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, eftersom allt annat vilar på den.
+
+**Tiderna höjdes 2026-10-27** när reglerna R-25 till R-30 och kraven K-15 till K-17 lades till. Totalt cirka **30,5 timmar** mot tidigare 25. Se avsnitt 11 om vad det betyder för tidsplanen.
 
 | ID | Uppgift | Klart när | Krav | Tid | Milstolpe |
 | --- | --- | --- | --- | --- | --- |
 | T-01 | Projektuppsättning: Next.js, TypeScript strikt, Tailwind, Vitest, lint, mappstruktur, CLAUDE.md och en tom sida på Vercel | Tom sida är live; `npm test` och lint körs i repot | – | 1,5 h |  |
-| T-02 | Datamodell och konfiguration: typer, Zod-scheman och filerna i `config/` | Typer kompilerar; konfigurationen validerar i ett test | Avsnitt 5, 7 | 1,5 h |  |
-| T-03 | Veckor och faser, inklusive blocklogik | Tester för R-01–R-04 gröna; P4 och P5 ger rätt faser | R-01–R-04 | 2 h |  |
-| T-04 | Veckotid och fördelning mellan sporter | Tester för R-05–R-10 gröna | R-05–R-10 | 2 h |  |
-| T-05 | Pass per vecka: dagar, långpass, intensitet och vila | Tester för R-11–R-16 gröna | R-11–R-16 | 3 h |  |
+| T-02 | Datamodell och konfiguration: typer, Zod-scheman och filerna i `config/`, inklusive instruktionsbiblioteket i `sessions.json` | Typer kompilerar; konfigurationen validerar i ett test; varje passtyp har en instruktion | Avsnitt 5, 7, R-30 | 2,5 h |  |
+| T-03 | Veckor och faser, inklusive blocklogik och flera lopp samma vecka | Tester för R-01–R-04 och R-27 gröna; P4 och P5 ger rätt faser | R-01–R-04, R-27 | 2,5 h |  |
+| T-04 | Veckotid, loppbelastning och fördelning mellan sporter | Tester för R-05–R-10, R-25 och R-29 gröna; en plan med ett enda lopp fördelar hela tiden | R-05–R-10, R-25, R-29 | 3 h |  |
+| T-05 | Pass per vecka: dagar, långpass, intensitet och vila | Tester för R-11–R-16 och R-28 gröna; varje pass har titel och instruktion | R-11–R-16, R-28, R-30 | 3,5 h |  |
 | T-06 | Ersättningar, teknik och säsong | Tester för R-17–R-21 gröna | R-17–R-21 | 1,5 h |  |
-| T-07 | Varningar och säkerhetstexter i planen | Tester för R-22–R-24 och öppet vatten gröna | R-22–R-24, K-11 | 1 h |  |
-| T-08 | Invarianttester, datumtester och `scripts/print-profiles.ts` | Alla invarianter gröna för P1–P5; skriptet skriver ut planerna som läsbar text | Avsnitt 9 | 1,5 h | **M1 Motorn klar** – Isabelle granskar P1–P5 |
+| T-07 | Varningar och säkerhetstexter i planen | Tester för R-22–R-24, R-26 och öppet vatten gröna | R-22–R-24, R-26, K-11 | 1,5 h |  |
+| T-08 | Invarianttester, slumpad egenskapstestning, datumtester och `scripts/print-profiles.ts` | Alla invarianter gröna för P1–P5 och för 200 slumpade indata; skriptet skriver ut planerna som läsbar text | Avsnitt 9 | 2 h | **M1 Motorn klar** – Isabelle granskar P1–P5 |
 | T-09 | Formulär i tre steg | Acceptanskriterierna för K-02–K-04 uppfyllda | K-02–K-04 | 2 h |  |
-| T-10 | Planvy: översikt och veckovy | Acceptanskriterierna för K-05–K-09 uppfyllda | K-05–K-09 | 2,5 h |  |
-| T-11 | Spara i webbläsaren | Acceptanskriteriet för K-10 uppfyllt | K-10 | 0,5 h | **M2 Appen live utan AI** – Isabelle testar i mobilen |
+| T-10 | Planvy: översikt, veckovy och markering av innevarande vecka | Acceptanskriterierna för K-05–K-09 och K-16 uppfyllda | K-05–K-09, K-16 | 3 h |  |
+| T-11 | Spara i webbläsaren, med validering av det som läses in | Acceptanskriterierna för K-10 och K-15 uppfyllda | K-10, K-15 | 1,5 h | **M2 Appen live utan AI** – Isabelle testar i mobilen |
 | T-12 | Förklaringar: skriv de 16 texterna med AI, Isabelle granskar, lägg dem i `config/explanations.json` med schema och tester | Acceptanskriterierna för K-08 och A-01–A-08 uppfyllda; alla 16 texter granskade | A-01–A-08 | 2 h + Isabelles granskningstid |  |
 | T-13 | Startsida och fasta texter | Acceptanskriterierna för K-01 och K-11 uppfyllda; texterna ordagrant enligt avsnitt 8 | K-01, K-11 | 1 h |  |
 | T-14 | Genomgång i mobil och av tillgänglighet | K-12 uppfyllt; kraven för tillgänglighet i avsnitt 8 kontrollerade | K-12 | 1 h |  |
-| T-15 | Ändra svar (Bra att ha) | Acceptanskriteriet för K-13 uppfyllt | K-13 | 0,5 h |  |
+| T-15 | Ändra svar — **nu Måste**, eftersom ett tomt formulär bredvid en sparad plan kan radera den | Acceptanskriteriet för K-13 uppfyllt | K-13 | 0,5 h |  |
 | T-16 | Utskrift (Bra att ha) | Acceptanskriteriet för K-14 uppfyllt | K-14 | 0,5 h |  |
+| T-18 | Avslut när planen är genomförd (Bra att ha) | Acceptanskriteriet för K-17 uppfyllt | K-17 | 0,25 h |  |
 | T-17 | README och förberedelse för demon | Definition of done för v1.0 uppfylld | Avsnitt 9 | 1 h | **M3 Klar för demo** |
 
 Tiderna avser Isabelles tid med Claude Code och har en osäkerhet på ungefär ±30 %.
 
 ## 11. Tidsplan och demo
 
-Demon är den 19 november 2026. Kapaciteten fram dit är cirka 20–27 timmar och backlogen cirka 25 timmar, så det finns ingen buffert: Bra att ha-uppgifterna stryks först, och om M1 inte är klar den 8 november är det en signal att stryka mer.
+Demon är den 19 november 2026. Kapaciteten fram dit är cirka 20–27 timmar.
+
+**Backlogen rymmes inte längre.** Efter tilläggen 2026-10-27 är den cirka **30,5 timmar** mot en kapacitet på 20–27. Att stryka Bra att ha-uppgifterna räcker inte — de är tillsammans 1,25 timmar. Något av följande måste väljas, och beslutet bör tas innan T-02:
+
+1. **Krymp textbiblioteken.** En förklaring per fas i stället för per fas och lopp ger fyra texter i stället för sexton, och en instruktion per passtyp i stället för per typ och sport. Sparar mest av Isabelles granskningstid, som är den verkliga flaskhalsen.
+2. **Stryk ett lopp ur v1.0.** Tre lopp i stället för fyra minskar både regelarbetet och antalet texter, och demon fungerar lika bra.
+3. **Flytta K-16 och K-17 efter demon.** Navigering i en lång plan är viktigt i vardagen men syns knappt i en demo på några minuter.
+4. **Utöka tiden.** Fem timmar till över tre veckor är ungefär tjugo minuter om dagen.
+
+Tilläggen är inte valfria i samma mening som övriga krav: utan R-25 planerar appen träning ovanpå ett sju timmar långt lopp, och utan K-15 kan en sparad plan ge en tom sida. De fyra kritiska tilläggen — R-08 utökad, R-25, K-15 och K-13 som Måste — bör behållas oavsett vad som stryks.
 
 &#91;embedded content: tidsplan · 5 arbetsblock och 3 milstolpar fram till demon\]
 
@@ -444,7 +481,7 @@ Regelmotorn är klar och granskad efter första arbetsveckan; därefter byggs gr
 
 **Om tiden inte räcker** (i den här ordningen)
 
-1. Stryk T-16 Utskrift och T-15 Ändra svar
+1. Stryk T-16 Utskrift och T-18 Avslut. **T-15 Ändra svar kan inte längre strykas** — den är Måste sedan 2026-10-27, eftersom ett tomt formulär bredvid en sparad plan kan radera den
 2. Förenkla översikten (K-06) till en lista utan fasförklaringar i varje rad
 3. Minska textbiblioteket: skriv en förklaring per fas i stället för en per fas och lopp, så att granskningen blir fyra texter i stället för sexton
 
