@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -17,4 +19,6 @@ jobs:
 
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run lint
       - run: npm run test:run
+      - run: npm run build
