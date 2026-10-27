@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "source": "vasaloppet.se, vatternrundan.se, vansbrosimningen.se, lidingoloppet.se",
+  "checkedOn": "2026-10-27",
+  "note": "Datumen är kontrollerade mot arrangörernas sidor. estimatedHours är ungefärlig tid i mål för en motionär och används av R-25 för att räkna loppet som belastning.",
+  "races": [
+    {
+      "id": "vasaloppet",
+      "name": "Vasaloppet",
+      "sport": "ski",
+      "distanceKm": 90,
+      "estimatedHours": 7,
+      "date": "2027-03-07",
+      "taperWeeks": 2,
+      "recoveryWeeks": 2,
+      "specificWeeks": 8
+    },
+    {
+      "id": "vatternrundan",
+      "name": "Vätternrundan",
+      "sport": "bike",
+      "distanceKm": 315,
+      "estimatedHours": 11,
+      "date": "2027-06-18",
+      "taperWeeks": 2,
+      "recoveryWeeks": 2,
+      "specificWeeks": 8
+    },
+    {
+      "id": "vansbrosimningen",
+      "name": "Vansbrosimningen",
+      "sport": "swim",
+      "distanceKm": 3,
+      "estimatedHours": 1,
+      "date": "2027-07-10",
+      "taperWeeks": 1,
+      "recoveryWeeks": 1,
+      "specificWeeks": 6
+    },
+    {
+      "id": "lidingoloppet",
+      "name": "Lidingöloppet",
+      "sport": "run",
+      "distanceKm": 30,
+      "estimatedHours": 3.5,
+      "date": "2027-09-25",
+      "taperWeeks": 1,
+      "recoveryWeeks": 1,
+      "specificWeeks": 8
+    }
+  ]
+}

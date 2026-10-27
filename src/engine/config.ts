@@ -1,0 +1,209 @@
+/**
+ * Scheman för filerna i `config/`, och den validerade konfigurationen.
+ *
+ * Konfigurationen valideras när modulen laddas, alltså när appen startar och i
+ * testerna. En felskriven siffra ska stoppa bygget, inte dyka upp som en konstig
+ * plan hos en användare.
+ */
+import { z } from 'zod';
+import racesFile from '../../config/races.json';
+import rulesFile from '../../config/rules.json';
+import sessionsFile from '../../config/sessions.json';
+
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'datum ska vara YYYY-MM-DD');
+const share = z.number().min(0).max(1);
+
+const sport = z.enum(['ski', 'bike', 'swim', 'run', 'strength']);
+const raceId = z.enum(['vasaloppet', 'vatternrundan', 'vansbrosimningen', 'lidingoloppet']);
+const sessionType = z.enum([
+  'easy',
+  'long',
+  'tempo',
+  'intervals',
+  'technique',
+  'strength',
+  'rest',
+  'race',
+]);
+
+/** Ett pass som text: titel och instruktion. Båda krävs enligt R-30. */
+const textEntry = z.object({
+  title: z.string().min(1),
+  instruction: z.string().min(1),
+});
+
+export const racesSchema = z.object({
+  schemaVersion: z.literal(1),
+  source: z.string().min(1),
+  checkedOn: isoDate,
+  note: z.string(),
+  races: z
+    .array(
+      z.object({
+        id: raceId,
+        name: z.string().min(1),
+        sport: sport,
+        distanceKm: z.number().positive(),
+        estimatedHours: z.number().positive(),
+        date: isoDate,
+        taperWeeks: z.number().int().positive(),
+        recoveryWeeks: z.number().int().nonnegative(),
+        specificWeeks: z.number().int().positive(),
+      }),
+    )
+    .length(4),
+});
+
+export const rulesSchema = z.object({
+  schemaVersion: z.literal(1),
+  rulesVersion: z.string().min(1),
+  note: z.string(),
+  weekTime: z.object({
+    _rule: z.string(),
+    phaseShare: z.object({ base: share, specific: share, recovery: share }),
+    taperShare: z.object({ firstWeek: share, secondWeek: share, singleWeek: share }),
+    deload: z.object({ everyNthWeek: z.number().int().positive(), share }),
+    firstWeeks: z.object({ count: z.number().int().positive(), maxShare: share }),
+  }),
+  raceLoad: z.object({ _rule: z.string(), subtractEstimatedRaceHours: z.boolean() }),
+  leftoverMinutes: z.object({ _rule: z.string(), distributeIntoExistingSessions: z.boolean() }),
+  sportSplit: z.object({
+    _rule: z.string(),
+    specific: z.object({
+      raceSportShare: share,
+      raceSportShareWhenTwoSports: share,
+      raceSportShareWhenOneSport: share,
+    }),
+    base: z.object({ newLevelBonus: share }),
+  }),
+  strength: z.object({
+    _rule: z.string(),
+    minutesPerSession: z.number().int().positive(),
+    sessionsByPhase: z.object({
+      base: z.number().int().nonnegative(),
+      specific: z.number().int().nonnegative(),
+      taper: z.number().int().nonnegative(),
+      recovery: z.number().int().nonnegative(),
+    }),
+  }),
+  trainingDays: z.object({
+    _rule: z.string(),
+    byHoursPerWeek: z
+      .array(
+        z.object({
+          upToHours: z.number().positive(),
+          days: z.number().int().min(1).max(7),
+        }),
+      )
+      .min(1),
+    minRestDays: z.number().int().min(1),
+  }),
+  session: z.object({
+    _rule: z.string(),
+    minMinutes: z.number().int().positive(),
+    maxMinutes: z.number().int().positive(),
+  }),
+  longSession: z.object({
+    _rule: z.string(),
+    maxShareOfWeek: share,
+    capMinutesBySport: z.object({
+      ski: z.number().int().positive(),
+      bike: z.number().int().positive(),
+      run: z.number().int().positive(),
+      swim: z.number().int().positive(),
+    }),
+    allowedWeekdays: z.array(z.number().int().min(1).max(7)).min(1),
+  }),
+  runVolume: z.object({
+    _rule: z.string(),
+    maxWeeklyIncrease: share,
+    noBackToBackForNewLevel: z.boolean(),
+  }),
+  intensity: z.object({
+    _rule: z.string(),
+    zoneText: z.object({
+      '1': z.string().min(1),
+      '2': z.string().min(1),
+      '3': z.string().min(1),
+      '4': z.string().min(1),
+    }),
+    byPhase: z.object({
+      base: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
+      specific: z.object({
+        hardSessionsPerWeek: z.number().int().nonnegative(),
+        maxZone: z.number().int().min(1).max(4),
+        maxZoneForNewLevel: z.number().int().min(1).max(4),
+      }),
+      taper: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
+      recovery: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
+    }),
+    noHardDaysBackToBack: z.boolean(),
+  }),
+  blocks: z.object({
+    _rule: z.string(),
+    sharedBlockMaxWeeks: z.number().int().positive(),
+    taperWeeksWhenShared: z.number().int().positive(),
+  }),
+  raceDay: z.object({
+    _rule: z.string(),
+    openerMinutesDayBefore: z.number().int().nonnegative(),
+    openerMaxZone: z.number().int().min(1).max(4),
+  }),
+  season: z.object({
+    _rule: z.string(),
+    openWaterMonths: z.array(z.number().int().min(1).max(12)).min(1),
+    swimDrylandBeforeMonth: z.number().int().min(1).max(12),
+  }),
+  classicWindow: z.object({ _rule: z.string(), months: z.number().int().positive() }),
+  warnings: z.object({
+    _rule: z.string(),
+    shortPreparation: z.object({ weeksThreshold: z.number().int().positive(), text: z.string().min(1) }),
+    lowHours: z.object({
+      hoursThresholdWithLongRace: z.number().positive(),
+      hoursThresholdOtherwise: z.number().positive(),
+      longRaceIds: z.array(raceId).min(1),
+      text: z.string().min(1),
+    }),
+    skiTechnique: z.object({ text: z.string().min(1) }),
+    outsideClassicWindow: z.object({ text: z.string().min(1) }),
+  }),
+});
+
+export const sessionsSchema = z.object({
+  schemaVersion: z.literal(1),
+  note: z.string(),
+  // R-30: varje passtyp måste finnas. Saknas en är det ett fel, inte ett tomt fält.
+  types: z.record(sessionType, textEntry),
+  sportVariants: z.record(z.string(), textEntry),
+  substitutes: z.record(z.string(), textEntry.extend({ _rule: z.string() })),
+  strengthExercises: z.object({
+    _rule: z.string(),
+    exercises: z
+      .array(z.object({ name: z.string().min(1), focus: z.string().min(1) }))
+      .min(1),
+  }),
+  safetyNotes: z.object({
+    openWater: z.object({ _rule: z.string(), text: z.string().min(1) }),
+  }),
+});
+
+export type RacesConfig = z.infer<typeof racesSchema>;
+export type RulesConfig = z.infer<typeof rulesSchema>;
+export type SessionsConfig = z.infer<typeof sessionsSchema>;
+
+/**
+ * Den validerade konfigurationen.
+ *
+ * `parse` kastar vid fel, vilket är meningen: hellre ett tydligt fel vid start
+ * än en plan byggd på en felskriven siffra.
+ */
+export const races: RacesConfig = racesSchema.parse(racesFile);
+export const rules: RulesConfig = rulesSchema.parse(rulesFile);
+export const sessions: SessionsConfig = sessionsSchema.parse(sessionsFile);
+
+/** Loppet med ett visst id. Kastar om det inte finns. */
+export function raceById(id: RacesConfig['races'][number]['id']): RacesConfig['races'][number] {
+  const race = races.races.find((candidate) => candidate.id === id);
+  if (race === undefined) throw new Error(`Loppet ${id} finns inte i config/races.json`);
+  return race;
+}
