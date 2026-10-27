@@ -357,6 +357,29 @@ v1.0 samlar inga personuppgifter: ingen databas, inga konton, inga hälsofrågor
 | AI-märkning | Vid förklaringarna | Förklaringarna är skrivna med hjälp av AI. |
 | Oberoende | Planens fot | Klassikerplaneraren är inte knuten till Vasaloppet, Vätternrundan, Vansbrosimningen, Lidingöloppet eller En svensk klassiker. |
 
+### Kostnad: noll kronor *(tillagt 2026-10-27)*
+
+**v1.0 ska inte kosta någonting — varken att utveckla eller att använda.** Det är ett krav på samma nivå som att appen ska fungera, inte en ambition. Allt som skulle införa en kostnad, nu eller senare, kräver Isabelles uttryckliga godkännande.
+
+Så här ser det ut i dag:
+
+| Del | Kostnad | Varför det håller |
+| --- | --- | --- |
+| Alla paket i `package.json` | 0 kr | Öppen källkod under MIT |
+| GitHub, publikt repo | 0 kr | Publika repon har fria byggminuter i Actions |
+| Vercel Hobby | 0 kr | Permanent gratis, inget kreditkort, **ingen fakturering alls** — överskrids en gräns pausas funktionen tills månaden vänder, ingen betalning kan utlösas |
+| AI | 0 kr | Inga anrop i körtid. Texterna skrivs under utvecklingen i Claude Code, som redan är betald |
+| Databas, backend, domän | 0 kr | Finns inte. Appen är helt statisk och sparar i webbläsaren |
+
+**Fyra ställen där en kostnad skulle kunna smyga sig in, och vad som hindrar det:**
+
+1. **Ett AI-anrop i körtid.** Hindras av A-08 och av ett test som underkänner varje beroende med "anthropic" i namnet. Kravet står alltså i kod, inte bara i text.
+2. **En betaltjänst som nytt beroende** — analys, felrapportering, databas, kartor, typsnittstjänst. Hindras av regeln i avsnitt 1 om att fråga innan bibliotek eller tjänster läggs till.
+3. **Vercels villkor för Hobby gäller personligt och icke-kommersiellt bruk.** Skulle appen någon gång ta betalt, visa reklam eller användas i en verksamhet krävs Pro. Så länge den är en kursbeta är den inom villkoren.
+4. **Ett privat repo** skulle göra byggminuterna i Actions begränsade. Repot ska förbli publikt.
+
+**Reserv.** Appen är helt statisk sedan beslutet om förgenererade förklaringar, så den kan driftas var som helst som serverar filer. GitHub Pages fungerar, är gratis utan kommersiell begränsning, och är redan beprövat i v0. Om Vercel någon gång skulle bli ett problem är bytet litet.
+
 **Skrivregler för alla texter**
 
 - Inga medicinska påståenden: skriv aldrig att appen förebygger skador, behandlar eller rehabiliterar
@@ -372,7 +395,7 @@ v1.0 samlar inga personuppgifter: ingen databas, inga konton, inga hälsofrågor
 | Tillgänglighet | Semantisk HTML, går att använda med tangentbord, god kontrast, sporter visas med både färg och text |
 | Säkerhet | Inga API-nycklar och inga hemligheter i repot; inga anrop till tredje part i körtid |
 | Kvalitet | TypeScript strikt, lint utan fel, alla tester gröna innan commit |
-| Kostnad | Inga AI-anrop i körtid, alltså noll rörlig kostnad; gratisnivåer hos Vercel |
+| Kostnad | **Noll kronor.** Se avsnittet nedan — kravet är absolut, inte en ambition |
 | Språk | Svenska i hela gränssnittet |
 
 ## 9. Test och definition of done

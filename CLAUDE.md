@@ -101,6 +101,22 @@ Enligt kravspecens avsnitt 1:
 
 **Så ställer du frågor:** samla dem, numrera dem, ge 2–3 alternativ per fråga plus din rekommendation och vad som är blockerat. Fortsätt under tiden med det som inte är blockerat.
 
+## Kostnad: noll kronor
+
+**Projektet får inte kosta någonting — varken att utveckla eller att använda.** Det är ett krav, inte en ambition, och det står i kravspecens avsnitt 8.
+
+Allt i dag är gratis: paketen är öppen källkod, repot är publikt (fria byggminuter i Actions), Vercels Hobby-nivå har ingen fakturering alls, och det finns inga AI-anrop i körtid eftersom förklaringarna är förgenererade.
+
+**Fråga alltid innan du:**
+
+- lägger till ett beroende eller en tjänst som har en betalnivå — även om vi skulle hålla oss inom gratisnivån
+- inför något som anropar en extern tjänst i körtid
+- gör något som kräver ett konto, ett kreditkort eller en nyckel
+
+Testet i `tests/project.test.ts` underkänner varje beroende med "anthropic" i namnet. Ta inte bort det — det är kravet A-08 skrivet i kod i stället för i text.
+
+Appen är helt statisk, så den kan driftas var som helst som serverar filer. Blir Vercel ett problem fungerar GitHub Pages, som redan är beprövat i `v0-pages`.
+
 ## Hemligheter
 
 API-nyckeln ligger i `.env.local` och i Vercels miljövariabler. `.env*` finns i `.gitignore`. **Nyckeln får bara läsas från serverkod** — aldrig i en komponent som skickas till webbläsaren. Inga hemligheter i repot, någonsin.
