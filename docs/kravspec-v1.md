@@ -224,9 +224,53 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   simning, inte volym, och R-31:s tak på 80 minuter gäller ändå. Sänks en grens vikt normeras
   andelarna om, så veckan blir inte kortare.
 
-- **R-36** (tillagd 2026-10-28) **Träningen fokuserar på nästa kommande lopp.** När ett lopp är,  avklarat ska dess gren inte längre tränas som huvudgren — tiden går till nästa lopps gren. Är,  Vasaloppet genomfört ligger fokus helt på cykeln inför Vätternrundan.,,  **Undantaget är grenens egen säsong.** Är det fortfarande vinter där man bor kan skidor användas,  som långpass för konditionsträning, och grenen behåller då `afterRace.keepShareInOwnSeason` —,  **10 procent**. Utanför sin säsong får den ingenting. Grenens egen säsong är de månader där den,  har sin högsta säsongsvikt i R-32: vinter för skidor, sommar för cykel.,,  Den frigjorda tiden går till **veckans fokusgren**, inte ut över alla grenar. Annars hamnade den,  hos löpningen, som har jämn vikt året om — och ett halvår före Lidingöloppet gör den ingen nytta,  där. Fokusgrenen rörs aldrig av regeln, oavsett vad som varit.,,  Före regeln gav en plan 33 timmar skidåkning efter Vasaloppet, varav en del i maj och juni.,  Veckorna direkt efter loppet gav 216 minuter skidor mot 65 minuter cykel, trots att Vasaloppet,  var avklarat och Vätternrundan var nästa lopp.
+- **R-36** (tillagd 2026-10-28) **Träningen fokuserar på nästa kommande lopp.** När ett lopp är
+  avklarat ska dess gren inte längre tränas som huvudgren — tiden går till nästa lopps gren. Är
+  Vasaloppet genomfört ligger fokus helt på cykeln inför Vätternrundan.
 
-- **R-37** (tillagd 2026-10-28) **Passet är det primära, grenen är ett val.** Träningsupplägget är,  långpass, intervaller och styrka — inte fyra separata sporter. Grenen som står på ett pass är den,  som passar nästa lopp bäst, men flera grenar ger samma konditionsträning, och den som hellre vill,  eller måste byta ska kunna göra det utan att tappa poängen med passet.,,  Varje pass av typen `easy`, `long`, `tempo` eller `intervals` bär därför en lista `alternatives`,  med de grenar det också kan göras i. Grenarna som är utbytbara är **längdskidor, cykel och,  löpning**; simning står inte med, eftersom den inte ger samma konditionsträning och dessutom,  kräver simhall.,,  Ett alternativ måste vara möjligt att faktiskt genomföra:,,  - **i säsong** — längdskidor erbjuds bara november till mars. Att föreslå skidor i juli gör,    planen otrovärdig.,  - **med utrustning användaren har** — minst en av grenens flaggor räcker. Skidor går med snö,    eller rullskidor, men också med en stakmaskin.,,  **Loppet, vilan, styrkan och teknikpassen har inga alternativ.** Ett teknikpass i simning kan,  inte bytas mot cykel — då är det inte längre samma pass.,,  Exempel ur en färdig plan:,,  | Pass | Gren | Kan också göras som |,  | --- | --- | --- |,  | Långpass i mars, mot Vätternrundan | Cykel | Längdskidor *(om det finns snö)*, Löpning |,  | Långpass i april, mot Vätternrundan | Cykel | Löpning |,  | Långpass i augusti, mot Lidingöloppet | Löpning | Cykel *(sliter mindre på kroppen)* |,,  Reglerna ligger i `sessionAlternatives` i `config/rules.json`. **Gränssnittet ska leda med,  passtypen**, inte med grenen: raden är ett långpass, och grenen är hur man väljer att göra det.
+  **Undantaget är grenens egen säsong.** Är det fortfarande vinter där man bor kan skidor användas
+  som långpass för konditionsträning, och grenen behåller då `afterRace.keepShareInOwnSeason` —
+  **10 procent**. Utanför sin säsong får den ingenting. Grenens egen säsong är de månader där den
+  har sin högsta säsongsvikt i R-32: vinter för skidor, sommar för cykel.
+
+  Den frigjorda tiden går till **veckans fokusgren**, inte ut över alla grenar. Annars hamnade den
+  hos löpningen, som har jämn vikt året om — och ett halvår före Lidingöloppet gör den ingen nytta
+  där. Fokusgrenen rörs aldrig av regeln, oavsett vad som varit.
+
+  Före regeln gav en plan 33 timmar skidåkning efter Vasaloppet, varav en del i maj och juni.
+  Veckorna direkt efter loppet gav 216 minuter skidor mot 65 minuter cykel, trots att Vasaloppet
+  var avklarat och Vätternrundan var nästa lopp.
+
+- **R-37** (tillagd 2026-10-28) **Passet är det primära, grenen är ett val.** Träningsupplägget är
+  långpass, intervaller och styrka — inte fyra separata sporter. Grenen som står på ett pass är den
+  som passar nästa lopp bäst, men flera grenar ger samma konditionsträning, och den som hellre vill
+  eller måste byta ska kunna göra det utan att tappa poängen med passet.
+
+  Varje pass av typen `easy`, `long`, `tempo` eller `intervals` bär därför en lista `alternatives`
+  med de grenar det också kan göras i. Grenarna som är utbytbara är **längdskidor, cykel och
+  löpning**; simning står inte med, eftersom den inte ger samma konditionsträning och dessutom
+  kräver simhall.
+
+  Ett alternativ måste vara möjligt att faktiskt genomföra:
+
+  - **i säsong** — längdskidor erbjuds bara november till mars. Att föreslå skidor i juli gör
+    planen otrovärdig.
+  - **med utrustning användaren har** — minst en av grenens flaggor räcker. Skidor går med snö
+    eller rullskidor, men också med en stakmaskin.
+
+  **Loppet, vilan, styrkan och teknikpassen har inga alternativ.** Ett teknikpass i simning kan
+  inte bytas mot cykel — då är det inte längre samma pass.
+
+  Exempel ur en färdig plan:
+
+  | Pass | Gren | Kan också göras som |
+  | --- | --- | --- |
+  | Långpass i mars, mot Vätternrundan | Cykel | Längdskidor *(om det finns snö)*, Löpning |
+  | Långpass i april, mot Vätternrundan | Cykel | Löpning |
+  | Långpass i augusti, mot Lidingöloppet | Löpning | Cykel *(sliter mindre på kroppen)* |
+
+  Reglerna ligger i `sessionAlternatives` i `config/rules.json`. **Gränssnittet ska leda med
+  passtypen**, inte med grenen: raden är ett långpass, och grenen är hur man väljer att göra det.
 
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
@@ -294,11 +338,11 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 **Ersättningar, teknik och säsong**
 
-- **R-17** Skidor utan snö eller rullskidor: stakmaskin om användaren har en, annars stavgång i backe med samma tid och zon.
-- **R-18** Simning utan simhall: före juni ersätts simpass med torrövningar för simteknik, och en varning visas om att simträning behövs.
-- **R-19** Pass i öppet vatten planeras bara juni–augusti och har alltid säkerhetstexten från avsnitt 8.
+- **R-17** Skidor utan snö eller rullskidor: stakmaskin om användaren har en, annars stavgång i backe med samma tid och zon. *(preciserad 2026-10-28)* Passet **behåller grenen**: det tränar fortfarande mot Vasaloppet, och det ska synas i planen. Stavgång i backe är skidträning, inte en nödlösning — bor man där det inte finns snö är det så man tränar för Vasaloppet, och det är bra träning. Gränssnittet ska därför visa "Stavgång i backe — Längdskidor", aldrig "i stället för längdskidor".
+- **R-18** Simning utan simhall: före juni ersätts simpass med torrövningar för simteknik, och en varning visas om att simträning behövs. *(preciserad 2026-10-28)* Undantaget är `season.openWaterMonths`, juni till augusti: då simmar man i öppet vatten och behöver ingen simhall, och det är dessutom vad Vansbrosimningen faktiskt är. Utanför de månaderna — inte bara före juni — blir simpassen torrövningar för den som saknar simhall. I oktober finns varken bassäng eller öppet vatten.
+- **R-19** Pass i öppet vatten planeras bara juni–augusti och har alltid säkerhetstexten från avsnitt 8. *(preciserad 2026-10-28)* Simpass juni till augusti planeras som öppet vatten och bär säkerhetstexten i fältet `safetyNote`. Texten sätts aldrig på ett ersatt pass: torrövningar på land behöver ingen varning om köldchock.
 - **R-20** Cykel utan landsvägscykel eller trainer: passet blir "cykel, t.ex. spinning på gym" och en varning visas.
-- **R-21** Nivå Ny i skidor eller simning: ett teknikpass per vecka i den sporten under bas och specifik fas, och en rekommendation om kurs i översikten.
+- **R-21** Nivå Ny i skidor eller simning: ett teknikpass per vecka i den sporten under bas och specifik fas, och en rekommendation om kurs i översikten. *(preciserad 2026-10-28)* Teknikpasset tas **före** veckans hårda pass — är man nybörjare avgör tekniken mer än intensiteten. Kursrekommendationen ges bara för grenar vars lopp faktiskt ingår i planen; ett simråd till den som inte ska simma Vansbrosimningen är bara brus. Texterna ligger i `technique.courseAdvice` i `config/rules.json`.
 
 **Varningar**
 
@@ -439,8 +483,10 @@ interface Session {
   zone: 1 | 2 | 3 | 4 | null;
   title: string;
   instruction: string;
-  safetyNote?: string;
+  safetyNote?: string;        // R-19, satt på pass i öppet vatten
   raceId?: RaceId;            // satt på pass av typen 'race'
+  alternatives: SessionAlternative[];   // R-37, grenar passet också kan göras i
+  substitutedAs?: string;     // R-17, R-18, R-20: nyckel i sessions.json när passet görs på annat sätt
 }
 
 interface Week {
@@ -555,8 +601,10 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Reglerna om dagar i rad i R-14 och R-16 håller också över veckogränsen, söndag till måndag *(tillagd 2026-10-28)*
 - Löptiden ökar högst 10 % mellan veckor, utom efter avlastning (R-14)
 - Inga pass före startdatum eller efter sista loppet, och loppdagen innehåller bara loppet (R-01, R-04)
-- Inget pass kräver utrustning som användaren saknar (R-17–R-20)
-- Varje pass i öppet vatten har säkerhetstexten (R-19)
+- Inget pass kräver utrustning som användaren saknar: det ersätts i stället, med tid och zon kvar (R-17–R-20)
+- Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
+- En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
+- Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
 - Samma indata ger samma plan (determinism)
 - Varje pass är 20–300 minuter och har titel, instruktion och zon där zon gäller (R-12, R-30) *(tillagd 2026-10-27)*
 - Varje pass av typen `race` har ett `raceId` som finns i `config/races.json` *(tillagd 2026-10-28)*
@@ -583,6 +631,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
+- Profil utan utrustning: skidpassen blir stavgång, simpassen torrövningar, och inget pass stryks (R-17, R-18) (tillagt 2026-10-28)
+- Samma profil med stakmaskin: skidpassen blir stakmaskin i stället för stavgång (R-17) (tillagt 2026-10-28)
+- Simpass i juli utan simhall: ingen ersättning, eftersom öppet vatten inte kräver bassäng (R-19) (tillagt 2026-10-28)
 - Lidingöloppets block när de tre andra loppen är avklarade: löpningen växer högst 10 procent i veckan (R-14) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 

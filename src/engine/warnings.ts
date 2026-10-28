@@ -12,7 +12,7 @@
  */
 import { raceById, rules } from './config.ts';
 import { startOfWeek, weeksBetween } from './dates.ts';
-import type { PlanInput, RaceId } from './types.ts';
+import type { PlanInput, RaceId, TrainedSport } from './types.ts';
 import type { WeekPlan } from './sessions.ts';
 
 /** Ett lopp som ligger för nära starten för en hel uppbyggnad (R-35). */
@@ -85,4 +85,26 @@ function weeksInWords(weeks: number): string {
   if (weeks <= 0) return 'mindre än en vecka';
   if (weeks === 1) return '1 vecka';
   return `${weeks} veckor`;
+}
+
+/**
+ * Kursrekommendationer för de grenar användaren är nybörjare i (R-21).
+ *
+ * Är man ny på längdskidor eller simning avgörs loppet av tekniken, inte av
+ * konditionen, och en kurs ger mer än extra träningstid. Rekommendationen hör
+ * i översikten, inte på varje pass — det är ett råd om hur man förbereder sig,
+ * inte en instruktion för en enskild dag.
+ *
+ * Bara grenar vars lopp faktiskt ingår i planen räknas. Att rekommendera en
+ * simkurs till den som inte ska simma Vansbrosimningen är bara brus.
+ */
+export function courseAdvice(input: PlanInput): string[] {
+  const grenar = rules.technique.sportsForNewLevel;
+  const iPlanen = new Set(input.races.map((race) => raceById(race.id).sport));
+
+  return grenar
+    .filter((sport) => iPlanen.has(sport))
+    .filter((sport) => input.levels[sport as TrainedSport] === 'new')
+    .map((sport) => rules.technique.courseAdvice[sport])
+    .filter((råd): råd is string => råd !== undefined);
 }

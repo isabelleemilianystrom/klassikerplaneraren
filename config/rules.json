@@ -314,5 +314,62 @@
       "bike": "sliter mindre på kroppen",
       "run": ""
     }
+  },
+  "substitutions": {
+    "_rule": "R-17, R-18, R-19, R-20",
+    "note": "Ett pass i en gren användaren saknar utrustning för görs på ett annat sätt, det stryks inte. requiredEquipment säger vad grenen kräver för att kunna göras som tänkt; saknas det väljs den första ersättningen i bySport vars egen utrustning finns. Den sista i listan kräver ingenting och gäller alltid som sista utväg.",
+    "requiredEquipment": {
+      "ski": [
+        "snowOrRollerSkis"
+      ],
+      "swim": [
+        "pool"
+      ],
+      "bike": [
+        "bike"
+      ]
+    },
+    "bySport": {
+      "ski": [
+        {
+          "key": "ski.skiErg",
+          "needs": [
+            "skiErg"
+          ]
+        },
+        {
+          "key": "ski.poleWalk",
+          "needs": []
+        }
+      ],
+      "swim": [
+        {
+          "key": "swim.dryland",
+          "needs": []
+        }
+      ],
+      "bike": [
+        {
+          "key": "bike.indoor",
+          "needs": []
+        }
+      ]
+    },
+    "openWaterSports": [
+      "swim"
+    ]
+  },
+  "technique": {
+    "_rule": "R-21",
+    "note": "Är man ny i skidor eller simning avgörs loppet av tekniken, inte av konditionen. Ett teknikpass per vecka i bas- och specifik fas, och en rekommendation om kurs i översikten. Teknikgrenarna är desamma som behåller teknikpass under återhämtningen (R-33), men här gäller det den som är nybörjare.",
+    "sportsForNewLevel": [
+      "ski",
+      "swim"
+    ],
+    "sessionsPerWeek": 1,
+    "courseAdvice": {
+      "ski": "Du är ny på längdskidor. Teknik avgör mer än kondition i Vasaloppet – försök komma ut på snö och gå gärna en skidkurs före loppet.",
+      "swim": "Du är ny på simning. Tekniken är det som gör 3 km i Vansbroån görbart – en simkurs eller några lektioner ger mer än extra simtid."
+    }
   }
 }

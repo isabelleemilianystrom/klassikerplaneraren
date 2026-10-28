@@ -241,6 +241,30 @@ export const rulesSchema = z.object({
     openWaterMonths: z.array(z.number().int().min(1).max(12)).min(1),
     swimDrylandBeforeMonth: z.number().int().min(1).max(12),
   }),
+  /** R-21: teknikpass och kursrekommendation för nybörjaren. */
+  technique: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    sportsForNewLevel: z.array(sport).min(1),
+    sessionsPerWeek: z.number().int().positive(),
+    courseAdvice: z.partialRecord(sport, z.string().min(1)),
+  }),
+  /** R-17, R-18, R-19, R-20: ersättningar när utrustning saknas. */
+  substitutions: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    /** Vad grenen kräver för att kunna göras som tänkt. */
+    requiredEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
+    /** Ersättningar i prioritetsordning. Nyckeln finns i sessions.json. */
+    bySport: z.partialRecord(
+      sport,
+      z
+        .array(z.object({ key: z.string().min(1), needs: z.array(z.string().min(1)) }))
+        .min(1),
+    ),
+    /** Grenar som går i öppet vatten under season.openWaterMonths. */
+    openWaterSports: z.array(sport),
+  }),
   /** R-37: grenar ett pass också kan göras i. */
   sessionAlternatives: z.object({
     _rule: z.string(),

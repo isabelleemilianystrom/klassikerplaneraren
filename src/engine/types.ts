@@ -98,6 +98,13 @@ export interface Session {
    * finns: loppet, vilan, styrkan och teknikpassen har inga.
    */
   alternatives: SessionAlternative[];
+  /**
+   * Satt när användaren saknar utrustning för grenen och passet därför görs
+   * på ett annat sätt (R-17, R-18, R-20). Titeln och instruktionen är redan
+   * ersättningens — det här fältet säger *vilken* ersättning det är, så att
+   * gränssnittet kan visa skälet.
+   */
+  substitutedAs?: string;
   safetyNote?: string;
   /**
    * Vilket lopp passet är, satt på pass av typen `race`.

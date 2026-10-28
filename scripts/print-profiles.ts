@@ -13,7 +13,7 @@ import { raceById, rules } from '../src/engine/config.ts';
 import { weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
 import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
-import { midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
+import { courseAdvice, midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
 import type { PlanInput, Zone } from '../src/engine/types.ts';
 import { PROFILES } from '../tests/profiles.ts';
 
@@ -101,6 +101,9 @@ function skrivVecka(plan: WeekPlan): string[] {
       continue;
     }
 
+    // Grenen står kvar också när passet görs på ett annat sätt. "Stavgång i
+    // backe — Längdskidor" är inte en motsägelse: bor man där det inte finns
+    // snö är det så man tränar för Vasaloppet, och det är bra träning.
     const sport = session.sport === null ? '' : SPORTNAMN[session.sport];
     const zon = zonText(session.zone);
 
@@ -110,6 +113,11 @@ function skrivVecka(plan: WeekPlan): string[] {
         (zon === '' ? '' : `, ${zon}`),
     );
     rader.push(`  ${' '.repeat(12)} ${session.instruction}`);
+
+    // R-19: säkerhetstexten för öppet vatten.
+    if (session.safetyNote !== undefined) {
+      rader.push(`  ${' '.repeat(12)} OBS: ${session.safetyNote}`);
+    }
 
     // R-37: grenarna passet också kan göras i.
     if (session.alternatives.length > 0) {
@@ -167,7 +175,10 @@ function main(): void {
 
     const checks = volumeChecks(input, planer);
 
-    const varningar = midProgrammeWarnings(midProgrammeStarts(input, planer));
+    const varningar = [
+      ...midProgrammeWarnings(midProgrammeStarts(input, planer)),
+      ...courseAdvice(input),
+    ];
     const varningsrader =
       varningar.length === 0
         ? []

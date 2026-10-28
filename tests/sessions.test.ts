@@ -396,7 +396,9 @@ describe('R-30: titel och instruktion', () => {
 
     expect(simteknik?.title).toBe(sessionTexts.sportVariants['swim.technique']?.title);
 
-    const skidteknik = buildWeekPlans(P1)
+    // P2 har skidor. P1 har inga, och där blir skidpassen stavgång i stället
+    // (R-17) — det prövas i sitt eget test.
+    const skidteknik = buildWeekPlans(P2)
       .flatMap((plan) => plan.sessions)
       .find((session) => session.type === 'technique' && session.sport === 'ski');
 

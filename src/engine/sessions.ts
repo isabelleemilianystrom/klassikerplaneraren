@@ -371,7 +371,19 @@ function enduranceSessions(
     const flestPass = (gräns?.maxSessionsPerWeek ?? Number.POSITIVE_INFINITY) - redanLagt;
     if (flestPass <= 0) continue;
 
+    // R-21: ett av veckans pass i en nybörjargren blir teknikpass. Det tas
+    // före de hårda passen — tekniken är det som avgör, inte intensiteten.
+    let teknikKvar = needsTechnique(sport, week.phase, input)
+      ? rules.technique.sessionsPerWeek
+      : 0;
+
     for (const längd of splitIntoSessions(minuter, tak, flestPass)) {
+      if (teknikKvar > 0) {
+        teknikKvar -= 1;
+        resultat.push({ sport, type: 'technique', minutes: längd, zone: 2 });
+        continue;
+      }
+
       const hård = hårda.get(sport)?.pop();
       resultat.push({
         sport,
@@ -484,6 +496,20 @@ function defaultTypeFor(sport: TrainedSport, phase: Phase): SessionType {
 
   const teknikgrenar: readonly string[] = rules.recovery.techniqueSports;
   return teknikgrenar.includes(sport) ? 'technique' : 'easy';
+}
+
+/**
+ * Sant när grenen ska ha ett teknikpass den här veckan (R-21).
+ *
+ * Är man ny i skidor eller simning avgörs loppet av tekniken, inte av
+ * konditionen. Ett teknikpass per vecka under bas- och specifik fas — i
+ * nedtrappning och återhämtning styr R-33 i stället.
+ */
+function needsTechnique(sport: TrainedSport, phase: Phase, input: PlanInput): boolean {
+  if (phase !== 'base' && phase !== 'specific') return false;
+
+  const grenar: readonly string[] = rules.technique.sportsForNewLevel;
+  return grenar.includes(sport) && input.levels[sport] === 'new';
 }
 
 /** Minuter per sport efter att långpasset tagit sin del. */
@@ -965,12 +991,100 @@ function withTitleAndInstruction(
     );
   }
 
-  return {
+  const grund: Session = {
     ...session,
     title: text.title,
     instruction: text.instruction,
     alternatives: alternativesFor(session, input),
   };
+
+  return withSafetyNote(withSubstitution(grund, input), input);
+}
+
+/**
+ * Passet gjort på ett annat sätt när utrustningen saknas (R-17, R-18, R-20).
+ *
+ * Skidor utan snö eller rullskidor blir stakmaskin om användaren har en,
+ * annars stavgång i backe. Simning utan simhall blir torrövningar. Cykel utan
+ * cykel blir spinning. Tid och zon är oförändrade — det är hur passet görs som
+ * ändras, inte vad det ska ge.
+ *
+ * Loppet ersätts aldrig: den som anmält sig till Vasaloppet åker Vasaloppet.
+ * Simning i öppet vatten juni till augusti kräver ingen simhall (R-19).
+ */
+function withSubstitution(session: Session, input: PlanInput): Session {
+  if (session.sport === null || session.type === 'race' || session.type === 'rest') {
+    return session;
+  }
+  if (hasRequiredEquipment(session.sport, session.date, input)) return session;
+
+  const kandidater = rules.substitutions.bySport[session.sport];
+  if (kandidater === undefined) return session;
+
+  const utrustning = input.equipment as Record<string, boolean>;
+  const vald = kandidater.find((kandidat) =>
+    kandidat.needs.every((flagga) => utrustning[flagga] === true),
+  );
+  if (vald === undefined) return session;
+
+  const text = sessionTexts.substitutes[vald.key];
+  if (text === undefined) {
+    throw new Error(`config/sessions.json saknar ersättningen "${vald.key}"`);
+  }
+
+  return {
+    ...session,
+    title: text.title,
+    instruction: text.instruction,
+    substitutedAs: vald.key,
+    // Ersättningen är redan ett byte av gren. Att dessutom lista alternativ
+    // skulle ge tre sätt att göra samma pass, vilket är ett för många.
+    alternatives: [],
+  };
+}
+
+/**
+ * Sant när grenen går att göra som tänkt (R-17, R-18, R-19, R-20).
+ *
+ * Simning juni till augusti går i öppet vatten och kräver ingen simhall. Det
+ * är dessutom det Vansbrosimningen faktiskt är.
+ */
+function hasRequiredEquipment(
+  sport: Exclude<Session['sport'], null>,
+  date: IsoDate,
+  input: PlanInput,
+): boolean {
+  if (isOpenWater(sport, date)) return true;
+
+  const krav = rules.substitutions.requiredEquipment[sport];
+  if (krav === undefined) return true;
+
+  const utrustning = input.equipment as Record<string, boolean>;
+  return krav.some((flagga) => utrustning[flagga] === true);
+}
+
+/** Sant för ett pass som planeras i öppet vatten (R-19). */
+function isOpenWater(sport: Exclude<Session['sport'], null>, date: IsoDate): boolean {
+  const grenar: readonly string[] = rules.substitutions.openWaterSports;
+  if (!grenar.includes(sport)) return false;
+
+  return rules.season.openWaterMonths.includes(monthOf(date));
+}
+
+/**
+ * Säkerhetstexten för öppet vatten (R-19).
+ *
+ * Varje pass i öppet vatten bär den, ordagrant enligt kravspecens avsnitt 8.
+ * Loppet undantas inte: Vansbrosimningen *är* öppet vatten.
+ */
+function withSafetyNote(session: Session, input: PlanInput): Session {
+  if (session.sport === null) return session;
+  if (session.type === 'rest') return session;
+  if (session.substitutedAs !== undefined) return session;
+  if (!isOpenWater(session.sport, session.date)) return session;
+
+  void input;
+  return { ...session, safetyNote: sessionTexts.safetyNotes.openWater.text };
 }
 
 /**
