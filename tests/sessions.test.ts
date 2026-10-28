@@ -1147,3 +1147,95 @@ describe('R-37: passet är det primära, grenen är ett val', () => {
     }
   });
 });
+
+describe('R-13: långpass också i basfasen', () => {
+  /** Långpassen i en fas, i veckoordning. */
+  function långaIFas(input: PlanInput, phase: string, raceId: string) {
+    return buildWeekPlans(input)
+      .filter(({ week }) => week.phase === phase && week.focusRaceId === raceId)
+      .map((plan) => ({
+        vecka: plan.week,
+        lång: plan.sessions.find((session) => session.type === 'long'),
+      }));
+  }
+
+  it('ger basveckorna ett långpass', () => {
+    // Grundperioden är där uthålligheten byggs. Tolv basveckor utan ett enda
+    // längre pass är svårt att försvara.
+    const bas = långaIFas(P2, 'base', 'vasaloppet');
+
+    expect(bas.length).toBeGreaterThan(0);
+    for (const { vecka, lång } of bas) {
+      expect(lång, `vecka ${vecka.index}`).toBeDefined();
+    }
+  });
+
+  it('håller basens långpass under hälften av grenens tak', () => {
+    const tak = rules.longSession.capMinutesBySport.ski;
+    const { endShareOfCap } = rules.longSession.growthByPhase.base;
+
+    for (const { vecka, lång } of långaIFas(P2, 'base', 'vasaloppet')) {
+      expect(lång?.minutes as number, `vecka ${vecka.index}`).toBeLessThanOrEqual(
+        Math.round(tak * endShareOfCap),
+      );
+    }
+  });
+
+  it('låter den specifika fasen ta vid där basen slutade', () => {
+    // Basen slutar på hälften av taket, den specifika fasen börjar där.
+    const bas = långaIFas(P2, 'base', 'vasaloppet');
+    const specifik = långaIFas(P2, 'specific', 'vasaloppet');
+
+    const sistaBas = bas.at(-1)?.lång?.minutes as number;
+    const förstaSpecifik = specifik[0]?.lång?.minutes as number;
+
+    expect(förstaSpecifik).toBeGreaterThan(sistaBas);
+
+    // Steget mellan faserna ska inte vara större än ett steg inom en fas.
+    const stegIFasen =
+      (specifik[1]?.lång?.minutes as number) - (specifik[0]?.lång?.minutes as number);
+    expect(förstaSpecifik - sistaBas).toBeLessThanOrEqual(stegIFasen * 2);
+  });
+
+  it('växer genom basfasen', () => {
+    const bas = långaIFas(P2, 'base', 'vasaloppet').filter(({ vecka }) => !vecka.isDeload);
+
+    for (const [i, { lång }] of bas.entries()) {
+      if (i === 0) continue;
+      expect(lång?.minutes as number, `position ${i}`).toBeGreaterThanOrEqual(
+        bas[i - 1]?.lång?.minutes as number,
+      );
+    }
+  });
+
+  it('ger inget långpass i nedtrappning eller återhämtning', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.week.phase === 'base' || plan.week.phase === 'specific') continue;
+
+        const lång = plan.sessions.find((session) => session.type === 'long');
+        expect(lång, `${namn} vecka ${plan.week.index} ${plan.week.phase}`).toBeUndefined();
+      }
+    }
+  });
+
+  it('hoppar över basveckor där grenen inte har tid för ett långpass', () => {
+    // P3 har tre timmar i veckan. Där tiden inte räcker blir det inget
+    // långpass, inte ett långpass som bara heter så.
+    const bas = långaIFas(P3, 'base', 'vasaloppet');
+    const med = bas.filter(({ lång }) => lång !== undefined);
+
+    expect(med.length).toBeGreaterThan(0);
+    for (const { lång } of med) {
+      expect(lång?.minutes as number).toBeGreaterThanOrEqual(rules.longSession.minMinutes);
+    }
+  });
+
+  it('ger basens långpass samma alternativ som andra pass (R-37)', () => {
+    const bas = långaIFas(P2, 'base', 'vasaloppet');
+    const första = bas[0]?.lång;
+
+    expect(första?.sport).toBe('ski');
+    expect(första?.alternatives.map((a) => a.sport)).toContain('bike');
+  });
+});

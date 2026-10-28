@@ -90,9 +90,19 @@
       6,
       7
     ],
-    "startShareOfCap": 0.5,
     "minMinutes": 45,
-    "borrowInFinalWeeks": 4
+    "borrowInFinalWeeks": 4,
+    "growthByPhase": {
+      "base": {
+        "startShareOfCap": 0.25,
+        "endShareOfCap": 0.5
+      },
+      "specific": {
+        "startShareOfCap": 0.5,
+        "endShareOfCap": 1
+      }
+    },
+    "note": "Långpasset finns i både bas- och specifik fas. Det växer genom varje fas, och den specifika fasen tar vid där basen slutade: basen går från en fjärdedel till hälften av grenens tak, den specifika fasen från hälften till taket. Grundperioden är där man bygger uthållighet, och ett kvartal utan ett enda längre pass är svårt att försvara."
   },
   "seasonWeights": {
     "_rule": "R-32",

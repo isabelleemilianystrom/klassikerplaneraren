@@ -224,10 +224,14 @@ function openerFor(
 /**
  * Veckans långpass i loppets sport (R-13, R-28).
  *
- * Passet ligger på den dag användaren valt och växer jämnt genom fasen: det börjar
- * på halva sitt tak och når taket i fasens sista vecka. Tre tak gäller
- * samtidigt — sportens tak i R-13, 70 procent av veckans tid i R-28, och den
- * tid sporten faktiskt har fått i veckan.
+ * Passet finns i både bas- och specifik fas, och ligger på den dag användaren
+ * valt. Det växer jämnt genom sin fas, och den specifika fasen tar vid där
+ * basen slutade: basen går från en fjärdedel till hälften av grenens tak, den
+ * specifika fasen från hälften till taket. Grundperioden är där uthålligheten
+ * byggs, och ett kvartal utan ett enda längre pass är svårt att försvara.
+ *
+ * Tre tak gäller samtidigt — grenens tak i R-13, 70 procent av veckans tid i
+ * R-28, och den tid grenen faktiskt har fått i veckan.
  *
  * Blir resultatet kortare än `longSession.minMinutes` är det inget långpass,
  * och veckan får i stället vanliga konditionspass.
@@ -241,21 +245,25 @@ function longSession(
   allWeeks: readonly WeekSkeleton[],
   preferredDays: PreferredDays,
 ): PendingSession | null {
-  if (week.phase !== 'specific' || week.focusRaceId === null) return null;
+  const kurva = week.phase === 'base' || week.phase === 'specific'
+    ? rules.longSession.growthByPhase[week.phase]
+    : undefined;
+  if (kurva === undefined || week.focusRaceId === null) return null;
 
   const sport = raceById(week.focusRaceId).sport as TrainedSport;
   const tillgängligt = budget.bySport[sport] ?? 0;
   if (tillgängligt === 0) return null;
 
   const cap = rules.longSession.capMinutesBySport[sport];
-  const { startShareOfCap, maxShareOfWeek } = rules.longSession;
+  const { maxShareOfWeek } = rules.longSession;
+  const { startShareOfCap, endShareOfCap } = kurva;
 
   // Hur långt genom fasen veckan ligger: 1/n i första veckan, 1 i den sista.
   const iFasen = allWeeks.filter((kandidat) => kandidat.phaseId === week.phaseId);
   const position = iFasen.findIndex((kandidat) => kandidat.index === week.index) + 1;
   const andelGenomFasen = position / iFasen.length;
 
-  const växande = cap * (startShareOfCap + (1 - startShareOfCap) * andelGenomFasen);
+  const växande = cap * (startShareOfCap + (endShareOfCap - startShareOfCap) * andelGenomFasen);
 
   // R-13: de sista veckorna före loppet får långpasset låna tid från de andra
   // grenarna, upp till taket i R-28. Annars binds det av grenens andel i R-08
