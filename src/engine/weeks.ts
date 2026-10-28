@@ -24,7 +24,7 @@ export interface WeekSkeleton extends Omit<Week, 'sessions' | 'totalMinutes'> {
 }
 
 /** Ett lopp placerat på en vecka i planen. */
-interface PlacedRace {
+export interface PlacedRace {
   id: RaceId;
   date: IsoDate;
   weekIndex: number;
