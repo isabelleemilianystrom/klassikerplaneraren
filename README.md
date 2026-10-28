@@ -30,6 +30,23 @@ npm run dev     # utvecklingsserver på http://localhost:3000
 npm run check   # typkontroll + lint + tester (kör detta före commit)
 ```
 
+## Visa appen i mobilen
+
+Appen är helt statisk och behöver ingen server. Till demon körs den lokalt.
+
+För att öppna den i telefonen behöver utvecklingsservern lyssna på nätverket,
+inte bara på den här datorn:
+
+```bash
+npm run dev -- --hostname 0.0.0.0
+```
+
+Öppna sedan `http://<datorns IP>:3000` i telefonen — datorn och telefonen måste
+vara på samma wifi. IP-adressen skrivs ut när servern startar, som `Network:`.
+
+Brandväggen i Windows frågar första gången om Node får ta emot anslutningar.
+Svara ja för privata nätverk.
+
 ## Granska planerna
 
 Gränssnittet är inte byggt än (T-09 och T-10). För att läsa de program motorn

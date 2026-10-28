@@ -42,7 +42,7 @@ v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär 
 
 | Mål | Så vet vi att det är uppfyllt |
 | --- | --- |
-| Klar för demon 19 nov | Appen är live på Vercel och fungerar i mobilen |
+| Klar för demon 19 nov | Appen går att köra lokalt och fungerar i mobilen *(ändrad 2026-10-28)* |
 | Programmen är rimliga | Alla regler i avsnitt 5 följs och verifieras av tester; referensprofilerna P1–P6 ger planer som Isabelle godkänner |
 | Snabbt att komma igång | Från startsida till färdigt program på under 2 minuter |
 | AI gör nytta | AI skriver förklaringarna till faserna under utvecklingen; Isabelle granskar dem och de följer med i appen |
@@ -76,7 +76,7 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
 - [x] **1. Loppdatum 2027.** Besvarad 2026-10-27: använd de belagda datumen — Vasaloppet **2027-03-07**, Vätternrundan **2027-06-18**, Vansbrosimningen **2027-07-10**, Lidingöloppet **2027-09-25**. Kontrollerade mot arrangörernas sidor i oktober 2026; `config/races.json` ska bära källa och kontrolldatum. *(Utökad 2026-10-28: datumen ligger nu i en lista per lopp, se avsnitt 7.)*
 - [x] **2. Distanser.** Besvarad 2026-10-27: **bara de fyra fulla distanserna** i v1.0, enligt lopptabellen i avsnitt 5. Användaren väljer vilka av de fyra hon gör. Öppet Spår, Halvvättern och övriga varianter ligger utanför v1.0 — motorn byggs så att fler lopp bara blir rader i `config/races.json`.
 - [x] **3. AI-modell och nyckel.** Besvarad 2026-10-27: **inga AI-anrop i körtid.** Förklaringarna förgenereras under utvecklingen med hjälp av AI, granskas av Isabelle och sparas i appen. Ingen API-nyckel, ingen kostnad, inget missbruksskydd och inga data som lämnar webbläsaren. Ett riktigt AI-anrop kan läggas till i en senare version. Se noten nedan om vad det innebär för avsnitt 6, 7 och T-12.
-- [x] **4. Konton.** Besvarad 2026-10-27: GitHub-repot finns och är publikt. **Vercel-konto saknas ännu** och skapas senare — senast till M2, eftersom den milstolpen kräver att appen går att testa i mobilen. T-01 byggs och testas lokalt tills dess.
+- [x] **4. Konton.** Besvarad 2026-10-27: GitHub-repot finns och är publikt. **Vercel-konto saknas ännu.** *(Uppdaterat 2026-10-28: drift väntar till efter demon.)* Demon körs lokalt med `npm run dev`, så inget konto behövs före den 19 november. Appen är helt statisk — inga serveranrop, ingen databas, inga AI-anrop i körtid — så den kan läggas på Vercel eller GitHub Pages när som helst efteråt utan att något i koden ändras.
 - [ ] **5. Granskning av träningsreglerna.** Vem granskar reglerna i avsnitt 5 före demon? Förslag: en tränare eller kunnig bekant; om ingen hinner visas betatexten tydligt. Blockerar M1-granskningen.
 - [ ] **6. Demon.** Hur lång är demon och vad ska den visa? Påverkar demomanuset i avsnitt 11.
 
@@ -420,7 +420,7 @@ En Next.js-app utan databas, där regelmotorn är en ren TypeScript-modul utan b
 | Datum | date-fns |
 | Test | Vitest |
 | Pakethanterare | npm |
-| Drift | Vercel, kopplat till GitHub-repot |
+| Drift | Lokalt till demon; Vercel eller GitHub Pages efteråt *(ändrad 2026-10-28)* |
 | Lagring | Webbläsarens localStorage, alltid inom try/catch |
 
 **Mappstruktur**
@@ -646,7 +646,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 **Definition of done för v1.0**
 
 - [ ] Alla Måste-krav är klara och testade
-- [ ] Appen är live på Vercel och fungerar i Safari på iOS och Chrome på Android
+- [ ] Appen går att köra lokalt med `npm run dev` och fungerar i mobil *(ändrad 2026-10-28:
+      demon körs lokalt, drift skjuts till efter demon)*
 - [ ] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna
 - [ ] Varje kombination av fas och lopp har en granskad förklaring
 - [ ] Varje passtyp har en granskad instruktion
@@ -660,7 +661,7 @@ Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, efters
 
 | ID | Uppgift | Klart när | Krav | Tid | Milstolpe |
 | --- | --- | --- | --- | --- | --- |
-| T-01 | Projektuppsättning: Next.js, TypeScript strikt, Tailwind, Vitest, lint, mappstruktur, CLAUDE.md och en tom sida på Vercel | Tom sida är live; `npm test` och lint körs i repot | – | 1,5 h |  |
+| T-01 | Projektuppsättning: Next.js, TypeScript strikt, Tailwind, Vitest, lint, mappstruktur, CLAUDE.md och en tom sida på Vercel | Appen går att köra lokalt; `npm test` och lint körs i repot *(ändrad 2026-10-28)* | – | 1,5 h |  |
 | T-02 | Datamodell och konfiguration: typer, Zod-scheman och filerna i `config/`, inklusive instruktionsbiblioteket i `sessions.json` | Typer kompilerar; konfigurationen validerar i ett test; varje passtyp har en instruktion | Avsnitt 5, 7, R-30 | 2,5 h |  |
 | T-03 | Veckor och faser, inklusive blocklogik och flera lopp samma vecka | Tester för R-01–R-04 och R-27 gröna; P4 och P5 ger rätt faser | R-01–R-04, R-27 | 2,5 h |  |
 | T-04 | Veckotid, loppbelastning och fördelning mellan sporter | Tester för R-05–R-10, R-25 och R-29 gröna; en plan med ett enda lopp fördelar hela tiden | R-05–R-10, R-25, R-29 | 3 h |  |
@@ -670,7 +671,7 @@ Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, efters
 | T-08 | Invarianttester, slumpad egenskapstestning, datumtester och `scripts/print-profiles.ts` | Alla invarianter gröna för P1–P5 och för 200 slumpade indata; skriptet skriver ut planerna som läsbar text | Avsnitt 9 | 2 h | **M1 Motorn klar** – Isabelle granskar P1–P5 |
 | T-09 | Formulär i tre steg | Acceptanskriterierna för K-02–K-04 uppfyllda | K-02–K-04 | 2 h |  |
 | T-10 | Planvy: översikt, veckovy och markering av innevarande vecka | Acceptanskriterierna för K-05–K-09 och K-16 uppfyllda | K-05–K-09, K-16 | 3 h |  |
-| T-11 | Spara i webbläsaren, med validering av det som läses in | Acceptanskriterierna för K-10 och K-15 uppfyllda | K-10, K-15 | 1,5 h | **M2 Appen live utan AI** – Isabelle testar i mobilen |
+| T-11 | Spara i webbläsaren, med validering av det som läses in | Acceptanskriterierna för K-10 och K-15 uppfyllda | K-10, K-15 | 1,5 h | **M2 Appen körbar utan AI** – Isabelle testar i mobilen |
 | T-12 | Förklaringar: skriv de 4 fastexterna och sammanfattningen med AI, Isabelle granskar, lägg dem i `config/explanations.json` med schema och tester | Acceptanskriterierna för K-08 och A-01–A-08 uppfyllda; alla texter granskade | A-01–A-08 | 1,5 h |  |
 | T-13 | Startsida och fasta texter | Acceptanskriterierna för K-01 och K-11 uppfyllda; texterna ordagrant enligt avsnitt 8 | K-01, K-11 | 1 h |  |
 | T-14 | Genomgång i mobil och av tillgänglighet | K-12 uppfyllt; kraven för tillgänglighet i avsnitt 8 kontrollerade | K-12 | 1 h |  |
@@ -707,7 +708,9 @@ Regelmotorn är klar och granskad efter första arbetsveckan; därefter byggs gr
 
 **Demomanus** (justeras efter fråga 6)
 
-1. Visa startsidan i mobilen och berätta problemet: fyra lopp, fyra sporter, ett år
+**Demon körs lokalt** *(beslut 2026-10-28)* med `npm run dev` på Isabelles egen dator. Appen är statisk och behöver ingen server, så drift skjuts till efter demon. Kravet på noll kronor påverkas inte — det blir i stället noll konton också.
+
+1. Visa startsidan och berätta problemet: fyra lopp, fyra sporter, ett år
 2. Fyll i profil P1 live – under en minut
 3. Visa översikten med faser och lopp, och öppna en vecka
 4. Visa en fasförklaring och en säkerhetstext, och berätta att förklaringarna är skrivna med AI och granskade i förväg
