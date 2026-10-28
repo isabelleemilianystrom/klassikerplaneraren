@@ -234,6 +234,18 @@ export const rulesSchema = z.object({
     openWaterMonths: z.array(z.number().int().min(1).max(12)).min(1),
     swimDrylandBeforeMonth: z.number().int().min(1).max(12),
   }),
+  /** R-37: grenar ett pass också kan göras i. */
+  sessionAlternatives: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    forTypes: z.array(sessionType).min(1),
+    interchangeable: z.array(sport).min(1),
+    /** Månader grenen går att utöva. Saknas grenen gäller den året om. */
+    seasonalMonths: z.partialRecord(sport, z.array(z.number().int().min(1).max(12)).min(1)),
+    /** Grenen kräver minst en av dessa utrustningsflaggor. */
+    requiresAnyEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
+    notes: z.partialRecord(sport, z.string()),
+  }),
   /** R-36: vad som händer med en gren vars lopp är avklarat. */
   afterRace: z.object({
     _rule: z.string(),

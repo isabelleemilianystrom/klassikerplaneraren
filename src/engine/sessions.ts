@@ -20,7 +20,7 @@
  */
 import { newLevelLimit, weekBudgets, type WeekBudget } from './budget.ts';
 import { raceById, rules, sessions as sessionTexts } from './config.ts';
-import { addDays, weekdayOf } from './dates.ts';
+import { addDays, monthOf, weekdayOf } from './dates.ts';
 import type {
   IsoDate,
   Level,
@@ -28,6 +28,7 @@ import type {
   PlanInput,
   PreferredDays,
   RaceId,
+  SessionAlternative,
   Session,
   SessionType,
   TrainedSport,
@@ -165,7 +166,7 @@ function buildWeekPlan(
   pending.push(...enduranceSessions(week, budget, input, long));
 
   const placed = placeOnDays(pending, week, input, dates, raceDates, openerDates, before);
-  const withTexts = placed.map((session, i) => withTitleAndInstruction(session, week, i));
+  const withTexts = placed.map((session, i) => withTitleAndInstruction(session, week, i, input));
 
   return {
     week,
@@ -878,6 +879,7 @@ function toSessions(
         zone: null,
         title: '',
         instruction: '',
+        alternatives: [],
       });
       continue;
     }
@@ -895,6 +897,7 @@ function toSessions(
         zone: session.zone,
         title: '',
         instruction: '',
+        alternatives: [],
       };
 
       // R-27: loppets id sätts bara på lopppass, så att en andra tävling samma
@@ -937,7 +940,12 @@ function textVariantFor(
  * inte som skidteknik. Saknas en kombination är det ett fel i konfigurationen
  * och ska märkas som ett kastat undantag, inte som ett tomt fält.
  */
-function withTitleAndInstruction(session: Session, week: WeekSkeleton, index: number): Session {
+function withTitleAndInstruction(
+  session: Session,
+  week: WeekSkeleton,
+  index: number,
+  input: PlanInput,
+): Session {
   const variant = textVariantFor(session, week);
   const allmän = sessionTexts.types[session.type];
 
@@ -949,5 +957,71 @@ function withTitleAndInstruction(session: Session, week: WeekSkeleton, index: nu
     );
   }
 
-  return { ...session, title: text.title, instruction: text.instruction };
+  return {
+    ...session,
+    title: text.title,
+    instruction: text.instruction,
+    alternatives: alternativesFor(session, input),
+  };
+}
+
+/**
+ * Grenarna passet också kan göras i (R-37).
+ *
+ * Träningsupplägget är långpass, intervaller och styrka — inte fyra separata
+ * sporter. Grenen som står på passet är den som passar nästa lopp bäst, men
+ * flera grenar ger samma konditionsträning, och den som hellre vill byta ska
+ * kunna göra det utan att tappa poängen med passet.
+ *
+ * Ett alternativ krävs vara möjligt att faktiskt genomföra: grenen måste vara
+ * i säsong, och användaren måste ha utrustningen. Att föreslå längdskidor i
+ * juli, eller till någon utan skidor, gör planen otrovärdig.
+ *
+ * Loppet, vilan, styrkan och teknikpassen har inga alternativ. Ett teknikpass
+ * i simning kan inte bytas mot cykel — då är det inte längre samma pass.
+ */
+function alternativesFor(session: Session, input: PlanInput): SessionAlternative[] {
+  const regler = rules.sessionAlternatives;
+
+  if (session.sport === null) return [];
+  if (!regler.forTypes.includes(session.type)) return [];
+
+  const månad = monthOf(session.date);
+
+  return regler.interchangeable
+    .filter((kandidat): kandidat is TrainedSport => kandidat !== session.sport)
+    .filter((kandidat) => inSeason(kandidat, månad))
+    .filter((kandidat) => hasEquipmentFor(kandidat, input))
+    .map((kandidat) => ({
+      sport: kandidat,
+      title: alternativeTitle(kandidat, session.type),
+      note: regler.notes[kandidat] ?? '',
+    }));
+}
+
+/** Sant när grenen går att utöva den månaden (R-37). */
+function inSeason(sport: TrainedSport, month: number): boolean {
+  const månader = rules.sessionAlternatives.seasonalMonths[sport];
+  return månader === undefined || månader.includes(month);
+}
+
+/**
+ * Sant när användaren har utrustning för grenen (R-37).
+ *
+ * Minst en av grenens flaggor räcker: skidor går med antingen snö eller
+ * rullskidor, eller med en stakmaskin. Grenar som inte kräver något —
+ * löpning — går alltid.
+ */
+function hasEquipmentFor(sport: TrainedSport, input: PlanInput): boolean {
+  const krav = rules.sessionAlternatives.requiresAnyEquipment[sport];
+  if (krav === undefined) return true;
+
+  const utrustning = input.equipment as Record<string, boolean>;
+  return krav.some((flagga) => utrustning[flagga] === true);
+}
+
+/** Alternativets titel, med grenens egen variant om det finns en. */
+function alternativeTitle(sport: TrainedSport, type: SessionType): string {
+  const variant = sessionTexts.sportVariants[`${sport}.${type}`];
+  return variant?.title ?? (sessionTexts.types[type]?.title ?? type);
 }

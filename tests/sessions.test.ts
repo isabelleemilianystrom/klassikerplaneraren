@@ -998,3 +998,152 @@ describe('alla grenar i planen tränas, också de tunna veckorna', () => {
     }
   });
 });
+
+describe('R-37: passet är det primära, grenen är ett val', () => {
+  /** Alla pass av en viss typ i en plan. */
+  function passAvTyp(input: PlanInput, type: string) {
+    return buildWeekPlans(input)
+      .flatMap((plan) => plan.sessions)
+      .filter((session) => session.type === type);
+  }
+
+  it('ger långpasset inför Lidingöloppet cykel som alternativ', () => {
+    // Ditt exempel: ett långpass inför Lidingöloppet är bäst som löpning, men
+    // kan också göras på landsvägscykel — och sliter då mindre på kroppen.
+    const löplångpass = buildWeekPlans(P2)
+      .filter(({ week }) => week.focusRaceId === 'lidingoloppet')
+      .flatMap((plan) => plan.sessions)
+      .filter((session) => session.type === 'long' && session.sport === 'run');
+
+    expect(löplångpass.length).toBeGreaterThan(0);
+    for (const session of löplångpass) {
+      expect(session.alternatives.map((a) => a.sport)).toContain('bike');
+    }
+  });
+
+  it('ger längdskidor som alternativ till ett cykellångpass i mars', () => {
+    // Ditt andra exempel: ett långpass inför Vätternrundan är optimalt på cykel,
+    // men finns det snö i mars går längdskidor lika bra.
+    const tidigVattern: PlanInput = {
+      ...P2,
+      races: [{ id: 'vatternrundan', date: '2027-05-08' }],
+      startDate: '2026-12-07',
+      today: '2026-12-07',
+    };
+
+    const mars = passAvTyp(tidigVattern, 'long').filter(
+      (session) => session.date >= '2027-03-01' && session.date < '2027-04-01',
+    );
+
+    expect(mars.length).toBeGreaterThan(0);
+    for (const session of mars) {
+      expect(session.sport).toBe('bike');
+      const skidor = session.alternatives.find((a) => a.sport === 'ski');
+      expect(skidor).toBeDefined();
+      expect(skidor?.note).toMatch(/snö/);
+    }
+  });
+
+  it('erbjuder inte längdskidor utanför skidsäsongen', () => {
+    // Att föreslå skidor i juli gör planen otrovärdig.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of plan.sessions) {
+          const månad = Number(session.date.slice(5, 7));
+          if ([11, 12, 1, 2, 3].includes(månad)) continue;
+
+          expect(
+            session.alternatives.map((a) => a.sport),
+            `${namn} ${session.date}`,
+          ).not.toContain('ski');
+        }
+      }
+    }
+  });
+
+  it('erbjuder inte en gren användaren saknar utrustning för', () => {
+    // P4 har ingen utrustning alls: inga skidor, ingen stakmaskin, ingen cykel.
+    for (const session of buildWeekPlans(P4).flatMap((plan) => plan.sessions)) {
+      const grenar = session.alternatives.map((a) => a.sport);
+      expect(grenar, session.id).not.toContain('bike');
+      expect(grenar, session.id).not.toContain('ski');
+    }
+  });
+
+  it('erbjuder skidor till den som har stakmaskin men ingen snö', () => {
+    // Minst en av grenens flaggor räcker.
+    const medStakmaskin: PlanInput = {
+      ...P2,
+      equipment: { snowOrRollerSkis: false, skiErg: true, pool: true, bike: true },
+    };
+
+    const vinter = buildWeekPlans(medStakmaskin)
+      .flatMap((plan) => plan.sessions)
+      .filter(
+        (session) =>
+          session.sport === 'bike' &&
+          rules.sessionAlternatives.forTypes.includes(session.type) &&
+          [12, 1, 2].includes(Number(session.date.slice(5, 7))),
+      );
+
+    expect(vinter.length).toBeGreaterThan(0);
+    expect(vinter.some((s) => s.alternatives.some((a) => a.sport === 'ski'))).toBe(true);
+  });
+
+  it('ger inga alternativ till lopp, vila, styrka eller teknik', () => {
+    // Ett teknikpass i simning kan inte bytas mot cykel — då är det inte längre
+    // samma pass.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of plan.sessions) {
+          if (rules.sessionAlternatives.forTypes.includes(session.type)) continue;
+          expect(session.alternatives, `${namn} ${session.id} ${session.type}`).toEqual([]);
+        }
+      }
+    }
+  });
+
+  it('har aldrig passets egen gren som alternativ', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of plan.sessions) {
+          expect(
+            session.alternatives.map((a) => a.sport),
+            `${namn} ${session.id}`,
+          ).not.toContain(session.sport);
+        }
+      }
+    }
+  });
+
+  it('ger varje alternativ en titel', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of plan.sessions) {
+          for (const alternativ of session.alternatives) {
+            expect(alternativ.title.length, `${namn} ${session.id} ${alternativ.sport}`)
+              .toBeGreaterThan(0);
+          }
+        }
+      }
+    }
+  });
+
+  it('erbjuder aldrig simning som alternativ', () => {
+    // Simning ger inte samma konditionsträning som ett långpass på cykel, och
+    // kräver dessutom simhall. Den står inte bland de utbytbara grenarna.
+    for (const [, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of plan.sessions) {
+          expect(session.alternatives.map((a) => a.sport)).not.toContain('swim');
+        }
+      }
+    }
+  });
+
+  it('ger samma alternativ varje gång', () => {
+    for (const profil of Object.values(PROFILES)) {
+      expect(buildWeekPlans(profil)).toEqual(buildWeekPlans(profil));
+    }
+  });
+});

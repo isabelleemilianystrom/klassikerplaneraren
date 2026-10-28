@@ -226,6 +226,8 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 - **R-36** (tillagd 2026-10-28) **Träningen fokuserar på nästa kommande lopp.** När ett lopp är,  avklarat ska dess gren inte längre tränas som huvudgren — tiden går till nästa lopps gren. Är,  Vasaloppet genomfört ligger fokus helt på cykeln inför Vätternrundan.,,  **Undantaget är grenens egen säsong.** Är det fortfarande vinter där man bor kan skidor användas,  som långpass för konditionsträning, och grenen behåller då `afterRace.keepShareInOwnSeason` —,  **10 procent**. Utanför sin säsong får den ingenting. Grenens egen säsong är de månader där den,  har sin högsta säsongsvikt i R-32: vinter för skidor, sommar för cykel.,,  Den frigjorda tiden går till **veckans fokusgren**, inte ut över alla grenar. Annars hamnade den,  hos löpningen, som har jämn vikt året om — och ett halvår före Lidingöloppet gör den ingen nytta,  där. Fokusgrenen rörs aldrig av regeln, oavsett vad som varit.,,  Före regeln gav en plan 33 timmar skidåkning efter Vasaloppet, varav en del i maj och juni.,  Veckorna direkt efter loppet gav 216 minuter skidor mot 65 minuter cykel, trots att Vasaloppet,  var avklarat och Vätternrundan var nästa lopp.
 
+- **R-37** (tillagd 2026-10-28) **Passet är det primära, grenen är ett val.** Träningsupplägget är,  långpass, intervaller och styrka — inte fyra separata sporter. Grenen som står på ett pass är den,  som passar nästa lopp bäst, men flera grenar ger samma konditionsträning, och den som hellre vill,  eller måste byta ska kunna göra det utan att tappa poängen med passet.,,  Varje pass av typen `easy`, `long`, `tempo` eller `intervals` bär därför en lista `alternatives`,  med de grenar det också kan göras i. Grenarna som är utbytbara är **längdskidor, cykel och,  löpning**; simning står inte med, eftersom den inte ger samma konditionsträning och dessutom,  kräver simhall.,,  Ett alternativ måste vara möjligt att faktiskt genomföra:,,  - **i säsong** — längdskidor erbjuds bara november till mars. Att föreslå skidor i juli gör,    planen otrovärdig.,  - **med utrustning användaren har** — minst en av grenens flaggor räcker. Skidor går med snö,    eller rullskidor, men också med en stakmaskin.,,  **Loppet, vilan, styrkan och teknikpassen har inga alternativ.** Ett teknikpass i simning kan,  inte bytas mot cykel — då är det inte längre samma pass.,,  Exempel ur en färdig plan:,,  | Pass | Gren | Kan också göras som |,  | --- | --- | --- |,  | Långpass i mars, mot Vätternrundan | Cykel | Längdskidor *(om det finns snö)*, Löpning |,  | Långpass i april, mot Vätternrundan | Cykel | Löpning |,  | Långpass i augusti, mot Lidingöloppet | Löpning | Cykel *(sliter mindre på kroppen)* |,,  Reglerna ligger i `sessionAlternatives` i `config/rules.json`. **Gränssnittet ska leda med,  passtypen**, inte med grenen: raden är ett långpass, och grenen är hur man väljer att göra det.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -418,6 +420,12 @@ interface PlanInput {
   equipment: { snowOrRollerSkis: boolean; skiErg: boolean; pool: boolean; bike: boolean };
 }
 
+interface SessionAlternative {
+  sport: Sport;
+  title: string;
+  note: string;               // t.ex. 'om det finns snö'; tom när inget villkor gäller
+}
+
 interface Session {
   id: string;                 // stabilt id, t.ex. 'w05-d3-1'
   date: string;
@@ -443,7 +451,7 @@ interface Week {
 }
 
 interface Plan {
-  schemaVersion: 2;
+  schemaVersion: 3;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;
@@ -570,6 +578,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Vårstart i maj med Vätternrundan i juni: planen når inte 1000 km och varningen i R-34 visas (tillagt 2026-10-28)
 - Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
+- Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
 - Lidingöloppets block när de tre andra loppen är avklarade: löpningen växer högst 10 procent i veckan (R-14) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 

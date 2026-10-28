@@ -266,5 +266,43 @@
     "_rule": "R-36",
     "note": "Träningen ska fokusera på nästa kommande lopp. När ett lopp är avklarat ska dess gren inte längre tränas — tiden går till nästa lopps gren i stället. Undantaget är grenens egen säsong: är det fortfarande vinter när Vasaloppet är avklarat kan skidor användas som långpass för konditionsträning, men inte som huvudgren.",
     "keepShareInOwnSeason": 0.1
+  },
+  "sessionAlternatives": {
+    "_rule": "R-37",
+    "note": "Träningsupplägget är långpass, intervaller och styrka — inte fyra separata sporter. Grenen som står först på ett pass är den som passar nästa lopp bäst, men flera grenar ger samma konditionsträning. Ett långpass inför Vätternrundan är optimalt på cykel, men finns det snö i mars går längdskidor lika bra. Ett långpass inför Lidingöloppet är bäst som löpning, men kan också göras på landsvägscykel — och sliter då mindre på kroppen.",
+    "forTypes": [
+      "easy",
+      "long",
+      "tempo",
+      "intervals"
+    ],
+    "interchangeable": [
+      "ski",
+      "bike",
+      "run"
+    ],
+    "seasonalMonths": {
+      "ski": [
+        11,
+        12,
+        1,
+        2,
+        3
+      ]
+    },
+    "requiresAnyEquipment": {
+      "ski": [
+        "snowOrRollerSkis",
+        "skiErg"
+      ],
+      "bike": [
+        "bike"
+      ]
+    },
+    "notes": {
+      "ski": "om det finns snö",
+      "bike": "sliter mindre på kroppen",
+      "run": ""
+    }
   }
 }

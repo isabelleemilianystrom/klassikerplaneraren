@@ -110,6 +110,14 @@ function skrivVecka(plan: WeekPlan): string[] {
         (zon === '' ? '' : `, ${zon}`),
     );
     rader.push(`  ${' '.repeat(12)} ${session.instruction}`);
+
+    // R-37: grenarna passet också kan göras i.
+    if (session.alternatives.length > 0) {
+      const alternativ = session.alternatives
+        .map((a) => (a.note === '' ? SPORTNAMN[a.sport] : `${SPORTNAMN[a.sport]} (${a.note})`))
+        .join(', ');
+      rader.push(`  ${' '.repeat(12)} Kan också göras som: ${alternativ}`);
+    }
   }
 
   rader.push('');

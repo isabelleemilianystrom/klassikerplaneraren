@@ -68,17 +68,36 @@ export interface PlanInput {
   };
 }
 
+/**
+ * En gren passet också kan göras i (R-37).
+ *
+ * Passet är det primära — ett långpass är ett långpass. Grenen som står först
+ * är den som passar nästa lopp bäst, men den som hellre vill, eller måste,
+ * byta ska kunna göra det utan att tappa poängen med passet.
+ */
+export interface SessionAlternative {
+  sport: TrainedSport;
+  title: string;
+  /** Kort skäl, t.ex. "om det finns snö". Tom när inget villkor gäller. */
+  note: string;
+}
+
 export interface Session {
   /** Stabilt id, t.ex. `w05-d3-1`. */
   id: string;
   date: IsoDate;
-  /** null för vila. */
+  /** Grenen som passar nästa lopp bäst. null för vila. */
   sport: Sport | null;
   type: SessionType;
   minutes: number;
   zone: Zone | null;
   title: string;
   instruction: string;
+  /**
+   * Grenar passet också kan göras i (R-37). Tom lista när inget alternativ
+   * finns: loppet, vilan, styrkan och teknikpassen har inga.
+   */
+  alternatives: SessionAlternative[];
   safetyNote?: string;
   /**
    * Vilket lopp passet är, satt på pass av typen `race`.
@@ -105,7 +124,7 @@ export interface Week {
 }
 
 export interface Plan {
-  schemaVersion: 2;
+  schemaVersion: 3;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;
