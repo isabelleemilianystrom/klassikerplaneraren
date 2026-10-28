@@ -30,6 +30,23 @@ npm run dev     # utvecklingsserver på http://localhost:3000
 npm run check   # typkontroll + lint + tester (kör detta före commit)
 ```
 
+## Granska planerna
+
+Gränssnittet är inte byggt än (T-09 och T-10). För att läsa de program motorn
+faktiskt skapar, kör:
+
+```bash
+npm run profiles
+```
+
+Det skriver en fil per referensprofil till `out/` — en översikt vecka för vecka
+med tid och fördelning mellan sporterna, och därefter varje enskilt pass med
+dag, längd, zon och instruktion. `out/oversikt.txt` sammanfattar alla sex.
+
+Profilerna står i kravspecens avsnitt 9 och är de planer som ska granskas vid
+milstolpe M1: från P1 som är ny i skidor och simning med sex timmar i veckan,
+till P4 som har sex veckor på sig till Vasaloppet.
+
 | Kommando | Gör |
 | --- | --- |
 | `npm run dev` | utvecklingsserver |
@@ -38,6 +55,7 @@ npm run check   # typkontroll + lint + tester (kör detta före commit)
 | `npm run test:run` | kör testerna en gång |
 | `npm run typecheck` | TypeScript utan att bygga |
 | `npm run lint` | ESLint |
+| `npm run profiles` | skriver referensprofilernas planer till `out/` |
 
 ## Så är koden uppdelad
 

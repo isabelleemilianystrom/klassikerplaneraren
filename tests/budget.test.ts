@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { sportsInPlan, weekBudgets } from '../src/engine/budget';
-import { raceById, rules } from '../src/engine/config';
-import { buildWeeks } from '../src/engine/weeks';
-import type { PlanInput, TrainedSport } from '../src/engine/types';
-import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles';
+import { sportsInPlan, weekBudgets } from '../src/engine/budget.ts';
+import { raceById, rules } from '../src/engine/config.ts';
+import { buildWeeks } from '../src/engine/weeks.ts';
+import type { PlanInput, TrainedSport } from '../src/engine/types.ts';
+import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
 
 /** Veckorna och deras budgetar parvis — testerna behöver nästan alltid båda. */
 function veckorMedBudget(input: PlanInput) {

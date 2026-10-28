@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { races, raceById, nextRaceDate, rules, sessions } from '../src/engine/config';
-import type { SessionType, Sport } from '../src/engine/types';
+import { races, raceById, nextRaceDate, rules, sessions } from '../src/engine/config.ts';
+import type { SessionType, Sport } from '../src/engine/types.ts';
 
 /**
  * Konfigurationen validerar redan mot sina scheman när modulen laddas — går

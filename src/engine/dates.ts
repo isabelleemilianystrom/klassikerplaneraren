@@ -18,7 +18,7 @@ import {
   parseISO,
   startOfWeek as startOfWeekFns,
 } from 'date-fns';
-import type { IsoDate } from './types';
+import type { IsoDate } from './types.ts';
 
 /** Veckan börjar på måndag. */
 const WEEK_OPTIONS = { weekStartsOn: 1 } as const;

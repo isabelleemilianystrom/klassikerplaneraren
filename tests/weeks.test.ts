@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { addWeeks, earliest, latest, startOfWeek, weekdayOf, weeksBetween } from '../src/engine/dates';
-import { raceById, races } from '../src/engine/config';
-import { buildWeeks, placeRaces, planEndDate, weekCount } from '../src/engine/weeks';
-import type { IsoDate, PlanInput, RaceId } from '../src/engine/types';
-import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles';
+import { addWeeks, earliest, latest, startOfWeek, weekdayOf, weeksBetween } from '../src/engine/dates.ts';
+import { raceById, races } from '../src/engine/config.ts';
+import { buildWeeks, placeRaces, planEndDate, weekCount } from '../src/engine/weeks.ts';
+import type { IsoDate, PlanInput, RaceId } from '../src/engine/types.ts';
+import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
 
 function weekOfRace(input: PlanInput, id: RaceId): number {
   const race = input.races.find((kandidat) => kandidat.id === id);

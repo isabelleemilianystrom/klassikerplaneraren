@@ -18,9 +18,9 @@
  *
  * Rena funktioner, inga sidoeffekter. Alla siffror kommer ur `config/rules.json`.
  */
-import { weekBudgets, type WeekBudget } from './budget';
-import { raceById, rules, sessions as sessionTexts } from './config';
-import { addDays, weekdayOf } from './dates';
+import { weekBudgets, type WeekBudget } from './budget.ts';
+import { raceById, rules, sessions as sessionTexts } from './config.ts';
+import { addDays, weekdayOf } from './dates.ts';
 import type {
   IsoDate,
   Level,
@@ -32,8 +32,8 @@ import type {
   SessionType,
   TrainedSport,
   Zone,
-} from './types';
-import { buildWeeks, placeRaces, type PlacedRace, type WeekSkeleton } from './weeks';
+} from './types.ts';
+import { buildWeeks, placeRaces, type PlacedRace, type WeekSkeleton } from './weeks.ts';
 
 /** En vecka med sina pass. */
 export interface WeekPlan {

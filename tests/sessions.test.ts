@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { raceById, rules, sessions as sessionTexts } from '../src/engine/config';
-import { addDays, weekdayOf } from '../src/engine/dates';
-import { buildWeekPlans, trainingDayCount, type WeekPlan } from '../src/engine/sessions';
-import type { PlanInput, Session, Weekday } from '../src/engine/types';
-import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles';
+import { raceById, rules, sessions as sessionTexts } from '../src/engine/config.ts';
+import { addDays, weekdayOf } from '../src/engine/dates.ts';
+import { buildWeekPlans, trainingDayCount, type WeekPlan } from '../src/engine/sessions.ts';
+import type { PlanInput, Session, Weekday } from '../src/engine/types.ts';
+import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
 
 /** Passen som är riktig träning — vila räknas inte som ett pass. */
 function träning(plan: WeekPlan): Session[] {

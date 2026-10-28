@@ -46,3 +46,6 @@ next-env.d.ts
 
 # TypeScript inkrementell byggcache
 *.tsbuildinfo
+
+# Genererade planer från npm run profiles
+out/

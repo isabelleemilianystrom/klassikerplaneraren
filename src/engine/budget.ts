@@ -7,10 +7,10 @@
  *
  * Rena funktioner, inga sidoeffekter. Alla siffror kommer ur `config/rules.json`.
  */
-import { raceById, rules } from './config';
-import type { Level, Phase, PlanInput, TrainedSport } from './types';
-import type { PlacedRace, WeekSkeleton } from './weeks';
-import { buildWeeks, placeRaces } from './weeks';
+import { raceById, rules } from './config.ts';
+import type { Level, Phase, PlanInput, TrainedSport } from './types.ts';
+import type { PlacedRace, WeekSkeleton } from './weeks.ts';
+import { buildWeeks, placeRaces } from './weeks.ts';
 
 /**
  * Sporterna i en fast ordning.

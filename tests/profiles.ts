@@ -4,7 +4,7 @@
  * Startdatum 2026-11-02 om inget annat anges. Profilerna är de planer Isabelle
  * granskar vid M1, och invarianterna ska gälla för allihop.
  */
-import type { PlanInput } from '../src/engine/types';
+import type { PlanInput } from '../src/engine/types.ts';
 
 export const START_DATE = '2026-11-02';
 

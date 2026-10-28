@@ -6,9 +6,9 @@
  * plan hos en användare.
  */
 import { z } from 'zod';
-import racesFile from '../../config/races.json';
-import rulesFile from '../../config/rules.json';
-import sessionsFile from '../../config/sessions.json';
+import racesFile from '../../config/races.json' with { type: 'json' };
+import rulesFile from '../../config/rules.json' with { type: 'json' };
+import sessionsFile from '../../config/sessions.json' with { type: 'json' };
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'datum ska vara YYYY-MM-DD');
 const share = z.number().min(0).max(1);

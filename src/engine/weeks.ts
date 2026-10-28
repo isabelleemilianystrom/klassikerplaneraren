@@ -8,9 +8,9 @@
  * Rena funktioner, inga sidoeffekter. Dagens datum används inte alls här —
  * planen utgår från `startDate`, som användaren väljer.
  */
-import { raceById, rules } from './config';
-import { addWeeks, endOfWeek, latest, startOfWeek, weeksBetween } from './dates';
-import type { IsoDate, Phase, PlanInput, RaceId, Week } from './types';
+import { raceById, rules } from './config.ts';
+import { addWeeks, endOfWeek, latest, startOfWeek, weeksBetween } from './dates.ts';
+import type { IsoDate, Phase, PlanInput, RaceId, Week } from './types.ts';
 
 /**
  * En vecka innan tid och pass fyllts i.
