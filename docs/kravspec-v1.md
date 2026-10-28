@@ -73,7 +73,7 @@ v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär 
 
 Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett svar; saknas ett svar som behövs, fråga.
 
-- [x] **1. Loppdatum 2027.** Besvarad 2026-10-27: använd de belagda datumen — Vasaloppet **2027-03-07**, Vätternrundan **2027-06-18**, Vansbrosimningen **2027-07-10**, Lidingöloppet **2027-09-25**. Kontrollerade mot arrangörernas sidor i oktober 2026; `config/races.json` ska bära källa och kontrolldatum.
+- [x] **1. Loppdatum 2027.** Besvarad 2026-10-27: använd de belagda datumen — Vasaloppet **2027-03-07**, Vätternrundan **2027-06-18**, Vansbrosimningen **2027-07-10**, Lidingöloppet **2027-09-25**. Kontrollerade mot arrangörernas sidor i oktober 2026; `config/races.json` ska bära källa och kontrolldatum. *(Utökad 2026-10-28: datumen ligger nu i en lista per lopp, se avsnitt 7.)*
 - [x] **2. Distanser.** Besvarad 2026-10-27: **bara de fyra fulla distanserna** i v1.0, enligt lopptabellen i avsnitt 5. Användaren väljer vilka av de fyra hon gör. Öppet Spår, Halvvättern och övriga varianter ligger utanför v1.0 — motorn byggs så att fler lopp bara blir rader i `config/races.json`.
 - [x] **3. AI-modell och nyckel.** Besvarad 2026-10-27: **inga AI-anrop i körtid.** Förklaringarna förgenereras under utvecklingen med hjälp av AI, granskas av Isabelle och sparas i appen. Ingen API-nyckel, ingen kostnad, inget missbruksskydd och inga data som lämnar webbläsaren. Ett riktigt AI-anrop kan läggas till i en senare version. Se noten nedan om vad det innebär för avsnitt 6, 7 och T-12.
 - [x] **4. Konton.** Besvarad 2026-10-27: GitHub-repot finns och är publikt. **Vercel-konto saknas ännu** och skapas senare — senast till M2, eftersom den milstolpen kräver att appen går att testa i mobilen. T-01 byggs och testas lokalt tills dess.
@@ -147,7 +147,11 @@ Reglerna nedan är förslag som granskas enligt fråga 5. Claude Code implemente
 
 **Återhämtning efter** (ändrad 2026-10-27): Vansbrosimningen stod tidigare som "Ingen", vilket motsade R-02. Lopp som tar fem timmar eller mer kräver två veckor, kortare lopp en.
 
-Datum enligt fråga 1.
+**Datum** (ändrad 2026-10-28). Varje lopp bär en **lista** med datum i `dates`, i kronologisk ordning och utan dubbletter, inte ett enda datum. Skälet är att en klassiker kan börja när som helst på året: den som startar i maj 2027 har redan missat Vasaloppet i mars och behöver mars 2028.
+
+Formuläret förifyller det första datumet i listan som ligger på eller efter startdatumet (`nextRaceDate` i `src/engine/config.ts`). Finns inget sådant datum lämnas fältet **tomt** med en hänvisning till arrangörens sida, så att användaren kan skriva in det själv. Ett datum som redan har varit får aldrig förifyllas, eftersom K-02 underkänner loppdatum före startdatumet — användaren ska inte mötas av ett felmeddelande på ett värde hon inte har skrivit.
+
+Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I oktober 2026 har inget av de fyra arrangörerna publicerat sina 2028-datum, så listorna bär bara 2027. Att lägga till ett år är en ändring i `config/races.json` och kräver ingen kodändring.
 
 **Nivåer** (visas i steg 2)
 

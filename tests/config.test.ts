@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { races, raceById, rules, sessions } from '../src/engine/config';
+import { races, raceById, nextRaceDate, rules, sessions } from '../src/engine/config';
 import type { SessionType, Sport } from '../src/engine/types';
 
 /**
@@ -20,10 +20,33 @@ describe('config/races.json', () => {
   });
 
   it('har de datum som beslutades i fråga 1', () => {
-    expect(raceById('vasaloppet').date).toBe('2027-03-07');
-    expect(raceById('vatternrundan').date).toBe('2027-06-18');
-    expect(raceById('vansbrosimningen').date).toBe('2027-07-10');
-    expect(raceById('lidingoloppet').date).toBe('2027-09-25');
+    expect(raceById('vasaloppet').dates).toContain('2027-03-07');
+    expect(raceById('vatternrundan').dates).toContain('2027-06-18');
+    expect(raceById('vansbrosimningen').dates).toContain('2027-07-10');
+    expect(raceById('lidingoloppet').dates).toContain('2027-09-25');
+  });
+
+  it('har loppdatumen i kronologisk ordning och utan dubbletter', () => {
+    for (const race of races.races) {
+      expect([...race.dates].sort(), race.id).toEqual(race.dates);
+      expect(new Set(race.dates).size, race.id).toBe(race.dates.length);
+    }
+  });
+
+  it('förifyller nästa datum på eller efter startdatumet', () => {
+    // Höststart: alla fyra loppen ligger framåt i tiden.
+    expect(nextRaceDate('vasaloppet', '2026-11-02')).toBe('2027-03-07');
+    expect(nextRaceDate('lidingoloppet', '2026-11-02')).toBe('2027-09-25');
+
+    // Loppdagen själv räknas som framåt, inte som passerad.
+    expect(nextRaceDate('vasaloppet', '2027-03-07')).toBe('2027-03-07');
+  });
+
+  it('förifyller ingenting när inget publicerat datum passar', () => {
+    // Vårstart 2027: Vasaloppet i mars har redan gått. Arrangören har inte
+    // publicerat 2028 än, så fältet ska lämnas tomt — aldrig förifyllas med
+    // ett datum som har varit, eftersom K-02 underkänner sådana.
+    expect(nextRaceDate('vasaloppet', '2027-05-03')).toBeNull();
   });
 
   it('har distanserna från lopptabellen', () => {
@@ -48,7 +71,7 @@ describe('config/races.json', () => {
   });
 
   it('har alla loppen inom tolv månader, som en klassiker kräver', () => {
-    const datum = races.races.map((race) => race.date).sort();
+    const datum = races.races.map((race) => race.dates[0] as string).sort();
     const första = new Date(`${datum[0] as string}T00:00:00Z`);
     const sista = new Date(`${datum.at(-1) as string}T00:00:00Z`);
     const månader = (sista.getTime() - första.getTime()) / (1000 * 60 * 60 * 24 * 30.44);

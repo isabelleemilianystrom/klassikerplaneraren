@@ -45,7 +45,20 @@ export const racesSchema = z.object({
         sport: sport,
         distanceKm: z.number().positive(),
         estimatedHours: z.number().positive(),
-        date: isoDate,
+        /**
+         * Loppets kommande datum i kronologisk ordning.
+         *
+         * Flera, eftersom en klassiker kan börja när som helst på året: den som
+         * startar på våren behöver nästa års datum för de lopp som redan gått.
+         * Listan får vara kort — den innehåller bara det arrangörerna publicerat.
+         */
+        dates: z
+          .array(isoDate)
+          .nonempty()
+          .refine(
+            (dates) => dates.every((datum, i) => i === 0 || (dates[i - 1] as string) < datum),
+            { message: "dates måste vara i kronologisk ordning och utan dubbletter" },
+          ),
         taperWeeks: z.number().int().positive(),
         recoveryWeeks: z.number().int().nonnegative(),
         specificWeeks: z.number().int().positive(),
@@ -206,4 +219,19 @@ export function raceById(id: RacesConfig['races'][number]['id']): RacesConfig['r
   const race = races.races.find((candidate) => candidate.id === id);
   if (race === undefined) throw new Error(`Loppet ${id} finns inte i config/races.json`);
   return race;
+}
+
+/**
+ * Loppets första datum på eller efter `onOrAfter`, eller null.
+ *
+ * Det här är datumet formuläret förifyller. Null betyder att arrangören inte
+ * har publicerat något datum som passar, och då ska fältet lämnas tomt så att
+ * användaren kan skriva in datumet själv — aldrig förifyllas med ett datum som
+ * redan har varit, för K-02 underkänner loppdatum före startdatumet.
+ */
+export function nextRaceDate(
+  id: RacesConfig['races'][number]['id'],
+  onOrAfter: string,
+): string | null {
+  return raceById(id).dates.find((datum) => datum >= onOrAfter) ?? null;
 }

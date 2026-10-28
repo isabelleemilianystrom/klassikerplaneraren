@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "vasaloppet.se, vatternrundan.se, vansbrosimningen.se, lidingoloppet.se",
   "checkedOn": "2026-10-27",
-  "note": "Datumen är kontrollerade mot arrangörernas sidor. estimatedHours är ungefärlig tid i mål för en motionär och används av R-25 för att räkna loppet som belastning.",
+  "note": "dates är loppets kommande datum i kronologisk ordning, kontrollerade mot arrangörernas sidor. Formuläret förifyller det första datumet som ligger på eller efter startdatumet; finns inget sådant lämnas fältet tomt. En klassiker kan börja när som helst på året, så den som startar på våren behöver nästa års datum för de lopp som redan passerat. I oktober 2026 har inget av arrangörerna publicerat 2028, därför står bara 2027 här. estimatedHours är ungefärlig tid i mål för en motionär och används av R-25 för att räkna loppet som belastning.",
   "races": [
     {
       "id": "vasaloppet",
@@ -10,7 +10,7 @@
       "sport": "ski",
       "distanceKm": 90,
       "estimatedHours": 7,
-      "date": "2027-03-07",
+      "dates": ["2027-03-07"],
       "taperWeeks": 2,
       "recoveryWeeks": 2,
       "specificWeeks": 8
@@ -21,7 +21,7 @@
       "sport": "bike",
       "distanceKm": 315,
       "estimatedHours": 11,
-      "date": "2027-06-18",
+      "dates": ["2027-06-18"],
       "taperWeeks": 2,
       "recoveryWeeks": 2,
       "specificWeeks": 8
@@ -32,7 +32,7 @@
       "sport": "swim",
       "distanceKm": 3,
       "estimatedHours": 1,
-      "date": "2027-07-10",
+      "dates": ["2027-07-10"],
       "taperWeeks": 1,
       "recoveryWeeks": 1,
       "specificWeeks": 6
@@ -43,7 +43,7 @@
       "sport": "run",
       "distanceKm": 30,
       "estimatedHours": 3.5,
-      "date": "2027-09-25",
+      "dates": ["2027-09-25"],
       "taperWeeks": 1,
       "recoveryWeeks": 1,
       "specificWeeks": 8

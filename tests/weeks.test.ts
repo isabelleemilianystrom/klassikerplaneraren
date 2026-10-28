@@ -23,7 +23,7 @@ function nästaFyraLoppEfter(start: IsoDate): PlanInput['races'] {
   const år = Number(start.slice(0, 4));
 
   return races.races.map((race) => {
-    const månadOchDag = race.date.slice(5);
+    const månadOchDag = (race.dates[0] as string).slice(5);
     const iÅr = `${år}-${månadOchDag}`;
     return { id: race.id, date: iÅr >= start ? iÅr : `${år + 1}-${månadOchDag}` };
   });
