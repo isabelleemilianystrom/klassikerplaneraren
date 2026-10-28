@@ -193,7 +193,12 @@ export const rulesSchema = z.object({
         maxZone: z.number().int().min(1).max(4),
         maxZoneForNewLevel: z.number().int().min(1).max(4),
       }),
-      taper: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
+      taper: z.object({
+        hardSessionsPerWeek: z.number().int().nonnegative(),
+        maxZone: z.number().int().min(1).max(4),
+        /** R-15: "korta inslag i zon 3". Utan tak blir det ett helt pass. */
+        maxHardMinutes: z.number().int().positive(),
+      }),
       recovery: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
     }),
     noHardDaysBackToBack: z.boolean(),

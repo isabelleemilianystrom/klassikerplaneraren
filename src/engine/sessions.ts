@@ -365,7 +365,44 @@ function enduranceSessions(
     }
   }
 
-  return distributeLeftover(resultat, budget, long, input);
+  return distributeLeftover(
+    capHardSessions(resultat, week.phase),
+    budget,
+    long,
+    input,
+    week.phase,
+  );
+}
+
+/**
+ * Fasens tak på hård tid (R-15), eller null när fasen inte har något.
+ *
+ * Bara nedtrappningen har ett tak. R-15 säger "korta inslag i zon 3" om just
+ * den fasen, och utan en siffra blev det ett helt tröskelpass på upp till två
+ * timmar veckan före loppet.
+ */
+function maxHardMinutes(phase: Phase): number | null {
+  const fas = rules.intensity.byPhase[phase];
+  return 'maxHardMinutes' in fas ? fas.maxHardMinutes : null;
+}
+
+/**
+ * Hårda pass kapade till fasens tak (R-15).
+ *
+ * Minuterna som kapas bort försvinner inte — de fördelas på veckans övriga
+ * pass av `distributeLeftover` (R-29). Veckans tid är alltså oförändrad, men
+ * den ligger i zon 1–2 i stället för i zon 3.
+ */
+function capHardSessions(
+  sessions: readonly PendingSession[],
+  phase: Phase,
+): PendingSession[] {
+  const tak = maxHardMinutes(phase);
+  if (tak === null) return [...sessions];
+
+  return sessions.map((session) =>
+    isHard(session) && session.minutes > tak ? { ...session, minutes: tak } : { ...session },
+  );
 }
 
 /**
@@ -384,6 +421,7 @@ function distributeLeftover(
   budget: WeekBudget,
   long: PendingSession | null,
   input: PlanInput,
+  fas: Phase,
 ): PendingSession[] {
   const resultat = endurance.map((session) => ({ ...session }));
 
@@ -396,9 +434,12 @@ function distributeLeftover(
   // samma resultat för samma indata.
   // R-31: ett pass i en sport man är ny i får inte växa förbi sitt veckotak.
   const taketFör = (session: PendingSession): number => {
-    if (session.sport === 'strength') return rules.session.maxMinutes;
+    // R-15: ett hårt pass får inte växa tillbaka förbi fasens tak.
+    const hårt = isHard(session) ? (maxHardMinutes(fas) ?? Infinity) : Infinity;
+    if (session.sport === 'strength') return Math.min(rules.session.maxMinutes, hårt);
+
     const gräns = newLevelLimit(session.sport, input);
-    return Math.min(rules.session.maxMinutes, gräns?.maxMinutesPerWeek ?? Infinity);
+    return Math.min(rules.session.maxMinutes, gräns?.maxMinutesPerWeek ?? Infinity, hårt);
   };
 
   while (kvar > 0) {

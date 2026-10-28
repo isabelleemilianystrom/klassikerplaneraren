@@ -137,7 +137,7 @@
     "byPhase": {
       "base": { "hardSessionsPerWeek": 1, "maxZone": 3 },
       "specific": { "hardSessionsPerWeek": 2, "maxZone": 4, "maxZoneForNewLevel": 3 },
-      "taper": { "hardSessionsPerWeek": 1, "maxZone": 3 },
+      "taper": { "hardSessionsPerWeek": 1, "maxZone": 3, "maxHardMinutes": 20 },
       "recovery": { "hardSessionsPerWeek": 0, "maxZone": 2 }
     },
     "noHardDaysBackToBack": true

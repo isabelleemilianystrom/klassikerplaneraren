@@ -222,7 +222,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 | 3 | Måttligt – du kan prata korta meningar |
 | 4 | Hårt – bara några ord i taget |
 
-- **R-15** Bas: alla pass i zon 1–2 utom ett pass i zon 3 per vecka. Specifik: ett pass i zon 3 och ett intervallpass i zon 4 per vecka; nivå Ny i sporten får bara zon 3. Nedtrappning: korta inslag i zon 3. Återhämtning: bara zon 1–2.
+- **R-15** Bas: alla pass i zon 1–2 utom ett pass i zon 3 per vecka. Specifik: ett pass i zon 3 och ett intervallpass i zon 4 per vecka; nivå Ny i sporten får bara zon 3. Nedtrappning: korta inslag i zon 3 — **högst 20 minuter**, `maxHardMinutes` i `config/rules.json` *(preciserad 2026-10-28)*. Utan en siffra blev det ett helt tröskelpass på upp till två timmar veckan före loppet, vilket motsäger både regelns ord och arrangörens råd att träna mindre och lugnare den sista veckan. De minuter som kapas bort flyttas till lugna pass, så veckans tid är oförändrad (R-29). Återhämtning: bara zon 1–2.
 - **R-16** Aldrig pass i zon 3–4 två dagar i rad.
 
 **Ersättningar, teknik och säsong**
@@ -451,6 +451,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Veckans totala tid överskrider aldrig fasens tid enligt R-05–R-07
 - Minst en vilodag per vecka (R-11)
 - Aldrig pass i zon 3–4 två dagar i rad (R-16)
+- Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
 - En sport där nivån är Ny håller sitt veckotak i både minuter och antal pass, loppet och öppningspasset inräknade (R-31) *(tillagd 2026-10-28)*
 - Summan av minuterna per sport plus de oplacerade minuterna är alltid exakt veckans konditionstid (R-29, R-31) *(tillagd 2026-10-28)*

@@ -741,3 +741,65 @@ describe('R-31: nybörjaren får ett pass i veckan', () => {
     expect(fler).toBe(true);
   });
 });
+
+describe('R-15: nedtrappningen har bara korta inslag i zon 3', () => {
+  const TAK = rules.intensity.byPhase.taper.maxHardMinutes;
+
+  it('kapar hårda pass till fasens tak', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.week.phase !== 'taper') continue;
+
+        for (const session of träning(plan)) {
+          if (session.zone === null || session.zone < 3) continue;
+          expect(session.minutes, `${namn} v${plan.week.index} ${session.id}`).toBeLessThanOrEqual(
+            TAK,
+          );
+        }
+      }
+    }
+  });
+
+  it('ger nedtrappningen minst ett kort inslag i zon 3 när tiden räcker', () => {
+    // R-15 säger att inslagen ska finnas, inte bara att de ska vara korta.
+    const nedtrappning = buildWeekPlans(P2).filter(
+      ({ week, budget }) => week.phase === 'taper' && budget.enduranceMinutes > TAK * 2,
+    );
+
+    expect(nedtrappning.length).toBeGreaterThan(0);
+    for (const plan of nedtrappning) {
+      const hårda = träning(plan).filter(
+        (session) => session.zone !== null && session.zone >= 3,
+      );
+      expect(hårda.length, `vecka ${plan.week.index}`).toBe(1);
+      expect(hårda[0]?.minutes, `vecka ${plan.week.index}`).toBe(TAK);
+    }
+  });
+
+  it('tappar inga minuter när ett hårt pass kapas', () => {
+    // Tiden ska flytta till lugna pass, inte försvinna ur veckan.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.week.phase !== 'taper' || plan.budget.raceMinutes > 0) continue;
+
+        const budget = plan.budget.strengthMinutes + plan.budget.enduranceMinutes;
+        if (budget < rules.session.minMinutes) continue;
+
+        expect(plan.totalMinutes, `${namn} vecka ${plan.week.index}`).toBe(budget);
+      }
+    }
+  });
+
+  it('rör inte de hårda passen i bas och specifik fas', () => {
+    // Taket gäller bara nedtrappningen. Ett tröskelpass i specifik fas ska
+    // fortfarande vara ett helt pass.
+    const längre = buildWeekPlans(P2).some(
+      ({ week, sessions }) =>
+        week.phase === 'specific' &&
+        sessions.some(
+          (session) => session.zone !== null && session.zone >= 3 && session.minutes > TAK,
+        ),
+    );
+    expect(längre).toBe(true);
+  });
+});
