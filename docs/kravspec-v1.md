@@ -289,6 +289,8 @@ CLAUDE.md
 
 **Datamodell** (ändras inte utan att fråga)
 
+*Ändringar:* `Session.raceId` tillagt 2026-10-28. Veckan har `focusRaceId`, men bara ett. Går två lopp samma vecka enligt R-27 är det andra ett pass av typen `race`, och utan id:t skulle koden behöva leta efter loppets namn i passets titel.
+
 ```ts
 type Sport = 'ski' | 'bike' | 'swim' | 'run' | 'strength';
 type RaceId = 'vasaloppet' | 'vatternrundan' | 'vansbrosimningen' | 'lidingoloppet';
@@ -316,6 +318,7 @@ interface Session {
   title: string;
   instruction: string;
   safetyNote?: string;
+  raceId?: RaceId;            // satt på pass av typen 'race'
 }
 
 interface Week {
@@ -423,6 +426,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Varje pass i öppet vatten har säkerhetstexten (R-19)
 - Samma indata ger samma plan (determinism)
 - Varje pass är 20–300 minuter och har titel, instruktion och zon där zon gäller (R-12, R-30) *(tillagd 2026-10-27)*
+- Varje pass av typen `race` har ett `raceId` som finns i `config/races.json` *(tillagd 2026-10-28)*
 - Loppveckans budget är minskad med loppets uppskattade tid (R-25) *(tillagd 2026-10-27)*
 - Andelarna mellan sporterna summerar alltid till 100 %, även när planen har en eller två sporter (R-08) *(tillagd 2026-10-27)*
 - Planen överlever en rundtur genom lagringen: sparad och inläst plan är identisk med originalet *(tillagd 2026-10-27)*

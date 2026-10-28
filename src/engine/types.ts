@@ -62,6 +62,14 @@ export interface Session {
   title: string;
   instruction: string;
   safetyNote?: string;
+  /**
+   * Vilket lopp passet är, satt på pass av typen `race`.
+   *
+   * Veckan har `focusRaceId`, men bara ett. Går två lopp samma vecka (R-27)
+   * är det andra ett pass här, och utan id:t skulle koden behöva leta efter
+   * loppets namn i titeln.
+   */
+  raceId?: RaceId;
 }
 
 export interface Week {
