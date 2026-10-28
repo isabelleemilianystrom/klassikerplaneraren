@@ -59,6 +59,11 @@ export const racesSchema = z.object({
             (dates) => dates.every((datum, i) => i === 0 || (dates[i - 1] as string) < datum),
             { message: "dates måste vara i kronologisk ordning och utan dubbletter" },
           ),
+        /**
+         * Kilometer man bör ha samlat i loppets gren före loppet, räknat över
+         * alla pass tillsammans. Saknas talet ges ingen varning. Se R-34.
+         */
+        volumeMilestoneKm: z.number().positive().optional(),
         taperWeeks: z.number().int().positive(),
         recoveryWeeks: z.number().int().nonnegative(),
         specificWeeks: z.number().int().positive(),
@@ -235,6 +240,10 @@ export const rulesSchema = z.object({
     note: z.string(),
     techniqueSports: z.array(sport).min(1),
   }),
+  /** R-34: snittfart per gren, bara för att räkna om tid till kilometer. */
+  trainingSpeedKmh: z
+    .object({ _rule: z.string(), note: z.string() })
+    .catchall(z.number().positive()),
   classicWindow: z.object({ _rule: z.string(), months: z.number().int().positive() }),
   warnings: z.object({
     _rule: z.string(),
@@ -247,6 +256,7 @@ export const rulesSchema = z.object({
     }),
     skiTechnique: z.object({ text: z.string().min(1) }),
     outsideClassicWindow: z.object({ text: z.string().min(1) }),
+    volumeMilestone: z.object({ _rule: z.string(), text: z.string().min(1) }),
   }),
 });
 

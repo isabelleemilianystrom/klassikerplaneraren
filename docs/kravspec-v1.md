@@ -136,12 +136,12 @@ Reglerna nedan är förslag som granskas enligt fråga 5. Claude Code implemente
 
 **Lopp** (`config/races.json`)
 
-| Lopp | Sport | Distans | Uppskattad tid | Nedtrappning | Återhämtning efter | Specifik fas |
-| --- | --- | --- | --- | --- | --- | --- |
-| Vasaloppet | Längdskidor | 90 km | 7 h | 2 veckor | 2 veckor | 8 veckor |
-| Vätternrundan | Cykel | 315 km | 11 h | 2 veckor | 2 veckor | 8 veckor |
-| Vansbrosimningen | Simning | 3 km | 1,25 h | 1 vecka | 1 vecka | 6 veckor |
-| Lidingöloppet | Löpning | 30 km | 3,5 h | 1 vecka | 1 vecka | 8 veckor |
+| Lopp | Sport | Distans | Uppskattad tid | Nedtrappning | Återhämtning efter | Specifik fas | Volymriktmärke |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Vasaloppet | Längdskidor | 90 km | 7 h | 2 veckor | 2 veckor | 8 veckor | – |
+| Vätternrundan | Cykel | 315 km | 11 h | 2 veckor | 2 veckor | 8 veckor | 1000 km |
+| Vansbrosimningen | Simning | 3 km | 1,25 h | 1 vecka | 1 vecka | 6 veckor | – |
+| Lidingöloppet | Löpning | 30 km | 3,5 h | 1 vecka | 1 vecka | 8 veckor | – |
 
 **Uppskattad tid** (tillagd 2026-10-27) är hur länge en motionär är ute i loppet. Siffran är grov men storleksordningen avgör: loppet är veckans största belastning och måste räknas som träning. Se R-25.
 
@@ -233,6 +233,26 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   och med fokus på rörelsen i stället för på tiden. Det är därför veckan efter Vätternrundan
   innehåller ett simteknikpass fast den i övrigt är vila.
 
+- **R-34** (tillagd 2026-10-28) **Volymriktmärke per lopp.** Ett lopp kan ha ett riktmärke för
+  hur många kilometer man bör ha samlat i loppets gren före loppet — **summan av alla pass**,
+  inte ett enskilt långpass. Talet ligger i `volumeMilestoneKm` i `config/races.json`.
+
+  **Vätternrundan: 1000 km.** Det är det riktmärke som brukar nämnas. De övriga tre loppen har
+  inget tal: de lämnas tomma hellre än gissade, och ger då ingen kontroll. Att lägga till ett
+  tal senare är en rad i konfigurationen.
+
+  Tid räknas om till kilometer med grenens träningsfart i `trainingSpeedKmh`, som för cykel är
+  **25 km/h**. Farten är lägre än Vätternrundans loppfart på 28,6 km/h eftersom loppet körs i
+  klunga medan ett träningspass oftast görs ensam. Farten används bara för den här omräkningen,
+  aldrig för att planera ett pass, och bara cykeln har ett tal.
+
+  Loppet självt räknas inte — riktmärket handlar om förberedelsen. Öppningspasset dagen före
+  räknas med, eftersom det är tid i sadeln.
+
+  **Motorn ändrar aldrig planen för att nå ett riktmärke.** Den totala volymen följer av hur
+  många timmar användaren kan träna och hur många veckor hon har, och båda har hon valt själv.
+  Når planen inte riktmärket visas varningen nedan.
+
 - **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`. *(utökad 2026-10-28)* Styrkan viktas mot veckans fokuslopp där grenen kräver det: inför **Vasaloppet** mot överkropp och bål, eftersom stakningen kommer därifrån. Texten och övningslistan ligger i `strengthVariants.byRace` och `strengthExercises.byRace` i `config/sessions.json`; saknas loppet används den allmänna. Arrangörens eget råd är att styrkan ska vara allmän, funktionell och skadeförebyggande, med extra överkropp särskilt före skidor.
 
 **Pass**
@@ -273,6 +293,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-24** Vasaloppet med nivå Ny i skidor och varken snö, rullskidor eller stakmaskin: "Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet."
 
 - **R-26** (tillagd 2026-10-27) Spänner loppen över mer än tolv månader: "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader." Planen skapas ändå. Kontrollen är det som gör planen till en klassikerplan och inte bara ett träningsprogram.
+- **R-34** (tillagd 2026-10-28) Planen når inte ett lopps volymriktmärke: "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor." Tonen är medveten: varningen betyder "det här når inte riktmärket", aldrig "du tränar för lite".
 
 **Sjukdom och missade pass.** Hanteras i v1.0 bara som fast text (avsnitt 8), inte som logik i motorn.
 
@@ -520,6 +541,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Start i var och en av årets tolv månader ger en hel plan där alla fyra loppen finns med, oavsett vilken ordning loppen kommer i (tillagt 2026-10-28)
 - Alla sju veckodagar som långpassdag och som vilodag: planen håller samtliga regler i varje kombination (tillagt 2026-10-28)
 - Plan med bara Vansbrosimningen och nivå Ny: veckan stannar på 80 minuter och resten redovisas som oplacerad tid (R-31) (tillagt 2026-10-28)
+- Vårstart i maj med Vätternrundan i juni: planen når inte 1000 km och varningen i R-34 visas (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**

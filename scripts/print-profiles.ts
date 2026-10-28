@@ -12,6 +12,7 @@ import { weekBudgets } from '../src/engine/budget.ts';
 import { raceById, rules } from '../src/engine/config.ts';
 import { weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
+import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
 import type { PlanInput, Zone } from '../src/engine/types.ts';
 import { PROFILES } from '../tests/profiles.ts';
 
@@ -155,8 +156,29 @@ function main(): void {
   for (const [namn, input] of Object.entries(PROFILES)) {
     const planer = buildWeekPlans(input);
 
+    const checks = volumeChecks(input, planer);
+
+    const riktmärken =
+      checks.length === 0
+        ? []
+        : [
+            'Volymriktmärken (R-34)',
+            '-----------------------',
+            '',
+            ...checks.map(
+              (check) =>
+                `  ${raceById(check.raceId).name}: ${Math.round(check.minutes / 60)} h ` +
+                `≈ ${check.kilometers} km av ${check.milestoneKm} km` +
+                `${check.reached ? '  (nått)' : '  (nås inte)'}`,
+            ),
+            '',
+            ...volumeWarnings(checks).map((varning) => `  ${varning}`),
+            '',
+          ];
+
     const text = [
       ...beskrivProfil(namn, input),
+      ...riktmärken,
       ...skrivÖversikt(input, planer),
       'Vecka för vecka',
       '---------------',

@@ -236,6 +236,10 @@
     },
     "outsideClassicWindow": {
       "text": "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader."
+    },
+    "volumeMilestone": {
+      "_rule": "R-34",
+      "text": "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor."
     }
   },
   "recovery": {
@@ -245,5 +249,10 @@
       "swim",
       "ski"
     ]
+  },
+  "trainingSpeedKmh": {
+    "_rule": "R-34",
+    "note": "Snittfart på ett lugnt träningspass, använd bara för att räkna om tid till kilometer i volymriktmärket. Aldrig för att planera ett pass. Cykelns 25 km/h är lägre än Vätternrundans loppfart på 28,6 eftersom loppet körs i klunga.",
+    "bike": 25
   }
 }
