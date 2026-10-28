@@ -421,7 +421,7 @@ En Next.js-app utan databas, där regelmotorn är en ren TypeScript-modul utan b
 | Test | Vitest |
 | Pakethanterare | npm |
 | Drift | Lokalt till demon; Vercel eller GitHub Pages efteråt *(ändrad 2026-10-28)* |
-| Lagring | Webbläsarens localStorage, alltid inom try/catch |
+| Lagring | Webbläsarens localStorage, alltid inom try/catch; egen `storageVersion` *(förtydligad 2026-10-28)* |
 
 **Mappstruktur**
 
@@ -605,6 +605,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
 - Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
+- Sparad data valideras fält för fält, inte bara på versionsnumret, och kastas när något inte stämmer (K-15) *(tillagd 2026-10-28)*
+- Appen fungerar när localStorage saknas, inte går att skriva till eller inte går att läsa (K-10) *(tillagd 2026-10-28)*
+- Startsidan ritas alltid, också när den sparade planen är trasig — aldrig en tom sida (K-15) *(tillagd 2026-10-28)*
 - Samma indata ger samma plan (determinism)
 - Varje pass är 20–300 minuter och har titel, instruktion och zon där zon gäller (R-12, R-30) *(tillagd 2026-10-27)*
 - Varje pass av typen `race` har ett `raceId` som finns i `config/races.json` *(tillagd 2026-10-28)*
@@ -636,6 +639,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Simpass i juli utan simhall: ingen ersättning, eftersom öppet vatten inte kräver bassäng (R-19) (tillagt 2026-10-28)
 - Lidingöloppets block när de tre andra loppen är avklarade: löpningen växer högst 10 procent i veckan (R-14) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
+- Sparad plan med rätt versionsnummer men fel form: kastas också — det var v0:s fel (K-15) (tillagt 2026-10-28)
+- "Gör en ny plan" frågar innan den raderar: ett program på fyrtiosju veckor ska inte gå att radera med ett felklick (K-10) (tillagt 2026-10-28)
 
 **Definition of done per uppgift**
 

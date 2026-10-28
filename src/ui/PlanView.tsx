@@ -25,7 +25,7 @@ import {
   totalHours,
   weekFocus,
 } from './plan-view.ts';
-import { FIXED, PLAN } from './texts.ts';
+import { FIXED, PLAN, STORAGE } from './texts.ts';
 
 interface Props {
   input: PlanInput;
@@ -33,9 +33,17 @@ interface Props {
   warnings: string[];
   today: IsoDate;
   onChangeAnswers: () => void;
+  onStartOver: () => void;
 }
 
-export default function PlanView({ input, plans, warnings, today, onChangeAnswers }: Props) {
+export default function PlanView({
+  input,
+  plans,
+  warnings,
+  today,
+  onChangeAnswers,
+  onStartOver,
+}: Props) {
   const aktuell = currentWeekIndex(plans, today);
   const [öppen, setÖppen] = useState<number | null>(aktuell);
   const aktuellRef = useRef<HTMLLIElement | null>(null);
@@ -111,13 +119,18 @@ export default function PlanView({ input, plans, warnings, today, onChangeAnswer
         ))}
       </section>
 
-      <button
-        type="button"
-        onClick={onChangeAnswers}
-        className="mt-12 rounded-lg border border-neutral-300 px-5 py-3 font-medium hover:bg-neutral-50"
-      >
-        {PLAN.changeAnswers}
-      </button>
+      <div className="mt-12 flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={onChangeAnswers}
+          className="rounded-lg border border-neutral-300 px-5 py-3 font-medium hover:bg-neutral-50"
+        >
+          {PLAN.changeAnswers}
+        </button>
+
+        {/* K-10: det ska gå att börja om, men inte av misstag. */}
+        <StartOver onStartOver={onStartOver} />
+      </div>
 
       <footer className="mt-12 space-y-3 border-t border-neutral-200 pt-6 text-sm text-neutral-600">
         <p>{FIXED.disclaimer}</p>
@@ -273,4 +286,48 @@ function grupperaPerDag(sessions: readonly Session[]): { date: IsoDate; sessions
   return [...perDag.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, dagens]) => ({ date, sessions: dagens }));
+}
+
+/**
+ * Knappen som kastar planen och börjar om (K-10).
+ *
+ * Den frågar först. Ett program på fyrtiosju veckor ska inte gå att radera
+ * med ett felklick, och det är hela skälet till att K-13 höjdes till Måste.
+ */
+function StartOver({ onStartOver }: { onStartOver: () => void }) {
+  const [frågar, setFrågar] = useState(false);
+
+  if (!frågar) {
+    return (
+      <button
+        type="button"
+        onClick={() => setFrågar(true)}
+        className="rounded-lg px-5 py-3 font-medium text-neutral-600 hover:bg-neutral-50"
+      >
+        {STORAGE.startOver}
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-neutral-300 p-4">
+      <p className="text-sm text-neutral-700">{STORAGE.startOverConfirm}</p>
+      <div className="mt-3 flex gap-2">
+        <button
+          type="button"
+          onClick={onStartOver}
+          className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+        >
+          {STORAGE.startOver}
+        </button>
+        <button
+          type="button"
+          onClick={() => setFrågar(false)}
+          className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium"
+        >
+          Avbryt
+        </button>
+      </div>
+    </div>
+  );
 }

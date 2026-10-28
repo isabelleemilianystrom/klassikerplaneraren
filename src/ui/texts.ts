@@ -186,3 +186,26 @@ export const PLAN = {
 
   changeAnswers: 'Ändra svar',
 } as const;
+
+/**
+ * Lagringen (K-10, K-15).
+ *
+ * Texten när en sparad plan kastas ska förklara vad som hände utan att skylla
+ * på användaren, och säga vad hon kan göra: fylla i formuläret igen.
+ */
+export const STORAGE = {
+  discarded: (reason: string): string => {
+    const skäl =
+      reason === 'old-version'
+        ? 'Den sparades med en äldre version av appen.'
+        : 'Den gick inte att läsa.';
+
+    return `Du hade ett sparat program, men det kunde inte öppnas. ${skäl} ` +
+      'Svara på frågorna igen så gör vi ett nytt – det tar ett par minuter.';
+  },
+
+  startOver: 'Gör en ny plan',
+
+  startOverConfirm:
+    'Det här tar bort ditt sparade program. Du svarar på frågorna igen och får ett nytt.',
+} as const;
