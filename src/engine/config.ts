@@ -110,6 +110,8 @@ export const rulesSchema = z.object({
       )
       .min(1),
     minRestDays: z.number().int().min(1),
+    /** Vilodagen läggs här först. 1 = måndag, dagen efter helgens långpass. */
+    preferredRestWeekday: z.number().int().min(1).max(7),
   }),
   session: z.object({
     _rule: z.string(),
@@ -126,6 +128,10 @@ export const rulesSchema = z.object({
       swim: z.number().int().positive(),
     }),
     allowedWeekdays: z.array(z.number().int().min(1).max(7)).min(1),
+    /** Långpassets andel av sitt tak i fasens första vecka. Se R-13. */
+    startShareOfCap: share,
+    /** Under det här är passet inget långpass, och planen får inget alls. */
+    minMinutes: z.number().int().positive(),
   }),
   runVolume: z.object({
     _rule: z.string(),

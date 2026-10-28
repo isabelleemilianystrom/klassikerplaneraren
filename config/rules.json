@@ -66,7 +66,8 @@
       { "upToHours": 9, "days": 5 },
       { "upToHours": 15, "days": 6 }
     ],
-    "minRestDays": 1
+    "minRestDays": 1,
+    "preferredRestWeekday": 1
   },
 
   "session": {
@@ -84,7 +85,9 @@
       "run": 150,
       "swim": 75
     },
-    "allowedWeekdays": [6, 7]
+    "allowedWeekdays": [6, 7],
+    "startShareOfCap": 0.5,
+    "minMinutes": 45
   },
 
   "runVolume": {
