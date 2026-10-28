@@ -224,6 +224,8 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   simning, inte volym, och R-31:s tak på 80 minuter gäller ändå. Sänks en grens vikt normeras
   andelarna om, så veckan blir inte kortare.
 
+- **R-36** (tillagd 2026-10-28) **Träningen fokuserar på nästa kommande lopp.** När ett lopp är,  avklarat ska dess gren inte längre tränas som huvudgren — tiden går till nästa lopps gren. Är,  Vasaloppet genomfört ligger fokus helt på cykeln inför Vätternrundan.,,  **Undantaget är grenens egen säsong.** Är det fortfarande vinter där man bor kan skidor användas,  som långpass för konditionsträning, och grenen behåller då `afterRace.keepShareInOwnSeason` —,  **10 procent**. Utanför sin säsong får den ingenting. Grenens egen säsong är de månader där den,  har sin högsta säsongsvikt i R-32: vinter för skidor, sommar för cykel.,,  Den frigjorda tiden går till **veckans fokusgren**, inte ut över alla grenar. Annars hamnade den,  hos löpningen, som har jämn vikt året om — och ett halvår före Lidingöloppet gör den ingen nytta,  där. Fokusgrenen rörs aldrig av regeln, oavsett vad som varit.,,  Före regeln gav en plan 33 timmar skidåkning efter Vasaloppet, varav en del i maj och juni.,  Veckorna direkt efter loppet gav 216 minuter skidor mot 65 minuter cykel, trots att Vasaloppet,  var avklarat och Vätternrundan var nästa lopp.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -265,6 +267,12 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
 - **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält. *(utökad 2026-10-28)* Grenspecifika varianter finns nu också där **loppet** ändrar vad passet innehåller, inte bara där grenen gör det: löpningens långpass och lugna pass nämner kuperad terräng och mjukt underlag eftersom Lidingöloppet är terränglöpning, och cykelns långpass nämner klungkörning — som ett **tips**, eftersom alla inte har någon att cykla med, och med ett uttalat tillägg att passet duger lika bra ensamt.
 - **R-14** Löptak: total löptid får öka högst 10 % från en vecka till nästa (veckor efter avlastning undantagna). Nivå Ny i löpning har aldrig löppass två dagar i rad.
+
+  **Löptaket är nu byggt** *(tidigare bara dess andra hälft; 2026-10-28)*. Jämförelsen görs mot senaste **normala** veckan — bas eller specifik fas, utan avlastning och utan lopp — inte mot veckan precis innan. Skälet till undantaget i regeln är att avlastningsveckan är medvetet lätt, men undantaget får inte betyda att taket släpps helt: då kunde löptiden femdubblas veckan efter en avlastning. Att hoppa över de lätta veckorna i jämförelsen ger regelns avsikt utan hålet.
+
+  Taket blev akut när R-36 infördes: när de andra loppen är avklarade går deras tid till det sista loppets gren, och är det Lidingöloppet växte löpningen från nittio minuter till åtta timmar på en vecka. Löpning sliter betydligt mer på kroppen än skidor och cykel, och det är precis vad den här regeln finns för.
+
+  De minuter taket skär bort går till de andra grenarna, men aldrig över ett nybörjartak (R-31) och aldrig till en gren vars lopp är avklarat och som är utanför sin säsong (R-36). Finns det ingen gren som kan ta emot behåller löpningen minuterna — taket är en riktlinje mot en skaderisk, inte ett skäl att göra veckan kortare än användaren valt.
 
 **Intensitet**
 
@@ -561,6 +569,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Plan med bara Vansbrosimningen och nivå Ny: veckan stannar på 80 minuter och resten redovisas som oplacerad tid (R-31) (tillagt 2026-10-28)
 - Vårstart i maj med Vätternrundan i juni: planen når inte 1000 km och varningen i R-34 visas (tillagt 2026-10-28)
 - Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
+- Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
+- Lidingöloppets block när de tre andra loppen är avklarade: löpningen växer högst 10 procent i veckan (R-14) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**

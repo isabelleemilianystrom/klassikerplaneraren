@@ -877,20 +877,40 @@ describe('R-15: nedtrappningen har bara korta inslag i zon 3', () => {
 });
 
 describe('R-13: långpasset lånar tid de sista veckorna', () => {
-  it('når över grenens egen andel av veckan', () => {
-    // I de sista specifikveckorna får långpasset låna från de andra grenarna.
-    // Utan det binds det av R-08:s 55 procent och hinner aldrig bli långt nog.
+  it('når sitt tak i fasens sista veckor', () => {
+    // Det här är vad lånet finns för: långpasset ska nå sitt tak och inte
+    // bindas av grenens andel av veckan. Om grenen råkar ha nog med tid ändå
+    // behövs inget lån, och då är utfallet detsamma — det är utfallet som
+    // räknas.
     const sista = buildWeekPlans(P2).filter(
       ({ week, budget }) =>
         week.phase === 'specific' &&
         week.focusRaceId === 'vatternrundan' &&
-        budget.enduranceMinutes > 0,
+        budget.enduranceMinutes > 0 &&
+        !week.isDeload,
+    );
+
+    const längsta = Math.max(
+      ...sista.flatMap((plan) =>
+        träning(plan).filter((s) => s.type === 'long').map((s) => s.minutes),
+      ),
+    );
+
+    expect(längsta).toBe(rules.longSession.capMinutesBySport.bike);
+  });
+
+  it('låter långpasset överstiga grenens andel när grenen är smal', () => {
+    // En plan på sex timmar i veckan: skidorna får inte 55 procent nog för ett
+    // långpass på fyra timmar, så lånet måste träda in.
+    const sista = buildWeekPlans(P1).filter(
+      ({ week, budget }) =>
+        week.phase === 'specific' && week.focusRaceId === 'vasaloppet' && budget.enduranceMinutes > 0,
     );
 
     const lånade = sista.filter((plan) => {
       const lång = träning(plan).find((session) => session.type === 'long');
       if (lång === undefined || lång.sport === null) return false;
-      return lång.minutes > (plan.budget.bySport[lång.sport as 'bike'] ?? 0);
+      return lång.minutes > (plan.budget.bySport[lång.sport as 'ski'] ?? 0);
     });
 
     expect(lånade.length).toBeGreaterThan(0);

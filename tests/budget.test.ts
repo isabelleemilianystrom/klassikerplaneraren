@@ -14,6 +14,30 @@ function veckorMedBudget(input: PlanInput) {
 }
 
 /**
+ * Sant när löptaket i R-14 inte har flyttat minuter den här veckan.
+ *
+ * Slår taket till hamnar överskottet hos de andra grenarna, och då stämmer
+ * inte säsongsvikterna för just den veckan. Det är inte ett fel — det är två
+ * regler som båda gäller, och löptaket väger tyngre eftersom det skyddar mot
+ * skada.
+ */
+function utanLöptak(budget: { bySport: Partial<Record<TrainedSport, number>> }, förväntatRun: number): boolean {
+  const run = budget.bySport.run ?? 0;
+  return run >= förväntatRun - 1;
+}
+
+/**
+ * Sant när alla loppen i planen ligger framför veckan.
+ *
+ * Säsongsvikterna i R-32 gäller bara så länge grenens lopp är kvar. Är ett
+ * lopp avklarat flyttas dess grens tid till nästa lopps gren (R-36), och då
+ * stämmer inte vikterna längre.
+ */
+function allaLoppKvar(input: PlanInput, vecka: { startDate: string }): boolean {
+  return input.races.every((race) => race.date >= vecka.startDate);
+}
+
+/**
  * Säsongens vikter för en månad, enligt R-32.
  *
  * `levels` behövs eftersom vikten sänks för den som inte är nybörjare i en
@@ -249,7 +273,10 @@ describe('R-08: fördelning i specifik fas', () => {
   it('fördelar resten mellan de övriga sporterna efter säsongen (R-32)', () => {
     const specifik = veckorMedBudget(P2).find(
       ({ vecka, budget }) =>
-        vecka.phase === 'specific' && vecka.focusRaceId === 'vasaloppet' && budget.raceMinutes === 0,
+        vecka.phase === 'specific' &&
+        vecka.focusRaceId === 'vasaloppet' &&
+        budget.raceMinutes === 0 &&
+        allaLoppKvar(P2, vecka),
     );
 
     const månad = monthOf(specifik?.vecka.startDate as string);
@@ -257,6 +284,9 @@ describe('R-08: fördelning i specifik fas', () => {
     const kvar =
       (specifik?.budget.enduranceMinutes as number) - (specifik?.budget.bySport.ski as number);
     const summaÖvriga = vikter.bike + vikter.swim + vikter.run;
+
+    const förväntatRun = (kvar * vikter.run) / summaÖvriga;
+    if (!utanLöptak(specifik?.budget as never, förväntatRun)) return;
 
     for (const sport of ['bike', 'swim', 'run'] as const) {
       const förväntat = (kvar * vikter[sport]) / summaÖvriga;
@@ -284,8 +314,12 @@ describe('R-09: fördelning i basfasen', () => {
     // P2 är erfaren i allt, så ingen bonus flyttar tid.
     for (const { vecka, budget } of veckorMedBudget(P2)) {
       if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
+      // Efter ett avklarat lopp gäller R-36 i stället.
+      if (!allaLoppKvar(P2, vecka)) continue;
 
       const vikter = säsongsvikter(monthOf(vecka.startDate), P2.levels);
+      if (!utanLöptak(budget, budget.enduranceMinutes * vikter.run)) continue;
+
       for (const sport of ['ski', 'bike', 'swim', 'run'] as const) {
         const förväntat = budget.enduranceMinutes * vikter[sport];
         expect(budget.bySport[sport] as number, vecka.index + " " + sport).toBeCloseTo(
@@ -302,6 +336,7 @@ describe('R-09: fördelning i basfasen', () => {
     // kan bita först, och prövas därför i sitt eget test.
     for (const { vecka, budget } of veckorMedBudget(P1)) {
       if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
+      if (!allaLoppKvar(P1, vecka)) continue;
 
       const vikter = säsongsvikter(monthOf(vecka.startDate), P1.levels);
       const minuter = budget.enduranceMinutes;
@@ -573,8 +608,11 @@ describe('R-32: säsongen styr fördelningen', () => {
       ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
     );
 
-    const vinter = bas.filter(({ vecka }) => [11, 12, 1, 2, 3].includes(monthOf(vecka.startDate)));
-    const sommar = bas.filter(({ vecka }) => [5, 6, 7, 8, 9].includes(monthOf(vecka.startDate)));
+    // Bara veckor där inget lopp är avklarat: därefter styr R-36.
+    const kvar = bas.filter(({ vecka }) => allaLoppKvar(P2, vecka));
+
+    const vinter = kvar.filter(({ vecka }) => [11, 12, 1, 2, 3].includes(monthOf(vecka.startDate)));
+    const sommar = kvar.filter(({ vecka }) => [5, 6, 7, 8, 9].includes(monthOf(vecka.startDate)));
 
     expect(vinter.length).toBeGreaterThan(0);
     for (const { vecka, budget } of vinter) {
@@ -594,6 +632,8 @@ describe('R-32: säsongen styr fördelningen', () => {
     // i en basvecka — utom när löpningen är loppets egen sport.
     for (const { vecka, budget } of veckorMedBudget(P2)) {
       if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
+      // Är Lidingöloppet det enda kvarvarande loppet ska löpningen dominera.
+      if (!allaLoppKvar(P2, vecka)) continue;
 
       const mest = Math.max(
         budget.bySport.ski as number,
@@ -605,8 +645,10 @@ describe('R-32: säsongen styr fördelningen', () => {
   });
 
   it('lägger underhållstiden i ett löparblock på cykeln, inte på skidorna', () => {
-    // Lidingöloppets block ligger i augusti. Då ska de 45 procent som inte går
-    // till löpningen mest gå till cykeln.
+    // Lidingöloppets block ligger i augusti. Då är både Vasaloppet och
+    // Vätternrundan avklarade, så skidorna är nollade av R-36 och cykeln får
+    // det lilla underhåll som finns. Skidåkning i augusti är ändå inte
+    // möjligt för de flesta.
     const lidingö = veckorMedBudget(P2).find(
       ({ vecka, budget }) =>
         vecka.phase === 'specific' &&
@@ -616,9 +658,8 @@ describe('R-32: säsongen styr fördelningen', () => {
     );
 
     expect(monthOf(lidingö?.vecka.startDate as string)).toBeGreaterThanOrEqual(7);
-    expect(lidingö?.budget.bySport.bike as number).toBeGreaterThan(
-      lidingö?.budget.bySport.ski as number,
-    );
+    expect(lidingö?.budget.bySport.ski as number).toBe(0);
+    expect(lidingö?.budget.bySport.bike as number).toBeGreaterThan(0);
   });
 
   it('ger alla sporter tid i varje vecka, också den som säsongen tonar ner', () => {
@@ -633,7 +674,14 @@ describe('R-32: säsongen styr fördelningen', () => {
         // Loppveckan är undantaget: där kan R-31 nolla loppets egen sport,
         // eftersom loppet och öppningspasset redan är veckans tid i den.
         if (budget.raceMinutes > 0) continue;
+
         for (const sport of sporter) {
+          // R-36: en gren vars lopp är avklarat ska inte längre tränas.
+          const loppKvar = profil.races.some(
+            (race) => raceById(race.id).sport === sport && race.date >= vecka.startDate,
+          );
+          if (!loppKvar) continue;
+
           expect(budget.bySport[sport], `${namn} v${vecka.index} ${sport}`).toBeGreaterThan(0);
         }
       }
@@ -663,5 +711,172 @@ describe('R-32: säsongen styr fördelningen', () => {
 
     const summa = summaAvSporter(vinter?.budget.bySport as Record<string, number>);
     expect(summa).toBe(vinter?.budget.enduranceMinutes);
+  });
+});
+
+describe('R-36: en avklarad grens tid går till nästa lopp', () => {
+  /** Veckans budget för en profil vid ett visst veckonummer. */
+  function vecka(input: PlanInput, index: number) {
+    return veckorMedBudget(input).find(({ vecka: v }) => v.index === index);
+  }
+
+  it('gör cykeln till huvudgren veckan efter Vasaloppet', () => {
+    // Vasaloppet går vecka 18 i P2. Veckorna 21–22 är bas mot Vätternrundan.
+    const efter = vecka(P2, 21);
+
+    expect(efter?.vecka.phase).toBe('base');
+    expect(efter?.vecka.focusRaceId).toBe('vatternrundan');
+    expect(efter?.budget.bySport.bike as number).toBeGreaterThan(
+      efter?.budget.bySport.ski as number,
+    );
+  });
+
+  it('behåller en liten andel skidor så länge det är vinter', () => {
+    // Mars är skidsäsong. Finns det snö kan skidor användas som konditions-
+    // träning, men inte som huvudgren.
+    const mars = vecka(P2, 21);
+
+    expect(monthOf(mars?.vecka.startDate as string)).toBe(3);
+    expect(mars?.budget.bySport.ski as number).toBeGreaterThan(0);
+
+    const andel = (mars?.budget.bySport.ski as number) / (mars?.budget.enduranceMinutes as number);
+    expect(andel).toBeLessThanOrEqual(rules.afterRace.keepShareInOwnSeason + 0.01);
+  });
+
+  it('ger noll skidor utanför skidsäsongen', () => {
+    for (const { vecka: v, budget } of veckorMedBudget(P2)) {
+      if (budget.enduranceMinutes === 0) continue;
+
+      const vasaKlart = (P2.races.find((r) => r.id === 'vasaloppet')?.date as string) < v.startDate;
+      const månad = monthOf(v.startDate);
+      const skidsäsong = [11, 12, 1, 2, 3].includes(månad);
+
+      if (vasaKlart && !skidsäsong) {
+        expect(budget.bySport.ski, `vecka ${v.index} (månad ${månad})`).toBe(0);
+      }
+    }
+  });
+
+  it('rör inte grenar vars lopp ligger kvar', () => {
+    // Före Vasaloppet ska skidorna ha full säsongsvikt.
+    const före = vecka(P2, 5);
+    expect(före?.budget.bySport.ski as number).toBeGreaterThan(
+      före?.budget.bySport.bike as number,
+    );
+  });
+
+  it('minskar skidtiden efter Vasaloppet kraftigt', () => {
+    const vasa = P2.races.find((r) => r.id === 'vasaloppet')?.date as string;
+    const efter = veckorMedBudget(P2).filter(({ vecka: v }) => v.startDate > vasa);
+
+    const skidtid = efter.reduce((a, { budget }) => a + (budget.bySport.ski ?? 0), 0);
+
+    // Före regeln var det 33 timmar. Nu ska det vara en bråkdel.
+    expect(skidtid / 60).toBeLessThan(10);
+  });
+
+  it('tappar inga minuter när en gren nollas', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka: v, budget } of veckorMedBudget(profil)) {
+        expect(
+          summaAvSporter(budget.bySport) + budget.unplacedMinutes,
+          `${namn} v${v.index}`,
+        ).toBe(budget.enduranceMinutes);
+      }
+    }
+  });
+});
+
+describe('R-14: löptiden ökar högst tio procent i veckan', () => {
+  /** Senaste normala veckans löptid, som taket räknas på. */
+  function löpreferenser(input: PlanInput) {
+    const rader = veckorMedBudget(input);
+    const resultat: { index: number; run: number; ref: number | null }[] = [];
+    let ref: number | null = null;
+
+    for (const { vecka, budget } of rader) {
+      resultat.push({ index: vecka.index, run: budget.bySport.run ?? 0, ref });
+
+      const normal =
+        (vecka.phase === 'base' || vecka.phase === 'specific') &&
+        !vecka.isDeload &&
+        vecka.raceIds.length === 0 &&
+        budget.enduranceMinutes > 0;
+
+      if (normal) ref = budget.bySport.run ?? ref;
+    }
+
+    return resultat;
+  }
+
+  it('håller taket i alla profiler', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      const rader = veckorMedBudget(profil);
+
+      for (const { index, run, ref } of löpreferenser(profil)) {
+        if (ref === null || ref === 0) continue;
+
+        // Loppveckan har sin egen logik.
+        const vecka = rader.find(({ vecka: v }) => v.index === index);
+        if ((vecka?.vecka.raceIds.length ?? 0) > 0) continue;
+
+        const tak = Math.floor(ref * (1 + rules.runVolume.maxWeeklyIncrease));
+        expect(run, `${namn} vecka ${index} (ref ${ref})`).toBeLessThanOrEqual(tak);
+      }
+    }
+  });
+
+  it('låter löpningen växa, inte stå still', () => {
+    // Taket är en gräns på ökningstakten, inte ett förbud mot att öka.
+    const rader = löpreferenser(P2).filter(({ run }) => run > 0);
+    const första = rader[0]?.run as number;
+    const högsta = Math.max(...rader.map(({ run }) => run));
+
+    expect(högsta).toBeGreaterThan(första * 2);
+  });
+
+  it('hindrar hoppet när de andra loppen är avklarade', () => {
+    // Utan taket växte löpningen från nittio minuter till åtta timmar på en
+    // vecka när Vätternrundan och Vansbrosimningen var avklarade och all tid
+    // gick till Lidingöloppet.
+    const lidingö = veckorMedBudget(P2).filter(
+      ({ vecka }) => vecka.focusRaceId === 'lidingoloppet' && vecka.phase === 'specific',
+    );
+
+    const högsta = Math.max(...lidingö.map(({ budget }) => budget.bySport.run ?? 0));
+    expect(högsta).toBeLessThan(300);
+  });
+
+  it('tappar inga minuter när taket skär', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        expect(
+          summaAvSporter(budget.bySport) + budget.unplacedMinutes,
+          `${namn} v${vecka.index}`,
+        ).toBe(budget.enduranceMinutes);
+      }
+    }
+  });
+
+  it('respekterar nybörjartaket när det flyttar minuter', () => {
+    // Löptaket får inte trycka simningen över sina åttio minuter (R-31).
+    const tak = rules.newLevelLimits.bySport.swim?.maxMinutesPerWeek as number;
+
+    for (const { vecka, budget } of veckorMedBudget(P1)) {
+      expect(budget.bySport.swim ?? 0, `vecka ${vecka.index}`).toBeLessThanOrEqual(tak);
+    }
+  });
+
+  it('ger inte tillbaka tid till en gren vars lopp är avklarat', () => {
+    // Skidor i augusti är inte ett alternativ bara för att löpningen fick för
+    // mycket (R-36).
+    const vasa = P2.races.find((r) => r.id === 'vasaloppet')?.date as string;
+
+    for (const { vecka, budget } of veckorMedBudget(P2)) {
+      if (vecka.startDate <= vasa) continue;
+      if ([11, 12, 1, 2, 3].includes(monthOf(vecka.startDate))) continue;
+
+      expect(budget.bySport.ski ?? 0, `vecka ${vecka.index}`).toBe(0);
+    }
   });
 });

@@ -261,5 +261,10 @@
     "_rule": "R-34",
     "note": "Snittfart på ett lugnt träningspass, använd bara för att räkna om tid till kilometer i volymriktmärket. Aldrig för att planera ett pass. Cykelns 25 km/h är lägre än Vätternrundans loppfart på 28,6 eftersom loppet körs i klunga.",
     "bike": 25
+  },
+  "afterRace": {
+    "_rule": "R-36",
+    "note": "Träningen ska fokusera på nästa kommande lopp. När ett lopp är avklarat ska dess gren inte längre tränas — tiden går till nästa lopps gren i stället. Undantaget är grenens egen säsong: är det fortfarande vinter när Vasaloppet är avklarat kan skidor användas som långpass för konditionsträning, men inte som huvudgren.",
+    "keepShareInOwnSeason": 0.1
   }
 }

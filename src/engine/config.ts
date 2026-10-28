@@ -234,6 +234,12 @@ export const rulesSchema = z.object({
     openWaterMonths: z.array(z.number().int().min(1).max(12)).min(1),
     swimDrylandBeforeMonth: z.number().int().min(1).max(12),
   }),
+  /** R-36: vad som händer med en gren vars lopp är avklarat. */
+  afterRace: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    keepShareInOwnSeason: share,
+  }),
   /** R-33: grenar som behåller teknikpass under återhämtningen. */
   recovery: z.object({
     _rule: z.string(),

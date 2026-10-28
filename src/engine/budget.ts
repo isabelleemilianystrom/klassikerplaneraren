@@ -60,8 +60,33 @@ export function sportsInPlan(input: PlanInput): TrainedSport[] {
 export function weekBudgets(input: PlanInput): WeekBudget[] {
   const races = placeRaces(input);
   const sports = sportsInPlan(input);
+  const weeks = buildWeeks(input);
 
-  return buildWeeks(input).map((week) => weekBudget(week, input, races, sports));
+  // Veckorna byggs i ordning, inte oberoende av varandra: R-14 begränsar hur
+  // mycket löptiden får öka från en vecka till nästa, och det går inte att
+  // avgöra utan att veta vad veckan innan gav.
+  const resultat: WeekBudget[] = [];
+
+  // Referensen är senaste *normala* veckans löptid. Avlastning, nedtrappning,
+  // återhämtning och loppveckor hoppas över: de är medvetet lätta och säger
+  // inget om vad kroppen är van vid. Utan det skulle en återhämtningsvecka
+  // efter ett lopp låsa löpningen på en nivå den inte kan växa ifrån.
+  let runReference: number | null = null;
+
+  for (const week of weeks) {
+    const budget = weekBudget(week, input, races, sports, runReference);
+    resultat.push(budget);
+
+    const normalVecka =
+      (week.phase === 'base' || week.phase === 'specific') &&
+      !week.isDeload &&
+      week.raceIds.length === 0 &&
+      budget.enduranceMinutes > 0;
+
+    if (normalVecka) runReference = budget.bySport.run ?? runReference;
+  }
+
+  return resultat;
 }
 
 function weekBudget(
@@ -69,6 +94,7 @@ function weekBudget(
   input: PlanInput,
   races: readonly PlacedRace[],
   sports: readonly TrainedSport[],
+  runReference: number | null,
 ): WeekBudget {
   const phaseMinutes = phaseBudget(week, input, races);
 
@@ -85,7 +111,13 @@ function weekBudget(
   const strengthMinutes = Math.min(kvar, strengthBudget(week.phase));
   const enduranceMinutes = kvar - strengthMinutes;
 
-  const bySport = splitBetweenSports(enduranceMinutes, week, input, sports);
+  const bySport = capRunVolume(
+    splitBetweenSports(enduranceMinutes, week, input, sports, races),
+    runReference,
+    week,
+    input,
+    finishedSports(week, races),
+  );
   const placerat = Object.values(bySport).reduce((a, b) => a + b, 0);
 
   return {
@@ -97,6 +129,76 @@ function weekBudget(
     bySport,
     unplacedMinutes: enduranceMinutes - placerat,
   };
+}
+
+/**
+ * Löptiden begränsad till tio procents ökning från veckan innan (R-14).
+ *
+ * Löpning sliter betydligt mer på kroppen än skidor och cykel, och en vecka
+ * som plötsligt dubblar löptiden är en skaderisk. Taket blev akut när R-36
+ * infördes: när de andra loppen är avklarade går deras tid till det sista
+ * loppets gren, och är det Lidingöloppet växte löpningen från nittio minuter
+ * till åtta timmar på en vecka.
+ *
+ * Jämförelsen görs mot senaste **normala** veckan, inte mot veckan precis
+ * innan. R-14 undantar veckor efter avlastning, och skälet är att
+ * avlastningsveckan är medvetet lätt — men undantaget får inte betyda att
+ * taket släpps helt, för då kan löptiden femdubblas veckan efter en
+ * avlastning. Att hoppa över de lätta veckorna i jämförelsen ger regelns
+ * avsikt utan hålet.
+ *
+ * De minuter taket skär bort går till de andra grenarna, i proportion till
+ * deras tid. Veckans totala tid är oförändrad (R-29).
+ */
+function capRunVolume(
+  bySport: Partial<Record<TrainedSport, number>>,
+  runReference: number | null,
+  week: WeekSkeleton,
+  input: PlanInput,
+  finished: ReadonlySet<TrainedSport>,
+): Partial<Record<TrainedSport, number>> {
+  const nu = bySport.run;
+  if (nu === undefined || runReference === null || runReference === 0) return bySport;
+
+  // Loppveckan har sin egen logik: där styr R-25, inte en ökningstakt.
+  if (week.raceIds.length > 0) return bySport;
+
+  const tak = Math.floor(runReference * (1 + rules.runVolume.maxWeeklyIncrease));
+  if (nu <= tak) return bySport;
+
+  const resultat = { ...bySport, run: tak };
+  let kvar = nu - tak;
+
+  // De frigjorda minuterna till de andra grenarna, en i taget till den som
+  // har minst tid. Två tak gäller fortfarande: nybörjartaket i R-31 får inte
+  // överskridas, och en gren vars lopp är avklarat ska inte få tillbaka tid
+  // genom bakvägen (R-36) — skidor i augusti är inte ett alternativ bara för
+  // att löpningen fick för mycket.
+  const taketFör = (sport: TrainedSport): number => {
+    if (finished.has(sport) && !isOwnSeason(sport, monthOf(week.startDate))) return 0;
+
+    const gräns = newLevelLimit(sport, input);
+    if (gräns === null) return Number.POSITIVE_INFINITY;
+    return Math.max(0, gräns.maxMinutesPerWeek - raceMinutesInSport(week, sport));
+  };
+
+  while (kvar > 0) {
+    const medPlats = (Object.keys(resultat) as TrainedSport[]).filter(
+      (sport) => sport !== 'run' && (resultat[sport] ?? 0) < taketFör(sport),
+    );
+    if (medPlats.length === 0) break;
+
+    const minst = medPlats.reduce((a, b) => ((resultat[b] ?? 0) < (resultat[a] ?? 0) ? b : a));
+    resultat[minst] = (resultat[minst] ?? 0) + 1;
+    kvar -= 1;
+  }
+
+  // Finns det minuter kvar har varje annan gren slagit i sitt tak. Då får
+  // löpningen behålla dem — hellre det än att veckan blir kortare än
+  // användaren valt. Löptaket är en riktlinje, inte ett förbud.
+  if (kvar > 0) resultat.run = tak + kvar;
+
+  return resultat;
 }
 
 /**
@@ -248,6 +350,7 @@ function splitBetweenSports(
   week: WeekSkeleton,
   input: PlanInput,
   sports: readonly TrainedSport[],
+  races: readonly PlacedRace[],
 ): Partial<Record<TrainedSport, number>> {
   if (sports.length === 0 || minutes === 0) {
     return Object.fromEntries(sports.map((sport) => [sport, 0]));
@@ -255,10 +358,13 @@ function splitBetweenSports(
 
   const månad = monthOf(week.startDate);
 
-  const andelar =
+  const grund =
     week.phase === 'specific' || week.phase === 'taper'
       ? specificShares(week, sports, månad, input.levels)
       : seasonSharesWithNewBonus(månad, input, sports);
+
+  // R-36: en gren vars lopp är avklarat lämnar plats åt nästa lopps gren.
+  const andelar = applyFinishedRaces(grund, sports, week, races, månad);
 
   return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
 }
@@ -351,6 +457,96 @@ function weightFor(
 
   const sänkt = rules.seasonWeights.experiencedWeightOverride[sport];
   return sänkt ?? seasonWeight;
+}
+
+/**
+ * Månaderna där grenen har sin högsta säsongsvikt — grenens egen säsong.
+ *
+ * För skidor är det vintern och för cykel sommaren. Det är de månader grenen
+ * faktiskt går att utöva där man bor, och därmed de månader den kan användas
+ * som konditionsträning även efter att dess lopp är avklarat (R-36).
+ */
+function isOwnSeason(sport: TrainedSport, month: number): boolean {
+  const vikter = rules.seasonWeights.seasons.map((säsong) => säsong.weights[sport]);
+  const högsta = Math.max(...vikter);
+
+  const säsong = rules.seasonWeights.seasons.find((kandidat) =>
+    kandidat.months.includes(month),
+  );
+  if (säsong === undefined) return false;
+
+  return säsong.weights[sport] >= högsta;
+}
+
+/**
+ * Vikterna justerade för lopp som redan är avklarade (R-36).
+ *
+ * Träningen ska fokusera på nästa kommande lopp. Är Vasaloppet avklarat ska
+ * skidorna inte längre vara huvudgren — tiden går till cykeln inför
+ * Vätternrundan. Men är det fortfarande vinter där man bor kan skidor
+ * användas som långpass för konditionsträning, och då behåller grenen en liten
+ * andel. Utanför sin egen säsong får den ingenting.
+ *
+ * Den frigjorda tiden går till veckans fokusgren, inte ut över alla grenar.
+ * Annars hamnade den hos löpningen, som har jämn vikt året om — och ett halvår
+ * före Lidingöloppet är det inte där tiden gör nytta.
+ */
+/** Grenarna vars lopp redan är avklarade när veckan börjar (R-36). */
+function finishedSports(
+  week: WeekSkeleton,
+  races: readonly PlacedRace[],
+): ReadonlySet<TrainedSport> {
+  return new Set(
+    races
+      .filter((race) => race.date < week.startDate)
+      .map((race) => raceById(race.id).sport as TrainedSport),
+  );
+}
+
+function applyFinishedRaces(
+  shares: readonly number[],
+  sports: readonly TrainedSport[],
+  week: WeekSkeleton,
+  races: readonly PlacedRace[],
+  month: number,
+): number[] {
+  const klaraGrenar = finishedSports(week, races);
+  if (klaraGrenar.size === 0) return [...shares];
+
+  const fokus = week.focusRaceId === null ? null : raceById(week.focusRaceId).sport;
+
+  const { keepShareInOwnSeason } = rules.afterRace;
+  const resultat = [...shares];
+  let frigjort = 0;
+
+  for (const [i, sport] of sports.entries()) {
+    // Fokusgrenen rörs aldrig: är veckan en uppbyggnad mot ett lopp är den
+    // grenen det veckan handlar om, oavsett vad som varit.
+    if (!klaraGrenar.has(sport) || sport === fokus) continue;
+
+    const behåll = isOwnSeason(sport, month) ? keepShareInOwnSeason : 0;
+    const nu = resultat[i] as number;
+    if (nu <= behåll) continue;
+
+    frigjort += nu - behåll;
+    resultat[i] = behåll;
+  }
+
+  if (frigjort === 0) return resultat;
+
+  // Den frigjorda tiden till fokusgrenen. Saknar veckan en — det kan hända i
+  // en plan vars sista lopp är avklarat — fördelas den på de grenar som finns
+  // kvar, i proportion till deras vikt, så att inget försvinner.
+  const fokusIndex = fokus === null ? -1 : sports.indexOf(fokus as TrainedSport);
+  if (fokusIndex !== -1) {
+    resultat[fokusIndex] = (resultat[fokusIndex] as number) + frigjort;
+    return resultat;
+  }
+
+  const kvarvarande = resultat.reduce((a, b) => a + b, 0);
+  if (kvarvarande === 0) return sports.map(() => 1 / sports.length);
+
+  return resultat.map((andel) => andel + (frigjort * andel) / kvarvarande);
 }
 
 /**
