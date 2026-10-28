@@ -13,6 +13,7 @@ import { raceById, rules } from '../src/engine/config.ts';
 import { weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
 import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
+import { midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
 import type { PlanInput, Zone } from '../src/engine/types.ts';
 import { PROFILES } from '../tests/profiles.ts';
 
@@ -158,6 +159,12 @@ function main(): void {
 
     const checks = volumeChecks(input, planer);
 
+    const varningar = midProgrammeWarnings(midProgrammeStarts(input, planer));
+    const varningsrader =
+      varningar.length === 0
+        ? []
+        : ['Varningar', '---------', '', ...varningar.map((v) => `  ${v}`), ''];
+
     const riktmärken =
       checks.length === 0
         ? []
@@ -178,6 +185,7 @@ function main(): void {
 
     const text = [
       ...beskrivProfil(namn, input),
+      ...varningsrader,
       ...riktmärken,
       ...skrivÖversikt(input, planer),
       'Vecka för vecka',

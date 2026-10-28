@@ -294,6 +294,24 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 - **R-26** (tillagd 2026-10-27) Spänner loppen över mer än tolv månader: "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader." Planen skapas ändå. Kontrollen är det som gör planen till en klassikerplan och inte bara ett träningsprogram.
 - **R-34** (tillagd 2026-10-28) Planen når inte ett lopps volymriktmärke: "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor." Tonen är medveten: varningen betyder "det här når inte riktmärket", aldrig "du tränar för lite".
+- **R-35** (tillagd 2026-10-28) **Mindre än tio veckor till första loppet.** Varningen lyder:
+  "Det är {weeks} till {race}. Ett helt program börjar med en grundperiod på flera månader, och
+  den hinner du inte – du hoppar in mitt i programmet, i den loppspecifika delen. Planen är lagd
+  för att du ska klara distansen, inte för att du ska slå en tid." Saknar planen grundperiod helt
+  läggs meningen "Den här planen innehåller ingen grundperiod alls." till.
+
+  Gränsen på tio veckor är inte godtycklig: det är **hela uppbyggnaden för Vasaloppet och
+  Vätternrundan** — två veckors nedtrappning plus åtta veckors specifik fas. Startar man senare än
+  så finns det ingen grundperiod kvar att göra, och planen börjar inne i den specifika fasen.
+  Användaren ska veta det, inte upptäcka det när programmet känns ovanligt tungt från vecka ett.
+
+  Bara **det första loppet** kontrolleras. De senare loppen har hela planen framför sig och bygger
+  upp sig i tur och ordning; att varna för dem vore att varna för något som inte är ett problem.
+
+  Gränsen och texterna ligger i `warnings.midProgramme` i `config/rules.json`. Varningen överlappar
+  med R-22, som går vid åtta veckor: den som startar sex veckor före loppet får båda. De säger olika
+  saker — R-35 vad som strukturellt händer med programmet, R-22 vad man bör sikta på — men om de
+  känns övertaliga i gränssnittet är R-22 den som bör slås samman hit.
 
 **Sjukdom och missade pass.** Hanteras i v1.0 bara som fast text (avsnitt 8), inte som logik i motorn.
 
@@ -542,6 +560,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Alla sju veckodagar som långpassdag och som vilodag: planen håller samtliga regler i varje kombination (tillagt 2026-10-28)
 - Plan med bara Vansbrosimningen och nivå Ny: veckan stannar på 80 minuter och resten redovisas som oplacerad tid (R-31) (tillagt 2026-10-28)
 - Vårstart i maj med Vätternrundan i juni: planen når inte 1000 km och varningen i R-34 visas (tillagt 2026-10-28)
+- Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**

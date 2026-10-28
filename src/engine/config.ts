@@ -257,6 +257,13 @@ export const rulesSchema = z.object({
     skiTechnique: z.object({ text: z.string().min(1) }),
     outsideClassicWindow: z.object({ text: z.string().min(1) }),
     volumeMilestone: z.object({ _rule: z.string(), text: z.string().min(1) }),
+    midProgramme: z.object({
+      _rule: z.string(),
+      weeksThreshold: z.number().int().positive(),
+      note: z.string(),
+      text: z.string().min(1),
+      noBaseSuffix: z.string().min(1),
+    }),
   }),
 });
 

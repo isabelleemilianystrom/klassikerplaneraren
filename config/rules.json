@@ -240,6 +240,13 @@
     "volumeMilestone": {
       "_rule": "R-34",
       "text": "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor."
+    },
+    "midProgramme": {
+      "_rule": "R-35",
+      "weeksThreshold": 10,
+      "note": "Tio veckor är hela uppbyggnaden för Vasaloppet och Vätternrundan: två veckors nedtrappning plus åtta veckors specifik fas. Startar man senare än så finns det ingen grundperiod kvar att göra, och planen börjar mitt i den loppspecifika delen.",
+      "text": "Det är {weeks} till {race}. Ett helt program börjar med en grundperiod på flera månader, och den hinner du inte – du hoppar in mitt i programmet, i den loppspecifika delen. Planen är lagd för att du ska klara distansen, inte för att du ska slå en tid.",
+      "noBaseSuffix": " Den här planen innehåller ingen grundperiod alls."
     }
   },
   "recovery": {
