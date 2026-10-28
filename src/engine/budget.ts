@@ -189,20 +189,36 @@ function specificShares(week: WeekSkeleton, sports: readonly TrainedSport[]): nu
 /**
  * Bas och återhämtning: jämnt mellan sporterna, mer till den som är ny (R-09).
  *
- * R-09 säger "+10 procentenheter för sporter där nivån är Ny". Är flera sporter
- * nya överskrider summan 100 procent — fyra sporter med två nya ger
- * 35 + 35 + 25 + 25 = 120. Andelarna normeras därför till 100 procent efteråt.
- * Den nya sporten får då mer tid än de övriga, men inte nödvändigtvis hela tio
- * procentenheter mer. Se den öppna frågan i kravspecens avsnitt 3.
+ * De tio procentenheterna läggs på nybörjarsportens andel och tas från de
+ * sporter där nivån är Van eller Erfaren. Att kunna cykla hjälper inte den som
+ * inte kan simma, så tiden ska flyttas dit tekniken saknas.
+ *
+ * Ingen sport får pressas under halva den jämna andelen. Är nästan alla
+ * sporter nya finns det inte tio procentenheter att hämta, och då krymper
+ * bonusen till det som går att ta. Golvet är det som gör att summan alltid
+ * blir exakt 100 procent utan att någon sport blir utan tid.
  */
 function evenSharesWithNewBonus(input: PlanInput, sports: readonly TrainedSport[]): number[] {
   const jämnt = 1 / sports.length;
-  const bonus = rules.sportSplit.base.newLevelBonus;
+  const nya = sports.filter((sport) => isNew(input.levels[sport]));
+  const vana = sports.length - nya.length;
 
-  const råa = sports.map((sport) => jämnt + (isNew(input.levels[sport]) ? bonus : 0));
-  const summa = råa.reduce((a, b) => a + b, 0);
+  // Ingen är ny, eller alla är nya: det finns inget att flytta tid mellan.
+  if (nya.length === 0 || vana === 0) {
+    return sports.map(() => jämnt);
+  }
 
-  return råa.map((andel) => andel / summa);
+  const { newLevelBonus, minShareOfEvenSplit } = rules.sportSplit.base;
+  const golv = jämnt * minShareOfEvenSplit;
+
+  const önskat = newLevelBonus * nya.length;
+  const möjligt = vana * (jämnt - golv);
+  const flyttat = Math.min(önskat, möjligt);
+
+  const tillNy = jämnt + flyttat / nya.length;
+  const tillVan = jämnt - flyttat / vana;
+
+  return sports.map((sport) => (isNew(input.levels[sport]) ? tillNy : tillVan));
 }
 
 function isNew(level: Level | undefined): boolean {

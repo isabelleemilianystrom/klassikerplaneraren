@@ -180,7 +180,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 **Fördelning mellan sporter**
 
 - **R-08** Specifik fas: 55 % till loppets sport, resten fördelat jämnt mellan övriga sporter i planen. *(utökad 2026-10-27)* Innehåller planen bara en sport går 100 % dit. Innehåller den två sporter går 65 % till loppets sport och 35 % till den andra. Andelen får aldrig lämnas ofördelad — profil P4 har bara ett lopp, och 45 % hade annars ingenstans att ta vägen.
-- **R-09** Bas: jämn fördelning mellan sporterna i planen, med +10 procentenheter för sporter där nivån är Ny.
+- **R-09** Bas: jämn fördelning mellan sporterna i planen, med +10 procentenheter för sporter där nivån är Ny. *(preciserad 2026-10-28)* De tio procentenheterna **tas från de sporter där nivån är Van eller Erfaren** — att kunna cykla hjälper inte den som inte kan simma, så tiden flyttas dit tekniken saknas. Ingen sport får pressas under **halva den jämna andelen**; är nästan alla sporter nya finns det inte tio procentenheter att hämta, och då krymper bonusen till det som går att ta. Golvet är det som gör att andelarna alltid summerar till 100 procent utan att någon sport blir utan tid. Siffrorna ligger i `config/rules.json` som `newLevelBonus` och `minShareOfEvenSplit`.
 - **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`.
 
 **Pass**

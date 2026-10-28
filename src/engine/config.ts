@@ -87,7 +87,7 @@ export const rulesSchema = z.object({
       raceSportShareWhenTwoSports: share,
       raceSportShareWhenOneSport: share,
     }),
-    base: z.object({ newLevelBonus: share }),
+    base: z.object({ newLevelBonus: share, minShareOfEvenSplit: share }),
   }),
   strength: z.object({
     _rule: z.string(),

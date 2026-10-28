@@ -43,7 +43,8 @@
       "raceSportShareWhenOneSport": 1.0
     },
     "base": {
-      "newLevelBonus": 0.1
+      "newLevelBonus": 0.1,
+      "minShareOfEvenSplit": 0.5
     }
   },
 

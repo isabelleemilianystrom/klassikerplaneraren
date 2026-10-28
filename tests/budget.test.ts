@@ -265,6 +265,78 @@ describe('R-09: fördelning i basfasen', () => {
     expect(Math.max(...minuter) - Math.min(...minuter)).toBeLessThanOrEqual(1);
   });
 
+  it('ger nybörjarsporten hela bonusen, tagen från de vana', () => {
+    // P1: fyra sporter, två nya. Jämnt är 25 procent, så de nya ska ha 35 och
+    // de vana 15.
+    const bas = veckorMedBudget(P1).find(
+      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
+    );
+    const minuter = bas?.budget.enduranceMinutes as number;
+    const { ski, swim, bike, run } = bas?.budget.bySport as Record<TrainedSport, number>;
+
+    expect(ski / minuter).toBeCloseTo(0.35, 2);
+    expect(swim / minuter).toBeCloseTo(0.35, 2);
+    expect(bike / minuter).toBeCloseTo(0.15, 2);
+    expect(run / minuter).toBeCloseTo(0.15, 2);
+  });
+
+  it('krymper bonusen när det inte finns tio procentenheter att hämta', () => {
+    // Tre av fyra sporter nya. Full bonus hade krävt 30 procentenheter från en
+    // enda van sport, som bara har 25 att ge. Golvet på halva den jämna andelen
+    // gör att den behåller 12,5 procent och bonusen krymper till det som finns.
+    const treNya: PlanInput = {
+      ...P1,
+      levels: { ski: 'new', swim: 'new', run: 'new', bike: 'experienced' },
+    };
+
+    const bas = veckorMedBudget(treNya).find(
+      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
+    );
+    const minuter = bas?.budget.enduranceMinutes as number;
+    const { bike } = bas?.budget.bySport as Record<TrainedSport, number>;
+
+    expect(bike / minuter).toBeCloseTo(0.125, 2);
+    expect(summaAvSporter(bas?.budget.bySport as Record<string, number>)).toBe(minuter);
+  });
+
+  it('fördelar jämnt när alla sporter är nya', () => {
+    const allaNya: PlanInput = {
+      ...P1,
+      levels: { ski: 'new', swim: 'new', bike: 'new', run: 'new' },
+    };
+
+    const bas = veckorMedBudget(allaNya).find(
+      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
+    );
+    const minuter = Object.values(bas?.budget.bySport as Record<string, number>);
+    expect(Math.max(...minuter) - Math.min(...minuter)).toBeLessThanOrEqual(1);
+  });
+
+  it('pressar aldrig en sport under halva den jämna andelen', () => {
+    // Golvet ska hålla för varje kombination av nivåer, inte bara de prövade.
+    const nivåer: ('new' | 'experienced')[] = ['new', 'experienced'];
+    const sporter: TrainedSport[] = ['ski', 'bike', 'swim', 'run'];
+
+    for (let mask = 0; mask < 16; mask += 1) {
+      const levels = Object.fromEntries(
+        sporter.map((sport, i) => [sport, nivåer[(mask >> i) & 1] as 'new' | 'experienced']),
+      );
+      const input: PlanInput = { ...P1, levels };
+
+      const bas = veckorMedBudget(input).find(
+        ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
+      );
+      const minuter = bas?.budget.enduranceMinutes as number;
+      const golv = (minuter / 4) * rules.sportSplit.base.minShareOfEvenSplit;
+
+      for (const sport of sporter) {
+        const fick = bas?.budget.bySport[sport] as number;
+        // En minut i marginal för avrundningen.
+        expect(fick, `mask ${mask}: ${sport}`).toBeGreaterThanOrEqual(Math.floor(golv) - 1);
+      }
+    }
+  });
+
   it('ger alla sporter i planen tid i basfasen', () => {
     // Lärdomen från v0: en fjärde gren som aldrig fick tid tränades aldrig.
     // Teknikgrenar går inte att komma ikapp på slutet.
