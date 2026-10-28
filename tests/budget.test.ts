@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sportsInPlan, weekBudgets } from '../src/engine/budget.ts';
 import { raceById, rules } from '../src/engine/config.ts';
+import { monthOf } from '../src/engine/dates.ts';
 import { buildWeeks } from '../src/engine/weeks.ts';
 import type { PlanInput, TrainedSport } from '../src/engine/types.ts';
 import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
@@ -10,6 +11,13 @@ function veckorMedBudget(input: PlanInput) {
   const veckor = buildWeeks(input);
   const budgetar = weekBudgets(input);
   return veckor.map((vecka, i) => ({ vecka, budget: budgetar[i] as (typeof budgetar)[number] }));
+}
+
+/** Säsongens vikter för en månad, enligt R-32. */
+function säsongsvikter(månad: number) {
+  const säsong = rules.seasonWeights.seasons.find((s) => s.months.includes(månad));
+  if (säsong === undefined) throw new Error("månad " + månad + " saknar säsong");
+  return säsong.weights;
 }
 
 function summaAvSporter(bySport: Partial<Record<TrainedSport, number>>): number {
@@ -224,20 +232,23 @@ describe('R-08: fördelning i specifik fas', () => {
     }
   });
 
-  it('fördelar resten jämnt mellan de övriga sporterna', () => {
+  it('fördelar resten mellan de övriga sporterna efter säsongen (R-32)', () => {
     const specifik = veckorMedBudget(P2).find(
       ({ vecka, budget }) =>
         vecka.phase === 'specific' && vecka.focusRaceId === 'vasaloppet' && budget.raceMinutes === 0,
     );
 
-    const övriga = [
-      specifik?.budget.bySport.bike as number,
-      specifik?.budget.bySport.swim as number,
-      specifik?.budget.bySport.run as number,
-    ];
+    const månad = monthOf(specifik?.vecka.startDate as string);
+    const vikter = säsongsvikter(månad);
+    const kvar =
+      (specifik?.budget.enduranceMinutes as number) - (specifik?.budget.bySport.ski as number);
+    const summaÖvriga = vikter.bike + vikter.swim + vikter.run;
 
-    // Högst en minut mellan dem — resten är avrundning.
-    expect(Math.max(...övriga) - Math.min(...övriga)).toBeLessThanOrEqual(1);
+    for (const sport of ['bike', 'swim', 'run'] as const) {
+      const förväntat = (kvar * vikter[sport]) / summaÖvriga;
+      // Två minuter i marginal för avrundningen.
+      expect(specifik?.budget.bySport[sport] as number, sport).toBeCloseTo(förväntat, -0.5);
+    }
   });
 });
 
@@ -255,29 +266,42 @@ describe('R-09: fördelning i basfasen', () => {
     expect(swim).toBeGreaterThan(run);
   });
 
-  it('fördelar jämnt när ingen sport är ny', () => {
-    // P2 är erfaren i allt.
-    const bas = veckorMedBudget(P2).find(
-      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
-    );
-    const minuter = Object.values(bas?.budget.bySport as Record<string, number>);
+  it('följer säsongens vikter när ingen sport är ny (R-32)', () => {
+    // P2 är erfaren i allt, så ingen bonus flyttar tid.
+    for (const { vecka, budget } of veckorMedBudget(P2)) {
+      if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
 
-    expect(Math.max(...minuter) - Math.min(...minuter)).toBeLessThanOrEqual(1);
+      const vikter = säsongsvikter(monthOf(vecka.startDate));
+      for (const sport of ['ski', 'bike', 'swim', 'run'] as const) {
+        const förväntat = budget.enduranceMinutes * vikter[sport];
+        expect(budget.bySport[sport] as number, vecka.index + " " + sport).toBeCloseTo(
+          förväntat,
+          -0.5,
+        );
+      }
+    }
   });
 
-  it('ger nybörjarsporten hela bonusen, tagen från de vana', () => {
-    // P1: fyra sporter, två nya. Jämnt är 25 procent, så de nya ska ha 35 och
-    // de vana 15.
-    const bas = veckorMedBudget(P1).find(
-      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
-    );
-    const minuter = bas?.budget.enduranceMinutes as number;
-    const { ski, swim, bike, run } = bas?.budget.bySport as Record<TrainedSport, number>;
+  it('ger nybörjarsporten mer än säsongens vikt, tagen från de vana', () => {
+    // P1 är ny i skidor och simning. Skidorna ska få mer än säsongen ger och
+    // de vana sporterna mindre. Simningen har dessutom ett tak i R-31 som
+    // kan bita först, och prövas därför i sitt eget test.
+    for (const { vecka, budget } of veckorMedBudget(P1)) {
+      if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
 
-    expect(ski / minuter).toBeCloseTo(0.35, 2);
-    expect(swim / minuter).toBeCloseTo(0.35, 2);
-    expect(bike / minuter).toBeCloseTo(0.15, 2);
-    expect(run / minuter).toBeCloseTo(0.15, 2);
+      const vikter = säsongsvikter(monthOf(vecka.startDate));
+      const minuter = budget.enduranceMinutes;
+
+      expect(budget.bySport.ski as number, "v" + vecka.index).toBeGreaterThan(
+        minuter * vikter.ski,
+      );
+      expect(budget.bySport.bike as number, "v" + vecka.index).toBeLessThan(
+        minuter * vikter.bike + 1,
+      );
+      expect(budget.bySport.run as number, "v" + vecka.index).toBeLessThan(
+        minuter * vikter.run + 1,
+      );
+    }
   });
 
   it('krymper bonusen när det inte finns tio procentenheter att hämta', () => {
@@ -299,7 +323,8 @@ describe('R-09: fördelning i basfasen', () => {
     expect(summaAvSporter(bas?.budget.bySport as Record<string, number>)).toBe(minuter);
   });
 
-  it('fördelar jämnt när alla sporter är nya', () => {
+  it('följer säsongens vikter när alla sporter är nya', () => {
+    // Är alla nya finns ingen att flytta tid ifrån, så säsongen bestämmer.
     const allaNya: PlanInput = {
       ...P1,
       levels: { ski: 'new', swim: 'new', bike: 'new', run: 'new' },
@@ -308,8 +333,12 @@ describe('R-09: fördelning i basfasen', () => {
     const bas = veckorMedBudget(allaNya).find(
       ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
     );
-    const minuter = Object.values(bas?.budget.bySport as Record<string, number>);
-    expect(Math.max(...minuter) - Math.min(...minuter)).toBeLessThanOrEqual(1);
+    const vikter = säsongsvikter(monthOf(bas?.vecka.startDate as string));
+    const minuter = bas?.budget.enduranceMinutes as number;
+
+    // Skidor och cykel har inget tak i R-31 och följer vikterna rakt.
+    expect(bas?.budget.bySport.ski as number).toBeCloseTo(minuter * vikter.ski, -0.5);
+    expect(bas?.budget.bySport.bike as number).toBeCloseTo(minuter * vikter.bike, -0.5);
   });
 
   it('pressar aldrig en sport under halva den jämna andelen', () => {
@@ -510,5 +539,105 @@ describe('R-31: nybörjartak per sport', () => {
         `vecka ${vecka.index}`,
       ).toBe(budget.enduranceMinutes);
     }
+  });
+});
+
+describe('R-32: säsongen styr fördelningen', () => {
+  it('ger skidorna mest på vintern och cykeln mest på sommaren', () => {
+    // P2 är erfaren i allt, så bara säsongen skiljer veckorna.
+    const bas = veckorMedBudget(P2).filter(
+      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
+    );
+
+    const vinter = bas.filter(({ vecka }) => [11, 12, 1, 2, 3].includes(monthOf(vecka.startDate)));
+    const sommar = bas.filter(({ vecka }) => [5, 6, 7, 8, 9].includes(monthOf(vecka.startDate)));
+
+    expect(vinter.length).toBeGreaterThan(0);
+    for (const { vecka, budget } of vinter) {
+      expect(budget.bySport.ski as number, `vecka ${vecka.index}`).toBeGreaterThan(
+        budget.bySport.bike as number,
+      );
+    }
+    for (const { vecka, budget } of sommar) {
+      expect(budget.bySport.bike as number, `vecka ${vecka.index}`).toBeGreaterThan(
+        budget.bySport.ski as number,
+      );
+    }
+  });
+
+  it('håller löpningen nere året om', () => {
+    // Löpningen sliter mer än skidor och cykel och får därför aldrig mest tid
+    // i en basvecka — utom när löpningen är loppets egen sport.
+    for (const { vecka, budget } of veckorMedBudget(P2)) {
+      if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
+
+      const mest = Math.max(
+        budget.bySport.ski as number,
+        budget.bySport.bike as number,
+        budget.bySport.swim as number,
+      );
+      expect(budget.bySport.run as number, `vecka ${vecka.index}`).toBeLessThanOrEqual(mest);
+    }
+  });
+
+  it('lägger underhållstiden i ett löparblock på cykeln, inte på skidorna', () => {
+    // Lidingöloppets block ligger i augusti. Då ska de 45 procent som inte går
+    // till löpningen mest gå till cykeln.
+    const lidingö = veckorMedBudget(P2).find(
+      ({ vecka, budget }) =>
+        vecka.phase === 'specific' &&
+        vecka.focusRaceId === 'lidingoloppet' &&
+        budget.enduranceMinutes > 0 &&
+        !vecka.isDeload,
+    );
+
+    expect(monthOf(lidingö?.vecka.startDate as string)).toBeGreaterThanOrEqual(7);
+    expect(lidingö?.budget.bySport.bike as number).toBeGreaterThan(
+      lidingö?.budget.bySport.ski as number,
+    );
+  });
+
+  it('ger alla sporter tid i varje vecka, också den som säsongen tonar ner', () => {
+    // Man behöver inte fokusera på allt samtidigt, men ingen gren får tappas
+    // helt — teknikgrenar går inte att komma ikapp på slutet.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      const sporter = sportsInPlan(profil);
+      if (sporter.length < 2) continue;
+
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        if (budget.enduranceMinutes === 0) continue;
+        // Loppveckan är undantaget: där kan R-31 nolla loppets egen sport,
+        // eftersom loppet och öppningspasset redan är veckans tid i den.
+        if (budget.raceMinutes > 0) continue;
+        for (const sport of sporter) {
+          expect(budget.bySport[sport], `${namn} v${vecka.index} ${sport}`).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it('summerar alltid till veckans konditionstid, oavsett säsong', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        expect(
+          summaAvSporter(budget.bySport) + budget.unplacedMinutes,
+          `${namn} v${vecka.index}`,
+        ).toBe(budget.enduranceMinutes);
+      }
+    }
+  });
+
+  it('normerar vikterna när planen inte har alla fyra sporterna', () => {
+    // P5 har bara cykel och simning. Vinterns vikter är 0,15 och 0,15, alltså
+    // lika — andelarna ska då bli hälften var och inte 30 procent av veckan.
+    const vinter = veckorMedBudget(P5).find(
+      ({ vecka, budget }) =>
+        vecka.phase === 'base' &&
+        budget.enduranceMinutes > 0 &&
+        [12, 1, 2].includes(monthOf(vecka.startDate)),
+    );
+
+    const summa = summaAvSporter(vinter?.budget.bySport as Record<string, number>);
+    expect(summa).toBe(vinter?.budget.enduranceMinutes);
   });
 });

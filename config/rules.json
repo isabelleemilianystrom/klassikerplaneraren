@@ -90,6 +90,28 @@
     "minMinutes": 45
   },
 
+  "seasonWeights": {
+    "_rule": "R-32",
+    "note": "Man behöver inte fokusera på alla grenar samtidigt. Vintern är skidornas och sommaren cykelns — det är där de långa passen går att lägga utan att slita ut kroppen, och det är de två längsta loppen. Löpningen hålls nere året om eftersom den sliter mer. Alla tolv månader måste täckas exakt en gång, och vikterna i varje säsong måste summera till 1.",
+    "seasons": [
+      {
+        "name": "winter",
+        "months": [11, 12, 1, 2, 3],
+        "weights": { "ski": 0.5, "bike": 0.15, "swim": 0.15, "run": 0.2 }
+      },
+      {
+        "name": "shoulder",
+        "months": [4, 10],
+        "weights": { "ski": 0.25, "bike": 0.35, "swim": 0.2, "run": 0.2 }
+      },
+      {
+        "name": "summer",
+        "months": [5, 6, 7, 8, 9],
+        "weights": { "ski": 0.1, "bike": 0.5, "swim": 0.2, "run": 0.2 }
+      }
+    ]
+  },
+
   "newLevelLimits": {
     "_rule": "R-31",
     "note": "Nybörjarkurser i simning är en timme i veckan. Ett program som planerar tre simpass för den som knappt kan simma är ett program som inte går att följa. Sporter som inte står här har ingen gräns.",

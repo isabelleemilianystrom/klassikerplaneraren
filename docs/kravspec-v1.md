@@ -186,6 +186,22 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   Loppets tid i sporten och dess öppningspass räknas av från taket. Den som är ny i simning har alltså loppet som veckans simning: inget tröskelpass läggs ovanpå 3 km i Vansbroån.
 
   Minuterna som taket skär bort går till de sporter som har plats kvar (R-29). Har ingen sport plats blir de kvar som `unplacedMinutes`, och veckans faktiska tid blir då lägre än den valda — det ska visas för användaren, inte gömmas. Det händer bara i planer där varje sport har slagit i sitt tak, till exempel en plan med bara Vansbrosimningen för en nybörjare.
+- **R-32** (tillagd 2026-10-28) **Säsongen styr fördelningen mellan grenarna.** Man behöver inte fokusera på alla grenar samtidigt. Vintern är svår att cykla på och är skidornas årstid; sommaren är cykelns. Det är också i de två grenarna de långa passen går att lägga utan att slita ut kroppen, och det är de två längsta loppen — Vasaloppet 90 km och Vätternrundan 315 km — så tid på skidor eller cykel är avgörande. Löpningen hålls nere året om eftersom den sliter betydligt mer.
+
+  Vikterna ligger i `seasonWeights` i `config/rules.json`:
+
+  | Säsong | Månader | Skidor | Cykel | Simning | Löpning |
+  | --- | --- | --- | --- | --- | --- |
+  | Vinter | nov–mar | 50 % | 15 % | 15 % | 20 % |
+  | Mellansäsong | apr, okt | 25 % | 35 % | 20 % | 20 % |
+  | Sommar | maj–sep | 10 % | 50 % | 20 % | 20 % |
+
+  Vikterna gäller där tiden delas mellan flera grenar: basfasen och återhämtningen (R-09), och den del av specifik fas som går till de övriga grenarna (R-08). Loppets egen sport får sina 55 eller 65 procent oavsett säsong — ett cykelblock i maj är ett cykelblock.
+
+  Månaden tas från veckans måndag. Innehåller planen inte alla fyra grenarna normeras vikterna till 100 procent över de som finns. Alla tolv månader måste höra till exakt en säsong och vikterna i varje säsong summera till 1; båda kontrolleras av schemat vid start.
+
+  Nybörjarbonusen i R-09 räknas ovanpå säsongens vikt, inte ovanpå en jämn andel. Tiden tas från varje van gren i proportion till hur mycket utrymme den har **över** golvet — annars kan en gren med låg säsongsvikt tryckas under det.
+
 - **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`.
 
 **Pass**
@@ -438,6 +454,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
 - En sport där nivån är Ny håller sitt veckotak i både minuter och antal pass, loppet och öppningspasset inräknade (R-31) *(tillagd 2026-10-28)*
 - Summan av minuterna per sport plus de oplacerade minuterna är alltid exakt veckans konditionstid (R-29, R-31) *(tillagd 2026-10-28)*
+- Skidorna får mer tid än cykeln i en basvecka november–mars, och cykeln mer än skidorna maj–september (R-32) *(tillagd 2026-10-28)*
+- Varje gren i planen får tid varje vecka utom i loppveckan, också den säsongen tonar ner (R-32) *(tillagd 2026-10-28)*
 - Långpasset ligger på den valda dagen när den är fri (R-13) *(tillagd 2026-10-28)*
 - Reglerna om dagar i rad i R-14 och R-16 håller också över veckogränsen, söndag till måndag *(tillagd 2026-10-28)*
 - Löptiden ökar högst 10 % mellan veckor, utom efter avlastning (R-14)

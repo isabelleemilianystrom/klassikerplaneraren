@@ -8,6 +8,7 @@
  * Rena funktioner, inga sidoeffekter. Alla siffror kommer ur `config/rules.json`.
  */
 import { raceById, rules } from './config.ts';
+import { monthOf } from './dates.ts';
 import type { Level, Phase, PlanInput, TrainedSport } from './types.ts';
 import type { PlacedRace, WeekSkeleton } from './weeks.ts';
 import { buildWeeks, placeRaces } from './weeks.ts';
@@ -252,10 +253,12 @@ function splitBetweenSports(
     return Object.fromEntries(sports.map((sport) => [sport, 0]));
   }
 
+  const månad = monthOf(week.startDate);
+
   const andelar =
     week.phase === 'specific' || week.phase === 'taper'
-      ? specificShares(week, sports)
-      : evenSharesWithNewBonus(input, sports);
+      ? specificShares(week, sports, månad)
+      : seasonSharesWithNewBonus(månad, input, sports);
 
   return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
 }
@@ -264,10 +267,17 @@ function splitBetweenSports(
  * Specifik fas och nedtrappning: loppets sport får huvuddelen (R-08).
  *
  * Andelen beror på hur många sporter planen innehåller. Med en enda sport går
- * allt dit, med två går 65 procent till loppets sport, annars 55. Resten
- * fördelas jämnt mellan de övriga — den får aldrig lämnas ofördelad.
+ * allt dit, med två går 65 procent till loppets sport, annars 55.
+ *
+ * Resten fördelas mellan de övriga efter säsongens vikter (R-32) — den får
+ * aldrig lämnas ofördelad. Ett cykelblock i maj lägger alltså sin
+ * underhållstid på skidor och löpning olika mycket beroende på månad.
  */
-function specificShares(week: WeekSkeleton, sports: readonly TrainedSport[]): number[] {
+function specificShares(
+  week: WeekSkeleton,
+  sports: readonly TrainedSport[],
+  month: number,
+): number[] {
   const { raceSportShare, raceSportShareWhenTwoSports, raceSportShareWhenOneSport } =
     rules.sportSplit.specific;
 
@@ -275,50 +285,89 @@ function specificShares(week: WeekSkeleton, sports: readonly TrainedSport[]): nu
   const index = loppetsSport === null ? -1 : sports.indexOf(loppetsSport as TrainedSport);
 
   // Saknar veckan ett fokuslopp, eller tränas inte loppets sport i planen,
-  // finns ingen sport att vikta mot. Då är en jämn fördelning det rimliga.
-  if (index === -1) return sports.map(() => 1 / sports.length);
+  // finns ingen sport att vikta mot. Då får säsongen bestämma ensam.
+  if (index === -1) return seasonShares(month, sports);
 
   if (sports.length === 1) return [raceSportShareWhenOneSport];
 
   const huvudandel = sports.length === 2 ? raceSportShareWhenTwoSports : raceSportShare;
-  const övriga = (1 - huvudandel) / (sports.length - 1);
 
-  return sports.map((_, i) => (i === index ? huvudandel : övriga));
+  // De övriga delar på resten, viktade efter säsongen.
+  const övriga = sports.filter((_, i) => i !== index);
+  const övrigaAndelar = seasonShares(month, övriga);
+
+  let j = 0;
+  return sports.map((_, i) =>
+    i === index ? huvudandel : (1 - huvudandel) * (övrigaAndelar[j++] as number),
+  );
 }
 
 /**
- * Bas och återhämtning: jämnt mellan sporterna, mer till den som är ny (R-09).
+ * Säsongens vikter för sporterna i planen, normerade till 100 procent (R-32).
+ *
+ * Man behöver inte fokusera på alla grenar samtidigt. Vintern är skidornas och
+ * sommaren cykelns — det är där de långa passen går att lägga utan att slita ut
+ * kroppen, och det är de två längsta loppen.
+ *
+ * Månaden tas från veckans måndag. En vecka som ligger över ett månadsskifte
+ * hör alltså till den månad den börjar i, vilket är enklare att förstå än att
+ * vikta inom veckan.
+ */
+function seasonShares(month: number, sports: readonly TrainedSport[]): number[] {
+  const säsong = rules.seasonWeights.seasons.find((kandidat) =>
+    kandidat.months.includes(month),
+  );
+  if (säsong === undefined) {
+    throw new Error(`Månad ${month} hör inte till någon säsong i config/rules.json`);
+  }
+
+  const råa = sports.map((sport) => säsong.weights[sport]);
+  const summa = råa.reduce((a, b) => a + b, 0);
+
+  // Innehåller planen bara grenar med låg vikt för säsongen blir summan liten,
+  // men andelarna ska ändå bli 100 procent av veckan.
+  return råa.map((vikt) => vikt / summa);
+}
+
+/**
+ * Bas och återhämtning: säsongens vikter, med mer till den som är ny (R-09, R-32).
  *
  * De tio procentenheterna läggs på nybörjarsportens andel och tas från de
  * sporter där nivån är Van eller Erfaren. Att kunna cykla hjälper inte den som
  * inte kan simma, så tiden ska flyttas dit tekniken saknas.
  *
- * Ingen sport får pressas under halva den jämna andelen. Är nästan alla
- * sporter nya finns det inte tio procentenheter att hämta, och då krymper
- * bonusen till det som går att ta. Golvet är det som gör att summan alltid
- * blir exakt 100 procent utan att någon sport blir utan tid.
+ * Ingen sport får pressas under halva den jämna andelen. Tiden tas från varje
+ * van sport i proportion till hur mycket utrymme den har *över* golvet, inte i
+ * proportion till dess andel — annars kan en sport med låg säsongsvikt tryckas
+ * under golvet. Finns det inte tio procentenheter att hämta krymper bonusen
+ * till det som går att ta.
  */
-function evenSharesWithNewBonus(input: PlanInput, sports: readonly TrainedSport[]): number[] {
-  const jämnt = 1 / sports.length;
-  const nya = sports.filter((sport) => isNew(input.levels[sport]));
-  const vana = sports.length - nya.length;
+function seasonSharesWithNewBonus(
+  month: number,
+  input: PlanInput,
+  sports: readonly TrainedSport[],
+): number[] {
+  const utgång = seasonShares(month, sports);
 
-  // Ingen är ny, eller alla är nya: det finns inget att flytta tid mellan.
-  if (nya.length === 0 || vana === 0) {
-    return sports.map(() => jämnt);
-  }
+  const nya = sports.filter((sport) => isNew(input.levels[sport]));
+  if (nya.length === 0 || nya.length === sports.length) return utgång;
 
   const { newLevelBonus, minShareOfEvenSplit } = rules.sportSplit.base;
-  const golv = jämnt * minShareOfEvenSplit;
+  const golv = (1 / sports.length) * minShareOfEvenSplit;
 
-  const önskat = newLevelBonus * nya.length;
-  const möjligt = vana * (jämnt - golv);
-  const flyttat = Math.min(önskat, möjligt);
+  const utrymme = sports.map((sport, i) =>
+    isNew(input.levels[sport]) ? 0 : Math.max(0, (utgång[i] as number) - golv),
+  );
+  const möjligt = utrymme.reduce((a, b) => a + b, 0);
+  if (möjligt === 0) return utgång;
 
-  const tillNy = jämnt + flyttat / nya.length;
-  const tillVan = jämnt - flyttat / vana;
+  const flyttat = Math.min(newLevelBonus * nya.length, möjligt);
 
-  return sports.map((sport) => (isNew(input.levels[sport]) ? tillNy : tillVan));
+  return sports.map((sport, i) =>
+    isNew(input.levels[sport])
+      ? (utgång[i] as number) + flyttat / nya.length
+      : (utgång[i] as number) - (flyttat * (utrymme[i] as number)) / möjligt,
+  );
 }
 
 function isNew(level: Level | undefined): boolean {

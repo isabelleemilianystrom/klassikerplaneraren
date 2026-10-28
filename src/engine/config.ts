@@ -133,6 +133,34 @@ export const rulesSchema = z.object({
     /** Under det här är passet inget långpass, och planen får inget alls. */
     minMinutes: z.number().int().positive(),
   }),
+  seasonWeights: z
+    .object({
+      _rule: z.string(),
+      note: z.string(),
+      seasons: z
+        .array(
+          z.object({
+            name: z.string().min(1),
+            months: z.array(z.number().int().min(1).max(12)).nonempty(),
+            weights: z
+              .object({ ski: share, bike: share, swim: share, run: share })
+              .refine(
+                (w) => Math.abs(w.ski + w.bike + w.swim + w.run - 1) < 1e-9,
+                { message: "vikterna i en säsong måste summera till 1" },
+              ),
+          }),
+        )
+        .nonempty(),
+    })
+    // Varje månad måste höra till exakt en säsong. Annars finns det veckor
+    // motorn inte vet hur den ska fördela, och det ska stoppa bygget.
+    .refine(
+      ({ seasons }) => {
+        const alla = seasons.flatMap((säsong) => säsong.months);
+        return alla.length === 12 && new Set(alla).size === 12;
+      },
+      { message: "säsongerna måste täcka alla tolv månader exakt en gång" },
+    ),
   newLevelLimits: z.object({
     _rule: z.string(),
     note: z.string(),
