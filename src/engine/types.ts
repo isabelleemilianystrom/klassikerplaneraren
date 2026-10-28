@@ -34,14 +34,32 @@ export type IsoDate = string;
 /** Sporterna användaren kan ange nivå i. Styrka är inte en av dem. */
 export type TrainedSport = Exclude<Sport, 'strength'>;
 
+/** Veckodag enligt ISO: 1 = måndag, 7 = söndag. */
+export type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+/**
+ * De dagar användaren själv väljer.
+ *
+ * Appen är byggd för folk med jobb. Alla har inte helgen fri, och ett program
+ * som lägger långpasset på en söndag man jobbar är ett program man inte kan
+ * följa. De två dagarna måste vara olika — vilodagen ska vara helt fri.
+ */
+export interface PreferredDays {
+  /** Dagen långpasset läggs på (R-13). */
+  longSession: Weekday;
+  /** Dagen som alltid är helt fri (R-11). */
+  rest: Weekday;
+}
+
 export interface PlanInput {
-  schemaVersion: 1;
+  schemaVersion: 2;
   today: IsoDate;
   startDate: IsoDate;
   races: { id: RaceId; date: IsoDate }[];
   levels: Partial<Record<TrainedSport, Level>>;
   /** 3–15 timmar, heltal. */
   hoursPerWeek: number;
+  preferredDays: PreferredDays;
   equipment: {
     snowOrRollerSkis: boolean;
     skiErg: boolean;
@@ -87,7 +105,7 @@ export interface Week {
 }
 
 export interface Plan {
-  schemaVersion: 1;
+  schemaVersion: 2;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;

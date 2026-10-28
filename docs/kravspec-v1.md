@@ -115,7 +115,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-01 | Startsida med kort förklaring, betatext, ansvarsfriskrivning, åldersgräns (18 år) och knappen "Skapa mitt program" | Måste | Givet att jag öppnar appen utan sparad plan, så ser jag förklaringen, texterna från avsnitt 8 och knappen som startar formuläret |
 | K-02 | Steg 1: välj minst ett av de fyra loppen och ange datum för varje valt lopp; startdatum är idag men kan ändras | Måste | Inget lopp valt eller ett loppdatum före startdatumet ger ett felmeddelande vid fältet, och jag kommer inte vidare |
 | K-03 | Steg 2: nivå per sport som ingår i valda lopp – Ny, Van eller Erfaren – med beskrivningarna i avsnitt 5 | Måste | Varje sport har exakt en vald nivå innan jag kommer vidare; förvalt är "Van" |
-| K-04 | Steg 3: timmar per vecka (3–15, heltal) och utrustning: snö eller rullskidor, stakmaskin, simhall, landsvägscykel eller trainer (ja/nej för varje) | Måste | Alla fält har standardvärden (6 timmar, nej på utrustning); värden utanför 3–15 kan inte väljas |
+| K-04 | Steg 3: timmar per vecka (3–15, heltal), vilken dag långpasset ska ligga på, vilken dag som är vilodag, och utrustning: snö eller rullskidor, stakmaskin, simhall, landsvägscykel eller trainer (ja/nej för varje) | Måste | Alla fält har standardvärden (6 timmar, söndag långpass, måndag vila, nej på utrustning); värden utanför 3–15 kan inte väljas; samma dag för långpass och vila ger ett felmeddelande vid fältet och jag kommer inte vidare |
 | K-05 | Generering: regelmotorn skapar planen direkt, med förklaringarna på plats från början | Måste | Planen med sina förklaringar visas inom 2 s efter att jag skickat formuläret, utan att något laddas i efterhand |
 | K-06 | Översikt: alla veckor från start till sista lopp med veckonummer, datumintervall, fas, total tid och markering av loppveckor | Måste | Antalet veckor stämmer med perioden; varje loppvecka är markerad med loppets namn |
 | K-07 | Veckovy: sju dagar med pass; varje pass visar sport, typ, minuter, intensitet i vardagsspråk och zon samt en kort instruktion; vilodagar visas som vila | Måste | Varje dag i veckan visas; intensitet visas som t.ex. "Lugnt – du ska kunna prata hela meningar (zon 2)" |
@@ -185,9 +185,9 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 **Pass**
 
-- **R-11** Antal träningsdagar: T ≤ 5 ger 4 dagar, T 6–9 ger 5 dagar, T ≥ 10 ger 6 dagar. Minst en helt vilodag i veckan.
+- **R-11** Antal träningsdagar: T ≤ 5 ger 4 dagar, T 6–9 ger 5 dagar, T ≥ 10 ger 6 dagar. Minst en helt vilodag i veckan. *(utökad 2026-10-28)* **Användaren väljer vilken dag som är vilodag.** Den dagen lämnas helt fri varje vecka — det enda som får ligga där är ett lopp eller dess öppningspass, eftersom R-04 väger tyngre. Formuläret föreslår måndag, dagen efter helgens långpass.
 - **R-12** Passlängd 20–300 minuter.
-- **R-13** Ett långpass per vecka i loppets sport under specifik fas, på lördag eller söndag. Det växer jämnt genom fasen upp till: skidor 240 min, cykel 300 min, löpning 150 min, simning 75 min.
+- **R-13** Ett långpass per vecka i loppets sport under specifik fas. *(ändrad 2026-10-28)* Passet läggs på **den dag användaren valt** — vilken dag som helst i veckan, inte bara helgen. Appen är byggd för folk med jobb, och alla har inte helgen fri; ett långpass på en söndag man arbetar är ett pass man inte kan göra. Formuläret föreslår söndag. Är den valda dagen upptagen av ett lopp eller ett öppningspass flyttas långpasset till den sista fria av `longSession.allowedWeekdays`, och i sista hand till någon annan fri dag — hellre ett långpass på fel dag än inget långpass. Det växer jämnt genom fasen upp till: skidor 240 min, cykel 300 min, löpning 150 min, simning 75 min. Det börjar på `startShareOfCap` av sitt tak i fasens första vecka och når taket i den sista; blir det kortare än `longSession.minMinutes` blir det inget långpass.
 - **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
 - **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält.
 - **R-14** Löptak: total löptid får öka högst 10 % från en vecka till nästa (veckor efter avlastning undantagna). Nivå Ny i löpning har aldrig löppass två dagar i rad.
@@ -304,13 +304,16 @@ type Level = 'new' | 'experienced' | 'advanced'; // Ny, Van, Erfaren
 type Phase = 'base' | 'specific' | 'taper' | 'recovery';
 type SessionType = 'easy' | 'long' | 'tempo' | 'intervals' | 'technique' | 'strength' | 'rest' | 'race';
 
+type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;   // ISO: 1 = måndag, 7 = söndag
+
 interface PlanInput {
-  schemaVersion: 1;
+  schemaVersion: 2;           // höjd 2026-10-28: preferredDays tillkom
   today: string;              // YYYY-MM-DD
   startDate: string;          // YYYY-MM-DD
   races: { id: RaceId; date: string }[];
   levels: Partial<Record<'ski' | 'bike' | 'swim' | 'run', Level>>;
   hoursPerWeek: number;       // 3–15
+  preferredDays: { longSession: Weekday; rest: Weekday };   // måste vara olika
   equipment: { snowOrRollerSkis: boolean; skiErg: boolean; pool: boolean; bike: boolean };
 }
 
@@ -339,7 +342,7 @@ interface Week {
 }
 
 interface Plan {
-  schemaVersion: 1;
+  schemaVersion: 2;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;
@@ -420,13 +423,16 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 | P3 Den begränsade | Alla fyra | 3 | Van i allt | Bara cykel |
 | P4 Kort tid | Bara Vasaloppet, 6 veckor efter start | 6 | Ny i skidor | Ingen |
 | P5 Lopp tätt | Vätternrundan och Vansbrosimningen, 2 veckor isär | 8 | Van i båda | Cykel och simhall |
-| P6 Vårstart | Alla fyra, start 2027-05-03, Vasaloppet sist (mars 2028) | 8 | Ny i skidor, Van i övrigt | Simhall och cykel |
+| P6 Vårstart | Alla fyra, start 2027-05-03, Vasaloppet sist (mars 2028); långpass onsdag, vila söndag | 8 | Ny i skidor, Van i övrigt | Simhall och cykel |
 
 **Invarianter** (gäller för P1–P6 och ska testas för varje vecka)
 
 - Veckans totala tid överskrider aldrig fasens tid enligt R-05–R-07
 - Minst en vilodag per vecka (R-11)
 - Aldrig pass i zon 3–4 två dagar i rad (R-16)
+- Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
+- Långpasset ligger på den valda dagen när den är fri (R-13) *(tillagd 2026-10-28)*
+- Reglerna om dagar i rad i R-14 och R-16 håller också över veckogränsen, söndag till måndag *(tillagd 2026-10-28)*
 - Löptiden ökar högst 10 % mellan veckor, utom efter avlastning (R-14)
 - Inga pass före startdatum eller efter sista loppet, och loppdagen innehåller bara loppet (R-01, R-04)
 - Inget pass kräver utrustning som användaren saknar (R-17–R-20)
@@ -451,6 +457,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Två lopp samma vecka: båda markeras, båda räknas som belastning, inget lopp försvinner (R-27)
 - Lopp som spänner över mer än tolv månader ger varningen i R-26 men ändå en plan
 - Start i var och en av årets tolv månader ger en hel plan där alla fyra loppen finns med, oavsett vilken ordning loppen kommer i (tillagt 2026-10-28)
+- Alla sju veckodagar som långpassdag och som vilodag: planen håller samtliga regler i varje kombination (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**

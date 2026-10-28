@@ -26,6 +26,7 @@ import type {
   Level,
   Phase,
   PlanInput,
+  PreferredDays,
   RaceId,
   Session,
   SessionType,
@@ -55,15 +56,76 @@ interface PendingSession {
   raceId?: RaceId;
 }
 
+/**
+ * De valda dagarna måste vara olika.
+ *
+ * Vilodagen ska vara helt fri, så den kan inte också bära veckans längsta
+ * pass. Formuläret hindrar det (K-04), men motorn litar inte på det.
+ */
+function requireDistinctDays(preferredDays: PreferredDays): void {
+  if (preferredDays.longSession === preferredDays.rest) {
+    throw new Error(
+      `Långpassdagen och vilodagen kan inte vara samma dag (båda är ${preferredDays.rest})`,
+    );
+  }
+}
+
 /** Hela planens veckor med pass. */
 export function buildWeekPlans(input: PlanInput): WeekPlan[] {
+  requireDistinctDays(input.preferredDays);
+
   const weeks = buildWeeks(input);
   const budgets = weekBudgets(input);
   const races = placeRaces(input);
 
-  return weeks.map((week, i) =>
-    buildWeekPlan(week, budgets[i] as WeekBudget, input, races, weeks),
-  );
+  // Veckorna byggs i ordning, inte oberoende av varandra: R-16 gäller också
+  // över veckogränsen. Ett hårt pass på söndagen får inte följas av ett hårt
+  // pass på måndagen i nästa vecka.
+  const resultat: WeekPlan[] = [];
+  let före: CarriedOver = INGET_FÖRE;
+
+  for (const [i, week] of weeks.entries()) {
+    const plan = buildWeekPlan(
+      week,
+      budgets[i] as WeekBudget,
+      input,
+      races,
+      weeks,
+      före,
+    );
+    resultat.push(plan);
+    före = carryOver(plan);
+  }
+
+  return resultat;
+}
+
+/**
+ * Det föregående veckan behöver skicka vidare.
+ *
+ * R-14 och R-16 handlar båda om dagar i rad, och veckogränsen är inte något
+ * reglerna känner av. Utan det här kunde söndag och måndag båda bli hårda.
+ */
+interface CarriedOver {
+  hardDates: ReadonlySet<IsoDate>;
+  runDates: ReadonlySet<IsoDate>;
+}
+
+const INGET_FÖRE: CarriedOver = { hardDates: new Set(), runDates: new Set() };
+
+function carryOver(plan: WeekPlan): CarriedOver {
+  return {
+    hardDates: new Set(
+      plan.sessions
+        .filter((session) => session.zone !== null && session.zone >= 3)
+        .map((session) => session.date),
+    ),
+    runDates: new Set(
+      plan.sessions
+        .filter((session) => session.sport === 'run' && session.type !== 'race')
+        .map((session) => session.date),
+    ),
+  };
 }
 
 function buildWeekPlan(
@@ -72,6 +134,7 @@ function buildWeekPlan(
   input: PlanInput,
   races: readonly PlacedRace[],
   allWeeks: readonly WeekSkeleton[],
+  before: CarriedOver,
 ): WeekPlan {
   const dates = weekDates(week);
   const pending: PendingSession[] = [];
@@ -92,7 +155,7 @@ function buildWeekPlan(
   }
 
   // 2. Långpasset (R-13, R-28).
-  const long = longSession(week, budget, dates, raceDates, openerDates, allWeeks);
+  const long = longSession(week, budget, dates, raceDates, openerDates, allWeeks, input.preferredDays);
   if (long !== null) pending.push(long);
 
   // 3. Styrkan (R-10).
@@ -101,7 +164,7 @@ function buildWeekPlan(
   // 4. Konditionen, sport för sport (R-12, R-15).
   pending.push(...enduranceSessions(week, budget, input, long));
 
-  const placed = placeOnDays(pending, week, input, dates, raceDates, openerDates);
+  const placed = placeOnDays(pending, week, input, dates, raceDates, openerDates, before);
   const withTexts = placed.map((session, i) => withTitleAndInstruction(session, week, i));
 
   return {
@@ -160,7 +223,7 @@ function openerFor(
 /**
  * Veckans långpass i loppets sport (R-13, R-28).
  *
- * Passet ligger på lördag eller söndag och växer jämnt genom fasen: det börjar
+ * Passet ligger på den dag användaren valt och växer jämnt genom fasen: det börjar
  * på halva sitt tak och når taket i fasens sista vecka. Tre tak gäller
  * samtidigt — sportens tak i R-13, 70 procent av veckans tid i R-28, och den
  * tid sporten faktiskt har fått i veckan.
@@ -175,6 +238,7 @@ function longSession(
   raceDates: ReadonlySet<IsoDate>,
   openerDates: ReadonlySet<IsoDate>,
   allWeeks: readonly WeekSkeleton[],
+  preferredDays: PreferredDays,
 ): PendingSession | null {
   if (week.phase !== 'specific' || week.focusRaceId === null) return null;
 
@@ -202,25 +266,43 @@ function longSession(
 
   if (minuter < rules.longSession.minMinutes) return null;
 
-  const dag = longSessionDate(dates, raceDates, openerDates);
+  const dag = longSessionDate(dates, raceDates, openerDates, preferredDays);
   if (dag === null) return null;
 
   return { sport, type: 'long', minutes: minuter, zone: 2, fixedDate: dag };
 }
 
-/** Sista tillåtna helgdagen som är fri (R-13). */
+/**
+ * Dagen långpasset läggs på (R-13).
+ *
+ * Användarens valda dag går först. Är den upptagen av ett lopp eller ett
+ * öppningspass tas den sista fria av standarddagarna i konfigurationen, och
+ * sist någon annan fri dag — hellre ett långpass på fel dag än inget långpass.
+ *
+ * Vilodagen hålls fri även här. Den som har bett om en fri söndag ska inte få
+ * veckans längsta pass just då.
+ */
 function longSessionDate(
   dates: readonly IsoDate[],
   raceDates: ReadonlySet<IsoDate>,
   openerDates: ReadonlySet<IsoDate>,
+  preferredDays: PreferredDays,
 ): IsoDate | null {
-  const helg = dates.filter(
+  const fria = dates.filter(
     (datum) =>
-      rules.longSession.allowedWeekdays.includes(weekdayOf(datum)) &&
       !raceDates.has(datum) &&
-      !openerDates.has(datum),
+      !openerDates.has(datum) &&
+      weekdayOf(datum) !== preferredDays.rest,
   );
-  return helg.at(-1) ?? null;
+
+  const vald = fria.find((datum) => weekdayOf(datum) === preferredDays.longSession);
+  if (vald !== undefined) return vald;
+
+  const standard = fria.filter((datum) =>
+    rules.longSession.allowedWeekdays.includes(weekdayOf(datum)),
+  );
+
+  return standard.at(-1) ?? fria.at(-1) ?? null;
 }
 
 /** Styrkans pass, 20 minuter styck (R-10). */
@@ -459,6 +541,7 @@ function placeOnDays(
   dates: readonly IsoDate[],
   raceDates: ReadonlySet<IsoDate>,
   openerDates: ReadonlySet<IsoDate>,
+  before: CarriedOver,
 ): Session[] {
   const perDag = new Map<IsoDate, PendingSession[]>(dates.map((datum) => [datum, []]));
 
@@ -472,7 +555,7 @@ function placeOnDays(
   const övriga = pending.filter((session) => session.fixedDate === undefined);
 
   for (const session of övriga) {
-    const dag = bestDateFor(session, lediga, perDag, input);
+    const dag = bestDateFor(session, lediga, perDag, input, before);
     (perDag.get(dag) as PendingSession[]).push(session);
   }
 
@@ -499,7 +582,7 @@ function trainingDates(
     (datum) =>
       !raceDates.has(datum) &&
       !openerDates.has(datum) &&
-      weekdayOf(datum) !== rules.trainingDays.preferredRestWeekday,
+      weekdayOf(datum) !== input.preferredDays.rest,
   );
 
   // Dagar som redan bär ett fast pass, till exempel långpasset, är med.
@@ -558,8 +641,11 @@ function bestDateFor(
   dates: readonly IsoDate[],
   perDag: ReadonlyMap<IsoDate, readonly PendingSession[]>,
   input: PlanInput,
+  before: CarriedOver,
 ): IsoDate {
-  const tillåtna = dates.filter((datum) => allowedOn(session, datum, perDag, input));
+  const tillåtna = dates.filter((datum) =>
+    allowedOn(session, datum, perDag, input, before),
+  );
   const urval = tillåtna.length > 0 ? tillåtna : dates;
 
   return [...urval].sort((a, b) => {
@@ -574,12 +660,14 @@ function allowedOn(
   date: IsoDate,
   perDag: ReadonlyMap<IsoDate, readonly PendingSession[]>,
   input: PlanInput,
+  before: CarriedOver,
 ): boolean {
   // R-16: aldrig zon 3–4 två dagar i rad.
   if (rules.intensity.noHardDaysBackToBack && isHard(session)) {
-    if (dayHas(date, perDag, isHard)) return false;
-    if (dayHas(addDays(date, -1), perDag, isHard)) return false;
-    if (dayHas(addDays(date, 1), perDag, isHard)) return false;
+    const hårdDag = (datum: IsoDate) =>
+      before.hardDates.has(datum) || dayHas(datum, perDag, isHard);
+
+    if (hårdDag(date) || hårdDag(addDays(date, -1)) || hårdDag(addDays(date, 1))) return false;
   }
 
   // R-14: nivå Ny i löpning får aldrig löppass två dagar i rad.
@@ -589,8 +677,10 @@ function allowedOn(
     input.levels.run === 'new'
   ) {
     const ärLöpning = (kandidat: PendingSession) => kandidat.sport === 'run';
-    if (dayHas(addDays(date, -1), perDag, ärLöpning)) return false;
-    if (dayHas(addDays(date, 1), perDag, ärLöpning)) return false;
+    const löpdag = (datum: IsoDate) =>
+      before.runDates.has(datum) || dayHas(datum, perDag, ärLöpning);
+
+    if (löpdag(addDays(date, -1)) || löpdag(addDays(date, 1))) return false;
   }
 
   return true;

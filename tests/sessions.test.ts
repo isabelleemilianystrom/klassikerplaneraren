@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { raceById, rules, sessions as sessionTexts } from '../src/engine/config';
 import { addDays, weekdayOf } from '../src/engine/dates';
 import { buildWeekPlans, trainingDayCount, type WeekPlan } from '../src/engine/sessions';
-import type { PlanInput, Session } from '../src/engine/types';
+import type { PlanInput, Session, Weekday } from '../src/engine/types';
 import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles';
 
 /** Passen som är riktig träning — vila räknas inte som ett pass. */
@@ -113,15 +113,14 @@ describe('R-13 och R-28: långpasset', () => {
     }
   });
 
-  it('lägger långpasset på lördag eller söndag', () => {
-    for (const [namn, planer] of alla()) {
-      for (const plan of planer) {
+  it('lägger långpasset på den dag användaren valt', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const plan of buildWeekPlans(profil)) {
         for (const session of träning(plan)) {
           if (session.type !== 'long') continue;
-          expect(
-            rules.longSession.allowedWeekdays,
-            `${namn} v${plan.week.index} ${session.date}`,
-          ).toContain(weekdayOf(session.date));
+          expect(weekdayOf(session.date), `${namn} v${plan.week.index} ${session.date}`).toBe(
+            profil.preferredDays.longSession,
+          );
         }
       }
     }
@@ -509,6 +508,167 @@ describe('P3 och P4: de smala planerna', () => {
       for (const session of träning(plan)) {
         expect(['ski', 'strength'], `vecka ${plan.week.index}`).toContain(session.sport);
       }
+    }
+  });
+});
+
+describe('användarens valda dagar', () => {
+  /** P1 med andra dagar än de förvalda. */
+  function medDagar(longSession: Weekday, rest: Weekday): PlanInput {
+    return { ...P1, preferredDays: { longSession, rest } };
+  }
+
+  it('håller den valda vilodagen helt fri, varje vecka', () => {
+    for (let dag = 1; dag <= 7; dag += 1) {
+      const vilodag = dag as Weekday;
+      const långpassdag = ((dag % 7) + 1) as Weekday;
+      const input = medDagar(långpassdag, vilodag);
+
+      for (const plan of buildWeekPlans(input)) {
+        // Loppet och dess öppningspass har fasta dagar och väger tyngre (R-04).
+        if (plan.budget.raceMinutes > 0) continue;
+
+        const påVilodagen = träning(plan).filter(
+          (session) => weekdayOf(session.date) === vilodag,
+        );
+        expect(påVilodagen, `vilodag ${vilodag}, vecka ${plan.week.index}`).toEqual([]);
+      }
+    }
+  });
+
+  it('lägger långpasset på den valda dagen, också en vardag', () => {
+    for (let dag = 1; dag <= 7; dag += 1) {
+      const långpassdag = dag as Weekday;
+      const vilodag = ((dag % 7) + 1) as Weekday;
+      const input = medDagar(långpassdag, vilodag);
+
+      const långa = buildWeekPlans(input)
+        .flatMap((plan) => plan.sessions)
+        .filter((session) => session.type === 'long');
+
+      expect(långa.length, `långpassdag ${långpassdag}`).toBeGreaterThan(0);
+      for (const session of långa) {
+        expect(weekdayOf(session.date), `långpassdag ${långpassdag}`).toBe(långpassdag);
+      }
+    }
+  });
+
+  it('ger fortfarande minst en vilodag i veckan', () => {
+    for (let dag = 1; dag <= 7; dag += 1) {
+      const input = medDagar(dag as Weekday, (((dag + 2) % 7) + 1) as Weekday);
+
+      for (const plan of buildWeekPlans(input)) {
+        const vila = plan.sessions.filter((session) => session.type === 'rest');
+        expect(vila.length, `dag ${dag}, vecka ${plan.week.index}`).toBeGreaterThanOrEqual(
+          rules.trainingDays.minRestDays,
+        );
+      }
+    }
+  });
+
+  it('håller alla andra regler oavsett vilka dagar som valts', () => {
+    for (let dag = 1; dag <= 7; dag += 1) {
+      const långpassdag = dag as Weekday;
+      const vilodag = ((dag % 7) + 1) as Weekday;
+      const planer = buildWeekPlans(medDagar(långpassdag, vilodag));
+
+      // R-12: passlängderna håller.
+      for (const plan of planer) {
+        for (const session of träning(plan)) {
+          if (session.type === 'race') continue;
+          expect(session.minutes, `dag ${dag}: ${session.id}`).toBeGreaterThanOrEqual(
+            rules.session.minMinutes,
+          );
+        }
+      }
+
+      // R-16: aldrig hårda pass två dagar i rad.
+      const hårda = new Set(
+        planer.flatMap((plan) =>
+          träning(plan)
+            .filter((session) => session.zone !== null && session.zone >= 3)
+            .map((session) => session.date),
+        ),
+      );
+      for (const datum of hårda) {
+        expect(hårda.has(addDays(datum, 1)), `dag ${dag}: ${datum}`).toBe(false);
+      }
+    }
+  });
+
+  it('säger till när långpassdagen och vilodagen är samma dag', () => {
+    expect(() => buildWeekPlans(medDagar(3, 3))).toThrow(/samma dag/);
+  });
+
+  it('flyttar långpasset när den valda dagen är upptagen av loppet', () => {
+    // P6 har långpass på onsdag. Ligger ett lopp eller öppningspass där ska
+    // planen ändå få sitt långpass, på en annan dag.
+    for (const plan of buildWeekPlans(P6)) {
+      const lång = träning(plan).find((session) => session.type === 'long');
+      if (lång === undefined) continue;
+
+      const upptagna = träning(plan)
+        .filter((session) => session.type === 'race')
+        .map((session) => session.date);
+
+      expect(upptagna, `vecka ${plan.week.index}`).not.toContain(lång.date);
+      expect(weekdayOf(lång.date), `vecka ${plan.week.index}`).not.toBe(P6.preferredDays.rest);
+    }
+  });
+
+  it('ger P6 sitt långpass på onsdag och fri söndag', () => {
+    expect(P6.preferredDays).toEqual({ longSession: 3, rest: 7 });
+
+    const planer = buildWeekPlans(P6);
+    const långa = planer.flatMap((plan) => plan.sessions).filter((s) => s.type === 'long');
+    expect(långa.length).toBeGreaterThan(0);
+
+    for (const session of långa) {
+      expect(weekdayOf(session.date)).toBe(3);
+    }
+  });
+});
+
+describe('reglerna om dagar i rad håller över veckogränsen', () => {
+  // Söndag och måndag ligger i olika veckor. Med lördag som vilodag är båda
+  // träningsdagar, och då måste reglerna se över gränsen.
+  const övergripande: PlanInput = {
+    ...P1,
+    levels: { ...P1.levels, run: 'new' },
+    preferredDays: { longSession: 5, rest: 6 },
+  };
+
+  it('ger aldrig två hårda pass i rad, inte heller söndag till måndag (R-16)', () => {
+    const planer = buildWeekPlans(övergripande);
+    const hårda = new Set(
+      planer.flatMap((plan) =>
+        träning(plan)
+          .filter((session) => session.zone !== null && session.zone >= 3)
+          .map((session) => session.date),
+      ),
+    );
+
+    expect(hårda.size).toBeGreaterThan(0);
+    const söndagar = [...hårda].filter((datum) => weekdayOf(datum) === 7);
+    expect(söndagar.length).toBeGreaterThan(0);
+
+    for (const datum of hårda) {
+      expect(hårda.has(addDays(datum, 1)), `${datum} och dagen efter`).toBe(false);
+    }
+  });
+
+  it('ger aldrig två löppass i rad till en ny löpare, över gränsen (R-14)', () => {
+    const löpdagar = new Set(
+      buildWeekPlans(övergripande).flatMap((plan) =>
+        träning(plan)
+          .filter((session) => session.sport === 'run' && session.type !== 'race')
+          .map((session) => session.date),
+      ),
+    );
+
+    expect(löpdagar.size).toBeGreaterThan(0);
+    for (const datum of löpdagar) {
+      expect(löpdagar.has(addDays(datum, 1)), `${datum} och dagen efter`).toBe(false);
     }
   });
 });
