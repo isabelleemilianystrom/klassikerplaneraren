@@ -704,8 +704,12 @@ describe('reglerna om dagar i rad håller över veckogränsen', () => {
     );
 
     expect(hårda.size).toBeGreaterThan(0);
-    const söndagar = [...hårda].filter((datum) => weekdayOf(datum) === 7);
-    expect(söndagar.length).toBeGreaterThan(0);
+
+    // Måndag är veckans första dag. Ligger ett hårt pass där måste
+    // kontrollen se bakåt in i föregående vecka för att R-16 ska hålla —
+    // det är hela poängen med det här testet.
+    const måndagar = [...hårda].filter((datum) => weekdayOf(datum) === 1);
+    expect(måndagar.length).toBeGreaterThan(0);
 
     for (const datum of hårda) {
       expect(hårda.has(addDays(datum, 1)), `${datum} och dagen efter`).toBe(false);
@@ -869,5 +873,108 @@ describe('R-15: nedtrappningen har bara korta inslag i zon 3', () => {
         ),
     );
     expect(längre).toBe(true);
+  });
+});
+
+describe('R-13: långpasset lånar tid de sista veckorna', () => {
+  it('når över grenens egen andel av veckan', () => {
+    // I de sista specifikveckorna får långpasset låna från de andra grenarna.
+    // Utan det binds det av R-08:s 55 procent och hinner aldrig bli långt nog.
+    const sista = buildWeekPlans(P2).filter(
+      ({ week, budget }) =>
+        week.phase === 'specific' &&
+        week.focusRaceId === 'vatternrundan' &&
+        budget.enduranceMinutes > 0,
+    );
+
+    const lånade = sista.filter((plan) => {
+      const lång = träning(plan).find((session) => session.type === 'long');
+      if (lång === undefined || lång.sport === null) return false;
+      return lång.minutes > (plan.budget.bySport[lång.sport as 'bike'] ?? 0);
+    });
+
+    expect(lånade.length).toBeGreaterThan(0);
+  });
+
+  it('håller sig inom R-28:s tak också när det lånar', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        const lång = träning(plan).find((session) => session.type === 'long');
+        if (lång === undefined) continue;
+
+        expect(
+          lång.minutes / plan.budget.enduranceMinutes,
+          `${namn} v${plan.week.index}`,
+        ).toBeLessThanOrEqual(rules.longSession.maxShareOfWeek);
+      }
+    }
+  });
+
+  it('tar lånet från de andra grenarna, inte ur veckans totala tid', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.budget.raceMinutes > 0) continue;
+
+        const budget = plan.budget.strengthMinutes + plan.budget.enduranceMinutes;
+        if (budget < rules.session.minMinutes) continue;
+
+        expect(plan.totalMinutes, `${namn} vecka ${plan.week.index}`).toBe(budget);
+      }
+    }
+  });
+
+  it('ger de två långa loppen långpass på minst halva loppets tid', () => {
+    // Ett långpass på tre timmar inför 315 kilometer är inte en förberedelse.
+    // Kravet gäller den som har tid nog; P3 med tre timmar i veckan kommer inte
+    // dit, och det är varningarnas sak att säga (R-23).
+    for (const profil of [P2, P6]) {
+      const längsta = new Map<string, number>();
+      for (const plan of buildWeekPlans(profil)) {
+        for (const session of träning(plan)) {
+          if (session.type !== 'long' || session.sport === null) continue;
+          längsta.set(session.sport, Math.max(längsta.get(session.sport) ?? 0, session.minutes));
+        }
+      }
+
+      for (const race of profil.races) {
+        const config = raceById(race.id);
+        if (config.sport !== 'ski' && config.sport !== 'bike') continue;
+
+        const andel = (längsta.get(config.sport) ?? 0) / 60 / config.estimatedHours;
+        expect(andel, `${config.name}`).toBeGreaterThanOrEqual(0.4);
+      }
+    }
+  });
+});
+
+describe('alla grenar i planen tränas, också de tunna veckorna', () => {
+  it('ger varje gren pass i alla profiler', () => {
+    // Lärdomen från v0: en gren som aldrig får plats tränas aldrig. Urvalet
+    // roterar därför i stället för att alltid stryka den minsta grenen.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      const planer = buildWeekPlans(profil);
+      const grenar = new Set(
+        planer
+          .flatMap((plan) => träning(plan))
+          .filter((session) => session.type !== 'race')
+          .map((session) => session.sport),
+      );
+
+      for (const race of profil.races) {
+        expect(grenar, `${namn}: ${race.id}`).toContain(raceById(race.id).sport);
+      }
+    }
+  });
+
+  it('ger P3 riktig simträning trots tre timmar i veckan', () => {
+    // P3 simmade noll minuter innan rotationen gjordes om.
+    const simpass = buildWeekPlans(P3)
+      .flatMap((plan) => träning(plan))
+      .filter((session) => session.sport === 'swim' && session.type !== 'race');
+
+    expect(simpass.length).toBeGreaterThan(20);
+    for (const session of simpass) {
+      expect(session.minutes).toBeGreaterThanOrEqual(rules.session.minMinutes);
+    }
   });
 });

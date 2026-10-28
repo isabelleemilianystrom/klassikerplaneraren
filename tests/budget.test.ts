@@ -13,11 +13,25 @@ function veckorMedBudget(input: PlanInput) {
   return veckor.map((vecka, i) => ({ vecka, budget: budgetar[i] as (typeof budgetar)[number] }));
 }
 
-/** Säsongens vikter för en månad, enligt R-32. */
-function säsongsvikter(månad: number) {
+/**
+ * Säsongens vikter för en månad, enligt R-32.
+ *
+ * `levels` behövs eftersom vikten sänks för den som inte är nybörjare i en
+ * gren som står i `experiencedWeightOverride` — i dag simning.
+ */
+function säsongsvikter(månad: number, levels: PlanInput['levels'] = {}) {
   const säsong = rules.seasonWeights.seasons.find((s) => s.months.includes(månad));
   if (säsong === undefined) throw new Error("månad " + månad + " saknar säsong");
-  return säsong.weights;
+
+  const ut = { ...säsong.weights };
+  for (const [sport, vikt] of Object.entries(rules.seasonWeights.experiencedWeightOverride)) {
+    const gren = sport as 'swim';
+    if (levels[gren] !== 'new') ut[gren] = vikt as number;
+  }
+
+  // Normera, som motorn gör: en sänkt vikt får inte göra veckan kortare.
+  const summa = ut.ski + ut.bike + ut.swim + ut.run;
+  return { ski: ut.ski / summa, bike: ut.bike / summa, swim: ut.swim / summa, run: ut.run / summa };
 }
 
 function summaAvSporter(bySport: Partial<Record<TrainedSport, number>>): number {
@@ -239,7 +253,7 @@ describe('R-08: fördelning i specifik fas', () => {
     );
 
     const månad = monthOf(specifik?.vecka.startDate as string);
-    const vikter = säsongsvikter(månad);
+    const vikter = säsongsvikter(månad, P2.levels);
     const kvar =
       (specifik?.budget.enduranceMinutes as number) - (specifik?.budget.bySport.ski as number);
     const summaÖvriga = vikter.bike + vikter.swim + vikter.run;
@@ -271,7 +285,7 @@ describe('R-09: fördelning i basfasen', () => {
     for (const { vecka, budget } of veckorMedBudget(P2)) {
       if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
 
-      const vikter = säsongsvikter(monthOf(vecka.startDate));
+      const vikter = säsongsvikter(monthOf(vecka.startDate), P2.levels);
       for (const sport of ['ski', 'bike', 'swim', 'run'] as const) {
         const förväntat = budget.enduranceMinutes * vikter[sport];
         expect(budget.bySport[sport] as number, vecka.index + " " + sport).toBeCloseTo(
@@ -289,7 +303,7 @@ describe('R-09: fördelning i basfasen', () => {
     for (const { vecka, budget } of veckorMedBudget(P1)) {
       if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
 
-      const vikter = säsongsvikter(monthOf(vecka.startDate));
+      const vikter = säsongsvikter(monthOf(vecka.startDate), P1.levels);
       const minuter = budget.enduranceMinutes;
 
       expect(budget.bySport.ski as number, "v" + vecka.index).toBeGreaterThan(
@@ -333,7 +347,7 @@ describe('R-09: fördelning i basfasen', () => {
     const bas = veckorMedBudget(allaNya).find(
       ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
     );
-    const vikter = säsongsvikter(monthOf(bas?.vecka.startDate as string));
+    const vikter = säsongsvikter(monthOf(bas?.vecka.startDate as string), allaNya.levels);
     const minuter = bas?.budget.enduranceMinutes as number;
 
     // Skidor och cykel har inget tak i R-31 och följer vikterna rakt.
@@ -341,8 +355,10 @@ describe('R-09: fördelning i basfasen', () => {
     expect(bas?.budget.bySport.bike as number).toBeCloseTo(minuter * vikter.bike, -0.5);
   });
 
-  it('pressar aldrig en sport under halva den jämna andelen', () => {
-    // Golvet ska hålla för varje kombination av nivåer, inte bara de prövade.
+  it('låter bonusen aldrig pressa en sport under halva den jämna andelen', () => {
+    // Golvet skyddar mot att nybörjarbonusen tar för mycket från en gren. Det
+    // skyddar inte mot att säsongens egen vikt är låg — en gren som säsongen
+    // tonar ner ska få lite tid, det är hela poängen med R-32.
     const nivåer: ('new' | 'experienced')[] = ['new', 'experienced'];
     const sporter: TrainedSport[] = ['ski', 'bike', 'swim', 'run'];
 
@@ -356,12 +372,15 @@ describe('R-09: fördelning i basfasen', () => {
         ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
       );
       const minuter = bas?.budget.enduranceMinutes as number;
+      const vikter = säsongsvikter(monthOf(bas?.vecka.startDate as string), levels);
       const golv = (minuter / 4) * rules.sportSplit.base.minShareOfEvenSplit;
 
       for (const sport of sporter) {
         const fick = bas?.budget.bySport[sport] as number;
-        // En minut i marginal för avrundningen.
-        expect(fick, `mask ${mask}: ${sport}`).toBeGreaterThanOrEqual(Math.floor(golv) - 1);
+        // Grenen ska ha minst golvet, eller minst sin säsongsvikt när den är
+        // lägre än golvet. En minut i marginal för avrundningen.
+        const kräv = Math.min(golv, minuter * vikter[sport]);
+        expect(fick, `mask ${mask}: ${sport}`).toBeGreaterThanOrEqual(Math.floor(kräv) - 1);
       }
     }
   });

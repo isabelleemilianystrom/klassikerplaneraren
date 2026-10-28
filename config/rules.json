@@ -91,11 +91,12 @@
       7
     ],
     "startShareOfCap": 0.5,
-    "minMinutes": 45
+    "minMinutes": 45,
+    "borrowInFinalWeeks": 4
   },
   "seasonWeights": {
     "_rule": "R-32",
-    "note": "Man behöver inte fokusera på alla grenar samtidigt. Vintern är skidornas och sommaren cykelns — det är där de långa passen går att lägga utan att slita ut kroppen, och det är de två längsta loppen. Löpningen hålls nere året om eftersom den sliter mer. Alla tolv månader måste täckas exakt en gång, och vikterna i varje säsong måste summera till 1.",
+    "note": "Man behöver inte fokusera på alla grenar samtidigt. Vintern är skidornas och sommaren cykelns — det är där de långa passen går att lägga utan att slita ut kroppen, och det är de två längsta loppen. Löpningen hålls nere året om eftersom den sliter mer. Alla tolv månader måste täckas exakt en gång, och vikterna i varje säsong måste summera till 1. Vikterna gäller nivå Ny. Är man Van eller Erfaren i en gren som står i experiencedWeightOverride får den grenen den vikten i stället, och den frigjorda tiden går till de övriga efter säsong.",
     "seasons": [
       {
         "name": "winter",
@@ -142,7 +143,10 @@
           "run": 0.2
         }
       }
-    ]
+    ],
+    "experiencedWeightOverride": {
+      "swim": 0.1
+    }
   },
   "newLevelLimits": {
     "_rule": "R-31",

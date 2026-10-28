@@ -257,7 +257,7 @@ function splitBetweenSports(
 
   const andelar =
     week.phase === 'specific' || week.phase === 'taper'
-      ? specificShares(week, sports, månad)
+      ? specificShares(week, sports, månad, input.levels)
       : seasonSharesWithNewBonus(månad, input, sports);
 
   return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
@@ -277,6 +277,7 @@ function specificShares(
   week: WeekSkeleton,
   sports: readonly TrainedSport[],
   month: number,
+  levels: PlanInput['levels'],
 ): number[] {
   const { raceSportShare, raceSportShareWhenTwoSports, raceSportShareWhenOneSport } =
     rules.sportSplit.specific;
@@ -286,7 +287,7 @@ function specificShares(
 
   // Saknar veckan ett fokuslopp, eller tränas inte loppets sport i planen,
   // finns ingen sport att vikta mot. Då får säsongen bestämma ensam.
-  if (index === -1) return seasonShares(month, sports);
+  if (index === -1) return seasonShares(month, sports, levels);
 
   if (sports.length === 1) return [raceSportShareWhenOneSport];
 
@@ -294,7 +295,7 @@ function specificShares(
 
   // De övriga delar på resten, viktade efter säsongen.
   const övriga = sports.filter((_, i) => i !== index);
-  const övrigaAndelar = seasonShares(month, övriga);
+  const övrigaAndelar = seasonShares(month, övriga, levels);
 
   let j = 0;
   return sports.map((_, i) =>
@@ -313,7 +314,11 @@ function specificShares(
  * hör alltså till den månad den börjar i, vilket är enklare att förstå än att
  * vikta inom veckan.
  */
-function seasonShares(month: number, sports: readonly TrainedSport[]): number[] {
+function seasonShares(
+  month: number,
+  sports: readonly TrainedSport[],
+  levels: PlanInput['levels'],
+): number[] {
   const säsong = rules.seasonWeights.seasons.find((kandidat) =>
     kandidat.months.includes(month),
   );
@@ -321,12 +326,31 @@ function seasonShares(month: number, sports: readonly TrainedSport[]): number[] 
     throw new Error(`Månad ${month} hör inte till någon säsong i config/rules.json`);
   }
 
-  const råa = sports.map((sport) => säsong.weights[sport]);
+  const råa = sports.map((sport) => weightFor(sport, säsong.weights[sport], levels));
   const summa = råa.reduce((a, b) => a + b, 0);
 
   // Innehåller planen bara grenar med låg vikt för säsongen blir summan liten,
   // men andelarna ska ändå bli 100 procent av veckan.
   return råa.map((vikt) => vikt / summa);
+}
+
+/**
+ * Grenens vikt, sänkt för den som inte är nybörjare där regeln säger det (R-32).
+ *
+ * Vansbrosimningen är tre kilometer och fem procent av klassikerns lopptid. Den
+ * som redan kan simma har tiden bättre använd på skidor eller cykel, där de två
+ * långa loppen avgörs. Nybörjaren behåller sin tid — frekvens och teknik är det
+ * som bygger simning, inte volym.
+ */
+function weightFor(
+  sport: TrainedSport,
+  seasonWeight: number,
+  levels: PlanInput['levels'],
+): number {
+  if (isNew(levels[sport])) return seasonWeight;
+
+  const sänkt = rules.seasonWeights.experiencedWeightOverride[sport];
+  return sänkt ?? seasonWeight;
 }
 
 /**
@@ -347,7 +371,7 @@ function seasonSharesWithNewBonus(
   input: PlanInput,
   sports: readonly TrainedSport[],
 ): number[] {
-  const utgång = seasonShares(month, sports);
+  const utgång = seasonShares(month, sports, input.levels);
 
   const nya = sports.filter((sport) => isNew(input.levels[sport]));
   if (nya.length === 0 || nya.length === sports.length) return utgång;

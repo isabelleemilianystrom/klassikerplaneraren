@@ -132,11 +132,22 @@ export const rulesSchema = z.object({
     startShareOfCap: share,
     /** Under det här är passet inget långpass, och planen får inget alls. */
     minMinutes: z.number().int().positive(),
+    /**
+     * Antal sista veckor i en specifik fas där långpasset får låna tid från de
+     * andra grenarna, upp till `maxShareOfWeek`. Se R-13.
+     */
+    borrowInFinalWeeks: z.number().int().nonnegative(),
   }),
   seasonWeights: z
     .object({
       _rule: z.string(),
       note: z.string(),
+      /**
+       * Grenar vars vikt sänks för den som inte är nybörjare. Vansbrosimningen
+       * är 5 procent av klassikerns lopptid; den som redan kan simma har tiden
+       * bättre använd på skidor eller cykel. Se R-32.
+       */
+      experiencedWeightOverride: z.partialRecord(sport, share),
       seasons: z
         .array(
           z.object({

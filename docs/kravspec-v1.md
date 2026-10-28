@@ -216,6 +216,14 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
   Nybörjarbonusen i R-09 räknas ovanpå säsongens vikt, inte ovanpå en jämn andel. Tiden tas från varje van gren i proportion till hur mycket utrymme den har **över** golvet — annars kan en gren med låg säsongsvikt tryckas under det.
 
+  **Simningens vikt sänks till 10 procent för den som inte är nybörjare**
+  *(tillagt 2026-10-28)*, via `experiencedWeightOverride`. Vansbrosimningen är tre kilometer och
+  drygt en timme, alltså fem procent av klassikerns samlade lopptid — men fick 15 procent av
+  träningstiden. Den som redan kan simma har tiden bättre använd på skidor eller cykel, där de två
+  långa loppen avgörs. Nybörjaren behåller sina 20 procent: frekvens och teknik är det som bygger
+  simning, inte volym, och R-31:s tak på 80 minuter gäller ändå. Sänks en grens vikt normeras
+  andelarna om, så veckan blir inte kortare.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -230,8 +238,10 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 **Pass**
 
 - **R-11** Antal träningsdagar: T ≤ 5 ger 4 dagar, T 6–9 ger 5 dagar, T ≥ 10 ger 6 dagar. Minst en helt vilodag i veckan. *(utökad 2026-10-28)* **Användaren väljer vilken dag som är vilodag.** Den dagen lämnas helt fri varje vecka — det enda som får ligga där är ett lopp eller dess öppningspass, eftersom R-04 väger tyngre. Formuläret föreslår måndag, dagen efter helgens långpass.
-- **R-12** Passlängd 20–300 minuter.
+- **R-12** Passlängd 20–300 minuter. *(utökad 2026-10-28)* Räcker veckans tid inte till ett pass i varje gren behåller fokusgrenen sin andel, och **de övriga grenarna roterar mellan veckorna** — urvalet styrs av veckonumret, aldrig av hur mycket tid grenen har. Annars stryks samma gren varje vecka: simningen har minst tid och tränades aldrig alls i profil P3, trots att Vansbrosimningen är ett av dess lopp. Varje gren som väljs fylls upp till minst ett helt pass innan resten fördelas efter grenarnas andelar.
 - **R-13** Ett långpass per vecka i loppets sport under specifik fas. *(ändrad 2026-10-28)* Passet läggs på **den dag användaren valt** — vilken dag som helst i veckan, inte bara helgen. Appen är byggd för folk med jobb, och alla har inte helgen fri; ett långpass på en söndag man arbetar är ett pass man inte kan göra. Formuläret föreslår söndag. Är den valda dagen upptagen av ett lopp eller ett öppningspass flyttas långpasset till den sista fria av `longSession.allowedWeekdays`, och i sista hand till någon annan fri dag — hellre ett långpass på fel dag än inget långpass. Det växer jämnt genom fasen upp till: skidor 240 min, cykel 300 min, löpning 150 min, simning 75 min. Det börjar på `startShareOfCap` av sitt tak i fasens första vecka och når taket i den sista; blir det kortare än `longSession.minMinutes` blir det inget långpass.
+
+  **De sista veckorna får långpasset låna tid från de andra grenarna** *(tillagd 2026-10-28)*, upp till taket på 70 procent i R-28. Antalet veckor står i `longSession.borrowInFinalWeeks`. Utan lånet binds långpasset av grenens andel i R-08 och hinner aldrig bli långt nog: Vasaloppets längsta pass stannade på 45 procent av loppets tid och Vätternrundans på 28 procent. Ett långpass på tre timmar inför 315 kilometer på cykel är inte en förberedelse. Lånet tas från de övriga grenarna i proportion till deras tid, så veckans totala tid är oförändrad (R-29). Det följer också arrangörens eget råd: träna mer specifikt perioden närmast varje tävling.
 - **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
 - **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält. *(utökad 2026-10-28)* Grenspecifika varianter finns nu också där **loppet** ändrar vad passet innehåller, inte bara där grenen gör det: löpningens långpass och lugna pass nämner kuperad terräng och mjukt underlag eftersom Lidingöloppet är terränglöpning, och cykelns långpass nämner klungkörning — som ett **tips**, eftersom alla inte har någon att cykla med, och med ett uttalat tillägg att passet duger lika bra ensamt.
 - **R-14** Löptak: total löptid får öka högst 10 % från en vecka till nästa (veckor efter avlastning undantagna). Nivå Ny i löpning har aldrig löppass två dagar i rad.

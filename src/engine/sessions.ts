@@ -256,11 +256,19 @@ function longSession(
 
   const växande = cap * (startShareOfCap + (1 - startShareOfCap) * andelGenomFasen);
 
+  // R-13: de sista veckorna före loppet får långpasset låna tid från de andra
+  // grenarna, upp till taket i R-28. Annars binds det av grenens andel i R-08
+  // och hinner aldrig bli långt nog — ett långpass på tre timmar inför 315
+  // kilometer på cykel är inte en förberedelse, det är en gissning.
+  const veckorKvarIFasen = iFasen.length - position;
+  const fårLåna = veckorKvarIFasen < rules.longSession.borrowInFinalWeeks;
+  const grenensTid = fårLåna ? budget.enduranceMinutes : tillgängligt;
+
   const minuter = Math.min(
     Math.round(växande),
     cap,
     Math.floor(budget.enduranceMinutes * maxShareOfWeek),
-    tillgängligt,
+    grenensTid,
     rules.session.maxMinutes,
   );
 
@@ -481,6 +489,39 @@ function remainingBySport(
     kvar.set(sport, minuter - avdrag);
   }
 
+  // Lånade långpasset mer än sin gren hade får de andra grenarna betala, i
+  // proportion till sin tid. Veckans totala tid är oförändrad.
+  if (long === null) return kvar;
+  const lånande = long.sport as TrainedSport;
+
+  const lån = -Math.min(0, kvar.get(lånande) ?? 0);
+  if (lån === 0) return kvar;
+
+  kvar.set(lånande, 0);
+
+  const övriga = [...kvar.entries()].filter(([sport]) => sport !== lånande);
+  const övrigTid = övriga.reduce((summa, [, minuter]) => summa + minuter, 0);
+  if (övrigTid <= 0) return kvar;
+
+  let kvarAttTa = Math.min(lån, övrigTid);
+  for (const [sport, minuter] of övriga) {
+    const andel = Math.round((lån * minuter) / övrigTid);
+    const tas = Math.min(andel, minuter, kvarAttTa);
+    kvar.set(sport, minuter - tas);
+    kvarAttTa -= tas;
+  }
+
+  // Avrundningsrest: ta den från den gren som har mest kvar.
+  while (kvarAttTa > 0) {
+    const störst = [...kvar.entries()]
+      .filter(([sport, minuter]) => sport !== lånande && minuter > 0)
+      .sort((a, b) => b[1] - a[1])[0];
+    if (störst === undefined) break;
+
+    kvar.set(störst[0], störst[1] - 1);
+    kvarAttTa -= 1;
+  }
+
   return kvar;
 }
 
@@ -503,38 +544,61 @@ function foldAwayTooSmallSports(
   const totalt = alla.reduce((summa, [, minuter]) => summa + minuter, 0);
   if (totalt < golv) return [];
 
-  // Rotationen: veckonumret avgör var i listan urvalet börjar.
-  const start = (week.index - 1) % alla.length;
-  const roterad = [...alla.slice(start), ...alla.slice(0, start)];
+  // Veckans fokusgren står alltid först och väljs alltid.
+  const fokus =
+    week.focusRaceId === null ? null : (raceById(week.focusRaceId).sport as TrainedSport);
 
-  // De sporter som har mest tid först, så att rotationen bara avgör lika fall.
-  const valda = [...roterad].sort((a, b) => b[1] - a[1]);
+  const övriga = alla.filter(([sport]) => sport !== fokus);
 
-  // Den minsta sporten faller bort så länge den, också efter att de bortvalda
-  // minuterna fördelats, skulle få mindre än ett pass. Det räcker inte att
-  // räkna på veckans totala tid: tar en sport 55 procent kan de övriga ligga
-  // under golvet fast summan rymmer fyra pass.
-  while (valda.length > 1) {
-    const kvarTid = valda.reduce((summa, [, minuter]) => summa + minuter, 0);
-    const minst = valda[valda.length - 1] as [TrainedSport, number];
+  // Rotationen avgör vilka av de övriga som kommer med, och den bygger på
+  // veckonumret. Urvalet får inte styras av hur mycket tid grenen har: då
+  // faller samma gren bort varje vecka, och en gren som aldrig tränas är
+  // precis det som gick fel i v0. Simningen har minst tid och skulle alltid
+  // vara den som ströks.
+  const start = övriga.length === 0 ? 0 : (week.index - 1) % övriga.length;
+  const roterade = [...övriga.slice(start), ...övriga.slice(0, start)];
 
-    if ((minst[1] * totalt) / kvarTid >= golv) break;
-    valda.pop();
-  }
+  const fokusRad = alla.find(([sport]) => sport === fokus);
 
-  // De bortvalda minuterna fördelas på de valda, i proportion till deras tid.
-  const valdTid = valda.reduce((summa, [, minuter]) => summa + minuter, 0);
-  const över = totalt - valdTid;
+  // Fokusgrenen behåller sin andel av veckan — den är vad veckan handlar om.
+  // Resten av tiden avgör hur många av de övriga grenarna som får plats, och
+  // rotationen avgör vilka. Så får varje gren sin tur över några veckor i
+  // stället för att den minsta alltid stryks.
+  const fokusTid = fokusRad === undefined ? 0 : Math.max(fokusRad[1], golv);
+  const kvarTillÖvriga = Math.max(0, totalt - fokusTid);
+  const platser = Math.min(roterade.length, Math.floor(kvarTillÖvriga / golv));
 
+  const valda: [TrainedSport, number][] =
+    fokusRad === undefined
+      ? roterade.slice(0, Math.max(1, Math.floor(totalt / golv)))
+      : [fokusRad, ...roterade.slice(0, platser)];
+
+  // Varje vald gren fylls först upp till ett helt pass. En proportionell
+  // fördelning håller annars den minsta grenen liten för alltid: simningen i
+  // en plan på tre timmar i veckan skulle få elva minuter, alltså inget pass,
+  // hur många veckor som än gick.
   const resultat: [TrainedSport, number][] = valda.map(([sport, minuter]) => [
     sport,
-    minuter + Math.floor((över * minuter) / valdTid),
+    Math.max(minuter, golv),
   ]);
 
-  // Avrundningsresten läggs på den sport som har mest tid, så inget tappas.
+  // Det som är kvar fördelas i proportion till grenarnas ursprungliga tid, så
+  // att veckans fokus ligger kvar där det ska.
+  const golvTid = resultat.reduce((summa, [, minuter]) => summa + minuter, 0);
+  const över = totalt - golvTid;
+
+  if (över > 0) {
+    const valdTid = valda.reduce((summa, [, minuter]) => summa + minuter, 0);
+    for (const [i, [, minuter]] of valda.entries()) {
+      const rad = resultat[i] as [TrainedSport, number];
+      rad[1] += Math.floor((över * minuter) / valdTid);
+    }
+  }
+
+  // Avrundningsresten läggs på den gren som har mest tid, så inget tappas.
   const summa = resultat.reduce((a, [, minuter]) => a + minuter, 0);
-  const första = resultat[0];
-  if (första !== undefined) första[1] += totalt - summa;
+  const störst = [...resultat].sort((a, b) => b[1] - a[1])[0];
+  if (störst !== undefined) störst[1] += totalt - summa;
 
   return resultat;
 }
