@@ -202,7 +202,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
   Nybörjarbonusen i R-09 räknas ovanpå säsongens vikt, inte ovanpå en jämn andel. Tiden tas från varje van gren i proportion till hur mycket utrymme den har **över** golvet — annars kan en gren med låg säsongsvikt tryckas under det.
 
-- **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`.
+- **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`. *(utökad 2026-10-28)* Styrkan viktas mot veckans fokuslopp där grenen kräver det: inför **Vasaloppet** mot överkropp och bål, eftersom stakningen kommer därifrån. Texten och övningslistan ligger i `strengthVariants.byRace` och `strengthExercises.byRace` i `config/sessions.json`; saknas loppet används den allmänna. Arrangörens eget råd är att styrkan ska vara allmän, funktionell och skadeförebyggande, med extra överkropp särskilt före skidor.
 
 **Pass**
 
@@ -210,7 +210,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-12** Passlängd 20–300 minuter.
 - **R-13** Ett långpass per vecka i loppets sport under specifik fas. *(ändrad 2026-10-28)* Passet läggs på **den dag användaren valt** — vilken dag som helst i veckan, inte bara helgen. Appen är byggd för folk med jobb, och alla har inte helgen fri; ett långpass på en söndag man arbetar är ett pass man inte kan göra. Formuläret föreslår söndag. Är den valda dagen upptagen av ett lopp eller ett öppningspass flyttas långpasset till den sista fria av `longSession.allowedWeekdays`, och i sista hand till någon annan fri dag — hellre ett långpass på fel dag än inget långpass. Det växer jämnt genom fasen upp till: skidor 240 min, cykel 300 min, löpning 150 min, simning 75 min. Det börjar på `startShareOfCap` av sitt tak i fasens första vecka och når taket i den sista; blir det kortare än `longSession.minMinutes` blir det inget långpass.
 - **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
-- **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält.
+- **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält. *(utökad 2026-10-28)* Grenspecifika varianter finns nu också där **loppet** ändrar vad passet innehåller, inte bara där grenen gör det: löpningens långpass och lugna pass nämner kuperad terräng och mjukt underlag eftersom Lidingöloppet är terränglöpning, och cykelns långpass nämner klungkörning — som ett **tips**, eftersom alla inte har någon att cykla med, och med ett uttalat tillägg att passet duger lika bra ensamt.
 - **R-14** Löptak: total löptid får öka högst 10 % från en vecka till nästa (veckor efter avlastning undantagna). Nivå Ny i löpning har aldrig löppass två dagar i rad.
 
 **Intensitet**

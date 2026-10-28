@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
-  "note": "R-30: en titel och en instruktion per passtyp. Sportspecifika varianter finns bara där sporten ändrar innehållet. Texterna visas för användaren och ska granskas av Isabelle.",
-
+  "note": "R-30: en titel och en instruktion per passtyp. Sportspecifika varianter finns bara där sporten ändrar innehållet. Texterna visas för användaren och ska granskas av Isabelle. Grenspecifika varianter finns där grenen ändrar vad passet faktiskt innehåller: Lidingöloppet är terränglöpning och Vätternrundan körs i klunga, och det syns i instruktionen.",
   "types": {
     "easy": {
       "title": "Lugnt pass",
@@ -36,7 +35,6 @@
       "instruction": "I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver."
     }
   },
-
   "sportVariants": {
     "swim.technique": {
       "title": "Simteknik",
@@ -49,9 +47,20 @@
     "ski.technique": {
       "title": "Skidteknik",
       "instruction": "Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna."
+    },
+    "run.long": {
+      "title": "Långpass i terräng",
+      "instruction": "Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten."
+    },
+    "run.easy": {
+      "title": "Lugn löptur",
+      "instruction": "Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på."
+    },
+    "bike.long": {
+      "title": "Långpass på cykel",
+      "instruction": "Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt."
     }
   },
-
   "substitutes": {
     "ski.skiErg": {
       "_rule": "R-17",
@@ -74,23 +83,77 @@
       "instruction": "Samma tid och samma zon som cykelpasset. Spinning, trainer eller motionscykel fungerar lika bra för konditionen."
     }
   },
-
   "strengthExercises": {
     "_rule": "R-10",
     "exercises": [
-      { "name": "Planka och sidoplanka", "focus": "bål" },
-      { "name": "Höftlyft", "focus": "höft" },
-      { "name": "Utfallssteg", "focus": "höft" },
-      { "name": "Tåhävningar", "focus": "vader" },
-      { "name": "Axelpress med hantlar", "focus": "axlar" },
-      { "name": "Rodd med gummiband", "focus": "axlar" }
-    ]
+      {
+        "name": "Planka och sidoplanka",
+        "focus": "bål"
+      },
+      {
+        "name": "Höftlyft",
+        "focus": "höft"
+      },
+      {
+        "name": "Utfallssteg",
+        "focus": "höft"
+      },
+      {
+        "name": "Tåhävningar",
+        "focus": "vader"
+      },
+      {
+        "name": "Axelpress med hantlar",
+        "focus": "axlar"
+      },
+      {
+        "name": "Rodd med gummiband",
+        "focus": "axlar"
+      }
+    ],
+    "byRace": {
+      "vasaloppet": [
+        {
+          "name": "Rodd med gummiband",
+          "focus": "axlar"
+        },
+        {
+          "name": "Dips mot bänk",
+          "focus": "axlar"
+        },
+        {
+          "name": "Planka och sidoplanka",
+          "focus": "bål"
+        },
+        {
+          "name": "Rysk vridning",
+          "focus": "bål"
+        },
+        {
+          "name": "Höftlyft",
+          "focus": "höft"
+        },
+        {
+          "name": "Tåhävningar",
+          "focus": "vader"
+        }
+      ]
+    }
   },
-
   "safetyNotes": {
     "openWater": {
       "_rule": "R-19, avsnitt 8",
       "text": "Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock."
+    }
+  },
+  "strengthVariants": {
+    "_rule": "R-10",
+    "note": "Styrkan är allmän och skadeförebyggande året om. Inför Vasaloppet viktas den mot överkropp och bål, eftersom stakningen kommer därifrån.",
+    "byRace": {
+      "vasaloppet": {
+        "title": "Styrka med vikt på överkropp",
+        "instruction": "Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först."
+      }
     }
   }
 }

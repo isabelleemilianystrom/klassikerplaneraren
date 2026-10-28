@@ -398,11 +398,60 @@ describe('R-30: titel och instruktion', () => {
   });
 
   it('använder den allmänna texten där ingen variant finns', () => {
-    const cykelLångpass = buildWeekPlans(P5)
+    // Skidornas långpass har ingen egen text — skidor är inte annorlunda nog.
+    expect(sessionTexts.sportVariants['ski.long']).toBeUndefined();
+
+    const skidLångpass = buildWeekPlans(P2)
+      .flatMap((plan) => plan.sessions)
+      .find((session) => session.type === 'long' && session.sport === 'ski');
+
+    expect(skidLångpass?.title).toBe(sessionTexts.types.long?.title);
+  });
+
+  it('ger löpningens långpass en text om terräng och underlag', () => {
+    // Lidingöloppet går på mjukt och ojämnt underlag, inte på asfalt.
+    const löpLångpass = buildWeekPlans(P2)
+      .flatMap((plan) => plan.sessions)
+      .find((session) => session.type === 'long' && session.sport === 'run');
+
+    expect(löpLångpass?.title).toBe(sessionTexts.sportVariants['run.long']?.title);
+    expect(löpLångpass?.instruction).toMatch(/terräng|stig|underlag/i);
+  });
+
+  it('nämner klungkörning som ett tips i cykelns långpass, inte som ett krav', () => {
+    const cykelLångpass = buildWeekPlans(P2)
       .flatMap((plan) => plan.sessions)
       .find((session) => session.type === 'long' && session.sport === 'bike');
 
-    expect(cykelLångpass?.title).toBe(sessionTexts.types.long?.title);
+    expect(cykelLångpass?.instruction).toMatch(/klunga/i);
+    // Det ska stå att passet duger ensamt — inte alla har någon att cykla med.
+    expect(cykelLångpass?.instruction).toMatch(/Tips:/);
+    expect(cykelLångpass?.instruction).toMatch(/ensam/i);
+  });
+
+  it('viktar styrkan mot överkropp i Vasaloppets block', () => {
+    const vasa = buildWeekPlans(P2).filter(
+      ({ week }) => week.focusRaceId === 'vasaloppet' && week.phase === 'specific',
+    );
+
+    const styrka = vasa.flatMap((p) => p.sessions).filter((s) => s.type === 'strength');
+    expect(styrka.length).toBeGreaterThan(0);
+    for (const session of styrka) {
+      expect(session.title).toBe(sessionTexts.strengthVariants.byRace['vasaloppet']?.title);
+      expect(session.instruction).toMatch(/överkropp/i);
+    }
+  });
+
+  it('ger allmän styrka i de andra loppens block', () => {
+    const andra = buildWeekPlans(P2).filter(
+      ({ week }) => week.focusRaceId === 'lidingoloppet' && week.phase === 'specific',
+    );
+
+    const styrka = andra.flatMap((p) => p.sessions).filter((s) => s.type === 'strength');
+    expect(styrka.length).toBeGreaterThan(0);
+    for (const session of styrka) {
+      expect(session.title).toBe(sessionTexts.types.strength?.title);
+    }
   });
 
   it('har en text för varje passtyp motorn kan skapa', () => {

@@ -829,6 +829,29 @@ function toSessions(
 }
 
 /**
+ * Den text som ligger närmast passet, eller undefined för den allmänna (R-30).
+ *
+ * Styrkan viktas mot veckans fokuslopp där grenen kräver det: inför Vasaloppet
+ * mot överkropp och bål, eftersom stakningen kommer därifrån (R-10).
+ *
+ * Grenspecifika varianter går före den allmänna texten. Simteknik beskrivs
+ * inte som skidteknik, och ett långpass i terräng inte som ett på asfalt.
+ */
+function textVariantFor(
+  session: Session,
+  week: WeekSkeleton,
+): { title: string; instruction: string } | undefined {
+  if (session.type === 'strength') {
+    return week.focusRaceId === null
+      ? undefined
+      : sessionTexts.strengthVariants.byRace[week.focusRaceId];
+  }
+
+  if (session.sport === null) return undefined;
+  return sessionTexts.sportVariants[`${session.sport}.${session.type}`];
+}
+
+/**
  * Titel och instruktion från `config/sessions.json` (R-30).
  *
  * Sportspecifika varianter går före den allmänna texten: simteknik beskrivs
@@ -836,8 +859,7 @@ function toSessions(
  * och ska märkas som ett kastat undantag, inte som ett tomt fält.
  */
 function withTitleAndInstruction(session: Session, week: WeekSkeleton, index: number): Session {
-  const variant =
-    session.sport === null ? undefined : sessionTexts.sportVariants[`${session.sport}.${session.type}`];
+  const variant = textVariantFor(session, week);
   const allmän = sessionTexts.types[session.type];
 
   const text = variant ?? allmän;

@@ -240,11 +240,17 @@ export const sessionsSchema = z.object({
   types: z.record(sessionType, textEntry),
   sportVariants: z.record(z.string(), textEntry),
   substitutes: z.record(z.string(), textEntry.extend({ _rule: z.string() })),
+  /** R-10: styrkans text, viktad mot ett lopp där grenen kräver det. */
+  strengthVariants: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    byRace: z.partialRecord(raceId, textEntry),
+  }),
   strengthExercises: z.object({
     _rule: z.string(),
-    exercises: z
-      .array(z.object({ name: z.string().min(1), focus: z.string().min(1) }))
-      .min(1),
+    exercises: z.array(z.object({ name: z.string().min(1), focus: z.string().min(1) })).min(1),
+    /** Övningar viktade mot ett lopp. Saknas loppet används exercises. */
+    byRace: z.partialRecord(raceId, z.array(z.object({ name: z.string().min(1), focus: z.string().min(1) })).min(1)),
   }),
   safetyNotes: z.object({
     openWater: z.object({ _rule: z.string(), text: z.string().min(1) }),
