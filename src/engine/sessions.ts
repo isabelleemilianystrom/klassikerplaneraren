@@ -18,7 +18,7 @@
  *
  * Rena funktioner, inga sidoeffekter. Alla siffror kommer ur `config/rules.json`.
  */
-import { weekBudgets, type WeekBudget } from './budget.ts';
+import { newLevelLimit, weekBudgets, type WeekBudget } from './budget.ts';
 import { raceById, rules, sessions as sessionTexts } from './config.ts';
 import { addDays, weekdayOf } from './dates.ts';
 import type {
@@ -344,7 +344,17 @@ function enduranceSessions(
     // kortast av allt, vilket är precis felet från v0.
     const tak = long !== null && long.sport === sport ? long.minutes : rules.session.maxMinutes;
 
-    for (const längd of splitIntoSessions(minuter, tak)) {
+    // R-31: är man ny i sporten får veckan bara så många pass som taket säger.
+    // En nybörjarkurs i simning är ett pass i veckan, inte två korta.
+    //
+    // Långpasset är redan lagt och räknas med. Är taket ett pass i veckan är
+    // långpasset alltså veckans enda pass i sporten.
+    const gräns = newLevelLimit(sport, input);
+    const redanLagt = long !== null && long.sport === sport ? 1 : 0;
+    const flestPass = (gräns?.maxSessionsPerWeek ?? Number.POSITIVE_INFINITY) - redanLagt;
+    if (flestPass <= 0) continue;
+
+    for (const längd of splitIntoSessions(minuter, tak, flestPass)) {
       const hård = hårda.get(sport)?.pop();
       resultat.push({
         sport,
@@ -355,7 +365,7 @@ function enduranceSessions(
     }
   }
 
-  return distributeLeftover(resultat, budget, long);
+  return distributeLeftover(resultat, budget, long, input);
 }
 
 /**
@@ -373,18 +383,26 @@ function distributeLeftover(
   endurance: readonly PendingSession[],
   budget: WeekBudget,
   long: PendingSession | null,
+  input: PlanInput,
 ): PendingSession[] {
   const resultat = endurance.map((session) => ({ ...session }));
 
   const planerat =
     resultat.reduce((summa, session) => summa + session.minutes, 0) + (long?.minutes ?? 0);
-  let kvar = budget.enduranceMinutes - planerat;
+  let kvar = budget.enduranceMinutes - budget.unplacedMinutes - planerat;
   if (kvar <= 0 || resultat.length === 0) return resultat;
 
   // En minut i taget på det kortaste passet som får växa. Enkelt och alltid
   // samma resultat för samma indata.
+  // R-31: ett pass i en sport man är ny i får inte växa förbi sitt veckotak.
+  const taketFör = (session: PendingSession): number => {
+    if (session.sport === 'strength') return rules.session.maxMinutes;
+    const gräns = newLevelLimit(session.sport, input);
+    return Math.min(rules.session.maxMinutes, gräns?.maxMinutesPerWeek ?? Infinity);
+  };
+
   while (kvar > 0) {
-    const kanVäxa = resultat.filter((session) => session.minutes < rules.session.maxMinutes);
+    const kanVäxa = resultat.filter((session) => session.minutes < taketFör(session));
     if (kanVäxa.length === 0) break;
 
     const kortast = kanVäxa.reduce((a, b) => (b.minutes < a.minutes ? b : a));
@@ -429,15 +447,24 @@ function foldAwayTooSmallSports(
   const totalt = alla.reduce((summa, [, minuter]) => summa + minuter, 0);
   if (totalt < golv) return [];
 
-  // Så många sporter som veckans tid räcker till, högst så många som finns.
-  const antal = Math.min(alla.length, Math.floor(totalt / golv));
-
   // Rotationen: veckonumret avgör var i listan urvalet börjar.
   const start = (week.index - 1) % alla.length;
   const roterad = [...alla.slice(start), ...alla.slice(0, start)];
 
   // De sporter som har mest tid först, så att rotationen bara avgör lika fall.
-  const valda = [...roterad].sort((a, b) => b[1] - a[1]).slice(0, antal);
+  const valda = [...roterad].sort((a, b) => b[1] - a[1]);
+
+  // Den minsta sporten faller bort så länge den, också efter att de bortvalda
+  // minuterna fördelats, skulle få mindre än ett pass. Det räcker inte att
+  // räkna på veckans totala tid: tar en sport 55 procent kan de övriga ligga
+  // under golvet fast summan rymmer fyra pass.
+  while (valda.length > 1) {
+    const kvarTid = valda.reduce((summa, [, minuter]) => summa + minuter, 0);
+    const minst = valda[valda.length - 1] as [TrainedSport, number];
+
+    if ((minst[1] * totalt) / kvarTid >= golv) break;
+    valda.pop();
+  }
 
   // De bortvalda minuterna fördelas på de valda, i proportion till deras tid.
   const valdTid = valda.reduce((summa, [, minuter]) => summa + minuter, 0);
@@ -466,13 +493,13 @@ function foldAwayTooSmallSports(
  * Två pass per sport och vecka är grundregeln. Fler blir det bara när taket
  * kräver det, för fler än så gör veckan svår att överblicka.
  */
-function splitIntoSessions(minutes: number, maxLength: number): number[] {
+function splitIntoSessions(minutes: number, maxLength: number, maxSessions: number): number[] {
   const { minMinutes } = rules.session;
   if (minutes < minMinutes) return [];
 
   const taket = Math.min(maxLength, rules.session.maxMinutes);
-  const flest = Math.floor(minutes / minMinutes);
-  const antal = Math.min(flest, Math.max(2, Math.ceil(minutes / taket)));
+  const flest = Math.min(Math.floor(minutes / minMinutes), maxSessions);
+  const antal = Math.max(1, Math.min(flest, Math.max(2, Math.ceil(minutes / taket))));
 
   const grund = Math.floor(minutes / antal);
   const rest = minutes - grund * antal;

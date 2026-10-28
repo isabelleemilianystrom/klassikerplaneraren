@@ -181,6 +181,11 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 - **R-08** Specifik fas: 55 % till loppets sport, resten fördelat jämnt mellan övriga sporter i planen. *(utökad 2026-10-27)* Innehåller planen bara en sport går 100 % dit. Innehåller den två sporter går 65 % till loppets sport och 35 % till den andra. Andelen får aldrig lämnas ofördelad — profil P4 har bara ett lopp, och 45 % hade annars ingenstans att ta vägen.
 - **R-09** Bas: jämn fördelning mellan sporterna i planen, med +10 procentenheter för sporter där nivån är Ny. *(preciserad 2026-10-28)* De tio procentenheterna **tas från de sporter där nivån är Van eller Erfaren** — att kunna cykla hjälper inte den som inte kan simma, så tiden flyttas dit tekniken saknas. Ingen sport får pressas under **halva den jämna andelen**; är nästan alla sporter nya finns det inte tio procentenheter att hämta, och då krymper bonusen till det som går att ta. Golvet är det som gör att andelarna alltid summerar till 100 procent utan att någon sport blir utan tid. Siffrorna ligger i `config/rules.json` som `newLevelBonus` och `minShareOfEvenSplit`.
+- **R-31** (tillagd 2026-10-28) **Nybörjartak per sport.** Är nivån Ny i en sport får veckan högst så många minuter och så många pass som `newLevelLimits.bySport` säger. För **simning: 80 minuter och ett pass i veckan** — en nybörjarkurs i simning är en timme i veckan, och ett program som planerar tre simpass för den som knappt kan simma är ett program som inte går att följa, hur rätt det än ser ut i en tabell. Sporter som inte står i konfigurationen har inget tak.
+
+  Loppets tid i sporten och dess öppningspass räknas av från taket. Den som är ny i simning har alltså loppet som veckans simning: inget tröskelpass läggs ovanpå 3 km i Vansbroån.
+
+  Minuterna som taket skär bort går till de sporter som har plats kvar (R-29). Har ingen sport plats blir de kvar som `unplacedMinutes`, och veckans faktiska tid blir då lägre än den valda — det ska visas för användaren, inte gömmas. Det händer bara i planer där varje sport har slagit i sitt tak, till exempel en plan med bara Vansbrosimningen för en nybörjare.
 - **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`.
 
 **Pass**
@@ -431,6 +436,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Minst en vilodag per vecka (R-11)
 - Aldrig pass i zon 3–4 två dagar i rad (R-16)
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
+- En sport där nivån är Ny håller sitt veckotak i både minuter och antal pass, loppet och öppningspasset inräknade (R-31) *(tillagd 2026-10-28)*
+- Summan av minuterna per sport plus de oplacerade minuterna är alltid exakt veckans konditionstid (R-29, R-31) *(tillagd 2026-10-28)*
 - Långpasset ligger på den valda dagen när den är fri (R-13) *(tillagd 2026-10-28)*
 - Reglerna om dagar i rad i R-14 och R-16 håller också över veckogränsen, söndag till måndag *(tillagd 2026-10-28)*
 - Löptiden ökar högst 10 % mellan veckor, utom efter avlastning (R-14)
@@ -458,6 +465,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Lopp som spänner över mer än tolv månader ger varningen i R-26 men ändå en plan
 - Start i var och en av årets tolv månader ger en hel plan där alla fyra loppen finns med, oavsett vilken ordning loppen kommer i (tillagt 2026-10-28)
 - Alla sju veckodagar som långpassdag och som vilodag: planen håller samtliga regler i varje kombination (tillagt 2026-10-28)
+- Plan med bara Vansbrosimningen och nivå Ny: veckan stannar på 80 minuter och resten redovisas som oplacerad tid (R-31) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**

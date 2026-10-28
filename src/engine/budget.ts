@@ -33,10 +33,20 @@ export interface WeekBudget {
   /** Konditionstid kvar att fördela mellan sporterna. */
   enduranceMinutes: number;
   /**
-   * Minuter per sport. Summerar alltid exakt till `enduranceMinutes` (R-29) —
+   * Minuter per sport, efter nybörjartaken i R-31.
+   *
+   * Summan plus `unplacedMinutes` är alltid exakt `enduranceMinutes` (R-29) —
    * ingen minut får försvinna i en avrundning.
    */
   bySport: Partial<Record<TrainedSport, number>>;
+  /**
+   * Minuter som inte gick att lägga någonstans (R-29, R-31).
+   *
+   * Noll i normalfallet. Blir det mer än noll har varje sport i planen slagit
+   * i sitt nybörjartak, och då är veckans faktiska tid lägre än den valda —
+   * det ska visas för användaren, inte gömmas.
+   */
+  unplacedMinutes: number;
 }
 
 /** Sporterna planen omfattar, i fast ordning. Styrka räknas inte som en sport. */
@@ -74,14 +84,104 @@ function weekBudget(
   const strengthMinutes = Math.min(kvar, strengthBudget(week.phase));
   const enduranceMinutes = kvar - strengthMinutes;
 
+  const bySport = splitBetweenSports(enduranceMinutes, week, input, sports);
+  const placerat = Object.values(bySport).reduce((a, b) => a + b, 0);
+
   return {
     index: week.index,
     phaseMinutes,
     raceMinutes,
     strengthMinutes,
     enduranceMinutes,
-    bySport: splitBetweenSports(enduranceMinutes, week, input, sports),
+    bySport,
+    unplacedMinutes: enduranceMinutes - placerat,
   };
+}
+
+/**
+ * Loppens tid i en viss sport den här veckan, öppningspasset inräknat.
+ *
+ * Används bara av nybörjartaken i R-31. Själva veckobudgeten räknar av loppet
+ * i R-25, men det gör den för hela veckan och inte per sport.
+ */
+function raceMinutesInSport(week: WeekSkeleton, sport: TrainedSport): number {
+  const egna = week.raceIds.filter((id) => raceById(id).sport === sport);
+  if (egna.length === 0) return 0;
+
+  const loppen = egna.reduce(
+    (summa, id) => summa + Math.round(raceById(id).estimatedHours * 60),
+    0,
+  );
+
+  return loppen + rules.raceDay.openerMinutesDayBefore;
+}
+
+/** Sportens tak för den som är ny i den, eller null om den inte har något (R-31). */
+export function newLevelLimit(
+  sport: TrainedSport,
+  input: PlanInput,
+): { maxMinutesPerWeek: number; maxSessionsPerWeek: number } | null {
+  if (input.levels[sport] !== 'new') return null;
+  return rules.newLevelLimits.bySport[sport] ?? null;
+}
+
+/**
+ * Nybörjartaken tillämpade, med de frigjorda minuterna flyttade (R-31, R-29).
+ *
+ * En nybörjarkurs i simning är en timme i veckan. Får den som knappt kan simma
+ * tre timmar simning i veckan är det ett program som inte går att följa, hur
+ * rätt det än ser ut i en tabell.
+ *
+ * Minuterna som taket skär bort går till de sporter som har plats kvar. Har
+ * ingen sport plats blir de kvar som `unplacedMinutes` — veckan blir då kortare
+ * än den valda tiden, och det är sanningen om vad som går att träna.
+ */
+function applyNewLevelLimits(
+  bySport: Partial<Record<TrainedSport, number>>,
+  input: PlanInput,
+  sports: readonly TrainedSport[],
+  week: WeekSkeleton,
+): Partial<Record<TrainedSport, number>> {
+  const tak = new Map<TrainedSport, number>();
+  for (const sport of sports) {
+    const gräns = newLevelLimit(sport, input);
+    if (gräns === null) continue;
+
+    // Loppet och dess öppningspass är redan tid i sporten och räknas av. Den
+    // som är ny i simning har loppet som veckans simning — inget tröskelpass
+    // ska läggas ovanpå 3 km i Vansbroån.
+    tak.set(sport, Math.max(0, gräns.maxMinutesPerWeek - raceMinutesInSport(week, sport)));
+  }
+  if (tak.size === 0) return bySport;
+
+  const resultat = { ...bySport };
+  let över = 0;
+
+  for (const [sport, gräns] of tak) {
+    const har = resultat[sport] ?? 0;
+    if (har > gräns) {
+      över += har - gräns;
+      resultat[sport] = gräns;
+    }
+  }
+
+  // De frigjorda minuterna, en i taget till den sport som har mest utrymme
+  // kvar. Enkelt, och alltid samma resultat för samma indata.
+  while (över > 0) {
+    const medPlats = sports.filter((sport) => {
+      const gräns = tak.get(sport);
+      return gräns === undefined || (resultat[sport] ?? 0) < gräns;
+    });
+    if (medPlats.length === 0) break;
+
+    const minst = medPlats.reduce((a, b) =>
+      (resultat[b] ?? 0) < (resultat[a] ?? 0) ? b : a,
+    );
+    resultat[minst] = (resultat[minst] ?? 0) + 1;
+    över -= 1;
+  }
+
+  return resultat;
 }
 
 /**
@@ -157,7 +257,7 @@ function splitBetweenSports(
       ? specificShares(week, sports)
       : evenSharesWithNewBonus(input, sports);
 
-  return distribute(minutes, sports, andelar);
+  return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
 }
 
 /**

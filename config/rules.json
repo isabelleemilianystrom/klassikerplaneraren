@@ -90,6 +90,14 @@
     "minMinutes": 45
   },
 
+  "newLevelLimits": {
+    "_rule": "R-31",
+    "note": "Nybörjarkurser i simning är en timme i veckan. Ett program som planerar tre simpass för den som knappt kan simma är ett program som inte går att följa. Sporter som inte står här har ingen gräns.",
+    "bySport": {
+      "swim": { "maxMinutesPerWeek": 80, "maxSessionsPerWeek": 1 }
+    }
+  },
+
   "runVolume": {
     "_rule": "R-14",
     "maxWeeklyIncrease": 0.1,

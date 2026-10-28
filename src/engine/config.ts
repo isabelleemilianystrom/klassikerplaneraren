@@ -133,6 +133,18 @@ export const rulesSchema = z.object({
     /** Under det här är passet inget långpass, och planen får inget alls. */
     minMinutes: z.number().int().positive(),
   }),
+  newLevelLimits: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    /** Per sport. Saknas sporten har den ingen gräns. Se R-31. */
+    bySport: z.partialRecord(
+      sport,
+      z.object({
+        maxMinutesPerWeek: z.number().int().positive(),
+        maxSessionsPerWeek: z.number().int().positive(),
+      }),
+    ),
+  }),
   runVolume: z.object({
     _rule: z.string(),
     maxWeeklyIncrease: share,

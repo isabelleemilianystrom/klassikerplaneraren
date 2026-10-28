@@ -418,3 +418,97 @@ describe('determinism', () => {
     expect(weekBudgets(baklänges)).toEqual(weekBudgets(P6));
   });
 });
+
+describe('R-31: nybörjartak per sport', () => {
+  const TAK = rules.newLevelLimits.bySport.swim as {
+    maxMinutesPerWeek: number;
+    maxSessionsPerWeek: number;
+  };
+
+  it('ger den som är ny i simning högst 80 minuter i veckan', () => {
+    // P1 är ny i simning. Nybörjarkurser är en timme i veckan.
+    for (const { vecka, budget } of veckorMedBudget(P1)) {
+      expect(budget.bySport.swim ?? 0, `vecka ${vecka.index}`).toBeLessThanOrEqual(
+        TAK.maxMinutesPerWeek,
+      );
+    }
+  });
+
+  it('gäller också i den specifika fasen mot Vansbrosimningen', () => {
+    // Utan taket får simningen 55 procent av veckan här, alltså 187 minuter.
+    const vansbro = veckorMedBudget(P1).filter(
+      ({ vecka, budget }) =>
+        vecka.phase === 'specific' &&
+        vecka.focusRaceId === 'vansbrosimningen' &&
+        budget.enduranceMinutes > 0,
+    );
+
+    expect(vansbro.length).toBeGreaterThan(0);
+    for (const { vecka, budget } of vansbro) {
+      expect(budget.bySport.swim, `vecka ${vecka.index}`).toBeLessThanOrEqual(
+        TAK.maxMinutesPerWeek,
+      );
+    }
+  });
+
+  it('räknar loppet och öppningspasset mot taket', () => {
+    // Vansbrosimningen tar en timme och öppningspasset 25 minuter. Tillsammans
+    // är det mer än taket, så loppveckan får ingen planerad simträning alls.
+    const loppveckan = veckorMedBudget(P1).find(({ vecka }) =>
+      vecka.raceIds.includes('vansbrosimningen'),
+    );
+
+    expect(loppveckan).toBeDefined();
+    expect(loppveckan?.budget.bySport.swim).toBe(0);
+  });
+
+  it('flyttar de frigjorda minuterna till de andra sporterna', () => {
+    for (const { vecka, budget } of veckorMedBudget(P1)) {
+      expect(
+        summaAvSporter(budget.bySport) + budget.unplacedMinutes,
+        `vecka ${vecka.index}`,
+      ).toBe(budget.enduranceMinutes);
+    }
+  });
+
+  it('rör inte den som är van i sporten', () => {
+    // P2 är erfaren i allt och ska inte träffas av något tak.
+    const över = veckorMedBudget(P2).filter(
+      ({ budget }) => (budget.bySport.swim ?? 0) > TAK.maxMinutesPerWeek,
+    );
+    expect(över.length).toBeGreaterThan(0);
+  });
+
+  it('lämnar inga minuter oplacerade när andra sporter har plats', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        expect(budget.unplacedMinutes, `${namn} vecka ${vecka.index}`).toBe(0);
+      }
+    }
+  });
+
+  it('visar veckans faktiska tid när ingen sport har plats kvar', () => {
+    // En plan med bara Vansbrosimningen, för en nybörjare: taket på 80 minuter
+    // är allt som går att träna, hur många timmar hon än har sagt att hon kan.
+    const baraSimning: PlanInput = {
+      ...P1,
+      races: [{ id: 'vansbrosimningen', date: '2027-07-10' }],
+      levels: { swim: 'new' },
+      hoursPerWeek: 8,
+    };
+
+    const basveckor = veckorMedBudget(baraSimning).filter(
+      ({ vecka, budget }) => vecka.phase === 'base' && budget.enduranceMinutes > 0,
+    );
+
+    expect(basveckor.length).toBeGreaterThan(0);
+    for (const { vecka, budget } of basveckor) {
+      expect(budget.bySport.swim, `vecka ${vecka.index}`).toBe(TAK.maxMinutesPerWeek);
+      expect(budget.unplacedMinutes, `vecka ${vecka.index}`).toBeGreaterThan(0);
+      expect(
+        summaAvSporter(budget.bySport) + budget.unplacedMinutes,
+        `vecka ${vecka.index}`,
+      ).toBe(budget.enduranceMinutes);
+    }
+  });
+});

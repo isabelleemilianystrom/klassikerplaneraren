@@ -672,3 +672,72 @@ describe('reglerna om dagar i rad håller över veckogränsen', () => {
     }
   });
 });
+
+describe('R-31: nybörjaren får ett pass i veckan', () => {
+  const TAK = rules.newLevelLimits.bySport.swim as {
+    maxMinutesPerWeek: number;
+    maxSessionsPerWeek: number;
+  };
+
+  /** Simpassen i veckan, loppet undantaget. */
+  function simpass(plan: WeekPlan): Session[] {
+    return träning(plan).filter(
+      (session) => session.sport === 'swim' && session.type !== 'race',
+    );
+  }
+
+  it('ger högst ett simpass i veckan åt den som är ny i simning', () => {
+    // P1 är ny i simning. En nybörjarkurs är ett pass i veckan, inte två korta.
+    for (const plan of buildWeekPlans(P1)) {
+      // Loppveckan har sitt öppningspass, som R-04 kräver.
+      if (plan.budget.raceMinutes > 0) continue;
+
+      expect(simpass(plan).length, `vecka ${plan.week.index}`).toBeLessThanOrEqual(
+        TAK.maxSessionsPerWeek,
+      );
+    }
+  });
+
+  it('håller minuttaket också när långpasset är simningens pass', () => {
+    for (const plan of buildWeekPlans(P1)) {
+      if (plan.budget.raceMinutes > 0) continue;
+
+      const minuter = simpass(plan).reduce((summa, session) => summa + session.minutes, 0);
+      expect(minuter, `vecka ${plan.week.index}`).toBeLessThanOrEqual(TAK.maxMinutesPerWeek);
+    }
+  });
+
+  it('gör långpasset till veckans enda simpass i Vansbroblocket', () => {
+    const vansbro = buildWeekPlans(P1).filter(
+      ({ week, budget }) =>
+        week.phase === 'specific' &&
+        week.focusRaceId === 'vansbrosimningen' &&
+        budget.enduranceMinutes > 0,
+    );
+
+    expect(vansbro.length).toBeGreaterThan(0);
+    for (const plan of vansbro) {
+      const pass = simpass(plan);
+      expect(pass.length, `vecka ${plan.week.index}`).toBe(1);
+      expect(pass[0]?.type, `vecka ${plan.week.index}`).toBe('long');
+    }
+  });
+
+  it('ger loppveckan bara öppningspasset och loppet', () => {
+    const loppveckan = buildWeekPlans(P1).find((plan) =>
+      plan.week.raceIds.includes('vansbrosimningen'),
+    );
+
+    const pass = simpass(loppveckan as WeekPlan);
+    expect(pass.length).toBe(1);
+    expect(pass[0]?.minutes).toBe(rules.raceDay.openerMinutesDayBefore);
+  });
+
+  it('rör inte den som är van i simning', () => {
+    // P2 är erfaren och ska kunna ha både fler och längre simpass.
+    const fler = buildWeekPlans(P2).some(
+      (plan) => simpass(plan).reduce((a, s) => a + s.minutes, 0) > TAK.maxMinutesPerWeek,
+    );
+    expect(fler).toBe(true);
+  });
+});
