@@ -146,34 +146,46 @@ describe('R-02: faserna', () => {
 });
 
 describe('R-03: blocklogiken', () => {
-  it('tar bort återhämtningen efter det första av två tätt liggande lopp', () => {
+  it('kortar nedtrappningen för det andra loppet, inte återhämtningen', () => {
     const lopp = placeRaces(P5);
     const vattern = lopp.find((race) => race.id === 'vatternrundan');
     const vansbro = lopp.find((race) => race.id === 'vansbrosimningen');
 
     // Två veckor isär, alltså mindre än fyra.
     expect((vansbro?.weekIndex as number) - (vattern?.weekIndex as number)).toBe(2);
-    expect(vattern?.recoveryWeeks).toBe(0);
     expect(vansbro?.taperWeeks).toBe(1);
+
+    // Kroppen ska få vila efter 315 kilometer. Återhämtningen kortas bara så
+    // mycket som behövs för att inte läggas ovanpå nästa loppvecka: en vecka
+    // ryms mellan loppen, alltså blir det en.
+    expect(vattern?.recoveryWeeks).toBe(1);
   });
 
-  it('ger ingen återhämtningsvecka mellan loppen i P5', () => {
+  it('ger återhämtning mellan loppen i P5', () => {
     const veckor = buildWeeks(P5);
     const vattern = weekOfRace(P5, 'vatternrundan');
+
+    // Veckan direkt efter Vätternrundan är återhämtning, inte uppbyggnad.
+    expect(veckor[vattern]?.phase).toBe('recovery');
+    expect(veckor[vattern]?.focusRaceId).toBe('vatternrundan');
+  });
+
+  it('ger det andra loppet bara sin loppvecka när de ligger tätt', () => {
+    // Ligger Vansbrosimningen två veckor efter Vätternrundan hinner den inte
+    // få någon egen uppbyggnad — veckan emellan är återhämtning. Det är ett
+    // medvetet val: tre kilometer simning är görbart med tekniken i ryggen,
+    // och kroppen behöver vilan efter 315 kilometer mer än den behöver
+    // ytterligare simvolym.
+    const veckor = buildWeeks(P5);
     const vansbro = weekOfRace(P5, 'vansbrosimningen');
 
-    for (let i = vattern; i < vansbro - 1; i += 1) {
-      expect(veckor[i]?.phase, `vecka ${i + 1}`).not.toBe('recovery');
-    }
-  });
+    expect(veckor[vansbro - 1]?.phase).toBe('taper');
+    expect(veckor[vansbro - 1]?.focusRaceId).toBe('vansbrosimningen');
 
-  it('gör veckan mellan loppen till specifik fas för det andra loppet', () => {
-    const veckor = buildWeeks(P5);
-    const vattern = weekOfRace(P5, 'vatternrundan');
-    const mellanvecka = veckor[vattern];
-
-    expect(mellanvecka?.phase).toBe('specific');
-    expect(mellanvecka?.focusRaceId).toBe('vansbrosimningen');
+    const egna = veckor.filter(
+      (vecka) => vecka.focusRaceId === 'vansbrosimningen' && vecka.phase === 'specific',
+    );
+    expect(egna).toEqual([]);
   });
 
   it('rör inte lopp som ligger fyra veckor eller mer isär', () => {
@@ -201,8 +213,10 @@ describe('R-03: blocklogiken', () => {
     const vansbro = lopp.find((race) => race.id === 'vansbrosimningen');
 
     expect((vansbro?.weekIndex as number) - (vattern?.weekIndex as number)).toBe(3);
-    expect(vattern?.recoveryWeeks).toBe(0);
     expect(vansbro?.taperWeeks).toBe(1);
+
+    // Tre veckor isär rymmer båda återhämtningsveckorna efter Vätternrundan.
+    expect(vattern?.recoveryWeeks).toBe(2);
   });
 });
 

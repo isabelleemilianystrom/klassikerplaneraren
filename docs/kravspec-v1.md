@@ -140,7 +140,7 @@ Reglerna nedan är förslag som granskas enligt fråga 5. Claude Code implemente
 | --- | --- | --- | --- | --- | --- | --- |
 | Vasaloppet | Längdskidor | 90 km | 7 h | 2 veckor | 2 veckor | 8 veckor |
 | Vätternrundan | Cykel | 315 km | 11 h | 2 veckor | 2 veckor | 8 veckor |
-| Vansbrosimningen | Simning | 3 km | 1 h | 1 vecka | 1 vecka | 6 veckor |
+| Vansbrosimningen | Simning | 3 km | 1,25 h | 1 vecka | 1 vecka | 6 veckor |
 | Lidingöloppet | Löpning | 30 km | 3,5 h | 1 vecka | 1 vecka | 8 veckor |
 
 **Uppskattad tid** (tillagd 2026-10-27) är hur länge en motionär är ute i loppet. Siffran är grov men storleksordningen avgör: loppet är veckans största belastning och måste räknas som träning. Se R-25.
@@ -165,7 +165,21 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 - **R-01** Planen går från måndagen i startdatumets vecka till söndagen i veckan med sista loppet. Veckor börjar på måndag.
 - **R-02** Varje vecka får en fas utifrån närmaste kommande lopp: Återhämtning (veckorna direkt efter ett lopp), Nedtrappning (sista veckorna före loppet), Specifik (veckorna före nedtrappningen) och Bas (övrig tid). Ordningen gäller i den prioriteten.
-- **R-03** Blocklogik: ligger två lopp mindre än 4 veckor isär, får det första loppet ingen återhämtningsvecka, nedtrappningen inför det andra blir 1 vecka och veckorna däremellan är specifik fas för det andra loppet.
+- **R-03** *(ändrad 2026-10-28)* Ligger två lopp mindre än fyra veckor isär får det andra
+  loppet en veckas nedtrappning i stället för sin vanliga, så att nedtrappningen inte kräver
+  veckor som redan är återhämtning.
+
+  **Återhämtningen efter det första loppet behålls.** Den kortas bara så mycket som krävs för
+  att inte sträcka sig in i nästa loppvecka. Tidigare ströks den helt, vilket innebar att den
+  som gör hela klassikern inte fick någon vila efter 315 kilometer på cykel — och det gällde
+  normalfallet, eftersom Vätternrundan och Vansbrosimningen ligger tre veckor isär med de
+  riktiga datumen.
+
+  Följden är att **Vansbrosimningen inte får någon egen specifik fas** när den följer nära på
+  Vätternrundan. Det är ett medvetet val: loppet är tre kilometer och en motionär simmar det
+  på en till en och en halv timme, alltså görbart med tekniken i ryggen. Simningen byggs upp
+  under årets bas- och specifikveckor, och hålls uppe med teknikpass under återhämtningen
+  (R-33). Kroppen behöver vilan efter Vätternrundan mer än den behöver ytterligare simvolym.
 - **R-27** (tillagd 2026-10-27) Flera lopp samma vecka: alla lopp som infaller samma vecka hör till den veckan. Veckan är nedtrappning för det första av dem, men varje lopp markeras, räknas som belastning enligt R-25 och får sin säkerhetstext. Inget lopp får försvinna ur planen för att ett annat ligger samma vecka.
 - **R-04** Loppdagen innehåller bara loppet. Dagen före ett lopp innehåller högst ett kort öppningspass på 20–30 minuter i loppets sport, i zon 1–2, eller vila. *(utökad 2026-10-27)*
 
@@ -201,6 +215,15 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   Månaden tas från veckans måndag. Innehåller planen inte alla fyra grenarna normeras vikterna till 100 procent över de som finns. Alla tolv månader måste höra till exakt en säsong och vikterna i varje säsong summera till 1; båda kontrolleras av schemat vid start.
 
   Nybörjarbonusen i R-09 räknas ovanpå säsongens vikt, inte ovanpå en jämn andel. Tiden tas från varje van gren i proportion till hur mycket utrymme den har **över** golvet — annars kan en gren med låg säsongsvikt tryckas under det.
+
+- **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
+  teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
+  `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
+
+  Kroppen ska få vila efter ett långt lopp, men tekniken tappas fort — särskilt i simning, där
+  det inte hjälper att ha cyklat. Ett teknikpass håller den uppe utan att belasta: kort, lugnt
+  och med fokus på rörelsen i stället för på tiden. Det är därför veckan efter Vätternrundan
+  innehåller ett simteknikpass fast den i övrigt är vila.
 
 - **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`. *(utökad 2026-10-28)* Styrkan viktas mot veckans fokuslopp där grenen kräver det: inför **Vasaloppet** mot överkropp och bål, eftersom stakningen kommer därifrån. Texten och övningslistan ligger i `strengthVariants.byRace` och `strengthExercises.byRace` i `config/sessions.json`; saknas loppet används den allmänna. Arrangörens eget råd är att styrkan ska vara allmän, funktionell och skadeförebyggande, med extra överkropp särskilt före skidor.
 
@@ -386,7 +409,7 @@ v1.0 samlar inga personuppgifter: ingen databas, inga konton, inga hälsofrågor
 | Röda flaggor | Planens topp | Avbryt passet och sök vård om du får bröstsmärta, ovanlig andfåddhet, yrsel eller oregelbunden puls. |
 | Smärtregel | Planen | Träningsvärk som går över på ett par dagar är normalt. Gör det ont mer och mer, haltar du eller sitter smärtan kvar nästa dag – vila den sporten och byt till något skonsammare. |
 | Sjukdom | Planen | Har du feber – vila. Börja sedan lugnt och ta inte igen missade pass. |
-| Öppet vatten | Varje pass i öppet vatten | Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. |
+| Öppet vatten | Varje pass i öppet vatten | Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen. *(utökad 2026-10-28)* |
 | AI-märkning | Vid förklaringarna | Förklaringarna är skrivna med hjälp av AI. |
 | Oberoende | Planens fot | Klassikerplaneraren är inte knuten till Vasaloppet, Vätternrundan, Vansbrosimningen, Lidingöloppet eller En svensk klassiker. |
 
@@ -451,6 +474,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Veckans totala tid överskrider aldrig fasens tid enligt R-05–R-07
 - Minst en vilodag per vecka (R-11)
 - Aldrig pass i zon 3–4 två dagar i rad (R-16)
+- Återhämtningen efter ett lopp finns kvar och kortas bara så att den inte går in i nästa loppvecka (R-03) *(tillagd 2026-10-28)*
+- Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
 - Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
 - En sport där nivån är Ny håller sitt veckotak i både minuter och antal pass, loppet och öppningspasset inräknade (R-31) *(tillagd 2026-10-28)*

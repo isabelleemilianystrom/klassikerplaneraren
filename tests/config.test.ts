@@ -59,7 +59,8 @@ describe('config/races.json', () => {
   it('har uppskattad tid för varje lopp, som R-25 behöver', () => {
     expect(raceById('vasaloppet').estimatedHours).toBe(7);
     expect(raceById('vatternrundan').estimatedHours).toBe(11);
-    expect(raceById('vansbrosimningen').estimatedHours).toBe(1);
+    // En amatör simmar Vansbro på 1–1,5 timmar; 1,25 är mitten.
+    expect(raceById('vansbrosimningen').estimatedHours).toBe(1.25);
     expect(raceById('lidingoloppet').estimatedHours).toBe(3.5);
   });
 
@@ -214,7 +215,7 @@ describe('config/sessions.json', () => {
 
   it('har säkerhetstexten för öppet vatten ordagrant från avsnitt 8', () => {
     expect(sessions.safetyNotes.openWater.text).toBe(
-      'Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock.',
+      'Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.',
     );
   });
 

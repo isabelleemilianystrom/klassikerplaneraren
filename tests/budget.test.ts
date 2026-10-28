@@ -165,8 +165,8 @@ describe('R-25: loppet räknas som belastning', () => {
     };
 
     const loppveckan = veckorMedBudget(sammaVecka).find(({ vecka }) => vecka.raceIds.length === 2);
-    // Vätternrundan 11 timmar plus Vansbrosimningen 1 timme.
-    expect(loppveckan?.budget.raceMinutes).toBe(720);
+    // Vätternrundan 11 timmar plus Vansbrosimningen 1,25 timmar.
+    expect(loppveckan?.budget.raceMinutes).toBe(735);
   });
 });
 
@@ -463,17 +463,22 @@ describe('R-31: nybörjartak per sport', () => {
     }
   });
 
-  it('gäller också i den specifika fasen mot Vansbrosimningen', () => {
-    // Utan taket får simningen 55 procent av veckan här, alltså 187 minuter.
-    const vansbro = veckorMedBudget(P1).filter(
-      ({ vecka, budget }) =>
-        vecka.phase === 'specific' &&
-        vecka.focusRaceId === 'vansbrosimningen' &&
-        budget.enduranceMinutes > 0,
+  it('gäller också i ett eget simblock', () => {
+    // Utan taket skulle simningen få hela veckan i sitt eget block. Efter
+    // Vätternrundan hinner Vansbrosimningen inte få någon specifik fas, så
+    // fallet prövas med en plan där simningen ligger ensam.
+    const simblock: PlanInput = {
+      ...P1,
+      races: [{ id: 'vansbrosimningen', date: '2027-07-10' }],
+      levels: { swim: 'new' },
+    };
+
+    const specifika = veckorMedBudget(simblock).filter(
+      ({ vecka, budget }) => vecka.phase === 'specific' && budget.enduranceMinutes > 0,
     );
 
-    expect(vansbro.length).toBeGreaterThan(0);
-    for (const { vecka, budget } of vansbro) {
+    expect(specifika.length).toBeGreaterThan(0);
+    for (const { vecka, budget } of specifika) {
       expect(budget.bySport.swim, `vecka ${vecka.index}`).toBeLessThanOrEqual(
         TAK.maxMinutesPerWeek,
       );

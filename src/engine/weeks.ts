@@ -51,10 +51,14 @@ export function weekCount(input: PlanInput): number {
 /**
  * Loppen placerade på veckor, i datumordning, med blocklogiken i R-03 tillämpad.
  *
- * Ligger två lopp mindre än fyra veckor isär förlorar det första sin
- * återhämtningsvecka och det andra får en veckas nedtrappning. Veckorna
- * däremellan blir då specifik fas för det andra loppet, vilket faller ut av
- * sig självt när fönstren räknas om.
+ * Ligger två lopp mindre än fyra veckor isär får det andra loppet en veckas
+ * nedtrappning i stället för sin vanliga, så att nedtrappningen inte kräver
+ * veckor som redan är återhämtning.
+ *
+ * Återhämtningen efter det första loppet behålls (ändrad 2026-10-28). Kroppen
+ * ska få vila efter 315 kilometer på cykel, och Vansbrosimningen är tre
+ * kilometer — ingen belastning som motiverar att den vilan stryks. Den kortas
+ * bara så mycket som krävs för att inte läggas ovanpå nästa loppvecka.
  */
 export function placeRaces(input: PlanInput): PlacedRace[] {
   const first = startOfWeek(input.startDate);
@@ -77,10 +81,14 @@ export function placeRaces(input: PlanInput): PlacedRace[] {
     const föregående = placed[i - 1] as PlacedRace;
     const detta = placed[i] as PlacedRace;
     const avstånd = detta.weekIndex - föregående.weekIndex;
+    if (avstånd <= 0) continue;
 
-    if (avstånd > 0 && avstånd < rules.blocks.sharedBlockMaxWeeks) {
-      föregående.recoveryWeeks = 0;
-      detta.taperWeeks = rules.blocks.taperWeeksWhenShared;
+    // Återhämtningen får aldrig sträcka sig in i eller förbi nästa loppvecka.
+    // Det är den enda anledningen att korta den.
+    föregående.recoveryWeeks = Math.min(föregående.recoveryWeeks, avstånd - 1);
+
+    if (avstånd < rules.blocks.sharedBlockMaxWeeks) {
+      detta.taperWeeks = Math.min(detta.taperWeeks, rules.blocks.taperWeeksWhenShared);
     }
   }
 

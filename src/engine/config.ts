@@ -218,6 +218,12 @@ export const rulesSchema = z.object({
     openWaterMonths: z.array(z.number().int().min(1).max(12)).min(1),
     swimDrylandBeforeMonth: z.number().int().min(1).max(12),
   }),
+  /** R-33: grenar som behåller teknikpass under återhämtningen. */
+  recovery: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    techniqueSports: z.array(sport).min(1),
+  }),
   classicWindow: z.object({ _rule: z.string(), months: z.number().int().positive() }),
   warnings: z.object({
     _rule: z.string(),

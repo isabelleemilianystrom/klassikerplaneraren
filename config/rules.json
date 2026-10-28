@@ -2,12 +2,11 @@
   "schemaVersion": 1,
   "rulesVersion": "1.0.0",
   "note": "Varje post hänvisar till sin regel i kravspecens avsnitt 5. Siffrorna ligger här och aldrig i motorn, så att de går att ändra utan att röra koden.",
-
   "weekTime": {
     "_rule": "R-05, R-06, R-07",
     "phaseShare": {
       "base": 0.75,
-      "specific": 1.0,
+      "specific": 1,
       "recovery": 0.5
     },
     "taperShare": {
@@ -24,30 +23,26 @@
       "maxShare": 0.6
     }
   },
-
   "raceLoad": {
     "_rule": "R-25",
     "subtractEstimatedRaceHours": true
   },
-
   "leftoverMinutes": {
     "_rule": "R-29",
     "distributeIntoExistingSessions": true
   },
-
   "sportSplit": {
     "_rule": "R-08, R-09",
     "specific": {
       "raceSportShare": 0.55,
       "raceSportShareWhenTwoSports": 0.65,
-      "raceSportShareWhenOneSport": 1.0
+      "raceSportShareWhenOneSport": 1
     },
     "base": {
       "newLevelBonus": 0.1,
       "minShareOfEvenSplit": 0.5
     }
   },
-
   "strength": {
     "_rule": "R-10",
     "minutesPerSession": 20,
@@ -58,24 +53,30 @@
       "recovery": 0
     }
   },
-
   "trainingDays": {
     "_rule": "R-11",
     "byHoursPerWeek": [
-      { "upToHours": 5, "days": 4 },
-      { "upToHours": 9, "days": 5 },
-      { "upToHours": 15, "days": 6 }
+      {
+        "upToHours": 5,
+        "days": 4
+      },
+      {
+        "upToHours": 9,
+        "days": 5
+      },
+      {
+        "upToHours": 15,
+        "days": 6
+      }
     ],
     "minRestDays": 1,
     "preferredRestWeekday": 1
   },
-
   "session": {
     "_rule": "R-12",
     "minMinutes": 20,
     "maxMinutes": 300
   },
-
   "longSession": {
     "_rule": "R-13, R-28",
     "maxShareOfWeek": 0.7,
@@ -85,47 +86,79 @@
       "run": 150,
       "swim": 75
     },
-    "allowedWeekdays": [6, 7],
+    "allowedWeekdays": [
+      6,
+      7
+    ],
     "startShareOfCap": 0.5,
     "minMinutes": 45
   },
-
   "seasonWeights": {
     "_rule": "R-32",
     "note": "Man behöver inte fokusera på alla grenar samtidigt. Vintern är skidornas och sommaren cykelns — det är där de långa passen går att lägga utan att slita ut kroppen, och det är de två längsta loppen. Löpningen hålls nere året om eftersom den sliter mer. Alla tolv månader måste täckas exakt en gång, och vikterna i varje säsong måste summera till 1.",
     "seasons": [
       {
         "name": "winter",
-        "months": [11, 12, 1, 2, 3],
-        "weights": { "ski": 0.5, "bike": 0.15, "swim": 0.15, "run": 0.2 }
+        "months": [
+          11,
+          12,
+          1,
+          2,
+          3
+        ],
+        "weights": {
+          "ski": 0.5,
+          "bike": 0.15,
+          "swim": 0.15,
+          "run": 0.2
+        }
       },
       {
         "name": "shoulder",
-        "months": [4, 10],
-        "weights": { "ski": 0.25, "bike": 0.35, "swim": 0.2, "run": 0.2 }
+        "months": [
+          4,
+          10
+        ],
+        "weights": {
+          "ski": 0.25,
+          "bike": 0.35,
+          "swim": 0.2,
+          "run": 0.2
+        }
       },
       {
         "name": "summer",
-        "months": [5, 6, 7, 8, 9],
-        "weights": { "ski": 0.1, "bike": 0.5, "swim": 0.2, "run": 0.2 }
+        "months": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "weights": {
+          "ski": 0.1,
+          "bike": 0.5,
+          "swim": 0.2,
+          "run": 0.2
+        }
       }
     ]
   },
-
   "newLevelLimits": {
     "_rule": "R-31",
     "note": "Nybörjarkurser i simning är en timme i veckan. Ett program som planerar tre simpass för den som knappt kan simma är ett program som inte går att följa. Sporter som inte står här har ingen gräns.",
     "bySport": {
-      "swim": { "maxMinutesPerWeek": 80, "maxSessionsPerWeek": 1 }
+      "swim": {
+        "maxMinutesPerWeek": 80,
+        "maxSessionsPerWeek": 1
+      }
     }
   },
-
   "runVolume": {
     "_rule": "R-14",
     "maxWeeklyIncrease": 0.1,
     "noBackToBackForNewLevel": true
   },
-
   "intensity": {
     "_rule": "R-15, R-16",
     "zoneText": {
@@ -135,37 +168,50 @@
       "4": "Hårt – bara några ord i taget"
     },
     "byPhase": {
-      "base": { "hardSessionsPerWeek": 1, "maxZone": 3 },
-      "specific": { "hardSessionsPerWeek": 2, "maxZone": 4, "maxZoneForNewLevel": 3 },
-      "taper": { "hardSessionsPerWeek": 1, "maxZone": 3, "maxHardMinutes": 20 },
-      "recovery": { "hardSessionsPerWeek": 0, "maxZone": 2 }
+      "base": {
+        "hardSessionsPerWeek": 1,
+        "maxZone": 3
+      },
+      "specific": {
+        "hardSessionsPerWeek": 2,
+        "maxZone": 4,
+        "maxZoneForNewLevel": 3
+      },
+      "taper": {
+        "hardSessionsPerWeek": 1,
+        "maxZone": 3,
+        "maxHardMinutes": 20
+      },
+      "recovery": {
+        "hardSessionsPerWeek": 0,
+        "maxZone": 2
+      }
     },
     "noHardDaysBackToBack": true
   },
-
   "blocks": {
     "_rule": "R-03, R-27",
     "sharedBlockMaxWeeks": 4,
     "taperWeeksWhenShared": 1
   },
-
   "raceDay": {
     "_rule": "R-04",
     "openerMinutesDayBefore": 25,
     "openerMaxZone": 2
   },
-
   "season": {
     "_rule": "R-17, R-18, R-19",
-    "openWaterMonths": [6, 7, 8],
+    "openWaterMonths": [
+      6,
+      7,
+      8
+    ],
     "swimDrylandBeforeMonth": 6
   },
-
   "classicWindow": {
     "_rule": "R-26",
     "months": 12
   },
-
   "warnings": {
     "_rule": "R-22, R-23, R-24, R-26",
     "shortPreparation": {
@@ -175,7 +221,10 @@
     "lowHours": {
       "hoursThresholdWithLongRace": 4,
       "hoursThresholdOtherwise": 3,
-      "longRaceIds": ["vasaloppet", "vatternrundan"],
+      "longRaceIds": [
+        "vasaloppet",
+        "vatternrundan"
+      ],
       "text": "Den tid du har valt är i minsta laget för dina lopp."
     },
     "skiTechnique": {
@@ -184,5 +233,13 @@
     "outsideClassicWindow": {
       "text": "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader."
     }
+  },
+  "recovery": {
+    "_rule": "R-33",
+    "note": "Kroppen ska få vila efter ett långt lopp. Men tekniken tappas fort, så pass i teknikgrenarna blir teknikpass i stället för att strykas — korta, lugna och med fokus på rörelsen i stället för på tiden.",
+    "techniqueSports": [
+      "swim",
+      "ski"
+    ]
   }
 }

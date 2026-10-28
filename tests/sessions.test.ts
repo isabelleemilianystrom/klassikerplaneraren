@@ -389,12 +389,18 @@ describe('R-30: titel och instruktion', () => {
   });
 
   it('använder den sportspecifika texten där det finns en', () => {
-    // Simningens långpass har en egen text: "Långpass i vattnet".
-    const simLångpass = buildWeekPlans(P5)
+    // Simteknik beskrivs inte som skidteknik.
+    const simteknik = buildWeekPlans(P1)
       .flatMap((plan) => plan.sessions)
-      .find((session) => session.type === 'long' && session.sport === 'swim');
+      .find((session) => session.type === 'technique' && session.sport === 'swim');
 
-    expect(simLångpass?.title).toBe(sessionTexts.sportVariants['swim.long']?.title);
+    expect(simteknik?.title).toBe(sessionTexts.sportVariants['swim.technique']?.title);
+
+    const skidteknik = buildWeekPlans(P1)
+      .flatMap((plan) => plan.sessions)
+      .find((session) => session.type === 'technique' && session.sport === 'ski');
+
+    expect(skidteknik?.title).toBe(sessionTexts.sportVariants['ski.technique']?.title);
   });
 
   it('använder den allmänna texten där ingen variant finns', () => {
@@ -756,19 +762,32 @@ describe('R-31: nybörjaren får ett pass i veckan', () => {
     }
   });
 
-  it('gör långpasset till veckans enda simpass i Vansbroblocket', () => {
-    const vansbro = buildWeekPlans(P1).filter(
-      ({ week, budget }) =>
-        week.phase === 'specific' &&
-        week.focusRaceId === 'vansbrosimningen' &&
-        budget.enduranceMinutes > 0,
+  it('ger nybörjaren ett simpass i veckan också i basfasen', () => {
+    // Går man en nybörjarkurs är det ett pass i veckan, och det ska finnas
+    // året om — också under vinterhalvåret, eftersom simning inte går att
+    // komma ikapp på slutet.
+    const basveckor = buildWeekPlans(P1).filter(
+      ({ week, budget }) => week.phase === 'base' && budget.enduranceMinutes > 0,
     );
 
-    expect(vansbro.length).toBeGreaterThan(0);
-    for (const plan of vansbro) {
+    expect(basveckor.length).toBeGreaterThan(0);
+    for (const plan of basveckor) {
       const pass = simpass(plan);
       expect(pass.length, `vecka ${plan.week.index}`).toBe(1);
-      expect(pass[0]?.type, `vecka ${plan.week.index}`).toBe('long');
+    }
+  });
+
+  it('håller uppe simningen med teknikpass under återhämtningen (R-33)', () => {
+    // Kroppen ska vila efter ett långt lopp, men tekniken tappas fort.
+    const återhämtning = buildWeekPlans(P1).filter(
+      ({ week, budget }) => week.phase === 'recovery' && budget.enduranceMinutes > 0,
+    );
+
+    expect(återhämtning.length).toBeGreaterThan(0);
+    for (const plan of återhämtning) {
+      const pass = simpass(plan);
+      expect(pass.length, `vecka ${plan.week.index}`).toBe(1);
+      expect(pass[0]?.type, `vecka ${plan.week.index}`).toBe('technique');
     }
   });
 

@@ -358,7 +358,7 @@ function enduranceSessions(
       const hård = hårda.get(sport)?.pop();
       resultat.push({
         sport,
-        type: hård?.type ?? 'easy',
+        type: hård?.type ?? defaultTypeFor(sport, week.phase),
         minutes: längd,
         zone: hård?.zone ?? 2,
       });
@@ -452,6 +452,21 @@ function distributeLeftover(
   }
 
   return resultat;
+}
+
+/**
+ * Passtypen när veckan inte har något hårt pass att ge sporten (R-33).
+ *
+ * Under återhämtningen blir pass i en teknikgren teknikpass. Kroppen ska få
+ * vila efter ett långt lopp, men tekniken tappas fort — särskilt i simning,
+ * där det inte hjälper att ha cyklat. Ett teknikpass håller den uppe utan att
+ * belasta.
+ */
+function defaultTypeFor(sport: TrainedSport, phase: Phase): SessionType {
+  if (phase !== 'recovery') return 'easy';
+
+  const teknikgrenar: readonly string[] = rules.recovery.techniqueSports;
+  return teknikgrenar.includes(sport) ? 'technique' : 'easy';
 }
 
 /** Minuter per sport efter att långpasset tagit sin del. */
