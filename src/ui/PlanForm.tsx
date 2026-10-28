@@ -32,7 +32,7 @@ interface Props {
   /** Dagens datum som ISO-sträng. Skickas in så att formuläret blir testbart. */
   today: string;
   /** Ifyllt tillstånd att börja från, för "Ändra svar" (K-13). */
-  initial?: FormState;
+  initial?: FormState | undefined;
   onSubmit: (input: PlanInput, state: FormState) => void;
 }
 

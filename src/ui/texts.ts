@@ -159,3 +159,30 @@ export const FORM = {
   next: 'Nästa',
   submit: 'Skapa programmet',
 } as const;
+
+/** Planvyn. */
+export const PLAN = {
+  heading: 'Ditt träningsprogram',
+
+  summary: (veckor: number, timmar: number, perVecka: number) =>
+    `${veckor} veckor och totalt ${timmar} timmar, utifrån ${perVecka} timmar i veckan. ` +
+    `De flesta veckor blir kortare än så – programmet varvar tyngre och lättare perioder.`,
+
+  warningsHeading: 'Att tänka på',
+  safetyHeading: 'Innan du börjar',
+  overviewHeading: 'Vecka för vecka',
+
+  weekNumber: (nummer: number) => `v. ${nummer}`,
+  currentWeek: 'Nu',
+  deload: 'lättare vecka',
+
+  phaseWeeks: (antal: number) => `${antal} ${antal === 1 ? 'vecka' : 'veckor'}`,
+
+  raceWeek: (lopp: string[]) => (lopp.length === 1 ? `${lopp[0]}` : lopp.join(' och ')),
+
+  rest: 'Vila – ingen planerad träning.',
+
+  alternatives: (grenar: string[]) => `Kan också göras som: ${grenar.join(', ')}`,
+
+  changeAnswers: 'Ändra svar',
+} as const;
