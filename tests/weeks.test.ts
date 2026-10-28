@@ -1,14 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { addWeeks, startOfWeek, weekdayOf, weeksBetween } from '../src/engine/dates';
-import { raceById } from '../src/engine/config';
+import { addWeeks, earliest, latest, startOfWeek, weekdayOf, weeksBetween } from '../src/engine/dates';
+import { raceById, races } from '../src/engine/config';
 import { buildWeeks, placeRaces, planEndDate, weekCount } from '../src/engine/weeks';
-import type { PlanInput, RaceId } from '../src/engine/types';
-import { P1, P2, P3, P4, P5, PROFILES } from './profiles';
+import type { IsoDate, PlanInput, RaceId } from '../src/engine/types';
+import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles';
 
 function weekOfRace(input: PlanInput, id: RaceId): number {
   const race = input.races.find((kandidat) => kandidat.id === id);
   if (race === undefined) throw new Error(`Profilen saknar ${id}`);
   return weeksBetween(startOfWeek(input.startDate), startOfWeek(race.date)) + 1;
+}
+
+/**
+ * De fyra loppens nästa datum efter `start`, inom tolv månader.
+ *
+ * Loppen går vid ungefär samma tid varje år. Hjälpfunktionen tar månad och dag
+ * ur `config/races.json` och väljer det året som ligger på eller efter `start`.
+ * Veckodagen blir inte den riktiga, men motorn bryr sig bara om datumet — det
+ * som prövas här är att en start i vilken månad som helst ger en hel plan.
+ */
+function nästaFyraLoppEfter(start: IsoDate): PlanInput['races'] {
+  const år = Number(start.slice(0, 4));
+
+  return races.races.map((race) => {
+    const månadOchDag = race.date.slice(5);
+    const iÅr = `${år}-${månadOchDag}`;
+    return { id: race.id, date: iÅr >= start ? iÅr : `${år + 1}-${månadOchDag}` };
+  });
 }
 
 describe('R-01: planens omfattning', () => {
@@ -300,5 +318,65 @@ describe('datum över årsskifte och sommartid', () => {
   it('räknar veckor rätt över ett helt år', () => {
     // 2026-11-02 till 2027-09-25 är 47 veckor, båda inklusive.
     expect(weekCount(P1)).toBe(47);
+  });
+});
+
+describe('starten är fri: klassikern kan börja när som helst på året', () => {
+  it('klarar att loppen kommer i en annan ordning än kalenderns', () => {
+    // P6 listar Vasaloppet först, som man brukar rabbla klassikern, fast det
+    // går sist i tiden. Planen ska följa datumen, inte listans ordning.
+    const lopp = placeRaces(P6);
+    expect(lopp.map((race) => race.id)).toEqual([
+      'vatternrundan',
+      'vansbrosimningen',
+      'lidingoloppet',
+      'vasaloppet',
+    ]);
+  });
+
+  it('gör Vasaloppet till sista loppet vid en vårstart', () => {
+    const veckor = buildWeeks(P6);
+    const sista = veckor.at(-1);
+    expect(sista?.phase).toBe('taper');
+    expect(sista?.focusRaceId).toBe('vasaloppet');
+    expect(sista?.raceIds).toEqual(['vasaloppet']);
+  });
+
+  it('ger samma plan oavsett vilken ordning loppen står i indatan', () => {
+    const baklänges: PlanInput = { ...P6, races: [...P6.races].reverse() };
+    expect(buildWeeks(baklänges)).toEqual(buildWeeks(P6));
+  });
+
+  it('ger en plan för en start i varje månad på året', () => {
+    // Tolv starter, var och en med sina fyra lopp inom tolv månader. Ingen av
+    // dem får sakna veckor, tappa ett lopp eller hamna i en okänd fas.
+    for (let månad = 1; månad <= 12; månad += 1) {
+      const start = `2027-${String(månad).padStart(2, '0')}-05`;
+      const input: PlanInput = {
+        ...P2,
+        today: start,
+        startDate: start,
+        races: nästaFyraLoppEfter(start),
+      };
+
+      const veckor = buildWeeks(input);
+      expect(veckor.length, start).toBe(weekCount(input));
+      expect(veckor.length, start).toBeGreaterThan(0);
+
+      const markerade = veckor.flatMap((vecka) => vecka.raceIds);
+      expect(markerade.length, start).toBe(4);
+      expect(new Set(markerade).size, start).toBe(4);
+    }
+  });
+
+  it('håller sig inom tolv månader i alla tolv starterna', () => {
+    // R-26: en klassiker ska rymmas inom tolv månader. Hjälpfunktionen ovan
+    // ska alltså aldrig bygga indata som utlöser varningen.
+    for (let månad = 1; månad <= 12; månad += 1) {
+      const start = `2027-${String(månad).padStart(2, '0')}-05`;
+      const datum = nästaFyraLoppEfter(start).map((race) => race.date);
+      const spann = weeksBetween(earliest(datum), latest(datum));
+      expect(spann, start).toBeLessThanOrEqual(52);
+    }
   });
 });

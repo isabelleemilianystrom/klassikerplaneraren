@@ -99,5 +99,32 @@ export const P5: PlanInput = {
   equipment: { ...INGEN_UTRUSTNING, pool: true, bike: true },
 };
 
-export const PROFILES = { P1, P2, P3, P4, P5 } as const;
+/**
+ * P6 Vårstart: klassikern börjad i maj, med Vasaloppet sist.
+ *
+ * En svensk klassiker går att börja när som helst på året — kravet är bara att
+ * alla fyra loppen genomförs inom tolv månader. Den som börjar på våren tar
+ * Vätternrundan, Vansbrosimningen och Lidingöloppet samma år och Vasaloppet
+ * våren därpå. Profilen finns för att loppen då kommer i en annan ordning än i
+ * P1, och för att planen sträcker sig över både ett årsskifte och ett skottår.
+ */
+export const P6: PlanInput = {
+  schemaVersion: 1,
+  today: '2027-05-03',
+  startDate: '2027-05-03',
+  // Loppen står med flit i den ordning man brukar rabbla klassikern, inte i
+  // datumordning: Vasaloppet först fast det går sist. Motorn ska följa datumen.
+  races: [
+    // Mars 2028 — nästa Vasaloppet efter en vårstart 2027.
+    { id: 'vasaloppet', date: '2028-03-05' },
+    { id: 'vatternrundan', date: LOPP.vatternrundan },
+    { id: 'vansbrosimningen', date: LOPP.vansbrosimningen },
+    { id: 'lidingoloppet', date: LOPP.lidingoloppet },
+  ],
+  levels: { ski: 'new', swim: 'experienced', bike: 'experienced', run: 'experienced' },
+  hoursPerWeek: 8,
+  equipment: { ...INGEN_UTRUSTNING, pool: true, bike: true },
+};
+
+export const PROFILES = { P1, P2, P3, P4, P5, P6 } as const;
 export type ProfileName = keyof typeof PROFILES;

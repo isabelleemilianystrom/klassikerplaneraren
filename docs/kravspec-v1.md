@@ -36,12 +36,14 @@ Den här fliken är den enda källan till vad som ska byggas i v1.0. Bygg exakt 
 
 v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär och får ett träningsprogram vecka för vecka fram till sina lopp. Den ska kunna visas upp den 19 november 2026 och vara en ren grund att bygga vidare på.
 
+**En klassiker kan börja när som helst på året** (tillagd 2026-10-28). Det enda kravet är att alla fyra loppen genomförs inom tolv månader (R-26). Appen antar därför aldrig att loppen kommer i en bestämd ordning: den som börjar på våren tar Vätternrundan, Vansbrosimningen och Lidingöloppet samma år och Vasaloppet våren därpå, och då är Vasaloppet planens sista lopp i stället för dess första. Planen styrs av loppens datum, aldrig av vilken ordning de råkar stå i.
+
 **Mål**
 
 | Mål | Så vet vi att det är uppfyllt |
 | --- | --- |
 | Klar för demon 19 nov | Appen är live på Vercel och fungerar i mobilen |
-| Programmen är rimliga | Alla regler i avsnitt 5 följs och verifieras av tester; referensprofilerna P1–P5 ger planer som Isabelle godkänner |
+| Programmen är rimliga | Alla regler i avsnitt 5 följs och verifieras av tester; referensprofilerna P1–P6 ger planer som Isabelle godkänner |
 | Snabbt att komma igång | Från startsida till färdigt program på under 2 minuter |
 | AI gör nytta | AI skriver förklaringarna till faserna under utvecklingen; Isabelle granskar dem och de följer med i appen |
 | Grund för senare versioner | Regelmotorn är en fristående modul med tester; lopp, regler och pass ligger i konfigurationsfiler |
@@ -414,8 +416,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 | P3 Den begränsade | Alla fyra | 3 | Van i allt | Bara cykel |
 | P4 Kort tid | Bara Vasaloppet, 6 veckor efter start | 6 | Ny i skidor | Ingen |
 | P5 Lopp tätt | Vätternrundan och Vansbrosimningen, 2 veckor isär | 8 | Van i båda | Cykel och simhall |
+| P6 Vårstart | Alla fyra, start 2027-05-03, Vasaloppet sist (mars 2028) | 8 | Ny i skidor, Van i övrigt | Simhall och cykel |
 
-**Invarianter** (gäller för P1–P5 och ska testas för varje vecka)
+**Invarianter** (gäller för P1–P6 och ska testas för varje vecka)
 
 - Veckans totala tid överskrider aldrig fasens tid enligt R-05–R-07
 - Minst en vilodag per vecka (R-11)
@@ -436,13 +439,14 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 - P4 ger varningen i R-22, P3 varningen i R-23 och P4 varningen i R-24
 - P5 följer blocklogiken i R-03
-- Datum: ISO-vecka 53 och årsskiftet 2026–2027, sommartid 28 mars 2027, skottår behövs inte i v1.0
+- Datum: ISO-vecka 53 och årsskiftet 2026–2027, sommartid 28 mars 2027, och skottåret 2028 — en vårstart lägger Vasaloppet i mars 2028, så februari 2028 ligger inne i planen (ändrad 2026-10-28)
 - Förklaringar: varje kombination av fas och lopp har en text, ingen text överskrider sin längdgräns, och ingen plan saknar förklaring
 - Konfiguration: alla filer i `config/` validerar mot sina scheman
 - **Slumpad egenskapstestning** *(tillagd 2026-10-27)*: minst 200 slumpade men giltiga indata körs mot samtliga invarianter. Fem profiler räcker inte — i v0 var det slumptestningen som avslöjade att en gren aldrig tränades, vilket P1–P5 hade missat
 - Plan med ett enda lopp: hela veckotiden går till den sporten, ingen andel blir ofördelad (R-08)
 - Två lopp samma vecka: båda markeras, båda räknas som belastning, inget lopp försvinner (R-27)
 - Lopp som spänner över mer än tolv månader ger varningen i R-26 men ändå en plan
+- Start i var och en av årets tolv månader ger en hel plan där alla fyra loppen finns med, oavsett vilken ordning loppen kommer i (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 
 **Definition of done per uppgift**
