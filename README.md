@@ -12,10 +12,14 @@ utrustning.
 
 ## Status
 
-**v1.0 byggs just nu** mot kravspecen i [`docs/kravspec-v1.md`](docs/kravspec-v1.md), som är den
-enda källan till vad som ska byggas. Uppgifterna körs i ordning ur backloggen i avsnitt 10.
+**v1.0 är byggd** mot kravspecen i [`docs/kravspec-v1.md`](docs/kravspec-v1.md), som är den
+enda källan till vad som ska byggas. Alla Måste-krav är klara och testade.
 
-Klart: **T-01 Projektuppsättning**.
+Appen går från startsida genom ett formulär i tre steg till ett program vecka för vecka, och
+sparar planen i webbläsaren så att den kommer tillbaka vid nästa besök.
+
+Drift väntar till efter demon den 19 november — appen är helt statisk och körs lokalt så
+länge. Se *Visa appen i mobilen* nedan.
 
 En tidigare version — statisk Vite-app på GitHub Pages, utan AI — finns kvar i taggen
 `v0-pages` och går att läsa med `git show v0-pages`.
@@ -49,8 +53,8 @@ Svara ja för privata nätverk.
 
 ## Granska planerna
 
-Gränssnittet är inte byggt än (T-09 och T-10). För att läsa de program motorn
-faktiskt skapar, kör:
+Appen visar en plan i taget. För att läsa alla sex referensprofiler som text —
+hela året, varje pass — kör:
 
 ```bash
 npm run profiles
@@ -60,9 +64,9 @@ Det skriver en fil per referensprofil till `out/` — en översikt vecka för ve
 med tid och fördelning mellan sporterna, och därefter varje enskilt pass med
 dag, längd, zon och instruktion. `out/oversikt.txt` sammanfattar alla sex.
 
-Profilerna står i kravspecens avsnitt 9 och är de planer som ska granskas vid
-milstolpe M1: från P1 som är ny i skidor och simning med sex timmar i veckan,
-till P4 som har sex veckor på sig till Vasaloppet.
+Profilerna står i kravspecens avsnitt 9: från P1 som är ny i skidor och simning
+med sex timmar i veckan, till P4 som har sex veckor på sig till Vasaloppet. Det
+är så planerna granskades inför demon, både av Isabelle och av en tränare.
 
 | Kommando | Gör |
 | --- | --- |
@@ -79,13 +83,21 @@ till P4 som har sex veckor på sig till Vasaloppet.
 ```
 config/            lopp, regler, pass och förklaringar som data
 prompts/           prompten som förklaringarna skrevs med
-src/engine/        generatePlan(input): Plan – ren funktion, ingen Next.js, ingen AI
-src/app/           sidor
-src/components/    gränssnittskomponenter
+src/engine/        regelmotorn – rena funktioner, ingen Next.js, ingen AI
+src/ui/            formulär, planvy, texter och lagring
+src/app/           sidan som binder ihop dem
 tests/             enhets-, invariant- och datumtester
 docs/              kravspecen
+prompts/           prompten som förklaringarna skrevs med
 scripts/           verktyg för granskning
 ```
+
+Motorn bygger planen i fyra steg, ett per modul:
+
+1. `weeks.ts` — vilka veckor planen omfattar och vilken fas varje vecka har
+2. `budget.ts` — hur många minuter varje vecka innehåller, fördelade på grenar
+3. `sessions.ts` — minuterna blir pass med dag, längd, zon och instruktion
+4. `warnings.ts` och `volume.ts` — vad appen bör säga om planens begränsningar
 
 Två principer bär upp det:
 

@@ -459,12 +459,14 @@ En Next.js-app utan databas, där regelmotorn är en ren TypeScript-modul utan b
 ```text
 config/            races.json, rules.json, sessions.json, explanations.json
 prompts/           phase-explanations.v1.md – prompten som texterna skrevs med
-src/engine/        generatePlan(input): Plan – ren funktion, ingen Next.js, ingen AI
-src/app/           sidor
-src/components/    gränssnittskomponenter
+src/engine/        regelmotorn – rena funktioner, ingen Next.js, ingen AI
+                   weeks, budget, sessions, warnings, volume, dates, config, types
+src/ui/            formulär, planvy, texter och lagring  (ändrad 2026-10-29:
+                   hette src/components/, men texter och lagring hör hit med)
+src/app/           sidan som binder ihop dem
 tests/             enhets-, invariant- och datumtester
 docs/              kravspec-v1.md (den här fliken som Markdown)
-scripts/           print-profiles.ts – skriver ut P1–P5 som text för granskning
+scripts/           print-profiles.ts – skriver ut P1–P6 som text för granskning
 CLAUDE.md
 ```
 
@@ -691,10 +693,13 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - [x] Alla Måste-krav är klara och testade *(2026-10-29)*
 - [ ] Appen går att köra lokalt med `npm run dev` och fungerar i mobil *(ändrad 2026-10-28:
       demon körs lokalt, drift skjuts till efter demon)*
+      **Återstår: prova på en riktig telefon.** Layouten är verifierad vid 360 px i en
+      iframe, utan vågrät scroll och med alla tryckytor minst 44 px, men det ersätter inte
+      en riktig skärm. Se *Visa appen i mobilen* i README.
 - [x] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna *(2026-10-29)*
 - [x] Varje fas har en granskad förklaring *(2026-10-29; en text per fas enligt A-02, krympt från en per fas och lopp)*
 - [x] Varje passtyp har en granskad instruktion *(2026-10-29)*
-- [ ] README beskriver idé, hur man kör projektet och var kravspecen finns
+- [x] README beskriver idé, hur man kör projektet och var kravspecen finns *(2026-10-29)*
 
 ## 10. Backlog i ordning
 
@@ -753,14 +758,29 @@ Regelmotorn är klar och granskad efter första arbetsveckan; därefter byggs gr
 
 **Demon körs lokalt** *(beslut 2026-10-28)* med `npm run dev` på Isabelles egen dator. Appen är statisk och behöver ingen server, så drift skjuts till efter demon. Kravet på noll kronor påverkas inte — det blir i stället noll konton också.
 
-1. Visa startsidan och berätta problemet: fyra lopp, fyra sporter, ett år
-2. Fyll i profil P1 live – under en minut
-3. Visa översikten med faser och lopp, och öppna en vecka
-4. Visa en fasförklaring och en säkerhetstext, och berätta att förklaringarna är skrivna med AI och granskade i förväg
-5. Visa kort i koden att regelmotorn är fristående och testad
-6. Avsluta med vägen framåt (avsnitt 12)
+Fem minuter räcker inte till allt. Manuset nedan är skrivet för att **planen** ska
+vara det man minns, inte koden.
 
-**Reserv för demon.** Ta skärmdumpar av P1 i förväg. Appen gör inga nätverksanrop när planen skapas, så den fungerar även utan uppkoppling.
+| Tid | Vad | Poängen |
+| --- | --- | --- |
+| 0:00–0:45 | Startsidan, och problemet: fyra lopp, fyra grenar, ett år | Vanliga appar planerar en sport och ett lopp |
+| 0:45–1:45 | Fyll i formuläret live som P1 | Under en minut från tom sida till färdig plan |
+| 1:45–3:00 | Översikten: faserna, loppveckorna, "Nu"-markeringen | Programmet har en riktning, inte bara pass |
+| 3:00–4:15 | Öppna en vecka: ett pass med zon, instruktion och alternativ | "Kan också göras som" — planen går att leva med |
+| 4:15–5:00 | Varningarna och fasförklaringen | Appen säger ifrån när den inte räcker, och texterna är granskade |
+
+**Det som inte hinns med** och som får bli frågor i stället: att motorn är fristående och
+testad, säsongsviktningen, ersättningarna, och vägen framåt i avsnitt 12.
+
+**Fyll i P1 så här** — öva på det, en minut är kort:
+
+- Alla fyra loppen, datumen är redan ifyllda
+- Mål: ta mig i mål på alla fyra
+- Ny på längdskidor och simning, van på cykel och löpning
+- Sex timmar i veckan, långpass söndag, ledig måndag
+- Simhall och cykel, inga skidor — då syns stavgången i backe, som är en poäng i sig
+
+**Reserv för demon.** Skapa planen i förväg så att den redan ligger sparad i webbläsaren — då syns den direkt om formuläret krånglar. Ta också skärmdumpar. Appen gör inga nätverksanrop alls, så den fungerar utan uppkoppling.
 
 ## 12. Utanför v1.0: framtida versioner
 
