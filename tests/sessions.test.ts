@@ -498,9 +498,39 @@ describe('R-29: veckans tid stämmer', () => {
         const budget = plan.budget.strengthMinutes + plan.budget.enduranceMinutes;
         if (budget < rules.session.minMinutes) continue;
 
-        expect(plan.totalMinutes, `${namn} vecka ${plan.week.index}`).toBe(budget);
+        // Invarianten i kravspecens avsnitt 9: passen plus den oplacerade
+        // tiden är exakt veckans budget. Oplacerad tid uppstår bara när varje
+        // gren slagit i ett tak (R-31, R-40) och ska redovisas, inte tystas.
+        expect(
+          plan.totalMinutes + plan.budget.unplacedMinutes,
+          `${namn} vecka ${plan.week.index}`,
+        ).toBe(budget);
       }
     }
+  });
+
+  it('håller den oplacerade tiden sällsynt och liten', () => {
+    // Fältet finns för de veckor där varje gren slagit i ett tak. Blir det en
+    // soptunna för minuter motorn tappar har invarianten ovan inget värde
+    // längre — därför den här gränsen.
+    let medOplacerat = 0;
+    let veckor = 0;
+
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.budget.raceMinutes > 0) continue;
+        veckor += 1;
+        if (plan.budget.unplacedMinutes === 0) continue;
+
+        medOplacerat += 1;
+        expect(plan.budget.unplacedMinutes, `${namn} v${plan.week.index}`).toBeLessThan(
+          rules.session.minMinutes,
+        );
+      }
+    }
+
+    expect(veckor).toBeGreaterThan(0);
+    expect(medOplacerat / veckor).toBeLessThan(0.1);
   });
 
   it('visar veckans faktiska tid, loppet inräknat', () => {
@@ -859,7 +889,13 @@ describe('R-15: nedtrappningen har bara korta inslag i zon 3', () => {
         const budget = plan.budget.strengthMinutes + plan.budget.enduranceMinutes;
         if (budget < rules.session.minMinutes) continue;
 
-        expect(plan.totalMinutes, `${namn} vecka ${plan.week.index}`).toBe(budget);
+        // Invarianten i kravspecens avsnitt 9: passen plus den oplacerade
+        // tiden är exakt veckans budget. Oplacerad tid uppstår bara när varje
+        // gren slagit i ett tak (R-31, R-40) och ska redovisas, inte tystas.
+        expect(
+          plan.totalMinutes + plan.budget.unplacedMinutes,
+          `${namn} vecka ${plan.week.index}`,
+        ).toBe(budget);
       }
     }
   });
@@ -940,7 +976,13 @@ describe('R-13: långpasset lånar tid de sista veckorna', () => {
         const budget = plan.budget.strengthMinutes + plan.budget.enduranceMinutes;
         if (budget < rules.session.minMinutes) continue;
 
-        expect(plan.totalMinutes, `${namn} vecka ${plan.week.index}`).toBe(budget);
+        // Invarianten i kravspecens avsnitt 9: passen plus den oplacerade
+        // tiden är exakt veckans budget. Oplacerad tid uppstår bara när varje
+        // gren slagit i ett tak (R-31, R-40) och ska redovisas, inte tystas.
+        expect(
+          plan.totalMinutes + plan.budget.unplacedMinutes,
+          `${namn} vecka ${plan.week.index}`,
+        ).toBe(budget);
       }
     }
   });
@@ -1245,6 +1287,7 @@ describe('R-13: långpass också i basfasen', () => {
 
 describe('R-40: golv per gren', () => {
   const GOLV = rules.session.minMinutesBySport.swim;
+  const TAK = rules.session.maxMinutesBySport.swim;
 
   /**
    * Öppningspasset dagen före loppet, som golvet inte gäller.
@@ -1263,7 +1306,45 @@ describe('R-40: golv per gren', () => {
 
   it('är satt i konfigurationen, inte i koden', () => {
     expect(GOLV).toBeGreaterThan(rules.session.minMinutes);
+    expect(TAK).toBeLessThan(rules.session.maxMinutes);
+    expect(TAK).toBeGreaterThan(GOLV);
     expect(rules.session._minMinutesBySport).toContain('simhallen');
+    expect(rules.session._maxMinutesBySport).toContain('R-40');
+  });
+
+  it('ger aldrig ett simpass längre än nittio minuter', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of träning(plan)) {
+          if (session.sport !== 'swim' || session.type === 'race') continue;
+
+          expect(session.minutes, `${namn} v${plan.week.index} ${session.id}`).toBeLessThanOrEqual(
+            TAK,
+          );
+        }
+      }
+    }
+  });
+
+  it('delar upp simningen i fler pass i stället för att göra ett för långt', () => {
+    // P2 jagar tid i Vansbrosimningen och får veckor med mer simtid än ett
+    // pass rymmer. Då ska det bli två pass, inte ett på nästan två timmar.
+    const veckor = buildWeekPlans(P2).filter(
+      (plan) =>
+        träning(plan).filter((session) => session.sport === 'swim' && session.type !== 'race')
+          .length >= 2,
+    );
+
+    expect(veckor.length).toBeGreaterThan(0);
+    for (const plan of veckor) {
+      for (const session of träning(plan)) {
+        if (session.sport !== 'swim' || session.type === 'race') continue;
+        if (ärÖppningspass(session, plan)) continue;
+
+        expect(session.minutes, `v${plan.week.index}`).toBeGreaterThanOrEqual(GOLV);
+        expect(session.minutes, `v${plan.week.index}`).toBeLessThanOrEqual(TAK);
+      }
+    }
   });
 
   it('ger aldrig ett simpass kortare än en timme', () => {

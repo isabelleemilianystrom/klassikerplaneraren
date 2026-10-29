@@ -321,18 +321,22 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   För profil P2, som är erfaren i allt, går simningen från **fjorton timmar och tjugoåtta pass**
   före Vasaloppet till **noll**. Profil P1, som är ny i simning, är oförändrad.
 
-- **R-40** (tillagd 2026-10-29) **Golv per gren: ett simpass är aldrig kortare än en timme.**
-  Står grenen i `session.minMinutesBySport` är det talet grenens kortaste pass, i stället för
-  `session.minMinutes`. **I dag står bara simning där, med 60 minuter.** Golvet gäller också
-  långpasset och ett hårt pass. Det gäller **inte** öppningspasset dagen före loppet (R-25) —
-  det är kort med flit och ligger på loppets plats.
+- **R-40** (tillagd 2026-10-29) **Golv och tak per gren: ett simpass är 60 till 90 minuter.**
+  Står grenen i `session.minMinutesBySport` och `session.maxMinutesBySport` är de talen
+  grenens kortaste och längsta pass, i stället för `session.minMinutes` och
+  `session.maxMinutes`. **I dag står bara simning där, med 60 och 90 minuter.** Golvet gäller
+  också långpasset och ett hårt pass. Det gäller **inte** öppningspasset dagen före loppet
+  (R-25) — det är kort med flit och ligger på loppets plats.
 
-  Skälet: ett pass kostar mer än sin träningstid. Att ta sig till simhallen, betala inträde och
-  byta om är lika mycket besvär för tjugo minuter i vattnet som för en timme, och ett program
-  som planerar tjugominuterspass i simhallen är ett program man slutar följa. Löpning och cykel
-  har inte den kostnaden — där går man ut genom dörren.
+  Skälet till golvet: ett pass kostar mer än sin träningstid. Att ta sig till simhallen, betala
+  inträde och byta om är lika mycket besvär för tjugo minuter i vattnet som för en timme, och
+  ett program som planerar tjugominuterspass i simhallen är ett program man slutar följa.
+  Löpning och cykel har inte den kostnaden — där går man ut genom dörren.
 
-  Tre följder:
+  Skälet till taket: nittio minuter är ett långt pass i en simhall, och mer än så blir det inte
+  av. Den tiden gör mer nytta i en annan gren.
+
+  Fyra följder:
 
   1. **Räcker veckans tid inte till ett helt pass simmar man inte den veckan**, och minuterna
      går till en annan gren (R-29). Hellre en vecka utan simning än en resa till simhallen för
@@ -346,6 +350,12 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
      inslag i högre fart i en annan gren veckan ändå tränar. Finns ingen sådan gren behåller
      passet sin längd och görs lugnt. Farten ska sitta i kroppen; kroppen bryr sig inte om i
      vilken gren den fick den.
+  4. **Golvet och taket går inte alltid att hålla samtidigt.** 106 minuter simning blir
+     antingen ett pass på 106 minuter eller två på 53, och båda bryter en regel. Då gäller
+     taket, och de minuter som blir över går till en annan gren (R-29). Går de inte dit heller
+     redovisas de som **oplacerad tid** i veckans budget — veckans faktiska tid är då lägre än
+     den valda, och det ska stå, inte tystas ner. I de sex profilerna händer det i tre veckor
+     av 226, med fem till femton minuter.
 
 
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
@@ -695,6 +705,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Inget simpass beskriver ansträngningen med hur mycket man kan prata (R-15) *(tillagd 2026-10-29)*
 - En gren som väntar får noll minuter, också via löptaket, och veckans fokusgren väntar aldrig (R-39) *(tillagd 2026-10-29)*
 - Inget pass är kortare än sin grens golv, utom öppningspasset dagen före loppet (R-40) *(tillagd 2026-10-29)*
+- Inget pass är längre än sin grens tak (R-40) *(tillagd 2026-10-29)*
+- Passen plus den oplacerade tiden är exakt veckans budget, och oplacerad tid är alltid mindre än ett pass (R-29, R-40) *(tillagd 2026-10-29)*
 - En gren som måste tränas får sitt pass varje vecka där veckan har tid alls (R-31, R-39, R-40) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
 - Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
@@ -744,6 +756,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Samma mål på alla lopp ändrar ingenting; det är skillnaden mellan loppen som räknas (R-38) (tillagt 2026-10-29)
 - Erfaren simmare: noll simning före Vasaloppet. Nybörjare: oförändrat (R-39) (tillagt 2026-10-29)
 - Tre timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
+- Vecka där simningen får mer tid än ett pass rymmer: passet stannar på taket och resten flyttar eller redovisas som oplacerad tid (R-29, R-40) (tillagt 2026-10-29)
 - Nedtrappningsvecka mot Vansbrosimningen: inget simpass på tjugo minuter, och veckans korta inslag i högre fart finns kvar (R-15, R-40) (tillagt 2026-10-29)
 - Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)

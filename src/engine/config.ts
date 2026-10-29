@@ -128,6 +128,11 @@ export const rulesSchema = z.object({
     minMinutesBySport: z.object({
       swim: z.number().int().positive(),
     }),
+    _maxMinutesBySport: z.string(),
+    /** Tak per gren, där ett längre pass ändå inte blir av. */
+    maxMinutesBySport: z.object({
+      swim: z.number().int().positive(),
+    }),
   }),
   longSession: z.object({
     _rule: z.string(),

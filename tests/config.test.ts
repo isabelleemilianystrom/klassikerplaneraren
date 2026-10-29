@@ -128,6 +128,17 @@ describe('config/rules.json', () => {
     // R-40: en timme i vattnet. Resan till simhallen kostar lika mycket för
     // tjugo minuter som för sextio.
     expect(rules.session.minMinutesBySport).toEqual({ swim: 60 });
+    expect(rules.session.maxMinutesBySport).toEqual({ swim: 90 });
+
+    // Långpasset är veckans längsta pass. Ligger grenens långpasstak utanför
+    // golvet och taket kan de två reglerna aldrig hållas samtidigt.
+    for (const [gren, tak] of Object.entries(rules.longSession.capMinutesBySport)) {
+      const golv: Record<string, number> = rules.session.minMinutesBySport;
+      const passtak: Record<string, number> = rules.session.maxMinutesBySport;
+
+      expect(tak, gren).toBeGreaterThanOrEqual(golv[gren] ?? rules.session.minMinutes);
+      expect(tak, gren).toBeLessThanOrEqual(passtak[gren] ?? rules.session.maxMinutes);
+    }
     expect(rules.longSession.capMinutesBySport).toEqual({
       ski: 240,
       bike: 300,

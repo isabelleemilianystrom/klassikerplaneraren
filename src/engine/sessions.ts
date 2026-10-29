@@ -180,10 +180,42 @@ function buildWeekPlan(
 
   return {
     week,
-    budget,
+    budget: withUnplacedMinutes(budget, withTexts),
     sessions: withTexts,
     totalMinutes: withTexts.reduce((summa, session) => summa + session.minutes, 0),
   };
+}
+
+/**
+ * Budgeten med de minuter som inte gick att lägga i ett pass (R-29).
+ *
+ * Normalfallet är noll. Mer än noll uppstår när varje gren veckan har slagit i
+ * ett tak: nybörjartaket i R-31, eller grenens passtak i R-40 — en vecka kan
+ * ge simningen 111 minuter, och nittio är det längsta pass som blir av. Går de
+ * minuterna inte till någon annan gren heller är veckans faktiska tid lägre än
+ * den valda, och det ska stå i budgeten i stället för att tystas ner.
+ *
+ * Loppet och öppningspasset ligger utanför budgeten (R-04, R-25) och räknas
+ * inte med.
+ */
+function withUnplacedMinutes(budget: WeekBudget, sessions: readonly Session[]): WeekBudget {
+  const öppningspass = sessions.filter((session) =>
+    sessions.some(
+      (kandidat) =>
+        kandidat.type === 'race' &&
+        kandidat.sport === session.sport &&
+        kandidat.date === addDays(session.date, 1),
+    ),
+  );
+
+  const placerat = sessions
+    .filter((session) => session.type !== 'race' && !öppningspass.includes(session))
+    .reduce((summa, session) => summa + session.minutes, 0);
+
+  const budgeterat = budget.enduranceMinutes + budget.strengthMinutes;
+  const kvar = Math.max(0, budgeterat - placerat);
+
+  return kvar === budget.unplacedMinutes ? budget : { ...budget, unplacedMinutes: kvar };
 }
 
 /** Veckans sju datum, måndag till söndag. */
@@ -554,8 +586,9 @@ function distributeLeftover(
     const hårt = isHard(session) ? (maxHardMinutes(fas) ?? Infinity) : Infinity;
     if (session.sport === 'strength') return Math.min(rules.session.maxMinutes, hårt);
 
+    // R-40: ett pass växer aldrig förbi sin egen grens tak.
     const gräns = newLevelLimit(session.sport, input);
-    return Math.min(rules.session.maxMinutes, gräns?.maxMinutesPerWeek ?? Infinity, hårt);
+    return Math.min(sessionCeiling(session.sport), gräns?.maxMinutesPerWeek ?? Infinity, hårt);
   };
 
   while (kvar > 0) {
@@ -669,6 +702,19 @@ function sessionFloor(sport: TrainedSport): number {
   return perGren[sport] ?? rules.session.minMinutes;
 }
 
+/**
+ * Längsta pass som blir av i en gren (R-40).
+ *
+ * Simning har ett tak de andra grenarna inte har: nittio minuter är ett långt
+ * pass i bassäng, och tiden utöver det gör mer nytta i en annan gren än som
+ * ytterligare längder. Får grenen mer tid än den rymmer flyttas överskottet
+ * (R-29) — det försvinner inte.
+ */
+function sessionCeiling(sport: TrainedSport): number {
+  const perGren: Partial<Record<TrainedSport, number>> = rules.session.maxMinutesBySport;
+  return perGren[sport] ?? rules.session.maxMinutes;
+}
+
 function foldAwayTooSmallSports(
   bySport: ReadonlyMap<TrainedSport, number>,
   week: WeekSkeleton,
@@ -776,14 +822,23 @@ function splitIntoSessions(
   const golv = sessionFloor(sport);
   if (minutes < golv) return [];
 
-  const taket = Math.min(maxLength, rules.session.maxMinutes);
+  const taket = Math.min(maxLength, sessionCeiling(sport));
+
+  // Så många pass att inget blir längre än taket — men aldrig så många att
+  // något blir kortare än golvet, och aldrig fler än R-31 tillåter.
+  const förTaket = Math.ceil(minutes / taket);
   const flest = Math.min(Math.floor(minutes / golv), maxSessions);
-  const antal = Math.max(1, Math.min(flest, Math.max(2, Math.ceil(minutes / taket))));
+  const antal = Math.max(1, Math.min(flest, Math.max(2, förTaket)));
 
   const grund = Math.floor(minutes / antal);
   const rest = minutes - grund * antal;
+  const pass = Array.from({ length: antal }, (_, i) => grund + (i < rest ? 1 : 0));
 
-  return Array.from({ length: antal }, (_, i) => grund + (i < rest ? 1 : 0));
+  // Golvet och taket går inte alltid att hålla samtidigt: 106 minuter simning
+  // blir antingen ett pass på 106 eller två på 53, och båda bryter en regel.
+  // Då gäller taket, och de minuter som blir över går till en annan gren
+  // (R-29) i stället för att bli längder ingen orkar simma.
+  return pass.map((längd) => Math.min(längd, taket));
 }
 
 /** Ett hårt pass med sin zon. */
