@@ -123,6 +123,11 @@ export const rulesSchema = z.object({
     _rule: z.string(),
     minMinutes: z.number().int().positive(),
     maxMinutes: z.number().int().positive(),
+    _minMinutesBySport: z.string(),
+    /** Golv per gren, där grenen har en fast kostnad utöver träningstiden. */
+    minMinutesBySport: z.object({
+      swim: z.number().int().positive(),
+    }),
   }),
   longSession: z.object({
     _rule: z.string(),

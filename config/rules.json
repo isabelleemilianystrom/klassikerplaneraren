@@ -75,7 +75,11 @@
   "session": {
     "_rule": "R-12",
     "minMinutes": 20,
-    "maxMinutes": 300
+    "maxMinutes": 300,
+    "_minMinutesBySport": "R-40: ett pass har en fast kostnad utöver träningstiden. Att ta sig till simhallen, betala inträde och byta om är lika mycket besvär för 20 minuter i vattnet som för en timme, så ett simpass är aldrig kortare än en timme. Räcker veckans tid inte till det simmar man inte den veckan, och minuterna går till en annan gren.",
+    "minMinutesBySport": {
+      "swim": 60
+    }
   },
   "longSession": {
     "_rule": "R-13, R-28",

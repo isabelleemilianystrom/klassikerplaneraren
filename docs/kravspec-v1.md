@@ -321,6 +321,33 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   För profil P2, som är erfaren i allt, går simningen från **fjorton timmar och tjugoåtta pass**
   före Vasaloppet till **noll**. Profil P1, som är ny i simning, är oförändrad.
 
+- **R-40** (tillagd 2026-10-29) **Golv per gren: ett simpass är aldrig kortare än en timme.**
+  Står grenen i `session.minMinutesBySport` är det talet grenens kortaste pass, i stället för
+  `session.minMinutes`. **I dag står bara simning där, med 60 minuter.** Golvet gäller också
+  långpasset och ett hårt pass. Det gäller **inte** öppningspasset dagen före loppet (R-25) —
+  det är kort med flit och ligger på loppets plats.
+
+  Skälet: ett pass kostar mer än sin träningstid. Att ta sig till simhallen, betala inträde och
+  byta om är lika mycket besvär för tjugo minuter i vattnet som för en timme, och ett program
+  som planerar tjugominuterspass i simhallen är ett program man slutar följa. Löpning och cykel
+  har inte den kostnaden — där går man ut genom dörren.
+
+  Tre följder:
+
+  1. **Räcker veckans tid inte till ett helt pass simmar man inte den veckan**, och minuterna
+     går till en annan gren (R-29). Hellre en vecka utan simning än en resa till simhallen för
+     tjugo minuter.
+  2. **Utom när grenen måste tränas.** Är man ny i grenen (R-31) eller är grenens lopp inne i
+     sin uppbyggnad (R-39) tas timmen från de andra grenarna i stället: den grenen väljs före
+     både rotationen och fokusgrenens återstod, och långpasset lämnar plats för den. Simning
+     går inte att komma ikapp de sista veckorna, och en gren som aldrig tränas är precis det
+     som gick fel i v0.
+  3. **Krockar golvet med taket på hårda minuter i nedtrappningen (R-15)** läggs veckans korta
+     inslag i högre fart i en annan gren veckan ändå tränar. Finns ingen sådan gren behåller
+     passet sin längd och görs lugnt. Farten ska sitta i kroppen; kroppen bryr sig inte om i
+     vilken gren den fick den.
+
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -667,6 +694,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - En gren man bara vill ta sig i mål i får mindre tid än en man siktar på en tid i, men aldrig noll (R-38) *(tillagd 2026-10-29)*
 - Inget simpass beskriver ansträngningen med hur mycket man kan prata (R-15) *(tillagd 2026-10-29)*
 - En gren som väntar får noll minuter, också via löptaket, och veckans fokusgren väntar aldrig (R-39) *(tillagd 2026-10-29)*
+- Inget pass är kortare än sin grens golv, utom öppningspasset dagen före loppet (R-40) *(tillagd 2026-10-29)*
+- En gren som måste tränas får sitt pass varje vecka där veckan har tid alls (R-31, R-39, R-40) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
 - Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
@@ -714,6 +743,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
 - Samma mål på alla lopp ändrar ingenting; det är skillnaden mellan loppen som räknas (R-38) (tillagt 2026-10-29)
 - Erfaren simmare: noll simning före Vasaloppet. Nybörjare: oförändrat (R-39) (tillagt 2026-10-29)
+- Tre timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
+- Nedtrappningsvecka mot Vansbrosimningen: inget simpass på tjugo minuter, och veckans korta inslag i högre fart finns kvar (R-15, R-40) (tillagt 2026-10-29)
 - Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
 - Profil utan utrustning: skidpassen blir stavgång, simpassen torrövningar, och inget pass stryks (R-17, R-18) (tillagt 2026-10-28)

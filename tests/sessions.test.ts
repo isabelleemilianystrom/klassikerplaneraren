@@ -1242,3 +1242,158 @@ describe('R-13: långpass också i basfasen', () => {
     expect(första?.alternatives.map((a) => a.sport)).toContain('bike');
   });
 });
+
+describe('R-40: golv per gren', () => {
+  const GOLV = rules.session.minMinutesBySport.swim;
+
+  /**
+   * Öppningspasset dagen före loppet, som golvet inte gäller.
+   *
+   * Det är kort med flit och ligger på loppets plats, inte i simhallen — det
+   * är inte en resa för tjugo minuters träning.
+   */
+  function ärÖppningspass(session: Session, plan: WeekPlan): boolean {
+    return plan.sessions.some(
+      (kandidat) =>
+        kandidat.type === 'race' &&
+        kandidat.sport === session.sport &&
+        kandidat.date === addDays(session.date, 1),
+    );
+  }
+
+  it('är satt i konfigurationen, inte i koden', () => {
+    expect(GOLV).toBeGreaterThan(rules.session.minMinutes);
+    expect(rules.session._minMinutesBySport).toContain('simhallen');
+  });
+
+  it('ger aldrig ett simpass kortare än en timme', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of träning(plan)) {
+          if (session.sport !== 'swim' || session.type === 'race') continue;
+          if (ärÖppningspass(session, plan)) continue;
+
+          expect(session.minutes, `${namn} v${plan.week.index} ${session.id}`).toBeGreaterThanOrEqual(
+            GOLV,
+          );
+        }
+      }
+    }
+  });
+
+  it('gäller också långpasset', () => {
+    // En plan med bara Vansbrosimningen. I de fyra loppens plan ligger
+    // Vätternrundan tre veckor före Vansbro, så Vansbro får aldrig egna
+    // specifika veckor (R-03) och därmed inget simlångpass att pröva.
+    const baraVansbro: PlanInput = {
+      schemaVersion: 3,
+      today: '2026-11-02',
+      startDate: '2026-11-02',
+      races: [{ id: 'vansbrosimningen', date: '2027-07-10', goal: 'time' }],
+      levels: { swim: 'experienced' },
+      hoursPerWeek: 6,
+      preferredDays: { longSession: 6 as Weekday, rest: 1 as Weekday },
+      equipment: { snowOrRollerSkis: false, skiErg: false, pool: true, bike: false },
+    };
+
+    const långpass = buildWeekPlans(baraVansbro)
+      .flatMap((plan) => träning(plan))
+      .filter((session) => session.type === 'long');
+
+    // Finns inget simlångpass har testet inte prövat det det säger.
+    expect(långpass.length).toBeGreaterThan(0);
+    for (const session of långpass) {
+      expect(session.sport).toBe('swim');
+      expect(session.minutes, session.id).toBeGreaterThanOrEqual(GOLV);
+    }
+  });
+
+  it('låter veckan stå utan simning hellre än att ge ett kort pass', () => {
+    // P3 har tre timmar i veckan. Där räcker simningens andel sällan till en
+    // hel timme, och då simmar hon inte den veckan — minuterna går till en
+    // annan gren i stället för att bli en resa till simhallen för tjugo
+    // minuter.
+    const planer = buildWeekPlans(P3);
+    const utan = planer.filter(
+      (plan) => !träning(plan).some((session) => session.sport === 'swim'),
+    );
+
+    expect(utan.length).toBeGreaterThan(0);
+
+    // Men minuterna försvinner inte ur veckan (R-29). Loppet och
+    // öppningspasset ligger utanför budgeten (R-04, R-25) och räknas inte.
+    for (const plan of utan) {
+      const planerat = träning(plan)
+        .filter((session) => session.type !== 'race' && !ärÖppningspass(session, plan))
+        .reduce((summa, session) => summa + session.minutes, 0);
+
+      expect(planerat + plan.budget.unplacedMinutes, `v${plan.week.index}`).toBe(
+        plan.budget.enduranceMinutes + plan.budget.strengthMinutes,
+      );
+    }
+  });
+
+  it('ger nybörjaren sin timme i vattnet varje vecka, också när långpasset är stort', () => {
+    // R-31 och R-40 tillsammans: nybörjarkursen är en timme i veckan, och
+    // långpasset ska lämna plats för den. Simning går inte att komma ikapp.
+    const veckor = buildWeekPlans(P1).filter(({ budget }) => budget.enduranceMinutes > 0);
+
+    expect(veckor.length).toBeGreaterThan(0);
+    for (const plan of veckor) {
+      const sim = träning(plan).filter(
+        (session) => session.sport === 'swim' && session.type !== 'race',
+      );
+      const öppningspass = sim.filter((session) => ärÖppningspass(session, plan));
+
+      expect(sim.length, `v${plan.week.index}`).toBeGreaterThanOrEqual(1);
+      for (const session of sim) {
+        if (öppningspass.includes(session)) continue;
+        expect(session.minutes, `v${plan.week.index}`).toBeGreaterThanOrEqual(GOLV);
+      }
+    }
+  });
+
+  it('ger simningen hela pass under uppbyggnaden mot Vansbrosimningen', () => {
+    // R-39 låter den erfarna simmaren börja sent. Börjar hon då ska det bli
+    // riktiga pass, inte tjugo minuter i veckan — annars har uppbyggnaden
+    // inget innehåll.
+    const vansbro = raceById('vansbrosimningen');
+    const planer = buildWeekPlans(P3);
+    const lopp = planer.find((plan) => plan.week.raceIds.includes('vansbrosimningen'));
+
+    expect(lopp).toBeDefined();
+    expect(vansbro.sport).toBe('swim');
+
+    const uppbyggnad = planer.filter(
+      (plan) =>
+        plan.week.index < (lopp?.week.index ?? 0) &&
+        plan.week.index >= (lopp?.week.index ?? 0) - 6 &&
+        plan.budget.enduranceMinutes > 0,
+    );
+
+    const sim = uppbyggnad.flatMap((plan) =>
+      träning(plan).filter((session) => session.sport === 'swim' && session.type !== 'race'),
+    );
+
+    expect(sim.length).toBeGreaterThan(0);
+  });
+
+  it('flyttar nedtrappningens hårda inslag ur vattnet i stället för att korta passet', () => {
+    // R-15 ger nedtrappningen högst tjugo hårda minuter. I simning finns inget
+    // sådant pass, så inslaget läggs i en annan gren — men det ska finnas kvar.
+    const tak = rules.intensity.byPhase.taper.maxHardMinutes;
+
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.week.phase !== 'taper') continue;
+
+        for (const session of träning(plan)) {
+          if (session.zone === null || session.zone < 3) continue;
+
+          expect(session.sport, `${namn} ${session.id}`).not.toBe('swim');
+          expect(session.minutes, `${namn} ${session.id}`).toBeLessThanOrEqual(tak);
+        }
+      }
+    }
+  });
+});

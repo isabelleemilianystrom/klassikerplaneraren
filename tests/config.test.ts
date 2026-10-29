@@ -122,9 +122,12 @@ describe('config/rules.json', () => {
     expect(Math.max(...steg.map((s) => s.days))).toBeLessThanOrEqual(6);
   });
 
-  it('har passlängderna från R-12 och långpasstaken från R-13', () => {
+  it('har passlängderna från R-12, golvet från R-40 och långpasstaken från R-13', () => {
     expect(rules.session.minMinutes).toBe(20);
     expect(rules.session.maxMinutes).toBe(300);
+    // R-40: en timme i vattnet. Resan till simhallen kostar lika mycket för
+    // tjugo minuter som för sextio.
+    expect(rules.session.minMinutesBySport).toEqual({ swim: 60 });
     expect(rules.longSession.capMinutesBySport).toEqual({
       ski: 240,
       bike: 300,
