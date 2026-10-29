@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "note": "R-30: en titel och en instruktion per passtyp. Sportspecifika varianter finns bara där sporten ändrar innehållet. Texterna visas för användaren och ska granskas av Isabelle. Grenspecifika varianter finns där grenen ändrar vad passet faktiskt innehåller: Lidingöloppet är terränglöpning och Vätternrundan körs i klunga, och det syns i instruktionen.",
+  "note": "R-30: en titel och en instruktion per passtyp. Sportspecifika varianter finns bara där sporten ändrar innehållet. Texterna visas för användaren och ska granskas av Isabelle. Grenspecifika varianter finns där grenen ändrar vad passet faktiskt innehåller: Lidingöloppet är terränglöpning och Vätternrundan körs i klunga, och det syns i instruktionen. Granskad av tränare 2026-10-29. Utförslöpning, blicklyft i öppet vatten och lopptaktiken i raceNotes lades till efter den granskningen.",
   "types": {
     "easy": {
       "title": "Lugnt pass",
@@ -38,11 +38,11 @@
   "sportVariants": {
     "swim.technique": {
       "title": "Simteknik",
-      "instruction": "Korta längder med fokus på en sak i taget: armtag, andning, position i vattnet. Vila mellan längderna så att tekniken håller."
+      "instruction": "Korta längder med fokus på en sak i taget: armtag, andning, position i vattnet. Vila mellan längderna så att tekniken håller. Öva också på att lyfta blicken framåt mitt i ett armtag — det är så du håller kursen i öppet vatten."
     },
     "swim.long": {
       "title": "Långpass i vattnet",
-      "instruction": "Simma jämnt i lugnt tempo. Öva på att hålla samma tag hela vägen — i öppet vatten finns ingen vägg att vila mot."
+      "instruction": "Simma jämnt i lugnt tempo. Öva på att hålla samma tag hela vägen — i öppet vatten finns ingen vägg att vila mot. Lyft blicken framåt var femte till tionde armtag utan att sänka höfterna: i en älv finns ingen linje i botten att följa."
     },
     "ski.technique": {
       "title": "Skidteknik",
@@ -50,7 +50,7 @@
     },
     "run.long": {
       "title": "Långpass i terräng",
-      "instruction": "Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten."
+      "instruction": "Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten."
     },
     "run.easy": {
       "title": "Lugn löptur",
@@ -154,6 +154,16 @@
         "title": "Styrka med vikt på överkropp",
         "instruction": "Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först."
       }
+    }
+  },
+  "raceNotes": {
+    "_rule": "R-30",
+    "note": "Råd som hör till loppdagen och inte till träningen. De läggs till lopppassets instruktion. Tillagda efter tränargranskningen 2026-10-29.",
+    "byRace": {
+      "vansbrosimningen": "Den första dryga kilometern simmar du motströms i Vanån. Gå inte ut för hårt där — får du mjölksyra i armarna direkt blir resten av loppet långt. Sedan vänder det och du får strömmen med dig.",
+      "vatternrundan": "Leta upp en klunga som håller ditt tempo och ligg med. Det sparar mycket energi över trettio mil. Ät och drick innan du känner att du behöver det.",
+      "lidingoloppet": "Loppet avgörs på sista milen. Går du ut hårt första milen får du betala för det i backarna mot slutet.",
+      "vasaloppet": "Nio mil är lång tid. Ät och drick vid kontrollerna från början, också när det känns lätt — det är svårt att hämta igen energi som tagit slut."
     }
   }
 }

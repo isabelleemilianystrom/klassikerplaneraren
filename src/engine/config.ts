@@ -335,6 +335,12 @@ export const sessionsSchema = z.object({
     /** Övningar viktade mot ett lopp. Saknas loppet används exercises. */
     byRace: z.partialRecord(raceId, z.array(z.object({ name: z.string().min(1), focus: z.string().min(1) })).min(1)),
   }),
+  /** R-30: lopptaktik som hör till loppdagen, inte till träningen. */
+  raceNotes: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    byRace: z.partialRecord(raceId, z.string().min(1)),
+  }),
   safetyNotes: z.object({
     openWater: z.object({ _rule: z.string(), text: z.string().min(1) }),
   }),

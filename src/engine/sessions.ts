@@ -998,7 +998,24 @@ function withTitleAndInstruction(
     alternatives: alternativesFor(session, input),
   };
 
-  return withSafetyNote(withSubstitution(grund, input), input);
+  return withRaceNote(withSafetyNote(withSubstitution(grund, input), input));
+}
+
+/**
+ * Lopptaktiken på loppdagen (R-30).
+ *
+ * Råd som hör till loppet och inte till träningen: motströmmen i Vanån,
+ * klungan i Vätternrundan, att Lidingöloppet avgörs på sista milen. De
+ * tränar man inte, man förhåller sig till dem — därför står de bara här,
+ * och bara på loppdagen.
+ */
+function withRaceNote(session: Session): Session {
+  if (session.type !== 'race' || session.raceId === undefined) return session;
+
+  const taktik = sessionTexts.raceNotes.byRace[session.raceId];
+  if (taktik === undefined) return session;
+
+  return { ...session, instruction: `${session.instruction} ${taktik}` };
 }
 
 /**

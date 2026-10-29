@@ -273,3 +273,78 @@ describe('R-21: teknik och kurs för nybörjaren', () => {
     expect(courseAdvice(P2)).toEqual([]);
   });
 });
+
+describe('R-30: lopptaktik på loppdagen', () => {
+  it('lägger till taktiken på varje lopppass', () => {
+    for (const [namn, sessions] of allaPass()) {
+      for (const session of sessions) {
+        if (session.type !== 'race') continue;
+
+        const taktik = sessionTexts.raceNotes.byRace[session.raceId as 'vasaloppet'];
+        expect(taktik, `${namn} ${session.id}`).toBeDefined();
+        expect(session.instruction, `${namn} ${session.id}`).toContain(taktik as string);
+      }
+    }
+  });
+
+  it('nämner motströmmen i Vansbrosimningen', () => {
+    const lopp = pass(P1).find(
+      (s) => s.type === 'race' && s.raceId === 'vansbrosimningen',
+    );
+
+    expect(lopp?.instruction).toMatch(/motströms/);
+    expect(lopp?.instruction).toMatch(/Vanån/);
+  });
+
+  it('nämner klungan i Vätternrundan och sista milen i Lidingöloppet', () => {
+    const sessions = pass(P2);
+
+    expect(
+      sessions.find((s) => s.raceId === 'vatternrundan')?.instruction,
+    ).toMatch(/klunga/);
+    expect(
+      sessions.find((s) => s.raceId === 'lidingoloppet')?.instruction,
+    ).toMatch(/sista milen/);
+  });
+
+  it('sätter ingen taktik på andra pass än loppet', () => {
+    const taktiker = Object.values(sessionTexts.raceNotes.byRace);
+
+    for (const [namn, sessions] of allaPass()) {
+      for (const session of sessions) {
+        if (session.type === 'race') continue;
+
+        for (const taktik of taktiker) {
+          expect(session.instruction, `${namn} ${session.id}`).not.toContain(taktik);
+        }
+      }
+    }
+  });
+
+  it('behåller den allmänna lopptexten före taktiken', () => {
+    const lopp = pass(P1).find((s) => s.type === 'race');
+    expect(lopp?.instruction).toMatch(/^I dag är det lopp\./);
+  });
+});
+
+describe('tränargranskningen 2026-10-29', () => {
+  it('nämner utförsbackarna i löpningens långpass', () => {
+    // Coachen: de flesta övar bara uppför, men det är nedför låren tar emot.
+    const långpass = pass(P2).find((s) => s.type === 'long' && s.sport === 'run');
+
+    expect(långpass?.instruction).toMatch(/utförsbackar/);
+    expect(långpass?.instruction).toMatch(/låren/);
+  });
+
+  it('nämner blicklyft i simningens pass', () => {
+    // Coachen: i en älv finns ingen linje i botten att följa.
+    const simpass = pass(P1).filter(
+      (s) => s.sport === 'swim' && (s.type === 'long' || s.type === 'technique'),
+    );
+
+    expect(simpass.length).toBeGreaterThan(0);
+    for (const session of simpass) {
+      expect(session.instruction, session.id).toMatch(/blicken/);
+    }
+  });
+});
