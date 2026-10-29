@@ -254,15 +254,6 @@
       "weeksThreshold": 8,
       "text": "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
     },
-    "lowHours": {
-      "hoursThresholdWithLongRace": 4,
-      "hoursThresholdOtherwise": 3,
-      "longRaceIds": [
-        "vasaloppet",
-        "vatternrundan"
-      ],
-      "text": "Den tid du har valt är i minsta laget för dina lopp."
-    },
     "skiTechnique": {
       "text": "Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet."
     },

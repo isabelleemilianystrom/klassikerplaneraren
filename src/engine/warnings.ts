@@ -11,8 +11,15 @@
  * Rena funktioner, inga sidoeffekter.
  */
 import { raceById, rules } from './config.ts';
-import { startOfWeek, weeksBetween } from './dates.ts';
-import type { PlanInput, RaceId, TrainedSport } from './types.ts';
+import {
+  earliest,
+  isIsoDate,
+  latest,
+  requireIsoDate,
+  startOfWeek,
+  weeksBetween,
+} from './dates.ts';
+import type { IsoDate, PlanInput, RaceId, TrainedSport } from './types.ts';
 import type { WeekPlan } from './sessions.ts';
 
 /** Ett lopp som ligger för nära starten för en hel uppbyggnad (R-35). */
@@ -107,4 +114,48 @@ export function courseAdvice(input: PlanInput): string[] {
     .filter((sport) => input.levels[sport as TrainedSport] === 'new')
     .map((sport) => rules.technique.courseAdvice[sport])
     .filter((råd): råd is string => råd !== undefined);
+}
+
+/**
+ * Varningen om att loppen inte ryms i tolv månader (R-26).
+ *
+ * En svensk klassiker kräver att alla fyra loppen genomförs inom tolv månader.
+ * Spänner de över mer än det är planen fortfarande ett träningsprogram, men
+ * den är inte en klassikerplan — och det är hela poängen med appen. Planen
+ * skapas ändå; kontrollen säger vad som gäller och låter användaren bestämma.
+ *
+ * Mäts från det första loppet till det sista. Ett enda lopp kan aldrig ligga
+ * mer än tolv månader från sig självt.
+ */
+export function classicWindowWarnings(input: PlanInput): string[] {
+  const { text } = rules.warnings.outsideClassicWindow;
+  if (input.races.length < 2) return [];
+
+  const datum = input.races.map((race) => race.date);
+  const första = earliest(datum);
+  const sista = latest(datum);
+
+  // Tolv månader efter det första loppet är sista dagen som räknas.
+  const gräns = addYear(första);
+  return sista > gräns ? [text] : [];
+}
+
+/**
+ * Samma datum ett år senare, som ISO-sträng.
+ *
+ * Skottår: är den 29 februari inte ett datum året därpå blir det den 28:e.
+ * Utan det hade `2028-02-29` blivit `2029-03-01`, vilket är en dag för sent.
+ */
+function addYear(date: IsoDate): IsoDate {
+  const år = Number(date.slice(0, 4)) + 1;
+  const restenAvDatumet = date.slice(4);
+
+  const kandidat = `${år}${restenAvDatumet}`;
+  if (isIsoDate(kandidat) && kandidat.slice(4) === restenAvDatumet) {
+    const prövning = new Date(`${kandidat}T00:00:00Z`);
+    const samma = prövning.toISOString().slice(0, 10) === kandidat;
+    if (samma) return kandidat;
+  }
+
+  return requireIsoDate(`${år}-02-28`, 'addYear');
 }

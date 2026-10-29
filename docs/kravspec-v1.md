@@ -78,6 +78,26 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
 - [x] **3. AI-modell och nyckel.** Besvarad 2026-10-27: **inga AI-anrop i körtid.** Förklaringarna förgenereras under utvecklingen med hjälp av AI, granskas av Isabelle och sparas i appen. Ingen API-nyckel, ingen kostnad, inget missbruksskydd och inga data som lämnar webbläsaren. Ett riktigt AI-anrop kan läggas till i en senare version. Se noten nedan om vad det innebär för avsnitt 6, 7 och T-12.
 - [x] **4. Konton.** Besvarad 2026-10-27: GitHub-repot finns och är publikt. **Vercel-konto saknas ännu.** *(Uppdaterat 2026-10-28: drift väntar till efter demon.)* Demon körs lokalt med `npm run dev`, så inget konto behövs före den 19 november. Appen är helt statisk — inga serveranrop, ingen databas, inga AI-anrop i körtid — så den kan läggas på Vercel eller GitHub Pages när som helst efteråt utan att något i koden ändras.
 - [x] **5. Granskning av träningsreglerna.** Vem granskar reglerna i avsnitt 5 före demon? Förslag: en tränare eller kunnig bekant; om ingen hinner visas betatexten tydligt. Blockerar M1-granskningen. **Besvarad 2026-10-29: granskad.** Fyra granskningar gjordes — en allmän klassikercoach och en specialist per gren. Profilerna P1–P5 lästes som text. Utfallet: periodiseringen, teknikprioriteringen för nybörjare, terrängträningen och volymvarningen för Vätternrundan bekräftades. Tre luckor hittades och är åtgärdade: utförslöpning inför Lidingöloppet, blicklyft i öppet vatten, och lopptaktiken i R-30. Kvar att besluta: volymriktmärken för de tre övriga loppen, som ingen av granskarna gav tal för.
+- [ ] **7. R-22 och R-24 — två varningar som redan sägs av andra.** *(Hittad 2026-10-29 när
+  varningarna skulle byggas.)* Båda har text och konfiguration men ingen kod, och båda går av
+  exakt när en annan, redan byggd varning också går av:
+
+  | Krav | Täcks av | Varför |
+  | --- | --- | --- |
+  | **R-22** under 8 veckor till första loppet | **R-35** under 10 veckor | 8 är mindre än 10, så R-35 går alltid av först. R-35:s text är längre och säger mer: att grundperioden saknas och vad planen i stället är lagd för |
+  | **R-24** Vasaloppet, ny på skidor, ingen utrustning | **R-21:s kursråd** för skidor | R-21 går av redan på "ny på skidor" och säger nästan ordagrant samma sak, plus nivån och skälet |
+
+  Byggdes de som de står visas två nästan identiska stycken. För P4 blev det i prov: *"Du har
+  kort tid att förbereda dig…"* direkt följt av *"Det är 5 veckor till Vasaloppet…"*, och
+  *"Teknik är avgörande i Vasaloppet…"* direkt följt av *"Du är ny på längdskidor. Teknik avgör
+  mer än kondition i Vasaloppet…"*.
+
+  **Förslag: stryk båda, som R-23 ströks.** Alternativet är att rikta om dem — R-22 mot något
+  R-35 inte säger, och R-24 mot det användaren faktiskt saknar: ett skidläger för att få någon
+  tid på snö. Det senare kräver en ny text, som Isabelle i så fall får godkänna.
+
+  **R-26 var den enda av de fyra varningarna som saknades på riktigt** och är nu byggd.
+
 - [x] **6. Demon.** Besvarad 2026-10-29: **högst fem minuter.** Det styr demomanuset i avsnitt 11 och vad som måste finnas. Fem minuter räcker till startsidan, formuläret ifyllt live, översikten och en öppnad vecka. Fasförklaringarna (T-12) hinner knappt visas och är därmed inte kritiska för demon.
 
 ### Not till fråga 3: vad beslutet ändrar
@@ -469,7 +489,11 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 **Varningar**
 
 - **R-22** Mindre än 8 veckor från start till första lopp: "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
-- **R-23** T under 4 timmar när Vasaloppet eller Vätternrundan ingår, eller under 3 timmar annars: "Den tid du har valt är i minsta laget för dina lopp."
+- **R-23** ~~T under 4 timmar när Vasaloppet eller Vätternrundan ingår, eller under 3 timmar
+  annars.~~ **Borttagen 2026-10-29**, ersatt av golvet i R-41. Varningen kunde inte längre gå av,
+  och en varning om att golvet är "i minsta laget" skulle motsäga golvet: sex timmar räcker till
+  tusen kilometer på cykel före Vätternrundan. Numret står kvar för att hänvisningar i resten av
+  dokumentet ska fortsätta stämma.
 - **R-24** Vasaloppet med nivå Ny i skidor och varken snö, rullskidor eller stakmaskin: "Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet."
 
 - **R-26** (tillagd 2026-10-27) Spänner loppen över mer än tolv månader: "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader." Planen skapas ändå. Kontrollen är det som gör planen till en klassikerplan och inte bara ett träningsprogram.
@@ -751,7 +775,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 **Särskilda testfall**
 
-- P4 ger varningen i R-22, P3 varningen i R-23 och P4 varningen i R-24
+- Loppen mer än tolv månader isär ger varningen i R-26, och planen skapas ändå. Skottdagen räknas rätt (R-26) *(byggd 2026-10-29)*
+- R-22 och R-24 är inte byggda: se öppen fråga 7 i avsnitt 3 *(R-23 borttagen 2026-10-29)*
 - P5 följer blocklogiken i R-03
 - Datum: ISO-vecka 53 och årsskiftet 2026–2027, sommartid 28 mars 2027, och skottåret 2028 — en vårstart lägger Vasaloppet i mars 2028, så februari 2028 ligger inne i planen (ändrad 2026-10-28)
 - Förklaringar: varje kombination av fas och lopp har en text, ingen text överskrider sin längdgräns, och ingen plan saknar förklaring

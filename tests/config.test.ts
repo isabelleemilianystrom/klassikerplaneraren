@@ -178,12 +178,9 @@ describe('config/rules.json', () => {
     expect(rules.season.openWaterMonths).toEqual([6, 7, 8]);
   });
 
-  it('har varningstexterna ordagrant från R-22 till R-24 och R-26', () => {
+  it('har varningstexterna ordagrant från R-22, R-24 och R-26', () => {
     expect(rules.warnings.shortPreparation.text).toBe(
       'Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid.',
-    );
-    expect(rules.warnings.lowHours.text).toBe(
-      'Den tid du har valt är i minsta laget för dina lopp.',
     );
     expect(rules.warnings.skiTechnique.text).toBe(
       'Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet.',
@@ -263,12 +260,6 @@ describe('konfigurationen hänger ihop', () => {
     }
   });
 
-  it('nämner bara lopp som finns i varningen om låga timmar', () => {
-    const idn = races.races.map((race) => race.id);
-    for (const id of rules.warnings.lowHours.longRaceIds) {
-      expect(idn).toContain(id);
-    }
-  });
 });
 
 describe('R-39: listan över grenar som får vänta', () => {

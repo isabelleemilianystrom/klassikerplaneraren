@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { raceById, rules } from '../src/engine/config.ts';
 import { addDays, addWeeks, startOfWeek } from '../src/engine/dates.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
-import { midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
+import {
+  classicWindowWarnings,
+  midProgrammeStarts,
+  midProgrammeWarnings,
+} from '../src/engine/warnings.ts';
 import type { PlanInput, RaceId } from '../src/engine/types.ts';
 import { P1, P2, P4, P6, PROFILES } from './profiles.ts';
 
@@ -146,5 +150,97 @@ describe('R-35: varningstexten', () => {
 
   it('ger ingen text när det inte finns något att varna för', () => {
     expect(midProgrammeWarnings(starter(P1))).toEqual([]);
+  });
+});
+
+describe('R-26: loppen ska rymmas i tolv månader', () => {
+  /** En plan med loppen på de datum testet behöver. */
+  function med(datum: [RaceId, string][]): PlanInput {
+    return {
+      ...P1,
+      races: datum.map(([id, date]) => ({ id, date, goal: 'finish' as const })),
+    };
+  }
+
+  it('varnar när det sista loppet ligger mer än tolv månader efter det första', () => {
+    const plan = med([
+      ['vasaloppet', '2027-03-07'],
+      ['lidingoloppet', '2028-03-08'],
+    ]);
+
+    expect(classicWindowWarnings(plan)).toEqual([rules.warnings.outsideClassicWindow.text]);
+  });
+
+  it('varnar inte när loppen ligger precis tolv månader isär', () => {
+    // Tolv månader ska räknas som inom tolv månader, inte utanför. Gränsen är
+    // det som avgör om planen är en klassikerplan, så den får inte ligga en
+    // dag fel.
+    const plan = med([
+      ['vasaloppet', '2027-03-07'],
+      ['lidingoloppet', '2028-03-07'],
+    ]);
+
+    expect(classicWindowWarnings(plan)).toEqual([]);
+  });
+
+  it('varnar på dagen efter tolv månader', () => {
+    const plan = med([
+      ['vasaloppet', '2027-03-07'],
+      ['lidingoloppet', '2028-03-08'],
+    ]);
+
+    expect(classicWindowWarnings(plan).length).toBe(1);
+  });
+
+  it('klarar skottdagen', () => {
+    // 29 februari 2028 plus ett år finns inte. Utan särskild hantering blev
+    // gränsen 1 mars 2029, vilket är en dag för sent.
+    const inom = med([
+      ['vasaloppet', '2028-02-29'],
+      ['lidingoloppet', '2029-02-28'],
+    ]);
+    const utanför = med([
+      ['vasaloppet', '2028-02-29'],
+      ['lidingoloppet', '2029-03-01'],
+    ]);
+
+    expect(classicWindowWarnings(inom)).toEqual([]);
+    expect(classicWindowWarnings(utanför).length).toBe(1);
+  });
+
+  it('varnar inte för en plan med ett enda lopp', () => {
+    expect(classicWindowWarnings(med([['vasaloppet', '2027-03-07']]))).toEqual([]);
+  });
+
+  it('varnar inte för någon av referensprofilerna', () => {
+    // Alla sex ligger inom tolv månader. Gör de inte det är det profilen som
+    // är fel, inte regeln.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      expect(classicWindowWarnings(profil), namn).toEqual([]);
+    }
+  });
+
+  it('bryr sig inte om i vilken ordning loppen står', () => {
+    const framlänges = med([
+      ['vasaloppet', '2027-03-07'],
+      ['lidingoloppet', '2028-03-08'],
+    ]);
+    const baklänges = med([
+      ['lidingoloppet', '2028-03-08'],
+      ['vasaloppet', '2027-03-07'],
+    ]);
+
+    expect(classicWindowWarnings(framlänges)).toEqual(classicWindowWarnings(baklänges));
+  });
+
+  it('planen skapas ändå', () => {
+    // Varningen säger vad som gäller; den tar inte bort programmet.
+    const plan = med([
+      ['vasaloppet', '2027-03-07'],
+      ['lidingoloppet', '2028-03-08'],
+    ]);
+
+    expect(classicWindowWarnings(plan).length).toBe(1);
+    expect(buildWeekPlans(plan).length).toBeGreaterThan(0);
   });
 });

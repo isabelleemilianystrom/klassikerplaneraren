@@ -11,7 +11,12 @@
  */
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { buildWeekPlans, type WeekPlan } from '../engine/sessions.ts';
-import { courseAdvice, midProgrammeStarts, midProgrammeWarnings } from '../engine/warnings.ts';
+import {
+  classicWindowWarnings,
+  courseAdvice,
+  midProgrammeStarts,
+  midProgrammeWarnings,
+} from '../engine/warnings.ts';
 import { volumeChecks, volumeWarnings } from '../engine/volume.ts';
 import type { PlanInput } from '../engine/types.ts';
 import PlanForm from '../ui/PlanForm.tsx';
@@ -37,6 +42,9 @@ function idag(): string {
  */
 function allaVarningar(input: PlanInput, planer: WeekPlan[]): string[] {
   return [
+    // R-26 först: ryms loppen inte i tolv månader är det inte en klassiker,
+    // och det är mer grundläggande än allt annat varningarna säger.
+    ...classicWindowWarnings(input),
     ...midProgrammeWarnings(midProgrammeStarts(input, planer)),
     ...volumeWarnings(volumeChecks(input, planer)),
     ...courseAdvice(input),
