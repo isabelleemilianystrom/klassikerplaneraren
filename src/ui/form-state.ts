@@ -121,7 +121,7 @@ export function validateStep3(state: FormState): FieldErrors {
     state.hoursPerWeek < min ||
     state.hoursPerWeek > max
   ) {
-    fel.hoursPerWeek = FORM.step3.errors.hours;
+    fel.hoursPerWeek = FORM.step3.errors.hours(min, max);
   }
 
   // Vilodagen ska vara helt fri, så den kan inte också bära veckans längsta pass.
@@ -135,12 +135,13 @@ export function validateStep3(state: FormState): FieldErrors {
 /**
  * Tillåtna timmar per vecka, ur konfigurationen.
  *
- * Nedre gränsen är kravspecens 3; den övre tas ur `trainingDays`, som är det
- * som faktiskt sätter taket för hur mycket tid motorn kan fördela.
+ * Nedre gränsen är golvet i R-41; den övre tas ur `trainingDays`, som är det
+ * som faktiskt sätter taket för hur mycket tid motorn kan fördela. Båda ligger
+ * i konfigurationen — formuläret och motorn ska aldrig kunna säga olika.
  */
 export function hoursRange(): { min: number; max: number } {
   const rader = rules.trainingDays.byHoursPerWeek;
-  return { min: 3, max: rader.at(-1)?.upToHours ?? 15 };
+  return { min: rules.weeklyHours.min, max: rader.at(-1)?.upToHours ?? 15 };
 }
 
 /** Felen i alla tre stegen. */

@@ -109,9 +109,11 @@ describe('R-34: volymriktmärken', () => {
     expect(check?.kilometers).toBeGreaterThanOrEqual(1000);
   });
 
-  it('når det inte med tre timmar i veckan', () => {
+  it('nås på golvet i R-41, när hela året finns kvar', () => {
+    // P3 ligger på sex timmar, minsta tid ett program byggs av. Räckte inte
+    // den tiden till tusen kilometer på ett år vore golvet satt för lågt.
     const check = kontroller(P3)[0];
-    expect(check?.reached).toBe(false);
+    expect(check?.reached).toBe(true);
   });
 
   it('når det inte när förberedelsetiden är kort', () => {
@@ -137,12 +139,14 @@ describe('R-34: volymriktmärken', () => {
 describe('R-34: varningstexten', () => {
   it('ges bara när riktmärket inte nås', () => {
     expect(volumeWarnings(kontroller(P2))).toEqual([]);
-    expect(volumeWarnings(kontroller(P3)).length).toBe(1);
+    expect(volumeWarnings(kontroller(P3))).toEqual([]);
+    // P6 startar sex och en halv vecka före Vätternrundan och hinner inte.
+    expect(volumeWarnings(kontroller(P6)).length).toBe(1);
   });
 
   it('säger vad planen ger och vad riktmärket är', () => {
-    const varning = volumeWarnings(kontroller(P3))[0] as string;
-    const check = kontroller(P3)[0];
+    const varning = volumeWarnings(kontroller(P6))[0] as string;
+    const check = kontroller(P6)[0];
 
     expect(varning).toContain(String(check?.kilometers));
     expect(varning).toContain('1000');
@@ -161,7 +165,7 @@ describe('R-34: varningstexten', () => {
   it('säger att planen når distansen, inte att användaren tränar för lite', () => {
     // Appen är byggd för folk som arbetar. En varning betyder "det här når inte
     // riktmärket", aldrig "du tränar för lite".
-    const varning = volumeWarnings(kontroller(P3))[0] as string;
+    const varning = volumeWarnings(kontroller(P6))[0] as string;
 
     expect(varning).toContain('klara distansen');
     expect(varning).not.toMatch(/för lite|otillräckligt|borde träna mer/i);

@@ -166,7 +166,9 @@ export const FORM = {
       'samma träning – skidor blir till exempel stavgång i backe.',
     errors: {
       sameDay: 'Långpasset och vilodagen kan inte vara samma dag.',
-      hours: 'Välj mellan 3 och 15 timmar.',
+      // Siffrorna kommer ur konfigurationen (R-41), så texten inte kan säga
+      // en sak och valideringen en annan.
+      hours: (min: number, max: number): string => `Välj mellan ${min} och ${max} timmar.`,
     },
   },
 

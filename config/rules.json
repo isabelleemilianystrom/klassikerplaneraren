@@ -53,6 +53,10 @@
       "recovery": 0
     }
   },
+  "weeklyHours": {
+    "_rule": "R-41: minsta tid som går att bygga ett program av. Under sex timmar i veckan räcker tiden inte till fyra grenar med varsitt långpass, och det programmet skulle bli en lista över pass som inte leder till loppen. Taket sätts av trainingDays, som är det som faktiskt avgör hur mycket tid motorn kan fördela.",
+    "min": 6
+  },
   "trainingDays": {
     "_rule": "R-11",
     "byHoursPerWeek": [

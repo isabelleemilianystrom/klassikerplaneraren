@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { rules } from '../src/engine/config.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
 import {
   hoursRange,
@@ -144,15 +145,19 @@ describe('K-04: steg 3, tid, dagar och utrustning', () => {
     expect(Object.values(state.equipment).every((värde) => värde === false)).toBe(true);
   });
 
-  it('tillåter 3 till 15 timmar', () => {
+  it('tillåter 6 till 15 timmar', () => {
+    // R-41: under sex timmar byggs inget program. Golvet står i
+    // konfigurationen och formuläret läser det därifrån.
     const { min, max } = hoursRange();
-    expect(min).toBe(3);
+    expect(min).toBe(6);
     expect(max).toBe(15);
+    expect(min).toBe(rules.weeklyHours.min);
 
-    for (const timmar of [min, 6, max]) {
+    for (const timmar of [min, 10, max]) {
       expect(validateStep3({ ...ifyllt(), hoursPerWeek: timmar }).hoursPerWeek).toBeUndefined();
     }
-    for (const timmar of [min - 1, max + 1, 0, 6.5]) {
+    // Tre och fem timmar var tillåtet förut och ska nu underkännas (R-41).
+    for (const timmar of [min - 1, 3, 5, max + 1, 0, 6.5]) {
       expect(validateStep3({ ...ifyllt(), hoursPerWeek: timmar }).hoursPerWeek).toBeDefined();
     }
   });

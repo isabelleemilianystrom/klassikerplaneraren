@@ -68,14 +68,20 @@ export const P2: PlanInput = {
   equipment: { snowOrRollerSkis: true, skiErg: true, pool: true, bike: true },
 };
 
-/** P3 Den begränsade: alla fyra, 3 h, van i allt, bara cykel. */
+/**
+ * P3 Den begränsade: alla fyra, 6 h, van i allt, bara cykel.
+ *
+ * Sex timmar är golvet i R-41 — minsta tid ett program byggs av. Profilen
+ * ligger med flit precis på golvet: det är där reglerna krockar med varandra,
+ * eftersom tiden inte räcker till allt på en gång.
+ */
 export const P3: PlanInput = {
   schemaVersion: 3,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
   levels: { ski: 'experienced', swim: 'experienced', bike: 'experienced', run: 'experienced' },
-  hoursPerWeek: 3,
+  hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
   equipment: { ...INGEN_UTRUSTNING, bike: true },
 };

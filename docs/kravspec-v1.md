@@ -115,7 +115,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-01 | Startsida med kort förklaring, betatext, ansvarsfriskrivning, åldersgräns (18 år) och knappen "Skapa mitt program" | Måste | Givet att jag öppnar appen utan sparad plan, så ser jag förklaringen, texterna från avsnitt 8 och knappen som startar formuläret |
 | K-02 | Steg 1: välj minst ett av de fyra loppen och ange datum och mål — ta sig i mål eller sikta på en tid — för varje valt lopp *(mål tillagt 2026-10-29)*; startdatum är idag men kan ändras | Måste | Inget lopp valt eller ett loppdatum före startdatumet ger ett felmeddelande vid fältet, och jag kommer inte vidare |
 | K-03 | Steg 2: nivå per sport som ingår i valda lopp – Ny, Van eller Erfaren – med beskrivningarna i avsnitt 5 | Måste | Varje sport har exakt en vald nivå innan jag kommer vidare; förvalt är "Van" |
-| K-04 | Steg 3: timmar per vecka (3–15, heltal), vilken dag långpasset ska ligga på, vilken dag som är vilodag, och utrustning: snö eller rullskidor, stakmaskin, simhall, landsvägscykel eller trainer (ja/nej för varje) | Måste | Alla fält har standardvärden (6 timmar, söndag långpass, måndag vila, nej på utrustning); värden utanför 3–15 kan inte väljas; samma dag för långpass och vila ger ett felmeddelande vid fältet och jag kommer inte vidare |
+| K-04 | Steg 3: timmar per vecka (6–15, heltal), vilken dag långpasset ska ligga på, vilken dag som är vilodag, och utrustning: snö eller rullskidor, stakmaskin, simhall, landsvägscykel eller trainer (ja/nej för varje) | Måste | Alla fält har standardvärden (6 timmar, söndag långpass, måndag vila, nej på utrustning); värden utanför 6–15 kan inte väljas; samma dag för långpass och vila ger ett felmeddelande vid fältet och jag kommer inte vidare |
 | K-05 | Generering: regelmotorn skapar planen direkt, med förklaringarna på plats från början | Måste | Planen med sina förklaringar visas inom 2 s efter att jag skickat formuläret, utan att något laddas i efterhand |
 | K-06 | Översikt: alla veckor från start till sista lopp med veckonummer, datumintervall, fas, total tid och markering av loppveckor | Måste | Antalet veckor stämmer med perioden; varje loppvecka är markerad med loppets namn |
 | K-07 | Veckovy: sju dagar med pass; varje pass visar sport, typ, minuter, intensitet i vardagsspråk och zon samt en kort instruktion; vilodagar visas som vila | Måste | Varje dag i veckan visas; intensitet visas som t.ex. "Lugnt – du ska kunna prata hela meningar (zon 2)" |
@@ -357,6 +357,19 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
      den valda, och det ska stå, inte tystas ner. I de sex profilerna händer det i tre veckor
      av 226, med fem till femton minuter.
 
+- **R-41** (tillagd 2026-10-29) **Minst sex timmar i veckan.** Under sex timmar byggs inget
+  program. Talet står i `weeklyHours.min` i `config/rules.json`, och formuläret läser samma
+  tal — gränsen i gränssnittet och gränsen i motorn kan aldrig säga olika. Fem timmar går inte
+  att välja; sex är standardvärdet och det lägsta som går.
+
+  Skälet: en klassiker är fyra grenar som var och en behöver ett långpass, och fyra långpass
+  ryms inte i mindre tid. Under golvet blir programmet en lista över pass som inte leder fram
+  till loppen, och ett sådant program är sämre än inget — det ser ut att ha räknat, men det har
+  inte råd med det det föreslår.
+
+  Att golvet ligger rätt syns på volymriktmärket: sex timmar i veckan räcker till tusen
+  kilometer på cykel före Vätternrundan när hela året finns kvar (R-34). Hade det inte gjort
+  det vore golvet satt för lågt.
 
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
@@ -574,7 +587,7 @@ interface PlanInput {
   startDate: string;          // YYYY-MM-DD
   races: { id: RaceId; date: string; goal: 'finish' | 'time' }[];   // R-38
   levels: Partial<Record<'ski' | 'bike' | 'swim' | 'run', Level>>;
-  hoursPerWeek: number;       // 3–15
+  hoursPerWeek: number;       // 6–15 (R-41)
   preferredDays: { longSession: Weekday; rest: Weekday };   // måste vara olika
   equipment: { snowOrRollerSkis: boolean; skiErg: boolean; pool: boolean; bike: boolean };
 }
@@ -690,7 +703,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 | --- | --- | --- | --- | --- |
 | P1 Förstagångsklassikern | Alla fyra | 6 | Ny i skidor och simning, Van i övrigt | Simhall och cykel |
 | P2 Tidsjägaren | Alla fyra | 10 | Erfaren i allt | Allt |
-| P3 Den begränsade | Alla fyra | 3 | Van i allt | Bara cykel |
+| P3 Den begränsade | Alla fyra | 6 | Van i allt | Bara cykel |
 | P4 Kort tid | Bara Vasaloppet, 6 veckor efter start | 6 | Ny i skidor | Ingen |
 | P5 Lopp tätt | Vätternrundan och Vansbrosimningen, 2 veckor isär | 8 | Van i båda | Cykel och simhall |
 | P6 Vårstart | Alla fyra, start 2027-05-03, Vasaloppet sist (mars 2028); långpass onsdag, vila söndag | 8 | Ny i skidor, Van i övrigt | Simhall och cykel |
@@ -755,7 +768,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
 - Samma mål på alla lopp ändrar ingenting; det är skillnaden mellan loppen som räknas (R-38) (tillagt 2026-10-29)
 - Erfaren simmare: noll simning före Vasaloppet. Nybörjare: oförändrat (R-39) (tillagt 2026-10-29)
-- Tre timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
+- Sex timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
+- Fem timmar i veckan går inte att välja, och sex gör det (R-41) (tillagt 2026-10-29)
+- Golvet på sex timmar räcker till volymriktmärket på 1000 km när hela året finns kvar (R-34, R-41) (tillagt 2026-10-29)
 - Vecka där simningen får mer tid än ett pass rymmer: passet stannar på taket och resten flyttar eller redovisas som oplacerad tid (R-29, R-40) (tillagt 2026-10-29)
 - Nedtrappningsvecka mot Vansbrosimningen: inget simpass på tjugo minuter, och veckans korta inslag i högre fart finns kvar (R-15, R-40) (tillagt 2026-10-29)
 - Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)

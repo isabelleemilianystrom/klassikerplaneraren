@@ -105,6 +105,11 @@ export const rulesSchema = z.object({
       recovery: z.number().int().nonnegative(),
     }),
   }),
+  weeklyHours: z.object({
+    _rule: z.string(),
+    /** Minsta tid per vecka som går att bygga ett program av (R-41). */
+    min: z.number().int().positive(),
+  }),
   trainingDays: z.object({
     _rule: z.string(),
     byHoursPerWeek: z
