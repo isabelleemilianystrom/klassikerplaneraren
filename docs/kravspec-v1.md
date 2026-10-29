@@ -78,7 +78,7 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
 - [x] **3. AI-modell och nyckel.** Besvarad 2026-10-27: **inga AI-anrop i körtid.** Förklaringarna förgenereras under utvecklingen med hjälp av AI, granskas av Isabelle och sparas i appen. Ingen API-nyckel, ingen kostnad, inget missbruksskydd och inga data som lämnar webbläsaren. Ett riktigt AI-anrop kan läggas till i en senare version. Se noten nedan om vad det innebär för avsnitt 6, 7 och T-12.
 - [x] **4. Konton.** Besvarad 2026-10-27: GitHub-repot finns och är publikt. **Vercel-konto saknas ännu.** *(Uppdaterat 2026-10-28: drift väntar till efter demon.)* Demon körs lokalt med `npm run dev`, så inget konto behövs före den 19 november. Appen är helt statisk — inga serveranrop, ingen databas, inga AI-anrop i körtid — så den kan läggas på Vercel eller GitHub Pages när som helst efteråt utan att något i koden ändras.
 - [x] **5. Granskning av träningsreglerna.** Vem granskar reglerna i avsnitt 5 före demon? Förslag: en tränare eller kunnig bekant; om ingen hinner visas betatexten tydligt. Blockerar M1-granskningen. **Besvarad 2026-10-29: granskad.** Fyra granskningar gjordes — en allmän klassikercoach och en specialist per gren. Profilerna P1–P5 lästes som text. Utfallet: periodiseringen, teknikprioriteringen för nybörjare, terrängträningen och volymvarningen för Vätternrundan bekräftades. Tre luckor hittades och är åtgärdade: utförslöpning inför Lidingöloppet, blicklyft i öppet vatten, och lopptaktiken i R-30. Kvar att besluta: volymriktmärken för de tre övriga loppen, som ingen av granskarna gav tal för.
-- [ ] **6. Demon.** Hur lång är demon och vad ska den visa? Påverkar demomanuset i avsnitt 11.
+- [x] **6. Demon.** Besvarad 2026-10-29: **högst fem minuter.** Det styr demomanuset i avsnitt 11 och vad som måste finnas. Fem minuter räcker till startsidan, formuläret ifyllt live, översikten och en öppnad vecka. Fasförklaringarna (T-12) hinner knappt visas och är därmed inte kritiska för demon.
 
 ### Not till fråga 3: vad beslutet ändrar
 
@@ -282,6 +282,16 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   innehåller ett simteknikpass fast den i övrigt är vila.
 
 - **R-34** (tillagd 2026-10-28) **Volymriktmärke per lopp.** Ett lopp kan ha ett riktmärke för
+  **Varför bara Vätternrundan har ett tal** *(besvarat vid tränargranskningen 2026-10-29)*.
+  För de övriga tre loppen finns inget motsvarande riktmärke, och det är inte en lucka utan
+  ett svar:
+
+  - **Vasaloppet:** desto mer tid på skidor desto bättre — det finns inget tak och inget
+    tydligt golv. Går det inte att komma åt snö är rullskidor eller stakmaskin vägen, och ett
+    skidläger för att få *någon* tid på snö är viktigare än ett kilometertal.
+  - **Vansbrosimningen:** det avgörande är att känna sig van i vattnet, inte att ha simmat ett
+    visst antal kilometer. Se R-38.
+  - **Lidingöloppet:** inget tal angivet.
   hur många kilometer man bör ha samlat i loppets gren före loppet — **summan av alla pass**,
   inte ett enskilt långpass. Talet ligger i `volumeMilestoneKm` i `config/races.json`.
 
@@ -658,7 +668,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - [ ] Alla Måste-krav är klara och testade
 - [ ] Appen går att köra lokalt med `npm run dev` och fungerar i mobil *(ändrad 2026-10-28:
       demon körs lokalt, drift skjuts till efter demon)*
-- [ ] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna
+- [x] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna *(2026-10-29)*
 - [ ] Varje kombination av fas och lopp har en granskad förklaring
 - [ ] Varje passtyp har en granskad instruktion
 - [ ] README beskriver idé, hur man kör projektet och var kravspecen finns
@@ -716,7 +726,7 @@ Regelmotorn är klar och granskad efter första arbetsveckan; därefter byggs gr
 2. Förenkla översikten (K-06) till en lista utan fasförklaringar i varje rad
 3. Minska textbiblioteket: skriv en förklaring per fas i stället för en per fas och lopp, så att granskningen blir fyra texter i stället för sexton
 
-**Demomanus** (justeras efter fråga 6)
+**Demomanus** — högst fem minuter *(fastställt 2026-10-29)*
 
 **Demon körs lokalt** *(beslut 2026-10-28)* med `npm run dev` på Isabelles egen dator. Appen är statisk och behöver ingen server, så drift skjuts till efter demon. Kravet på noll kronor påverkas inte — det blir i stället noll konton också.
 
