@@ -608,6 +608,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Sparad data valideras fält för fält, inte bara på versionsnumret, och kastas när något inte stämmer (K-15) *(tillagd 2026-10-28)*
 - Appen fungerar när localStorage saknas, inte går att skriva till eller inte går att läsa (K-10) *(tillagd 2026-10-28)*
 - Startsidan ritas alltid, också när den sparade planen är trasig — aldrig en tom sida (K-15) *(tillagd 2026-10-28)*
+- Texterna i avsnitt 8 används ordagrant: ett test läser kravspecen och jämför, så att de två inte kan glida isär (K-01, K-11) *(tillagd 2026-10-29)*
 - Samma indata ger samma plan (determinism)
 - Varje pass är 20–300 minuter och har titel, instruktion och zon där zon gäller (R-12, R-30) *(tillagd 2026-10-27)*
 - Varje pass av typen `race` har ett `raceId` som finns i `config/races.json` *(tillagd 2026-10-28)*
@@ -641,6 +642,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 - Sparad plan med rätt versionsnummer men fel form: kastas också — det var v0:s fel (K-15) (tillagt 2026-10-28)
 - "Gör en ny plan" frågar innan den raderar: ett program på fyrtiosju veckor ska inte gå att radera med ett felklick (K-10) (tillagt 2026-10-28)
+- En ändrad bokstav i en fast text, eller en förvanskad unicode-escape, gör testet rött — det var v0:s fel (K-01, K-11) (tillagt 2026-10-29)
 
 **Definition of done per uppgift**
 
