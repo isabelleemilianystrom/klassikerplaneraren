@@ -44,7 +44,7 @@ v1.0 är en enkel webbapp där en klassikeraspirant fyller i ett kort formulär 
 | --- | --- |
 | Klar för demon 19 nov | Appen går att köra lokalt och fungerar i mobilen *(ändrad 2026-10-28)* |
 | Programmen är rimliga | Alla regler i avsnitt 5 följs och verifieras av tester; referensprofilerna P1–P6 ger planer som Isabelle godkänner |
-| Snabbt att komma igång | Från startsida till färdigt program på under 2 minuter |
+| Lätt att komma igång | Formuläret känns överblickbart: tre steg, inga frågor som kräver att man slår upp något, och förvalda svar överallt *(ändrad 2026-10-29: tidsmålet "under 2 minuter" ströks — det pressade mot färre frågor, och frågorna är det som gör planen personlig)* |
 | AI gör nytta | AI skriver förklaringarna till faserna under utvecklingen; Isabelle granskar dem och de följer med i appen |
 | Grund för senare versioner | Regelmotorn är en fristående modul med tester; lopp, regler och pass ligger i konfigurationsfiler |
 
@@ -764,7 +764,7 @@ vara det man minns, inte koden.
 | Tid | Vad | Poängen |
 | --- | --- | --- |
 | 0:00–0:45 | Startsidan, och problemet: fyra lopp, fyra grenar, ett år | Vanliga appar planerar en sport och ett lopp |
-| 0:45–1:45 | Fyll i formuläret live som P1 | Under en minut från tom sida till färdig plan |
+| 0:45–1:45 | Fyll i formuläret live som P1 | Tre steg, förvalda svar, inget att slå upp |
 | 1:45–3:00 | Översikten: faserna, loppveckorna, "Nu"-markeringen | Programmet har en riktning, inte bara pass |
 | 3:00–4:15 | Öppna en vecka: ett pass med zon, instruktion och alternativ | "Kan också göras som" — planen går att leva med |
 | 4:15–5:00 | Varningarna och fasförklaringen | Appen säger ifrån när den inte räcker, och texterna är granskade |
@@ -772,7 +772,7 @@ vara det man minns, inte koden.
 **Det som inte hinns med** och som får bli frågor i stället: att motorn är fristående och
 testad, säsongsviktningen, ersättningarna, och vägen framåt i avsnitt 12.
 
-**Fyll i P1 så här** — öva på det, en minut är kort:
+**Fyll i P1 så här** — öva på det så att det flyter:
 
 - Alla fyra loppen, datumen är redan ifyllda
 - Mål: ta mig i mål på alla fyra
