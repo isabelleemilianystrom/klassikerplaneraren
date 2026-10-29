@@ -133,7 +133,7 @@ function Steg1({ state, setState, felFör }: StegProps) {
           type="date"
           value={state.startDate}
           onChange={(e) => setState({ ...state, startDate: e.target.value })}
-          className="rounded-lg border border-neutral-300 px-3 py-2"
+          className="rounded-lg border border-neutral-300 px-3 py-2.5"
         />
       </Fält>
 
@@ -143,8 +143,9 @@ function Steg1({ state, setState, felFör }: StegProps) {
 
         <ul className="mt-3 space-y-3">
           {state.races.map((race) => (
-            <li key={race.id} className="rounded-lg border border-neutral-200 p-4">
-              <label className="flex items-start gap-3">
+            <li key={race.id} className="rounded-lg border border-neutral-200">
+              {/* Etiketten täcker hela kortet, så tryckytan blir stor nog. */}
+              <label className="flex cursor-pointer items-start gap-3 p-4">
                 <input
                   type="checkbox"
                   checked={race.selected}
@@ -155,14 +156,14 @@ function Steg1({ state, setState, felFör }: StegProps) {
               </label>
 
               {race.selected && (
-                <div className="mt-3 pl-8">
+                <div className="px-4 pb-4 pl-12">
                   <label className="block text-sm text-neutral-600">
                     {FORM.step1.dateLabel}
                     <input
                       type="date"
                       value={race.date}
                       onChange={(e) => byggOm(race.id, { date: e.target.value })}
-                      className="mt-1 block rounded-lg border border-neutral-300 px-3 py-2 text-base text-neutral-900"
+                      className="mt-1 block rounded-lg border border-neutral-300 px-3 py-2.5 text-base text-neutral-900"
                     />
                   </label>
 
@@ -271,7 +272,7 @@ function Steg3({ state, setState, felFör }: StegProps) {
           step={1}
           value={state.hoursPerWeek}
           onChange={(e) => setState({ ...state, hoursPerWeek: Number(e.target.value) })}
-          className="w-24 rounded-lg border border-neutral-300 px-3 py-2"
+          className="w-24 rounded-lg border border-neutral-300 px-3 py-2.5"
         />
       </Fält>
 
@@ -324,7 +325,7 @@ function Dagval({ value, onChange }: { value: Weekday; onChange: (dag: Weekday) 
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value) as Weekday)}
-      className="rounded-lg border border-neutral-300 px-3 py-2"
+      className="rounded-lg border border-neutral-300 px-3 py-2.5"
     >
       {WEEKDAYS.map((dag) => (
         <option key={dag.value} value={dag.value}>

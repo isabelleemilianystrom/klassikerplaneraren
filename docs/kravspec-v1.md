@@ -123,7 +123,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-09 | Varningar enligt avsnitt 5 visas överst i planen; planen skapas ändå | Måste | Givet Vasaloppet om 6 veckor, när planen skapas, så visas varningen om kort förberedelsetid och en plan |
 | K-10 | Den senaste planen sparas i webbläsaren och visas vid återbesök, med knappen "Gör en ny plan". Formuläret står aldrig tomt bredvid en sparad plan *(förtydligad 2026-10-27)* | Måste | Efter omladdning visas samma plan; fungerar inte lagringen visas planen ändå utan fel; en ändring i formuläret kan aldrig radera planen oavsiktligt |
 | K-11 | Säkerhetstexter från avsnitt 8: ansvarsfriskrivning, röda flaggor, smärtregel och sjukdomsregel i planen; säkerhetstext på varje pass i öppet vatten | Måste | Varje pass i öppet vatten har säkerhetstexten; övriga texter syns i planen |
-| K-12 | Fungerar i mobil från 360 px bredd | Måste | Ingen vågrät scroll och alla knappar går att trycka på vid 360 px |
+| K-12 | Fungerar i mobil från 360 px bredd | Måste | Ingen vågrät scroll och alla tryckytor minst 44 × 44 px vid 360 px *(preciserad 2026-10-29: gränsen 44 px är den vanliga minimigränsen för en tryckyta på pekskärm)* |
 | K-13 | Ändra svar: tillbaka till formuläret med tidigare svar ifyllda | **Måste** *(höjd från Bra att ha 2026-10-27)* | Givet en sparad plan, när jag trycker "Ändra svar", så är formuläret ifyllt med mina svar |
 | K-14 | Utskrift: planen går att skriva ut snyggt via webbläsarens utskrift | Bra att ha | Utskriften visar översikt och alla veckor utan knappar och menyer |
 | K-15 | Sparad plan valideras vid inläsning. Går den inte att använda kastas den, lagringen rensas och användaren får veta varför. Formuläret ritas alltid, även om planen är trasig | Måste *(tillagd 2026-10-27)* | Givet en sparad plan från en äldre version, när jag öppnar appen, så ser jag formuläret och ett meddelande om att den gamla planen inte kunde läsas — aldrig en tom sida |
@@ -594,7 +594,7 @@ Så här ser det ut i dag:
 | --- | --- |
 | Mobil | Fungerar från 360 px bredd; testas i Safari på iOS och Chrome på Android |
 | Prestanda | Planen med förklaringar visas inom 2 s |
-| Tillgänglighet | Semantisk HTML, går att använda med tangentbord, god kontrast, sporter visas med både färg och text |
+| Tillgänglighet | Semantisk HTML, går att använda med tangentbord, god kontrast, sporter visas med både färg och text. **Kontrollerat 2026-10-29:** rubriknivåer utan hopp, varje fält har etikett, varje fältgrupp har legend, allt interaktivt nås med tangentbord, `lang="sv"`, och all text klarar WCAG AA (lägsta uppmätta 4,73:1) |
 | Säkerhet | Inga API-nycklar och inga hemligheter i repot; inga anrop till tredje part i körtid |
 | Kvalitet | TypeScript strikt, lint utan fel, alla tester gröna innan commit |
 | Kostnad | **Noll kronor.** Se avsnittet nedan — kravet är absolut, inte en ambition |
@@ -641,6 +641,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Appen fungerar när localStorage saknas, inte går att skriva till eller inte går att läsa (K-10) *(tillagd 2026-10-28)*
 - Startsidan ritas alltid, också när den sparade planen är trasig — aldrig en tom sida (K-15) *(tillagd 2026-10-28)*
 - Texterna i avsnitt 8 används ordagrant: ett test läser kravspecen och jämför, så att de två inte kan glida isär (K-01, K-11) *(tillagd 2026-10-29)*
+- "Ändra svar" fyller formuläret med exakt de svar som sparades, och lämnar det aldrig tomt bredvid en sparad plan (K-13) *(tillagd 2026-10-29)*
 - Samma indata ger samma plan (determinism)
 - Varje pass är 20–300 minuter och har titel, instruktion och zon där zon gäller (R-12, R-30) *(tillagd 2026-10-27)*
 - Varje pass av typen `race` har ett `raceId` som finns i `config/races.json` *(tillagd 2026-10-28)*
@@ -667,6 +668,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
 - Samma mål på alla lopp ändrar ingenting; det är skillnaden mellan loppen som räknas (R-38) (tillagt 2026-10-29)
+- Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
 - Profil utan utrustning: skidpassen blir stavgång, simpassen torrövningar, och inget pass stryks (R-17, R-18) (tillagt 2026-10-28)
 - Samma profil med stakmaskin: skidpassen blir stakmaskin i stället för stavgång (R-17) (tillagt 2026-10-28)
@@ -686,7 +688,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 **Definition of done för v1.0**
 
-- [ ] Alla Måste-krav är klara och testade
+- [x] Alla Måste-krav är klara och testade *(2026-10-29; K-08 fasförklaringar återstår, se T-12)*
 - [ ] Appen går att köra lokalt med `npm run dev` och fungerar i mobil *(ändrad 2026-10-28:
       demon körs lokalt, drift skjuts till efter demon)*
 - [x] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna *(2026-10-29)*

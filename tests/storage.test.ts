@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clear, load, save } from '../src/ui/storage.ts';
-import { initialState, toPlanInput, type FormState } from '../src/ui/form-state.ts';
+import {
+  initialState,
+  toPlanInput,
+  validateAll,
+  type FormState,
+} from '../src/ui/form-state.ts';
 import type { PlanInput } from '../src/engine/types.ts';
 
 const IDAG = '2026-10-28';
@@ -255,5 +260,100 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
 
     expect(svar.status).toBe('ok');
     expect(lagring.har(NYCKEL)).toBe(true);
+  });
+});
+
+describe('K-13: ändra svar', () => {
+  /** Sparar och läser tillbaka, som appen gör vid "Ändra svar". */
+  function tillbaka(form: FormState, input: PlanInput): FormState | null {
+    save(input, form);
+    const läst = load();
+    return läst.status === 'ok' ? läst.form : null;
+  }
+
+  it('fyller formuläret med exakt de svar som sparades', () => {
+    const { form, input } = ifyllt();
+    expect(tillbaka(form, input)).toEqual(form);
+  });
+
+  it('behåller varje fält genom lagringen', () => {
+    // Ett fält som tappas bort betyder att användaren måste svara om.
+    const egna: FormState = {
+      ...ifyllt().form,
+      startDate: '2026-11-16',
+      hoursPerWeek: 11,
+      longSessionDay: 6,
+      restDay: 3,
+      levels: { ski: 'new', run: 'advanced' },
+      equipment: { snowOrRollerSkis: true, skiErg: false, pool: true, bike: false },
+      races: ifyllt().form.races.map((race) =>
+        race.id === 'lidingoloppet'
+          ? { ...race, selected: true, goal: 'time' as const }
+          : race,
+      ),
+    };
+
+    const input = toPlanInput(egna, IDAG) as PlanInput;
+    const läst = tillbaka(egna, input) as FormState;
+
+    expect(läst.startDate).toBe('2026-11-16');
+    expect(läst.hoursPerWeek).toBe(11);
+    expect(läst.longSessionDay).toBe(6);
+    expect(läst.restDay).toBe(3);
+    expect(läst.levels).toEqual({ ski: 'new', run: 'advanced' });
+    expect(läst.equipment.pool).toBe(true);
+    expect(läst.equipment.bike).toBe(false);
+  });
+
+  it('behåller vilka lopp som var valda och deras mål', () => {
+    const egna: FormState = {
+      ...ifyllt().form,
+      races: ifyllt().form.races.map((race) =>
+        race.id === 'vasaloppet'
+          ? { ...race, selected: true, goal: 'time' as const }
+          : { ...race, selected: race.id === 'vatternrundan', goal: 'finish' as const },
+      ),
+      levels: { ski: 'experienced', bike: 'experienced' },
+    };
+
+    const input = toPlanInput(egna, IDAG) as PlanInput;
+    const läst = tillbaka(egna, input) as FormState;
+
+    const valda = läst.races.filter((race) => race.selected).map((race) => race.id);
+    expect(valda).toEqual(['vasaloppet', 'vatternrundan']);
+
+    expect(läst.races.find((race) => race.id === 'vasaloppet')?.goal).toBe('time');
+    expect(läst.races.find((race) => race.id === 'vatternrundan')?.goal).toBe('finish');
+  });
+
+  it('behåller datumen på lopp som inte valdes', () => {
+    // Avmarkerar man ett lopp och ångrar sig ska datumet finnas kvar.
+    const { form, input } = ifyllt();
+    const läst = tillbaka(form, input) as FormState;
+
+    for (const race of form.races) {
+      const samma = läst.races.find((kandidat) => kandidat.id === race.id);
+      expect(samma?.date, race.id).toBe(race.date);
+    }
+  });
+
+  it('ger ett formulär som fortfarande är giltigt', () => {
+    // Det som sparades gick att bygga en plan av, och det ska det göra igen.
+    const { form, input } = ifyllt();
+    const läst = tillbaka(form, input) as FormState;
+
+    expect(validateAll(läst)).toEqual({});
+    expect(toPlanInput(läst, IDAG)).toEqual(input);
+  });
+
+  it('lämnar aldrig ett tomt formulär bredvid en sparad plan', () => {
+    // Skälet till att K-13 höjdes till Måste: ett tomt formulär som skickas in
+    // skriver över planen med något användaren inte menade.
+    const { form, input } = ifyllt();
+    const läst = tillbaka(form, input) as FormState;
+
+    expect(läst.races.some((race) => race.selected)).toBe(true);
+    expect(Object.keys(läst.levels).length).toBeGreaterThan(0);
+    expect(läst.hoursPerWeek).toBeGreaterThan(0);
   });
 });
