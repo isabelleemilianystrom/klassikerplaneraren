@@ -688,12 +688,12 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 **Definition of done för v1.0**
 
-- [x] Alla Måste-krav är klara och testade *(2026-10-29; K-08 fasförklaringar återstår, se T-12)*
+- [x] Alla Måste-krav är klara och testade *(2026-10-29)*
 - [ ] Appen går att köra lokalt med `npm run dev` och fungerar i mobil *(ändrad 2026-10-28:
       demon körs lokalt, drift skjuts till efter demon)*
 - [x] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna *(2026-10-29)*
-- [ ] Varje kombination av fas och lopp har en granskad förklaring
-- [ ] Varje passtyp har en granskad instruktion
+- [x] Varje fas har en granskad förklaring *(2026-10-29; en text per fas enligt A-02, krympt från en per fas och lopp)*
+- [x] Varje passtyp har en granskad instruktion *(2026-10-29)*
 - [ ] README beskriver idé, hur man kör projektet och var kravspecen finns
 
 ## 10. Backlog i ordning

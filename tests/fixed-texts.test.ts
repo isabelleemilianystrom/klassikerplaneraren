@@ -188,9 +188,8 @@ describe('K-01 och K-11: texterna står där avsnitt 8 säger', () => {
     expect(PLAN).toContain('independence');
   });
 
-  it('har ännu inte AI-märkningen', () => {
-    // Den hör till förklaringarna, som skrivs i T-12. Testet finns för att
-    // påminna: kommer texten in i appen ska den stå vid förklaringarna.
-    expect(START.has('aiMarking') || PLAN.has('aiMarking')).toBe(false);
+  it('har AI-märkningen vid förklaringarna', () => {
+    // A-07: texterna är skrivna med AI, och det ska stå där de visas.
+    expect(PLAN).toContain('aiMarking');
   });
 });

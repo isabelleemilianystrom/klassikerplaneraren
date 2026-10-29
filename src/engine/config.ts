@@ -9,6 +9,7 @@ import { z } from 'zod';
 import racesFile from '../../config/races.json' with { type: 'json' };
 import rulesFile from '../../config/rules.json' with { type: 'json' };
 import sessionsFile from '../../config/sessions.json' with { type: 'json' };
+import explanationsFile from '../../config/explanations.json' with { type: 'json' };
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'datum ska vara YYYY-MM-DD');
 const share = z.number().min(0).max(1);
@@ -353,9 +354,29 @@ export const sessionsSchema = z.object({
   }),
 });
 
+/**
+ * Förklaringarna (A-01, A-02, A-05).
+ *
+ * Längdgränserna kontrolleras här och i ett test. En för lång text är
+ * ogiltig och kortas inte automatiskt — den skrivs om.
+ */
+export const explanationsSchema = z.object({
+  schemaVersion: z.literal(1),
+  promptVersion: z.string().min(1),
+  note: z.string(),
+  summary: z.string().min(1).max(500),
+  phases: z.object({
+    base: z.string().min(1).max(300),
+    specific: z.string().min(1).max(300),
+    taper: z.string().min(1).max(300),
+    recovery: z.string().min(1).max(300),
+  }),
+});
+
 export type RacesConfig = z.infer<typeof racesSchema>;
 export type RulesConfig = z.infer<typeof rulesSchema>;
 export type SessionsConfig = z.infer<typeof sessionsSchema>;
+export type ExplanationsConfig = z.infer<typeof explanationsSchema>;
 
 /**
  * Den validerade konfigurationen.
@@ -366,6 +387,7 @@ export type SessionsConfig = z.infer<typeof sessionsSchema>;
 export const races: RacesConfig = racesSchema.parse(racesFile);
 export const rules: RulesConfig = rulesSchema.parse(rulesFile);
 export const sessions: SessionsConfig = sessionsSchema.parse(sessionsFile);
+export const explanations: ExplanationsConfig = explanationsSchema.parse(explanationsFile);
 
 /** Loppet med ett visst id. Kastar om det inte finns. */
 export function raceById(id: RacesConfig['races'][number]['id']): RacesConfig['races'][number] {

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "promptVersion": "v1",
+  "note": "Skrivna med AI under utvecklingen enligt prompts/phase-explanations.v1.md, och granskade av Isabelle innan de gick in. Appen gör inga AI-anrop i körtid. Texterna innehåller inga siffror, datum eller loppnamn — de väljs utifrån fas, inte utifrån användarens svar.",
+  "summary": "Programmet är indelat i perioder. Först bygger du en bred grund, sedan smalnar träningen av mot nästa lopp, och strax före trappar du ner så att du står på startlinjen utvilad. Efter loppet kommer återhämtning. Det är en lång resa, och den är gjord för att rymmas i ett vanligt liv. Missar du ett pass går det bra — fortsätt bara med nästa.",
+  "phases": {
+    "base": "Nu bygger du grunden. Passen är lugna och du ska kunna prata hela meningar genom dem. Känns det för lätt är det rätt — det är så uthållighet byggs, och den tar månader. Långpasset växer försiktigt varje vecka.",
+    "specific": "Nu smalnar träningen av. Grenen du närmar dig får mest av tiden, långpasset blir längre för varje vecka, och du får ett par hårdare pass. De andra grenarna hålls igång, men står tillbaka ett tag.",
+    "taper": "Nu trappar du ner. Tiden sjunker tydligt och passen blir kortare, men några korta inslag i högre fart finns kvar så att farten sitter i kroppen. Det ska kännas som att du har mer kvar att ge — det är hela poängen.",
+    "recovery": "Nu vilar du in dig igen. Halva tiden, allt i lugnt tempo, och teknikpass där tekniken är lätt att tappa. Det känns ofta som för lite. Det är det inte: det är nu kroppen tar hand om det du just gjort."
+  }
+}

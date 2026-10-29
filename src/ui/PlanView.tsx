@@ -25,6 +25,7 @@ import {
   totalHours,
   weekFocus,
 } from './plan-view.ts';
+import { explanations } from '../engine/config.ts';
 import { FIXED, PLAN, STORAGE } from './texts.ts';
 
 interface Props {
@@ -62,6 +63,10 @@ export default function PlanView({
         <p className="mt-3 text-neutral-700">
           {PLAN.summary(plans.length, totalHours(plans), input.hoursPerWeek)}
         </p>
+
+        {/* A-04: sammanfattningen, skriven i förväg och granskad. */}
+        <p className="mt-4 text-neutral-700">{explanations.summary}</p>
+        <p className="mt-2 text-sm text-neutral-500">{FIXED.aiMarking}</p>
       </header>
 
       {/* K-09: varningarna står överst, och planen visas ändå. */}
@@ -99,7 +104,10 @@ export default function PlanView({
               {PLAN.phaseWeeks(grupp.weeks.length)}
             </p>
 
-            {/* K-08: fasförklaringen skrivs i T-12 och hamnar här. */}
+            {/* K-08: varför fasen finns. En text per fas (A-02). */}
+            <p className="mt-2 text-sm text-neutral-700">
+              {explanations.phases[grupp.phase]}
+            </p>
 
             <ul className="mt-3 space-y-2">
               {grupp.weeks.map((plan) => (
