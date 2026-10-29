@@ -69,7 +69,9 @@
     "ski.skiErg": {
       "_rule": "R-17",
       "title": "Stakmaskin",
-      "instruction": "Samma tid och samma zon som skidpasset. Håll lätt böjda knän och tyngden framåt, och dra med hela kroppen."
+      "instruction": "Samma tid och samma zon som skidpasset. Håll lätt böjda knän och tyngden framåt, och dra med hela kroppen.",
+      "_splitNote": "R-44: läggs till när passet är längre än taket. {minutes} är tiden som blir över och {other} är vad den görs som.",
+      "splitNote": " Ta högst 90 minuter i maskinen och de sista {minutes} minuterna som {other} — samma rörelse längre än så sliter på armbågar och axlar, och är tungt att hålla ut. Går det inte fungerar den tiden på trainern inomhus lika bra."
     },
     "ski.poleWalk": {
       "_rule": "R-17",

@@ -391,6 +391,63 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   kilometer på cykel före Vätternrundan när hela året finns kvar (R-34). Hade det inte gjort
   det vore golvet satt för lågt.
 
+- **R-42** (tillagd 2026-10-29) **Veckans tre fasta dagar, och ett pass per dag.** Varje vecka i
+  bas- och specifik fas har **en styrkedag, en långpassdag och en kvalitetsdag**, och **en dag
+  bär ett pass**.
+
+  1. **Styrkedagen** är en hel timme styrka och ingenting annat. Talen står i `strength` i
+     `config/rules.json`: `minutesPerSession: 60`, `ownDay: true`, ett pass i veckan.
+  2. **Långpassdagen** ligger på den dag användaren valt (R-13) och bär veckans längsta pass.
+     Inget annat pass i veckan får vara längre än långpasset — i någon gren.
+  3. **Kvalitetsdagen** bär veckans hårda pass. I specifik fas är det **intervallpasset i
+     zon 4**; i grundperioden tröskelpasset i zon 3, eftersom zon 4 inte hör hemma där än.
+     Passet får en egen plats och ligger först i kön när dagarna delas ut.
+  4. **En dag bär ett pass.** Antalet pass är därför aldrig fler än veckan har träningsdagar
+     (R-11), och grenarna får platser efter hur mycket tid de har. Minuter som inte får plats
+     flyttar till en annan gren (R-29) eller redovisas som oplacerad tid.
+
+  Skälet: appen är byggd för folk som arbetar. Två pass samma dag förutsätter att man kan träna
+  två gånger, och före den här regeln kunde en tisdag bära två löppass på 53 minuter **plus**
+  ett styrkepass på 20. Det är inget program man följer; det är en lista.
+
+  Följden för långpasset: med en plats per dag är veckans tid delad på platserna vad ett vanligt
+  pass blir, så långpasset får ett golv där. Är grenens egen andel mindre än det lånar
+  långpasset upp till snittet från de andra grenarna — annars kapar långpassets längd varje
+  annat pass i veckan, och timmar försvinner. Det är samma lån som de sista veckorna i fasen
+  (R-13), bara mindre.
+
+  **Känd gräns:** en nybörjare i **två** grenar på sex timmar i veckan får ingen kvalitetsdag i
+  de tunnaste basveckorna. Där räcker tiden till ett simpass på en timme (R-40) och
+  fokusgrenens långpass, och inget mer. Teknik går före intensitet — den går inte att komma
+  ikapp på slutet (R-21). För profil P1 gäller det ungefär halva grundperioden; de övriga fem
+  profilerna får sin kvalitetsdag varje vecka.
+
+- **R-43** (tillagd 2026-10-29) **Två lugna dagar efter ett hårt pass.** Efter en belastad dag
+  följer **två dagar som varken bär ett hårt pass eller långpasset**. Talet står i
+  `intensity.minEasyDaysAfterHard`. Långpasset räknas som belastning, så en vecka bär **högst
+  två** belastade dagar: kvalitetsdagen och långpassdagen. Regeln gäller över veckogränsen.
+
+  Skälet, ur tränargranskningen 2026-10-29: hårda pass på onsdag, fredag och söndag bryter inte
+  mot R-16 — de ligger inte två dagar i rad — men tre tunga dagar i en vecka utan helvila
+  emellan tömmer depåerna ändå. Det räcker inte att belastningen är utspridd i kalendern.
+
+  Följden för planeringen: det hårt bundna passet väljer dag **först**. Ett hårt pass har med
+  den här regeln bara någon enstaka möjlig dag, medan ett lugnt pass passar nästan var som
+  helst. Får de lugna passen välja först tar de dagen det hårda behövde, och då finns ingen
+  tillåten dag kvar.
+
+- **R-44** (tillagd 2026-10-29) **Tak per ersättning.** En ersättning kan ha ett eget tak per
+  pass, i `substitutions.bySport` med `maxMinutes` och `overflowKey`. **I dag har bara
+  stakmaskinen ett: 90 minuter, resten som stavgång i backe.**
+
+  Passet **behåller sin tid** — skidträningen behövs — men instruktionen säger hur den delas,
+  och nämner att tiden på trainern inomhus fungerar lika bra. Det blir inget andra pass av det:
+  en dag bär ett pass (R-42), och det här är ett pass som görs på två sätt.
+
+  Skälet, ur tränargranskningen: två och en halv timme i stakmaskin är samma rörelse hela vägen.
+  Det sliter på armbågar och axlar jämfört med att åka skidor, och är dessutom tungt att hålla
+  ut. Stavgång i backe är fullgod skidträning (R-17), så delningen kostar ingenting.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -430,7 +487,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   många timmar användaren kan träna och hur många veckor hon har, och båda har hon valt själv.
   Når planen inte riktmärket visas varningen nedan.
 
-- **R-10** Styrka räknas in i veckotiden: 2 pass à 20 minuter i bas, 1 i specifik fas, inga i nedtrappning och återhämtning. Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`. *(utökad 2026-10-28)* Styrkan viktas mot veckans fokuslopp där grenen kräver det: inför **Vasaloppet** mot överkropp och bål, eftersom stakningen kommer därifrån. Texten och övningslistan ligger i `strengthVariants.byRace` och `strengthExercises.byRace` i `config/sessions.json`; saknas loppet används den allmänna. Arrangörens eget råd är att styrkan ska vara allmän, funktionell och skadeförebyggande, med extra överkropp särskilt före skidor.
+- **R-10** Styrka räknas in i veckotiden: **1 pass à 60 minuter** i bas och specifik fas, inga i nedtrappning och återhämtning. *(ändrad 2026-10-29 efter tränargranskning: var 2 pass à 20 minuter i bas och 1 i specifik. Ett styrkepass på tjugo minuter ovanpå två löppass är inget styrkepass — se R-42.)* Övningar för bål, höft, vader och axlar från en fast lista i `config/sessions.json`. *(utökad 2026-10-28)* Styrkan viktas mot veckans fokuslopp där grenen kräver det: inför **Vasaloppet** mot överkropp och bål, eftersom stakningen kommer därifrån. Texten och övningslistan ligger i `strengthVariants.byRace` och `strengthExercises.byRace` i `config/sessions.json`; saknas loppet används den allmänna. Arrangörens eget råd är att styrkan ska vara allmän, funktionell och skadeförebyggande, med extra överkropp särskilt före skidor.
 
 **Pass**
 
@@ -476,7 +533,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   | 4 | Hårt – du andas varje tag |
 
   Simningens lugna pass har också en egen instruktion, av samma skäl.
-- **R-16** Aldrig pass i zon 3–4 två dagar i rad.
+- **R-16** Aldrig pass i zon 3–4 två dagar i rad. *(utökad 2026-10-29: numera två lugna dagar, och långpasset räknas som belastning — se R-43. R-16 är kvar som den undre gränsen.)*
 
 **Ersättningar, teknik och säsong**
 
@@ -743,6 +800,10 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - En gren som väntar får noll minuter, också via löptaket, och veckans fokusgren väntar aldrig (R-39) *(tillagd 2026-10-29)*
 - Inget pass är kortare än sin grens golv, utom öppningspasset dagen före loppet (R-40) *(tillagd 2026-10-29)*
 - Inget pass är längre än sin grens tak (R-40) *(tillagd 2026-10-29)*
+- Ingen dag bär mer än ett pass, och styrkepasset ligger ensamt på sin dag (R-42) *(tillagd 2026-10-29)*
+- Långpasset är veckans längsta pass, i alla grenar (R-42) *(tillagd 2026-10-29)*
+- Antalet pass är aldrig fler än veckans träningsdagar (R-11, R-42) *(tillagd 2026-10-29)*
+- Veckan bär högst två belastade dagar, och aldrig två inom två dagar — inte heller över veckogränsen (R-43) *(tillagd 2026-10-29)*
 - Passen plus den oplacerade tiden är exakt veckans budget, och oplacerad tid är alltid mindre än ett pass (R-29, R-40) *(tillagd 2026-10-29)*
 - En gren som måste tränas får sitt pass varje vecka där veckan har tid alls (R-31, R-39, R-40) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
@@ -795,6 +856,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Erfaren simmare: noll simning före Vasaloppet. Nybörjare: oförändrat (R-39) (tillagt 2026-10-29)
 - Sex timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
 - Fem timmar i veckan går inte att välja, och sex gör det (R-41) (tillagt 2026-10-29)
+- Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 4 (R-42) (tillagt 2026-10-29)
+- Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
+- Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)
 - Golvet på sex timmar räcker till volymriktmärket på 1000 km när hela året finns kvar (R-34, R-41) (tillagt 2026-10-29)
 - Vecka där simningen får mer tid än ett pass rymmer: passet stannar på taket och resten flyttar eller redovisas som oplacerad tid (R-29, R-40) (tillagt 2026-10-29)
 - Nedtrappningsvecka mot Vansbrosimningen: inget simpass på tjugo minuter, och veckans korta inslag i högre fart finns kvar (R-15, R-40) (tillagt 2026-10-29)

@@ -45,9 +45,11 @@
   },
   "strength": {
     "_rule": "R-10",
-    "minutesPerSession": 20,
+    "_ownDay": "R-42: styrkepasset ligger på en egen dag utan annan träning, och är en hel timme. Ett styrkepass på tjugo minuter ovanpå två löppass är inget styrkepass.",
+    "minutesPerSession": 60,
+    "ownDay": true,
     "sessionsByPhase": {
-      "base": 2,
+      "base": 1,
       "specific": 1,
       "taper": 0,
       "recovery": 0
@@ -199,7 +201,7 @@
         "maxZone": 3
       },
       "specific": {
-        "hardSessionsPerWeek": 2,
+        "hardSessionsPerWeek": 1,
         "maxZone": 4,
         "maxZoneForNewLevel": 3
       },
@@ -214,6 +216,8 @@
       }
     },
     "noHardDaysBackToBack": true,
+    "_minEasyDaysAfterHard": "R-43: efter ett hårt pass ska två dagar följa som varken bär ett hårt pass eller långpasset. Långpasset är belastning det också — tre tunga dagar i en vecka tömmer depåerna, hur väl de än ligger isär i kalendern.",
+    "minEasyDaysAfterHard": 2,
     "zoneTextBySport": {
       "_rule": "R-15",
       "note": "Pratprovet går inte att använda i vattnet. För simning beskrivs ansträngningen med andningen i stället — hur ofta man behöver andas och om man kan hålla samma tag.",
@@ -348,7 +352,10 @@
           "key": "ski.skiErg",
           "needs": [
             "skiErg"
-          ]
+          ],
+          "_maxMinutes": "R-44: längsta tid i stakmaskin i ett pass. Samma rörelse i två och en halv timme sliter på armbågar och axlar, och är dessutom mentalt tungt. Passet behåller sin tid; resten görs som ersättningen i overflowKey.",
+          "maxMinutes": 90,
+          "overflowKey": "ski.poleWalk"
         },
         {
           "key": "ski.poleWalk",

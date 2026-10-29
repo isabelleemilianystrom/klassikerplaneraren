@@ -109,16 +109,40 @@ export function buildWeekPlans(input: PlanInput): WeekPlan[] {
  */
 interface CarriedOver {
   hardDates: ReadonlySet<IsoDate>;
+  /** Dagar som bar ett hårt pass eller långpasset (R-43). */
+  loadDates: ReadonlySet<IsoDate>;
   runDates: ReadonlySet<IsoDate>;
 }
 
-const INGET_FÖRE: CarriedOver = { hardDates: new Set(), runDates: new Set() };
+const INGET_FÖRE: CarriedOver = {
+  hardDates: new Set(),
+  loadDates: new Set(),
+  runDates: new Set(),
+};
+
+/**
+ * Dagar som bär veckans belastning (R-43).
+ *
+ * Ett hårt pass är belastning, och långpasset är det också. Lärdomen från
+ * tränargranskningen är att tre tunga dagar i en vecka tömmer depåerna även
+ * när de ligger utspridda i kalendern — det räcker inte att de inte ligger i
+ * rad.
+ */
+function isLoadDay(session: { zone: number | null; type: SessionType }): boolean {
+  if (session.type === 'race' || session.type === 'long') return session.type === 'long';
+  return session.zone !== null && session.zone >= 3;
+}
 
 function carryOver(plan: WeekPlan): CarriedOver {
   return {
     hardDates: new Set(
       plan.sessions
         .filter((session) => session.zone !== null && session.zone >= 3)
+        .map((session) => session.date),
+    ),
+    loadDates: new Set(
+      plan.sessions
+        .filter((session) => isLoadDay(session))
         .map((session) => session.date),
     ),
     runDates: new Set(
@@ -155,7 +179,19 @@ function buildWeekPlan(
     }
   }
 
-  // 2. Långpasset (R-13, R-28).
+  // 2. Veckans dagar. R-42 ger en dag ett pass, så antalet dagar avgör både
+  //    hur många pass veckan rymmer och hur lång var och en blir.
+  const styrka = strengthSessions(budget);
+  const dagar = trainingDates(
+    input,
+    dates,
+    raceDates,
+    openerDates,
+    planeradePerDag(dates, pending),
+  );
+  const platser = Math.max(1, dagar.length - styrka.length);
+
+  // 3. Långpasset (R-13, R-28).
   const long = longSession(
     week,
     budget,
@@ -166,14 +202,22 @@ function buildWeekPlan(
     input.preferredDays,
     input,
     races,
+    platser,
   );
   if (long !== null) pending.push(long);
 
-  // 3. Styrkan (R-10).
-  pending.push(...strengthSessions(budget));
+  // 4. Styrkan (R-10, R-42). Egen dag, så den tar en av veckans dagar.
+  pending.push(...styrka);
 
-  // 4. Konditionen, sport för sport (R-12, R-15).
-  pending.push(...enduranceSessions(week, budget, input, long, races));
+  // 5. Konditionen, sport för sport (R-12, R-15).
+  //
+  // R-42 ger en dag ett pass, så veckan rymmer aldrig fler konditionspass än
+  // den har dagar kvar när styrkan och långpasset tagit sina. Byggs det fler
+  // måste placeringen lägga två på samma dag, och då faller både den regeln
+  // och R-14 om löpning två dagar i rad.
+  const kvarPlatser = Math.max(1, platser - (long === null ? 0 : 1));
+
+  pending.push(...enduranceSessions(week, budget, input, long, races, kvarPlatser));
 
   const placed = placeOnDays(pending, week, input, dates, raceDates, openerDates, before);
   const withTexts = placed.map((session, i) => withTitleAndInstruction(session, week, i, input));
@@ -216,6 +260,21 @@ function withUnplacedMinutes(budget: WeekBudget, sessions: readonly Session[]): 
   const kvar = Math.max(0, budgeterat - placerat);
 
   return kvar === budget.unplacedMinutes ? budget : { ...budget, unplacedMinutes: kvar };
+}
+
+/** Passen med fast dag, grupperade per dag — vad `trainingDates` behöver. */
+function planeradePerDag(
+  dates: readonly IsoDate[],
+  pending: readonly PendingSession[],
+): Map<IsoDate, PendingSession[]> {
+  const karta = new Map<IsoDate, PendingSession[]>(dates.map((datum) => [datum, []]));
+
+  for (const session of pending) {
+    if (session.fixedDate === undefined) continue;
+    karta.get(session.fixedDate)?.push(session);
+  }
+
+  return karta;
 }
 
 /** Veckans sju datum, måndag till söndag. */
@@ -340,6 +399,7 @@ function longSession(
   preferredDays: PreferredDays,
   input: PlanInput,
   races: readonly PlacedRace[],
+  slots: number,
 ): PendingSession | null {
   const kurva = week.phase === 'base' || week.phase === 'specific'
     ? rules.longSession.growthByPhase[week.phase]
@@ -367,11 +427,35 @@ function longSession(
   // kilometer på cykel är inte en förberedelse, det är en gissning.
   const veckorKvarIFasen = iFasen.length - position;
   const fårLåna = veckorKvarIFasen < rules.longSession.borrowInFinalWeeks;
-  const grenensTid = fårLåna ? budget.enduranceMinutes : tillgängligt;
+
+  // Långpasset ska vara veckans längsta pass. Med en plats per dag (R-42) är
+  // veckans tid delad på platserna vad ett vanligt pass blir, och ett
+  // långpass kortare än det är precis felet från v0: där låg långpasset sist
+  // i kön och blev alltid för kort.
+  const snitt = slots <= 0 ? 0 : Math.ceil(budget.enduranceMinutes / slots);
+
+  // Grenens egen andel får aldrig hålla långpasset under ett vanligt pass.
+  // Gör den det lånar långpasset upp till snittet — annars kapar långpassets
+  // längd varje annat pass i veckan, och timmar försvinner (R-29). Det är
+  // samma lån som de sista veckorna i fasen, bara mindre.
+  const grenensTid = fårLåna ? budget.enduranceMinutes : Math.max(tillgängligt, snitt);
 
   // R-40: ett långpass är inget undantag från grenens golv. Ett simpass på
   // femtio minuter är lika mycket besvär att ta sig till som ett på sextio.
-  const golv = Math.max(rules.longSession.minMinutes, sessionFloor(sport));
+  //
+  // Golvet gäller dessutom alla grenar veckan tränar, inte bara långpassets
+  // egen: långpasset är veckans längsta pass (R-42), så ett långpass på femtio
+  // minuter skulle klippa veckans simpass till femtio. Ryms inte det högsta
+  // golvet blir det inget långpass, och då är inget pass bundet av det.
+  const golvIVeckan = (Object.entries(budget.bySport) as [TrainedSport, number][])
+    .filter(([, minuter]) => minuter > 0)
+    .map(([gren]) => sessionFloor(gren));
+
+  const golv = Math.max(
+    rules.longSession.minMinutes,
+    sessionFloor(sport),
+    ...golvIVeckan,
+  );
 
   // R-31: det som måste lämnas kvar till en nybörjargren dras av — men aldrig
   // så att långpasset faller under sitt eget golv. Räcker veckan inte till
@@ -380,7 +464,7 @@ function longSession(
   const utrymme = Math.max(budget.enduranceMinutes - reserv, golv);
 
   const minuter = Math.min(
-    Math.round(växande),
+    Math.max(Math.round(växande), snitt),
     cap,
     Math.floor(budget.enduranceMinutes * maxShareOfWeek),
     grenensTid,
@@ -456,10 +540,36 @@ function enduranceSessions(
   input: PlanInput,
   long: PendingSession | null,
   races: readonly PlacedRace[],
+  slots: number,
 ): PendingSession[] {
   const kvarPerSport = remainingBySport(budget, long);
-  const fördelat = foldAwayTooSmallSports(kvarPerSport, week, input, races);
-  const hårda = hardSessionPlan(week, input, fördelat);
+
+  // R-31: taket per vecka gäller också när färre pass delar på samma tid.
+  // Långpassets minuter räknas in i grenens vecka och dras av här.
+  const takPerSport = new Map<TrainedSport, number>();
+  for (const [sport] of kvarPerSport) {
+    const gräns = newLevelLimit(sport, input);
+    if (gräns === null) continue;
+
+    const iLångpasset = long !== null && long.sport === sport ? long.minutes : 0;
+    takPerSport.set(sport, Math.max(0, gräns.maxMinutesPerWeek - iLångpasset));
+  }
+
+  const fördelat = foldAwayTooSmallSports(kvarPerSport, week, input, races, slots, takPerSport);
+  // Platserna delas ut: varje gren som kom med får en, och det som blir över
+  // går till grenarna med mest tid. Så blir det aldrig fler pass än dagar.
+  const platsPerSport = shareSlots(fördelat, slots);
+
+  // R-42: en dag i veckan ska vara intervaller. Passet behöver därför en egen
+  // plats — har grenen bara en plats och den går till teknikpasset (R-21)
+  // finns inget hårt pass kvar att lägga, och veckan blir helt utan kvalitet.
+  // Det hände i 32 av 38 veckor för en nybörjare på skidor.
+  const medLedigPlats = fördelat.filter(([sport]) => {
+    const teknik = needsTechnique(sport, week.phase, input) ? rules.technique.sessionsPerWeek : 0;
+    return (platsPerSport.get(sport) ?? 0) > teknik;
+  });
+
+  const hårda = hardSessionPlan(week, input, medLedigPlats);
 
   const resultat: PendingSession[] = [];
 
@@ -467,7 +577,8 @@ function enduranceSessions(
     // Långpasset ska vara veckans längsta pass. Har sporten ett långpass får
     // dess övriga pass därför inte bli längre än det — annars blir "långpasset"
     // kortast av allt, vilket är precis felet från v0.
-    const tak = long !== null && long.sport === sport ? long.minutes : rules.session.maxMinutes;
+    // Långpasset är veckans längsta pass — i sin egen gren och i alla andra.
+    const tak = long !== null ? long.minutes : rules.session.maxMinutes;
 
     // R-31: är man ny i sporten får veckan bara så många pass som taket säger.
     // En nybörjarkurs i simning är ett pass i veckan, inte två korta.
@@ -476,7 +587,10 @@ function enduranceSessions(
     // långpasset alltså veckans enda pass i sporten.
     const gräns = newLevelLimit(sport, input);
     const redanLagt = long !== null && long.sport === sport ? 1 : 0;
-    const flestPass = (gräns?.maxSessionsPerWeek ?? Number.POSITIVE_INFINITY) - redanLagt;
+    const flestPass = Math.min(
+      (gräns?.maxSessionsPerWeek ?? Number.POSITIVE_INFINITY) - redanLagt,
+      platsPerSport.get(sport) ?? 0,
+    );
     if (flestPass <= 0) continue;
 
     // R-21: ett av veckans pass i en nybörjargren blir teknikpass. Det tas
@@ -586,9 +700,17 @@ function distributeLeftover(
     const hårt = isHard(session) ? (maxHardMinutes(fas) ?? Infinity) : Infinity;
     if (session.sport === 'strength') return Math.min(rules.session.maxMinutes, hårt);
 
+    // R-42: inget pass växer förbi långpasset — det är veckans längsta.
+    const längsta = long === null || session === long ? Infinity : long.minutes;
+
     // R-40: ett pass växer aldrig förbi sin egen grens tak.
     const gräns = newLevelLimit(session.sport, input);
-    return Math.min(sessionCeiling(session.sport), gräns?.maxMinutesPerWeek ?? Infinity, hårt);
+    return Math.min(
+      sessionCeiling(session.sport),
+      gräns?.maxMinutesPerWeek ?? Infinity,
+      hårt,
+      längsta,
+    );
   };
 
   while (kvar > 0) {
@@ -689,6 +811,40 @@ function remainingBySport(
  * fjärde gren aldrig, vilket är värst för den som är nybörjare i just den.
  */
 /**
+ * Veckans platser fördelade på grenarna (R-42).
+ *
+ * En dag bär ett pass, så antalet platser är antalet dagar som är kvar. Varje
+ * gren som kom med får en plats — annars hade den inte kommit med — och de
+ * platser som blir över går till grenarna med mest tid. Vid lika tid avgör
+ * namnet, så att samma indata alltid ger samma plan.
+ */
+function shareSlots(
+  bySport: readonly [TrainedSport, number][],
+  slots: number,
+): Map<TrainedSport, number> {
+  const resultat = new Map<TrainedSport, number>(bySport.map(([sport]) => [sport, 1]));
+
+  let kvar = slots - bySport.length;
+  const ordnade = [...bySport].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+  // Varv efter varv, så att den största grenen inte tar alla platser på en gång.
+  while (kvar > 0) {
+    let delatUt = 0;
+
+    for (const [sport] of ordnade) {
+      if (kvar <= 0) break;
+      resultat.set(sport, (resultat.get(sport) as number) + 1);
+      kvar -= 1;
+      delatUt += 1;
+    }
+
+    if (delatUt === 0) break;
+  }
+
+  return resultat;
+}
+
+/**
  * Kortaste pass som är värt att göra i en gren (R-40).
  *
  * De flesta grenar har bara träningstiden att betala. Simningen har mer: man
@@ -720,6 +876,8 @@ function foldAwayTooSmallSports(
   week: WeekSkeleton,
   input: PlanInput,
   races: readonly PlacedRace[],
+  maxSports: number,
+  maxBySport: ReadonlyMap<TrainedSport, number>,
 ): [TrainedSport, number][] {
   const alla = [...bySport.entries()].filter(([, minuter]) => minuter > 0);
   if (alla.length === 0) return [];
@@ -762,7 +920,15 @@ function foldAwayTooSmallSports(
     const golv = sessionFloor(sport);
     if (kvar < golv) return;
 
-    const tid = Math.min(Math.max(minuter, golv), kvar);
+    // R-42: fler grenar än veckan har dagar går inte att lägga ut.
+    if (valda.length >= maxSports) return;
+
+    // R-31: taket per vecka går före golvet. Ryms inget helt pass under taket
+    // tränas grenen inte den veckan.
+    const tak = maxBySport.get(sport) ?? Number.POSITIVE_INFINITY;
+    if (tak < golv) return;
+
+    const tid = Math.min(Math.max(minuter, golv), kvar, tak);
     valda.push({ sport, minutes: tid, share: minuter });
     kvar -= tid;
   };
@@ -790,15 +956,24 @@ function foldAwayTooSmallSports(
     if (andelar > 0) {
       for (const [i, rad] of valda.entries()) {
         const utrad = resultat[i] as [TrainedSport, number];
-        utrad[1] += Math.floor((över * rad.share) / andelar);
+        const tak = maxBySport.get(rad.sport) ?? Number.POSITIVE_INFINITY;
+        utrad[1] = Math.min(utrad[1] + Math.floor((över * rad.share) / andelar), tak);
       }
     }
   }
 
   // Avrundningsresten läggs på den gren som har mest tid, så inget tappas.
   const summa = resultat.reduce((a, [, minuter]) => a + minuter, 0);
-  const störst = [...resultat].sort((a, b) => b[1] - a[1])[0];
-  if (störst !== undefined) störst[1] += totalt - summa;
+  const rest = totalt - summa;
+
+  if (rest > 0) {
+    // Resten går till den största grenen som har utrymme under sitt tak.
+    const ordnade = [...resultat].sort((a, b) => b[1] - a[1]);
+    const mottagare = ordnade.find(
+      ([sport, minuter]) => minuter + rest <= (maxBySport.get(sport) ?? Number.POSITIVE_INFINITY),
+    );
+    if (mottagare !== undefined) mottagare[1] += rest;
+  }
 
   return resultat;
 }
@@ -872,13 +1047,17 @@ function hardSessionPlan(
   if (week.focusRaceId === null) return plan;
   const fokusgren = raceById(week.focusRaceId).sport as TrainedSport;
   const sport = hardSessionSport(fokusgren, week.phase, available);
+  if (sport === null) return plan;
 
   const maxZone = maxZoneFor(week.phase, input.levels[sport]);
   const hårda: HardSession[] = [];
 
-  // Tröskelpasset i zon 3 kommer först, intervallpasset därefter.
+  // Intervallpasset först där zonen tillåter det: räcker veckan till ett enda
+  // hårt pass ska det vara intervallerna — en dag i veckan ska vara
+  // intervaller (R-42). Tröskelpasset i zon 3 är det hårda passet i
+  // grundperioden, där zon 4 inte hör hemma än.
+  if (maxZone >= 4) hårda.push({ type: 'intervals', zone: 4 });
   if (maxZone >= 3) hårda.push({ type: 'tempo', zone: 3 });
-  if (fas.hardSessionsPerWeek >= 2 && maxZone >= 4) hårda.push({ type: 'intervals', zone: 4 });
 
   plan.set(sport, hårda.slice(0, fas.hardSessionsPerWeek));
   return plan;
@@ -898,17 +1077,23 @@ function hardSessionSport(
   focus: TrainedSport,
   phase: Phase,
   available: readonly [TrainedSport, number][],
-): TrainedSport {
+): TrainedSport | null {
   const tak = maxHardMinutes(phase);
-  if (tak === null || sessionFloor(focus) <= tak) return focus;
+  const rymsIFokus = tak === null || sessionFloor(focus) <= tak;
+  const fokusHarPlats = available.some(([gren]) => gren === focus);
+
+  if (rymsIFokus && fokusHarPlats) return focus;
 
   // Den gren som har mest tid i veckan får inslaget. Namnet avgör vid lika
   // tid, så att samma indata alltid ger samma plan.
   const kandidater = available
-    .filter(([gren]) => gren !== focus && sessionFloor(gren) <= tak)
+    .filter(([gren]) => gren !== focus && (tak === null || sessionFloor(gren) <= tak))
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
-  return kandidater[0]?.[0] ?? focus;
+  // Finns ingen gren med en ledig plats blir det inget hårt pass. Det är
+  // bättre än att tränga bort teknikpasset, som är det en nybörjare behöver
+  // mest — teknik går inte att komma ikapp på slutet.
+  return kandidater[0]?.[0] ?? (fokusHarPlats ? focus : null);
 }
 
 /** Fasens högsta zon, nedsatt för den som är ny i sporten (R-15). */
@@ -945,7 +1130,7 @@ function placeOnDays(
   }
 
   const lediga = trainingDates(input, dates, raceDates, openerDates, perDag);
-  const övriga = pending.filter((session) => session.fixedDate === undefined);
+  const övriga = inConstraintOrder(pending.filter((session) => session.fixedDate === undefined));
 
   for (const session of övriga) {
     const dag = bestDateFor(session, lediga, perDag, input, before);
@@ -1023,6 +1208,30 @@ export function trainingDayCount(hoursPerWeek: number): number {
 }
 
 /**
+ * Passen i den ordning de ska få välja dag.
+ *
+ * Det hårt bundna passet väljer först. Ett hårt pass ska ha två lugna dagar
+ * efter sig (R-43) och styrkan vill ha en egen dag (R-42), så de har bara
+ * någon enstaka dag att välja mellan — medan ett lugnt pass passar nästan var
+ * som helst. Får de lugna passen välja först tar de dagen det hårda behövde,
+ * och då finns ingen tillåten dag kvar och regeln bryts.
+ *
+ * Ordningen inom varje grupp är oförändrad, så samma indata ger samma plan.
+ */
+function inConstraintOrder(pending: readonly PendingSession[]): PendingSession[] {
+  const ordning = (session: PendingSession): number => {
+    if (isLoadDay(session)) return 0;
+    if (session.sport === 'strength') return 1;
+    return 2;
+  };
+
+  return [...pending]
+    .map((session, i) => ({ session, i }))
+    .sort((a, b) => ordning(a.session) - ordning(b.session) || a.i - b.i)
+    .map(({ session }) => session);
+}
+
+/**
  * Dagen som passar passet bäst (R-14, R-16).
  *
  * Reglerna rangordnas: ett hårt pass får aldrig hamna intill ett annat hårt
@@ -1061,6 +1270,34 @@ function allowedOn(
       before.hardDates.has(datum) || dayHas(datum, perDag, isHard);
 
     if (hårdDag(date) || hårdDag(addDays(date, -1)) || hårdDag(addDays(date, 1))) return false;
+  }
+
+  // R-42: styrkepasset ligger ensamt på sin dag. Ett styrkepass på tjugo
+  // minuter ovanpå två löppass är inget styrkepass — och en hel timme styrka
+  // förtjänar en dag.
+  if (rules.strength.ownDay) {
+    const ärStyrka = (kandidat: PendingSession) => kandidat.sport === 'strength';
+    const dagensPass = perDag.get(date) ?? [];
+
+    if (session.sport === 'strength' && dagensPass.length > 0) return false;
+    if (session.sport !== 'strength' && dayHas(date, perDag, ärStyrka)) return false;
+  }
+
+  // R-42: ett konditionspass per dag. Appen är byggd för folk med jobb, och
+  // två pass samma dag förutsätter att man kan träna två gånger.
+  if (session.sport !== 'strength' && (perDag.get(date) ?? []).length > 0) return false;
+
+  // R-43: efter ett hårt pass följer två dagar som varken bär ett hårt pass
+  // eller långpasset.
+  const lugnaDagar = rules.intensity.minEasyDaysAfterHard;
+  if (lugnaDagar > 0 && isLoadDay(session)) {
+    const belastad = (datum: IsoDate) =>
+      before.loadDates.has(datum) || dayHas(datum, perDag, isLoadDay);
+
+    if (belastad(date)) return false;
+    for (let steg = 1; steg <= lugnaDagar; steg += 1) {
+      if (belastad(addDays(date, -steg)) || belastad(addDays(date, steg))) return false;
+    }
   }
 
   // R-14: nivå Ny i löpning får aldrig löppass två dagar i rad.
@@ -1240,6 +1477,33 @@ function withRaceNote(session: Session): Session {
  * Loppet ersätts aldrig: den som anmält sig till Vasaloppet åker Vasaloppet.
  * Simning i öppet vatten juni till augusti kräver ingen simhall (R-19).
  */
+/**
+ * Tillägget som delar ett för långt ersättningspass (R-44).
+ *
+ * Ett långpass på två och en halv timme i stakmaskin är samma rörelse hela
+ * vägen. Passet behåller sin tid — skidträningen behövs — men instruktionen
+ * säger hur den delas. Det blir inget andra pass av det: en dag bär ett pass
+ * (R-42), och det här är ett pass som görs på två sätt.
+ */
+function splitNoteFor(
+  substitute: { maxMinutes?: number | undefined; overflowKey?: string | undefined },
+  text: { splitNote?: string | undefined },
+  minutes: number,
+): string {
+  const { maxMinutes, overflowKey } = substitute;
+  if (maxMinutes === undefined || overflowKey === undefined) return '';
+  if (text.splitNote === undefined || minutes <= maxMinutes) return '';
+
+  const resten = sessionTexts.substitutes[overflowKey];
+  if (resten === undefined) {
+    throw new Error(`config/sessions.json saknar ersättningen "${overflowKey}"`);
+  }
+
+  return text.splitNote
+    .replace('{minutes}', String(minutes - maxMinutes))
+    .replace('{other}', resten.title.toLowerCase());
+}
+
 function withSubstitution(session: Session, input: PlanInput): Session {
   if (session.sport === null || session.type === 'race' || session.type === 'rest') {
     return session;
@@ -1263,7 +1527,7 @@ function withSubstitution(session: Session, input: PlanInput): Session {
   return {
     ...session,
     title: text.title,
-    instruction: text.instruction,
+    instruction: text.instruction + splitNoteFor(vald, text, session.minutes),
     substitutedAs: vald.key,
     // Ersättningen är redan ett byte av gren. Att dessutom lista alternativ
     // skulle ge tre sätt att göra samma pass, vilket är ett för många.

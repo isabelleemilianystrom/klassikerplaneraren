@@ -97,7 +97,10 @@ export const rulesSchema = z.object({
   }),
   strength: z.object({
     _rule: z.string(),
+    _ownDay: z.string(),
     minutesPerSession: z.number().int().positive(),
+    /** Styrkepasset ligger ensamt på sin dag (R-42). */
+    ownDay: z.boolean(),
     sessionsByPhase: z.object({
       base: z.number().int().nonnegative(),
       specific: z.number().int().nonnegative(),
@@ -252,6 +255,9 @@ export const rulesSchema = z.object({
       recovery: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
     }),
     noHardDaysBackToBack: z.boolean(),
+    _minEasyDaysAfterHard: z.string(),
+    /** Lugna dagar som ska följa ett hårt pass (R-43). */
+    minEasyDaysAfterHard: z.number().int().nonnegative(),
   }),
   blocks: z.object({
     _rule: z.string(),
@@ -286,7 +292,17 @@ export const rulesSchema = z.object({
     bySport: z.partialRecord(
       sport,
       z
-        .array(z.object({ key: z.string().min(1), needs: z.array(z.string().min(1)) }))
+        .array(
+          z.object({
+            key: z.string().min(1),
+            needs: z.array(z.string().min(1)),
+            _maxMinutes: z.string().optional(),
+            /** Längsta tid i den här ersättningen i ett enda pass (R-44). */
+            maxMinutes: z.number().int().positive().optional(),
+            /** Ersättningen resten av tiden görs som (R-44). */
+            overflowKey: z.string().min(1).optional(),
+          }),
+        )
         .min(1),
     ),
     /** Grenar som går i öppet vatten under season.openWaterMonths. */
@@ -357,7 +373,15 @@ export const sessionsSchema = z.object({
   // R-30: varje passtyp måste finnas. Saknas en är det ett fel, inte ett tomt fält.
   types: z.record(sessionType, textEntry),
   sportVariants: z.record(z.string(), textEntry),
-  substitutes: z.record(z.string(), textEntry.extend({ _rule: z.string() })),
+  substitutes: z.record(
+    z.string(),
+    textEntry.extend({
+      _rule: z.string(),
+      _splitNote: z.string().optional(),
+      /** Läggs till när passet är längre än ersättningens tak (R-44). */
+      splitNote: z.string().optional(),
+    }),
+  ),
   /** R-10: styrkans text, viktad mot ett lopp där grenen kräver det. */
   strengthVariants: z.object({
     _rule: z.string(),

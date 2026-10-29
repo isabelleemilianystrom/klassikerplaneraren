@@ -725,26 +725,40 @@ describe('reglerna om dagar i rad håller över veckogränsen', () => {
     preferredDays: { longSession: 5, rest: 6 },
   };
 
-  it('ger aldrig två hårda pass i rad, inte heller söndag till måndag (R-16)', () => {
+  it('håller de lugna dagarna efter ett hårt pass, också över veckogränsen (R-43)', () => {
     const planer = buildWeekPlans(övergripande);
-    const hårda = new Set(
+
+    // Belastning är hårda pass *och* långpasset. Tre tunga dagar i en vecka
+    // tömmer depåerna även när de inte ligger i rad.
+    const belastning = new Set(
       planer.flatMap((plan) =>
         träning(plan)
-          .filter((session) => session.zone !== null && session.zone >= 3)
+          .filter(
+            (session) =>
+              session.type === 'long' || (session.zone !== null && session.zone >= 3),
+          )
           .map((session) => session.date),
       ),
     );
 
-    expect(hårda.size).toBeGreaterThan(0);
+    expect(belastning.size).toBeGreaterThan(0);
 
-    // Måndag är veckans första dag. Ligger ett hårt pass där måste
-    // kontrollen se bakåt in i föregående vecka för att R-16 ska hålla —
-    // det är hela poängen med det här testet.
-    const måndagar = [...hårda].filter((datum) => weekdayOf(datum) === 1);
-    expect(måndagar.length).toBeGreaterThan(0);
+    const gap = rules.intensity.minEasyDaysAfterHard;
 
-    for (const datum of hårda) {
-      expect(hårda.has(addDays(datum, 1)), `${datum} och dagen efter`).toBe(false);
+    // Ligger en belastad dag inom de `gap` första dagarna i sin vecka måste
+    // kontrollen se bakåt in i föregående vecka — det är hela poängen med
+    // det här testet. Måndagen är styrkedagen (R-42), så gränsfallet kommer
+    // via veckans andra dag.
+    const tidigtIVeckan = [...belastning].filter((datum) => weekdayOf(datum) <= gap);
+    expect(tidigtIVeckan.length).toBeGreaterThan(0);
+
+    for (const datum of belastning) {
+      for (let steg = 1; steg <= gap; steg += 1) {
+        expect(
+          belastning.has(addDays(datum, steg)),
+          `${datum} och ${steg} dagar senare`,
+        ).toBe(false);
+      }
     }
   });
 
@@ -1475,6 +1489,238 @@ describe('R-40: golv per gren', () => {
           expect(session.minutes, `${namn} ${session.id}`).toBeLessThanOrEqual(tak);
         }
       }
+    }
+  });
+});
+
+
+describe('R-42: en dag styrka, en dag långpass, en dag intervaller', () => {
+  const STYRKA = rules.strength.minutesPerSession;
+
+  /** Passen per dag, vila oräknad. */
+  function perDag(plan: WeekPlan): Map<string, Session[]> {
+    const karta = new Map<string, Session[]>();
+
+    for (const session of träning(plan)) {
+      const rad = karta.get(session.date) ?? [];
+      rad.push(session);
+      karta.set(session.date, rad);
+    }
+
+    return karta;
+  }
+
+  it('har talen i konfigurationen, inte i koden', () => {
+    expect(STYRKA).toBe(60);
+    expect(rules.strength.ownDay).toBe(true);
+    expect(rules.strength.sessionsByPhase.base).toBe(1);
+    expect(rules.strength.sessionsByPhase.specific).toBe(1);
+    expect(rules.intensity.byPhase.specific.hardSessionsPerWeek).toBe(1);
+  });
+
+  it('ger aldrig en dag mer än ett pass', () => {
+    // Appen är byggd för folk med jobb. Två pass samma dag förutsätter att man
+    // kan träna två gånger, och tre pass på en tisdag är inget program.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const [datum, dagens] of perDag(plan)) {
+          expect(dagens.length, `${namn} ${datum}: ${dagens.map((s) => s.id).join(', ')}`).toBe(1);
+        }
+      }
+    }
+  });
+
+  it('lägger styrkepasset ensamt på sin dag, en hel timme', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const [datum, dagens] of perDag(plan)) {
+          const styrka = dagens.filter((session) => session.sport === 'strength');
+          if (styrka.length === 0) continue;
+
+          expect(dagens.length, `${namn} ${datum}`).toBe(1);
+          expect(styrka[0]?.minutes, `${namn} ${datum}`).toBe(STYRKA);
+        }
+      }
+    }
+  });
+
+  it('ger ett styrkepass i veckan i bas och specifik fas, inget i nedtrappning', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.budget.strengthMinutes === 0) continue;
+
+        const styrka = träning(plan).filter((session) => session.sport === 'strength');
+        const väntat = rules.strength.sessionsByPhase[plan.week.phase];
+
+        expect(styrka.length, `${namn} v${plan.week.index} ${plan.week.phase}`).toBe(väntat);
+      }
+    }
+  });
+
+  it('gör långpasset till veckans längsta pass', () => {
+    // Lärdomen från v0: ligger långpasset sist i kön blir det alltid för
+    // kort, och med ett pass per dag kapar dess längd dessutom alla andra.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        const lång = träning(plan).find((session) => session.type === 'long');
+        if (lång === undefined) continue;
+
+        for (const session of träning(plan)) {
+          if (session.type === 'race' || session.sport === 'strength') continue;
+
+          expect(lång.minutes, `${namn} v${plan.week.index} mot ${session.id}`).toBeGreaterThanOrEqual(
+            session.minutes,
+          );
+        }
+      }
+    }
+  });
+
+  it('ger veckan ett hårt pass när tiden räcker till det', () => {
+    // P1 är ny i både skidor och simning. I de tunnaste basveckorna räcker
+    // tiden till ett simpass och fokusgrenen, och då finns ingen plats kvar
+    // till intervaller — teknik går före, eftersom den inte går att komma
+    // ikapp på slutet. Profilen prövas därför lösare än de övriga.
+    for (const [namn, planer] of alla()) {
+      let med = 0;
+      let borde = 0;
+
+      for (const plan of planer) {
+        const fas = rules.intensity.byPhase[plan.week.phase];
+        if (fas.hardSessionsPerWeek === 0) continue;
+        if (plan.week.raceIds.length > 0 || plan.budget.enduranceMinutes === 0) continue;
+
+        borde += 1;
+        if (träning(plan).some((session) => session.zone !== null && session.zone >= 3)) med += 1;
+      }
+
+      if (borde === 0) continue;
+      const gräns = namn === 'P1' ? 0.45 : 1;
+      expect(med / borde, `${namn}: ${med} av ${borde}`).toBeGreaterThanOrEqual(gräns);
+    }
+  });
+
+  it('ger aldrig fler pass än veckan har träningsdagar', () => {
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        const dagar = new Set(träning(plan).map((session) => session.date));
+        const vila = plan.sessions.filter((session) => session.type === 'rest').length;
+
+        expect(dagar.size + vila, `${namn} v${plan.week.index}`).toBe(7);
+      }
+    }
+  });
+});
+
+describe('R-43: två lugna dagar efter ett hårt pass', () => {
+  const GAP = rules.intensity.minEasyDaysAfterHard;
+
+  /** Dagar som bär belastning: ett hårt pass eller långpasset. */
+  function belastade(planer: readonly WeekPlan[]): Set<string> {
+    return new Set(
+      planer.flatMap((plan) =>
+        träning(plan)
+          .filter(
+            (session) =>
+              session.type !== 'race' &&
+              (session.type === 'long' || (session.zone !== null && session.zone >= 3)),
+          )
+          .map((session) => session.date),
+      ),
+    );
+  }
+
+  it('har talet i konfigurationen', () => {
+    expect(GAP).toBe(2);
+    expect(rules.intensity._minEasyDaysAfterHard).toContain('Långpasset');
+  });
+
+  it('lägger aldrig två belastade dagar närmare än två dagar isär', () => {
+    // Tränargranskningen: hårda pass på onsdag, fredag och söndag ligger inte
+    // i rad, men tre tunga dagar i en vecka tömmer depåerna ändå.
+    for (const [namn, planer] of alla()) {
+      const dagar = belastade(planer);
+      expect(dagar.size, namn).toBeGreaterThan(0);
+
+      for (const datum of dagar) {
+        for (let steg = 1; steg <= GAP; steg += 1) {
+          expect(dagar.has(addDays(datum, steg)), `${namn}: ${datum} + ${steg} dagar`).toBe(false);
+        }
+      }
+    }
+  });
+
+  it('ger veckan högst två belastade dagar', () => {
+    // Ett hårt pass och ett långpass. Fler ryms inte med två lugna dagar
+    // emellan, och det är hela poängen.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        const dagar = träning(plan).filter(
+          (session) =>
+            session.type !== 'race' &&
+            (session.type === 'long' || (session.zone !== null && session.zone >= 3)),
+        );
+
+        expect(dagar.length, `${namn} v${plan.week.index}`).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+});
+
+describe('R-44: taket för ett ersättningspass', () => {
+  /** Bor i Skåne: har stakmaskin, men ingen snö och inga rullskidor. */
+  const skåne: PlanInput = {
+    ...P2,
+    equipment: { snowOrRollerSkis: false, skiErg: true, pool: true, bike: true },
+  };
+
+  const TAK = 90;
+
+  function stakpass(): Session[] {
+    return buildWeekPlans(skåne)
+      .flatMap((plan) => träning(plan))
+      .filter((session) => session.substitutedAs === 'ski.skiErg');
+  }
+
+  it('har taket i konfigurationen', () => {
+    const stak = rules.substitutions.bySport.ski?.find((rad) => rad.key === 'ski.skiErg');
+
+    expect(stak?.maxMinutes).toBe(TAK);
+    expect(stak?.overflowKey).toBe('ski.poleWalk');
+  });
+
+  it('delar passet när det är längre än taket', () => {
+    const långa = stakpass().filter((session) => session.minutes > TAK);
+    expect(långa.length).toBeGreaterThan(0);
+
+    for (const session of långa) {
+      expect(session.instruction, session.id).toContain('högst 90 minuter');
+      expect(session.instruction, session.id).toContain('stavgång i backe');
+      expect(session.instruction, session.id).toContain(String(session.minutes - TAK));
+    }
+  });
+
+  it('säger ingenting om delning när passet ryms under taket', () => {
+    const korta = stakpass().filter((session) => session.minutes <= TAK);
+    expect(korta.length).toBeGreaterThan(0);
+
+    for (const session of korta) {
+      expect(session.instruction, session.id).not.toContain('högst 90 minuter');
+    }
+  });
+
+  it('behåller passets tid — skidträningen försvinner inte', () => {
+    // Passet görs på två sätt, men det är ett pass och tiden är oförändrad.
+    // Ett andra pass samma dag vore precis vad R-42 förbjuder.
+    for (const plan of buildWeekPlans(skåne)) {
+      const dagar = new Set(träning(plan).map((session) => session.date));
+      expect(dagar.size, `v${plan.week.index}`).toBe(träning(plan).length);
+    }
+  });
+
+  it('har inga ersättningsmarkörer kvar i texten', () => {
+    for (const session of stakpass()) {
+      expect(session.instruction, session.id).not.toMatch(/\{\w+\}/);
     }
   });
 });
