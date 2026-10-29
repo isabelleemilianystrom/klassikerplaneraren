@@ -12,13 +12,15 @@
 import { nextRaceDate, raceById, races, rules } from '../engine/config.ts';
 import { isIsoDate } from '../engine/dates.ts';
 import { FORM } from './texts.ts';
-import type { Level, PlanInput, RaceId, TrainedSport, Weekday } from '../engine/types.ts';
+import type { Level, PlanInput, RaceGoal, RaceId, TrainedSport, Weekday } from '../engine/types.ts';
 
 /** Ett valt lopp i formuläret. Datumet är en sträng så länge det skrivs. */
 export interface RaceChoice {
   id: RaceId;
   selected: boolean;
   date: string;
+  /** Vad användaren vill med loppet (R-38). Förvalt är att ta sig i mål. */
+  goal: RaceGoal;
 }
 
 export interface FormState {
@@ -44,6 +46,7 @@ export function initialState(today: string): FormState {
       id: race.id,
       selected: false,
       date: nextRaceDate(race.id, today) ?? '',
+      goal: 'finish',
     })),
     levels: {},
     hoursPerWeek: 6,
@@ -155,10 +158,14 @@ export function toPlanInput(state: FormState, today: string): PlanInput | null {
   if (Object.keys(validateAll(state)).length > 0) return null;
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     today,
     startDate: state.startDate,
-    races: selectedRaces(state).map((race) => ({ id: race.id, date: race.date })),
+    races: selectedRaces(state).map((race) => ({
+      id: race.id,
+      date: race.date,
+      goal: race.goal,
+    })),
     levels: Object.fromEntries(
       sportsToRate(state).map((sport) => [sport, state.levels[sport] as Level]),
     ),

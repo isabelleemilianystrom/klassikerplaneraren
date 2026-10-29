@@ -18,7 +18,7 @@ function medVeckorKvar(weeks: number, raceId: RaceId = 'vasaloppet'): PlanInput 
     ...P4,
     today: START,
     startDate: START,
-    races: [{ id: raceId, date: datum }],
+    races: [{ id: raceId, date: datum, goal: 'finish' }],
   };
 }
 

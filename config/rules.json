@@ -371,5 +371,10 @@
       "ski": "Du är ny på längdskidor. Teknik avgör mer än kondition i Vasaloppet – försök komma ut på snö och gå gärna en skidkurs före loppet.",
       "swim": "Du är ny på simning. Tekniken är det som gör 3 km i Vansbroån görbart – en simkurs eller några lektioner ger mer än extra simtid."
     }
+  },
+  "raceGoal": {
+    "_rule": "R-38",
+    "note": "Den som bara vill ta sig i mål behöver vattenvana och teknik, inte volym. Den som vill slå en tid behöver bådadera. Målet \"finish\" sänker därför grenens andel av veckan och flyttar tiden till de lopp användaren faktiskt siktar på. Teknikpassen rörs aldrig — det är de som gör loppet görbart, och de är billigast i tid.",
+    "finishWeightFactor": 0.6
   }
 }

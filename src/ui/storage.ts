@@ -23,10 +23,10 @@ const KEY = 'klassikerplaneraren';
 /**
  * Lagringens version. Höjs när formen på det sparade ändras.
  *
- * 1 — första versionen, med `PlanInput` i schemaVersion 2 och formulärets
- *     tillstånd.
+ * 1 — första versionen, med `PlanInput` i schemaVersion 2.
+ * 2 — målsättning per lopp (R-38). `PlanInput` är nu schemaVersion 3.
  */
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 /** Det som sparas. Planen räknas om vid inläsning, den sparas inte. */
 interface Saved {
@@ -166,7 +166,7 @@ function isPlanInput(värde: unknown): värde is PlanInput {
   if (typeof värde !== 'object' || värde === null) return false;
   const input = värde as Partial<PlanInput>;
 
-  if (input.schemaVersion !== 2) return false;
+  if (input.schemaVersion !== 3) return false;
   if (typeof input.startDate !== 'string' || !isIsoDate(input.startDate)) return false;
   if (typeof input.today !== 'string' || !isIsoDate(input.today)) return false;
 
@@ -175,6 +175,7 @@ function isPlanInput(värde: unknown): värde is PlanInput {
     if (typeof race !== 'object' || race === null) return false;
     if (typeof race.id !== 'string') return false;
     if (typeof race.date !== 'string' || !isIsoDate(race.date)) return false;
+    if (race.goal !== 'finish' && race.goal !== 'time') return false;
   }
 
   if (typeof input.hoursPerWeek !== 'number' || !Number.isFinite(input.hoursPerWeek)) return false;
@@ -206,6 +207,7 @@ function isFormState(värde: unknown): värde is FormState {
     if (typeof race.id !== 'string') return false;
     if (typeof race.selected !== 'boolean') return false;
     if (typeof race.date !== 'string') return false;
+    if (race.goal !== 'finish' && race.goal !== 'time') return false;
   }
 
   if (typeof form.hoursPerWeek !== 'number') return false;

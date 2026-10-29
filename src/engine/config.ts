@@ -277,6 +277,13 @@ export const rulesSchema = z.object({
     requiresAnyEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
     notes: z.partialRecord(sport, z.string()),
   }),
+  /** R-38: vad målet med loppet gör med grenens andel. */
+  raceGoal: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    /** Grenens vikt multipliceras med detta när målet är att ta sig i mål. */
+    finishWeightFactor: share,
+  }),
   /** R-36: vad som händer med en gren vars lopp är avklarat. */
   afterRace: z.object({
     _rule: z.string(),

@@ -113,7 +113,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | ID | Krav | Prio | Acceptanskriterier |
 | --- | --- | --- | --- |
 | K-01 | Startsida med kort förklaring, betatext, ansvarsfriskrivning, åldersgräns (18 år) och knappen "Skapa mitt program" | Måste | Givet att jag öppnar appen utan sparad plan, så ser jag förklaringen, texterna från avsnitt 8 och knappen som startar formuläret |
-| K-02 | Steg 1: välj minst ett av de fyra loppen och ange datum för varje valt lopp; startdatum är idag men kan ändras | Måste | Inget lopp valt eller ett loppdatum före startdatumet ger ett felmeddelande vid fältet, och jag kommer inte vidare |
+| K-02 | Steg 1: välj minst ett av de fyra loppen och ange datum och mål — ta sig i mål eller sikta på en tid — för varje valt lopp *(mål tillagt 2026-10-29)*; startdatum är idag men kan ändras | Måste | Inget lopp valt eller ett loppdatum före startdatumet ger ett felmeddelande vid fältet, och jag kommer inte vidare |
 | K-03 | Steg 2: nivå per sport som ingår i valda lopp – Ny, Van eller Erfaren – med beskrivningarna i avsnitt 5 | Måste | Varje sport har exakt en vald nivå innan jag kommer vidare; förvalt är "Van" |
 | K-04 | Steg 3: timmar per vecka (3–15, heltal), vilken dag långpasset ska ligga på, vilken dag som är vilodag, och utrustning: snö eller rullskidor, stakmaskin, simhall, landsvägscykel eller trainer (ja/nej för varje) | Måste | Alla fält har standardvärden (6 timmar, söndag långpass, måndag vila, nej på utrustning); värden utanför 3–15 kan inte väljas; samma dag för långpass och vila ger ett felmeddelande vid fältet och jag kommer inte vidare |
 | K-05 | Generering: regelmotorn skapar planen direkt, med förklaringarna på plats från början | Måste | Planen med sina förklaringar visas inom 2 s efter att jag skickat formuläret, utan att något laddas i efterhand |
@@ -271,6 +271,25 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
   Reglerna ligger i `sessionAlternatives` i `config/rules.json`. **Gränssnittet ska leda med
   passtypen**, inte med grenen: raden är ett långpass, och grenen är hur man väljer att göra det.
+
+- **R-38** (tillagd 2026-10-29) **Målet med loppet styr hur mycket grenen får.** Användaren
+  anger per lopp om hon vill **ta sig i mål** eller **sikta på en tid**. Förvalt är att ta sig i
+  mål — det är vad de flesta vill med sin första klassiker.
+
+  Den som bara vill komma runt Vansbroån behöver **vattenvana och teknik, inte simvolym**. Den
+  som vill slå en tid behöver bådadera. Målet `finish` multiplicerar därför grenens säsongsvikt
+  med `raceGoal.finishWeightFactor` — **0,6** — och den frigjorda tiden går till de lopp
+  användaren faktiskt siktar på.
+
+  **Teknikpassen rörs aldrig.** Det är de som gör loppet görbart, och de är billigast i tid.
+  **Nybörjaren rörs inte heller:** för den som knappt kan simma är frekvensen själva
+  förberedelsen, och nybörjartaket i R-31 håller volymen nere ändå.
+
+  Är alla lopp satta till samma mål ändras ingenting — andelarna normeras tillbaka. Det är
+  **skillnaden mellan loppen** som får genomslag.
+
+  I profil P5, där Vätternrundan är på tid och Vansbrosimningen bara ska klaras, flyttar regeln
+  **tretton timmar** från simningen till cykeln över planens trettiofem veckor.
 
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
@@ -470,10 +489,10 @@ type SessionType = 'easy' | 'long' | 'tempo' | 'intervals' | 'technique' | 'stre
 type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;   // ISO: 1 = måndag, 7 = söndag
 
 interface PlanInput {
-  schemaVersion: 2;           // höjd 2026-10-28: preferredDays tillkom
+  schemaVersion: 3;           // höjd 2026-10-29: mål per lopp tillkom (R-38)
   today: string;              // YYYY-MM-DD
   startDate: string;          // YYYY-MM-DD
-  races: { id: RaceId; date: string }[];
+  races: { id: RaceId; date: string; goal: 'finish' | 'time' }[];   // R-38
   levels: Partial<Record<'ski' | 'bike' | 'swim' | 'run', Level>>;
   hoursPerWeek: number;       // 3–15
   preferredDays: { longSession: Weekday; rest: Weekday };   // måste vara olika
@@ -602,6 +621,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Minst en vilodag per vecka (R-11)
 - Aldrig pass i zon 3–4 två dagar i rad (R-16)
 - Återhämtningen efter ett lopp finns kvar och kortas bara så att den inte går in i nästa loppvecka (R-03) *(tillagd 2026-10-28)*
+- En gren man bara vill ta sig i mål i får mindre tid än en man siktar på en tid i, men aldrig noll (R-38) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
 - Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
@@ -646,6 +666,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Vårstart i maj med Vätternrundan i juni: planen når inte 1000 km och varningen i R-34 visas (tillagt 2026-10-28)
 - Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
+- Samma mål på alla lopp ändrar ingenting; det är skillnaden mellan loppen som räknas (R-38) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
 - Profil utan utrustning: skidpassen blir stavgång, simpassen torrövningar, och inget pass stryks (R-17, R-18) (tillagt 2026-10-28)
 - Samma profil med stakmaskin: skidpassen blir stakmaskin i stället för stavgång (R-17) (tillagt 2026-10-28)

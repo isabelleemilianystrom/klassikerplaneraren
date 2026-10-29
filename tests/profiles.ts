@@ -26,16 +26,22 @@ const INGEN_UTRUSTNING = {
   bike: false,
 } as const;
 
+/**
+ * Alla fyra loppen med målet att ta sig i mål (R-38).
+ *
+ * Det är vad de flesta vill med sin första klassiker, och därmed förvalet i
+ * formuläret. Profilerna som siktar på tid anger det själva.
+ */
 const ALLA_FYRA = [
-  { id: 'vasaloppet' as const, date: LOPP.vasaloppet },
-  { id: 'vatternrundan' as const, date: LOPP.vatternrundan },
-  { id: 'vansbrosimningen' as const, date: LOPP.vansbrosimningen },
-  { id: 'lidingoloppet' as const, date: LOPP.lidingoloppet },
+  { id: 'vasaloppet' as const, date: LOPP.vasaloppet, goal: 'finish' as const },
+  { id: 'vatternrundan' as const, date: LOPP.vatternrundan, goal: 'finish' as const },
+  { id: 'vansbrosimningen' as const, date: LOPP.vansbrosimningen, goal: 'finish' as const },
+  { id: 'lidingoloppet' as const, date: LOPP.lidingoloppet, goal: 'finish' as const },
 ];
 
 /** P1 Förstagångsklassikern: alla fyra, 6 h, ny i skidor och simning. */
 export const P1: PlanInput = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
@@ -45,12 +51,17 @@ export const P1: PlanInput = {
   equipment: { ...INGEN_UTRUSTNING, pool: true, bike: true },
 };
 
-/** P2 Tidsjägaren: alla fyra, 10 h, erfaren i allt, all utrustning. */
+/**
+ * P2 Tidsjägaren: alla fyra, 10 h, erfaren i allt, all utrustning.
+ *
+ * Den enda profilen som siktar på tid i alla fyra loppen (R-38). Det är vad
+ * namnet betyder, och det gör att regeln prövas i båda riktningarna.
+ */
 export const P2: PlanInput = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   today: START_DATE,
   startDate: START_DATE,
-  races: ALLA_FYRA,
+  races: ALLA_FYRA.map((race) => ({ ...race, goal: 'time' as const })),
   levels: { ski: 'advanced', swim: 'advanced', bike: 'advanced', run: 'advanced' },
   hoursPerWeek: 10,
   preferredDays: VANLIGA_DAGAR,
@@ -59,7 +70,7 @@ export const P2: PlanInput = {
 
 /** P3 Den begränsade: alla fyra, 3 h, van i allt, bara cykel. */
 export const P3: PlanInput = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
@@ -77,10 +88,10 @@ export const P3: PlanInput = {
  * enda sport (R-08).
  */
 export const P4: PlanInput = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   today: START_DATE,
   startDate: START_DATE,
-  races: [{ id: 'vasaloppet', date: '2026-12-13' }],
+  races: [{ id: 'vasaloppet', date: '2026-12-13', goal: 'finish' }],
   levels: { ski: 'new' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
@@ -94,12 +105,13 @@ export const P4: PlanInput = {
  * återhämtningsvecka och det andra få en veckas nedtrappning.
  */
 export const P5: PlanInput = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   today: START_DATE,
   startDate: START_DATE,
   races: [
-    { id: 'vatternrundan', date: LOPP.vatternrundan },
-    { id: 'vansbrosimningen', date: '2027-07-02' },
+    { id: 'vatternrundan', date: LOPP.vatternrundan, goal: 'time' },
+    // Vill bara ta sig i mål i vattnet, och tiden går till cykeln (R-38).
+    { id: 'vansbrosimningen', date: '2027-07-02', goal: 'finish' },
   ],
   levels: { bike: 'experienced', swim: 'experienced' },
   hoursPerWeek: 8,
@@ -117,17 +129,17 @@ export const P5: PlanInput = {
  * P1, och för att planen sträcker sig över både ett årsskifte och ett skottår.
  */
 export const P6: PlanInput = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   today: '2027-05-03',
   startDate: '2027-05-03',
   // Loppen står med flit i den ordning man brukar rabbla klassikern, inte i
   // datumordning: Vasaloppet först fast det går sist. Motorn ska följa datumen.
   races: [
     // Mars 2028 — nästa Vasaloppet efter en vårstart 2027.
-    { id: 'vasaloppet', date: '2028-03-05' },
-    { id: 'vatternrundan', date: LOPP.vatternrundan },
-    { id: 'vansbrosimningen', date: LOPP.vansbrosimningen },
-    { id: 'lidingoloppet', date: LOPP.lidingoloppet },
+    { id: 'vasaloppet', date: '2028-03-05', goal: 'finish' },
+    { id: 'vatternrundan', date: LOPP.vatternrundan, goal: 'finish' },
+    { id: 'vansbrosimningen', date: LOPP.vansbrosimningen, goal: 'finish' },
+    { id: 'lidingoloppet', date: LOPP.lidingoloppet, goal: 'finish' },
   ],
   levels: { ski: 'new', swim: 'experienced', bike: 'experienced', run: 'experienced' },
   hoursPerWeek: 8,

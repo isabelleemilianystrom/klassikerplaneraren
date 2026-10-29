@@ -117,6 +117,21 @@ export const FORM = {
     startDateLabel: 'Första träningsdagen',
     startDateHelp: 'Förvalt är i dag. Programmet börjar på måndagen i den veckan.',
     dateLabel: 'Datum',
+    goalLabel: 'Vad vill du med loppet?',
+    goals: [
+      {
+        value: 'finish' as const,
+        name: 'Ta mig i mål',
+        help: 'Jag vill genomföra loppet. Tiden spelar mindre roll.',
+      },
+      {
+        value: 'time' as const,
+        name: 'Sikta på en tid',
+        help: 'Jag har en tid i huvudet och vill träna för den.',
+      },
+    ],
+    goalHelp:
+      'Svaret styr hur mycket tid grenen får. Vill du bara ta dig i mål räcker det med att bli trygg och hålla tekniken — då går tiden till de lopp du siktar på i stället.',
     datePlaceholderMissing: 'Arrangören har inte publicerat något datum som passar – skriv in det själv',
     errors: {
       noRace: 'Välj minst ett lopp för att komma vidare.',

@@ -34,6 +34,17 @@ export type IsoDate = string;
 /** Sporterna användaren kan ange nivå i. Styrka är inte en av dem. */
 export type TrainedSport = Exclude<Sport, 'strength'>;
 
+/**
+ * Vad användaren vill med ett lopp (R-38).
+ *
+ * `finish` — ta sig i mål. `time` — sikta på en tid.
+ *
+ * Skillnaden är stor i träningsupplägg. Den som bara vill komma runt
+ * Vansbrosimningen behöver vattenvana och teknik, inte simvolym. Den som vill
+ * slå en tid behöver bådadera.
+ */
+export type RaceGoal = 'finish' | 'time';
+
 /** Veckodag enligt ISO: 1 = måndag, 7 = söndag. */
 export type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -52,10 +63,11 @@ export interface PreferredDays {
 }
 
 export interface PlanInput {
-  schemaVersion: 2;
+  schemaVersion: 3;
   today: IsoDate;
   startDate: IsoDate;
-  races: { id: RaceId; date: IsoDate }[];
+  /** Varje lopp med sitt datum och vad användaren vill med det (R-38). */
+  races: { id: RaceId; date: IsoDate; goal: RaceGoal }[];
   levels: Partial<Record<TrainedSport, Level>>;
   /** 3–15 timmar, heltal. */
   hoursPerWeek: number;

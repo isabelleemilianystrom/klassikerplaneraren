@@ -25,7 +25,7 @@ function nästaFyraLoppEfter(start: IsoDate): PlanInput['races'] {
   return races.races.map((race) => {
     const månadOchDag = (race.dates[0] as string).slice(5);
     const iÅr = `${år}-${månadOchDag}`;
-    return { id: race.id, date: iÅr >= start ? iÅr : `${år + 1}-${månadOchDag}` };
+    return { id: race.id, date: iÅr >= start ? iÅr : `${år + 1}-${månadOchDag}`, goal: 'finish' as const };
   });
 }
 
@@ -192,8 +192,8 @@ describe('R-03: blocklogiken', () => {
     const isär: PlanInput = {
       ...P2,
       races: [
-        { id: 'vasaloppet', date: '2027-03-07' },
-        { id: 'vatternrundan', date: '2027-06-18' },
+        { id: 'vasaloppet', date: '2027-03-07', goal: 'finish' },
+        { id: 'vatternrundan', date: '2027-06-18', goal: 'finish' },
       ],
     };
 
@@ -224,8 +224,8 @@ describe('R-27: flera lopp samma vecka', () => {
   const sammaVecka: PlanInput = {
     ...P5,
     races: [
-      { id: 'vatternrundan', date: '2027-06-18' },
-      { id: 'vansbrosimningen', date: '2027-06-20' },
+      { id: 'vatternrundan', date: '2027-06-18', goal: 'finish' },
+      { id: 'vansbrosimningen', date: '2027-06-20', goal: 'finish' },
     ],
   };
 

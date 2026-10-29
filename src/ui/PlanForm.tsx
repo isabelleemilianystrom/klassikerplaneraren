@@ -23,6 +23,7 @@ import {
   validateStep3,
   type FieldErrors,
   type FormState,
+  type RaceChoice,
 } from './form-state.ts';
 import { EQUIPMENT, FORM, LEVELS, raceLabel, SPORT_NAMES, WEEKDAYS } from './texts.ts';
 
@@ -112,7 +113,10 @@ interface StegProps {
 
 /** Steg 1: loppen och deras datum (K-02). */
 function Steg1({ state, setState, felFör }: StegProps) {
-  function byggOm(id: string, ändring: Partial<{ selected: boolean; date: string }>) {
+  function byggOm(
+    id: string,
+    ändring: Partial<{ selected: boolean; date: string; goal: RaceChoice['goal'] }>,
+  ) {
     setState({
       ...state,
       races: state.races.map((race) => (race.id === id ? { ...race, ...ändring } : race)),
@@ -172,6 +176,31 @@ function Steg1({ state, setState, felFör }: StegProps) {
                   {felFör(`date-${race.id}`) !== undefined && (
                     <Fel text={felFör(`date-${race.id}`) as string} />
                   )}
+
+                  {/* R-38: vad användaren vill med loppet. */}
+                  <fieldset className="mt-4">
+                    <legend className="text-sm font-medium text-neutral-900">
+                      {FORM.step1.goalLabel}
+                    </legend>
+
+                    <div className="mt-2 space-y-2">
+                      {FORM.step1.goals.map((mål) => (
+                        <label key={mål.value} className="flex items-start gap-3">
+                          <input
+                            type="radio"
+                            name={`goal-${race.id}`}
+                            checked={race.goal === mål.value}
+                            onChange={() => byggOm(race.id, { goal: mål.value })}
+                            className="mt-1 h-5 w-5"
+                          />
+                          <span className="text-sm">
+                            <span className="font-medium">{mål.name}</span>
+                            <span className="block text-neutral-600">{mål.help}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
                 </div>
               )}
             </li>

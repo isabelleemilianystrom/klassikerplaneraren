@@ -9,7 +9,7 @@
  */
 import { raceById, rules } from './config.ts';
 import { monthOf } from './dates.ts';
-import type { Level, Phase, PlanInput, TrainedSport } from './types.ts';
+import type { Level, Phase, PlanInput, RaceGoal, TrainedSport } from './types.ts';
 import type { PlacedRace, WeekSkeleton } from './weeks.ts';
 import { buildWeeks, placeRaces } from './weeks.ts';
 
@@ -360,7 +360,7 @@ function splitBetweenSports(
 
   const grund =
     week.phase === 'specific' || week.phase === 'taper'
-      ? specificShares(week, sports, månad, input.levels)
+      ? specificShares(week, sports, månad, input)
       : seasonSharesWithNewBonus(månad, input, sports);
 
   // R-36: en gren vars lopp är avklarat lämnar plats åt nästa lopps gren.
@@ -383,7 +383,7 @@ function specificShares(
   week: WeekSkeleton,
   sports: readonly TrainedSport[],
   month: number,
-  levels: PlanInput['levels'],
+  input: PlanInput,
 ): number[] {
   const { raceSportShare, raceSportShareWhenTwoSports, raceSportShareWhenOneSport } =
     rules.sportSplit.specific;
@@ -393,7 +393,7 @@ function specificShares(
 
   // Saknar veckan ett fokuslopp, eller tränas inte loppets sport i planen,
   // finns ingen sport att vikta mot. Då får säsongen bestämma ensam.
-  if (index === -1) return seasonShares(month, sports, levels);
+  if (index === -1) return seasonShares(month, sports, input);
 
   if (sports.length === 1) return [raceSportShareWhenOneSport];
 
@@ -401,7 +401,7 @@ function specificShares(
 
   // De övriga delar på resten, viktade efter säsongen.
   const övriga = sports.filter((_, i) => i !== index);
-  const övrigaAndelar = seasonShares(month, övriga, levels);
+  const övrigaAndelar = seasonShares(month, övriga, input);
 
   let j = 0;
   return sports.map((_, i) =>
@@ -423,7 +423,7 @@ function specificShares(
 function seasonShares(
   month: number,
   sports: readonly TrainedSport[],
-  levels: PlanInput['levels'],
+  input: PlanInput,
 ): number[] {
   const säsong = rules.seasonWeights.seasons.find((kandidat) =>
     kandidat.months.includes(month),
@@ -432,12 +432,22 @@ function seasonShares(
     throw new Error(`Månad ${month} hör inte till någon säsong i config/rules.json`);
   }
 
-  const råa = sports.map((sport) => weightFor(sport, säsong.weights[sport], levels));
+  const råa = sports.map((sport) =>
+    goalWeight(sport, weightFor(sport, säsong.weights[sport], input.levels), input),
+  );
   const summa = råa.reduce((a, b) => a + b, 0);
 
   // Innehåller planen bara grenar med låg vikt för säsongen blir summan liten,
   // men andelarna ska ändå bli 100 procent av veckan.
   return råa.map((vikt) => vikt / summa);
+}
+
+/**
+ * Vad användaren vill med grenens lopp, eller null om grenen inte har ett (R-38).
+ */
+function goalFor(sport: TrainedSport, input: PlanInput): RaceGoal | null {
+  const race = input.races.find((kandidat) => raceById(kandidat.id).sport === sport);
+  return race?.goal ?? null;
 }
 
 /**
@@ -457,6 +467,19 @@ function weightFor(
 
   const sänkt = rules.seasonWeights.experiencedWeightOverride[sport];
   return sänkt ?? seasonWeight;
+}
+
+/**
+ * Grenens vikt efter vad användaren vill med loppet (R-38).
+ *
+ * Den som bara vill ta sig i mål behöver vana och teknik, inte volym. Tiden
+ * som frigörs går till de lopp hon faktiskt siktar på. Nybörjaren rörs inte:
+ * för den som knappt kan simma är frekvensen själva förberedelsen, och
+ * nybörjartaket i R-31 håller volymen nere ändå.
+ */
+function goalWeight(sport: TrainedSport, vikt: number, input: PlanInput): number {
+  if (isNew(input.levels[sport])) return vikt;
+  return goalFor(sport, input) === 'finish' ? vikt * rules.raceGoal.finishWeightFactor : vikt;
 }
 
 /**
@@ -567,7 +590,7 @@ function seasonSharesWithNewBonus(
   input: PlanInput,
   sports: readonly TrainedSport[],
 ): number[] {
-  const utgång = seasonShares(month, sports, input.levels);
+  const utgång = seasonShares(month, sports, input);
 
   const nya = sports.filter((sport) => isNew(input.levels[sport]));
   if (nya.length === 0 || nya.length === sports.length) return utgång;

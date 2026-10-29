@@ -360,8 +360,8 @@ describe('R-04: loppdagen', () => {
     const sammaVecka: PlanInput = {
       ...P5,
       races: [
-        { id: 'vatternrundan', date: '2027-06-18' },
-        { id: 'vansbrosimningen', date: '2027-06-20' },
+        { id: 'vatternrundan', date: '2027-06-18', goal: 'finish' },
+        { id: 'vansbrosimningen', date: '2027-06-20', goal: 'finish' },
       ],
     };
 
@@ -1028,7 +1028,7 @@ describe('R-37: passet är det primära, grenen är ett val', () => {
     // men finns det snö i mars går längdskidor lika bra.
     const tidigVattern: PlanInput = {
       ...P2,
-      races: [{ id: 'vatternrundan', date: '2027-05-08' }],
+      races: [{ id: 'vatternrundan', date: '2027-05-08', goal: 'finish' }],
       startDate: '2026-12-07',
       today: '2026-12-07',
     };

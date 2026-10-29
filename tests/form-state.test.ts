@@ -190,8 +190,8 @@ describe('formuläret till en plan', () => {
     const input = toPlanInput(ifyllt(), IDAG);
 
     expect(input).not.toBeNull();
-    expect(input?.schemaVersion).toBe(2);
-    expect(input?.races).toEqual([{ id: 'vasaloppet', date: '2027-03-07' }]);
+    expect(input?.schemaVersion).toBe(3);
+    expect(input?.races).toEqual([{ id: 'vasaloppet', date: '2027-03-07', goal: 'finish' }]);
     expect(input?.levels).toEqual({ ski: 'experienced' });
     expect(input?.preferredDays).toEqual({ longSession: 7, rest: 1 });
   });
