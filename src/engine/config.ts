@@ -289,6 +289,13 @@ export const rulesSchema = z.object({
     requiresAnyEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
     notes: z.partialRecord(sport, z.string()),
   }),
+  /** R-39: grenar som kan vänta tills deras egen uppbyggnad börjar. */
+  deferredSports: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    /** Grenar som får vänta. Kort och uttrycklig med flit. */
+    sports: z.array(sport),
+  }),
   /** R-38: vad målet med loppet gör med grenens andel. */
   raceGoal: z.object({
     _rule: z.string(),

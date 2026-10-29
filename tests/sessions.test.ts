@@ -988,13 +988,14 @@ describe('alla grenar i planen tränas, också de tunna veckorna', () => {
     }
   });
 
-  it('ger P3 riktig simträning trots tre timmar i veckan', () => {
-    // P3 simmade noll minuter innan rotationen gjordes om.
+  it('ger P3 riktig simträning när simningen väl börjat', () => {
+    // P3 simmade noll minuter innan rotationen gjordes om. Simningen börjar
+    // nu senare (R-39), men när den väl börjar ska passen vara riktiga pass.
     const simpass = buildWeekPlans(P3)
       .flatMap((plan) => träning(plan))
       .filter((session) => session.sport === 'swim' && session.type !== 'race');
 
-    expect(simpass.length).toBeGreaterThan(20);
+    expect(simpass.length).toBeGreaterThan(5);
     for (const session of simpass) {
       expect(session.minutes).toBeGreaterThanOrEqual(rules.session.minMinutes);
     }

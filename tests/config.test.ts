@@ -256,3 +256,34 @@ describe('konfigurationen hänger ihop', () => {
     }
   });
 });
+
+describe('R-39: listan över grenar som får vänta', () => {
+  it('innehåller bara simning', () => {
+    // Listan är kort med flit. Löpning och cykel står inte med: 30 respektive
+    // 315 kilometer kräver uppbyggnad i månader.
+    expect(rules.deferredSports.sports).toEqual(['swim']);
+  });
+
+  it('innehåller ingen gren vars lopp har ett volymriktmärke', () => {
+    // Motorn har ett skydd mot det (R-39), men skyddet ska aldrig behöva slå
+    // till — konfigurationen ska vara rätt från början. Lägger någon till en
+    // gren med riktmärke blir det här testet rött först.
+    for (const sport of rules.deferredSports.sports) {
+      const lopp = races.races.filter((race) => race.sport === sport);
+
+      for (const race of lopp) {
+        expect(race.volumeMilestoneKm, `${sport}: ${race.name}`).toBeUndefined();
+      }
+    }
+  });
+
+  it('innehåller ingen gren vars lopp tar mer än två timmar', () => {
+    // Ett långt lopp kräver uppbyggnad, oavsett hur van man är. Simningen är
+    // den enda gren vars lopp är kort nog att kunna vänta.
+    for (const sport of rules.deferredSports.sports) {
+      for (const race of races.races.filter((kandidat) => kandidat.sport === sport)) {
+        expect(race.estimatedHours, `${sport}: ${race.name}`).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+});

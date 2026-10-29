@@ -117,6 +117,7 @@ function weekBudget(
     week,
     input,
     finishedSports(week, races),
+    new Set(sports.filter((sport) => isDeferred(sport, week, input, races))),
   );
   const placerat = Object.values(bySport).reduce((a, b) => a + b, 0);
 
@@ -156,6 +157,7 @@ function capRunVolume(
   week: WeekSkeleton,
   input: PlanInput,
   finished: ReadonlySet<TrainedSport>,
+  deferred: ReadonlySet<TrainedSport>,
 ): Partial<Record<TrainedSport, number>> {
   const nu = bySport.run;
   if (nu === undefined || runReference === null || runReference === 0) return bySport;
@@ -175,6 +177,12 @@ function capRunVolume(
   // genom bakvägen (R-36) — skidor i augusti är inte ett alternativ bara för
   // att löpningen fick för mycket.
   const taketFör = (sport: TrainedSport): number => {
+    // R-39: en gren som ännu inte börjat tränas tar inte emot något alls.
+    // Till skillnad från en avklarad gren finns här inget säsongsundantag —
+    // poängen är att grenen inte ska tränas än.
+    if (deferred.has(sport)) return 0;
+
+    // R-36: en avklarad gren får träna i sin egen säsong, men inte utanför.
     if (finished.has(sport) && !isOwnSeason(sport, monthOf(week.startDate))) return 0;
 
     const gräns = newLevelLimit(sport, input);
@@ -360,8 +368,8 @@ function splitBetweenSports(
 
   const grund =
     week.phase === 'specific' || week.phase === 'taper'
-      ? specificShares(week, sports, månad, input)
-      : seasonSharesWithNewBonus(månad, input, sports);
+      ? specificShares(week, sports, månad, input, races)
+      : seasonSharesWithNewBonus(månad, input, sports, week, races);
 
   // R-36: en gren vars lopp är avklarat lämnar plats åt nästa lopps gren.
   const andelar = applyFinishedRaces(grund, sports, week, races, månad);
@@ -384,6 +392,7 @@ function specificShares(
   sports: readonly TrainedSport[],
   month: number,
   input: PlanInput,
+  races: readonly PlacedRace[],
 ): number[] {
   const { raceSportShare, raceSportShareWhenTwoSports, raceSportShareWhenOneSport } =
     rules.sportSplit.specific;
@@ -393,7 +402,7 @@ function specificShares(
 
   // Saknar veckan ett fokuslopp, eller tränas inte loppets sport i planen,
   // finns ingen sport att vikta mot. Då får säsongen bestämma ensam.
-  if (index === -1) return seasonShares(month, sports, input);
+  if (index === -1) return seasonShares(month, sports, input, week, races);
 
   if (sports.length === 1) return [raceSportShareWhenOneSport];
 
@@ -401,7 +410,13 @@ function specificShares(
 
   // De övriga delar på resten, viktade efter säsongen.
   const övriga = sports.filter((_, i) => i !== index);
-  const övrigaAndelar = seasonShares(month, övriga, input);
+  const övrigaAndelar = seasonShares(month, övriga, input, week, races);
+
+  // Är varje annan gren uppskjuten (R-39) finns ingen att dela med. Då tar
+  // loppets gren hela veckan — tiden ska inte försvinna.
+  if (övrigaAndelar.every((andel) => andel === 0)) {
+    return sports.map((_, i) => (i === index ? 1 : 0));
+  }
 
   let j = 0;
   return sports.map((_, i) =>
@@ -424,6 +439,8 @@ function seasonShares(
   month: number,
   sports: readonly TrainedSport[],
   input: PlanInput,
+  week: WeekSkeleton,
+  races: readonly PlacedRace[],
 ): number[] {
   const säsong = rules.seasonWeights.seasons.find((kandidat) =>
     kandidat.months.includes(month),
@@ -432,14 +449,67 @@ function seasonShares(
     throw new Error(`Månad ${month} hör inte till någon säsong i config/rules.json`);
   }
 
-  const råa = sports.map((sport) =>
-    goalWeight(sport, weightFor(sport, säsong.weights[sport], input.levels), input),
-  );
+  const råa = sports.map((sport) => {
+    // R-39: en gren som kan vänta får ingen tid alls än.
+    if (isDeferred(sport, week, input, races)) return 0;
+
+    return goalWeight(sport, weightFor(sport, säsong.weights[sport], input.levels), input);
+  });
   const summa = råa.reduce((a, b) => a + b, 0);
+
+  // Är varje gren i listan uppskjuten (R-39) blir summan noll. Returnera
+  // nollorna som de är — anroparen avgör vad som ska hända med tiden.
+  if (summa === 0) return råa;
 
   // Innehåller planen bara grenar med låg vikt för säsongen blir summan liten,
   // men andelarna ska ändå bli 100 procent av veckan.
   return råa.map((vikt) => vikt / summa);
+}
+
+/**
+ * Sant när grenen kan vänta med att börja tränas (R-39).
+ *
+ * Man behöver inte träna alla grenar från dag ett. Är man van i en gren och
+ * loppet inte kräver uppbyggd volym kan grenen vänta tills dess egen
+ * uppbyggnad börjar — en erfaren simmare behöver inte simma i november för
+ * ett lopp i juli.
+ *
+ * Fem villkor, alla måste gälla:
+ *
+ * - **Grenen står i `deferredSports.sports`.** Listan är kort och uttrycklig:
+ *   i dag bara simning. Löpning och cykel står inte med, eftersom 30
+ *   respektive 315 kilometer kräver uppbyggnad i månader.
+ * - **Grenen är inte veckans fokus.** Basperioden mot ett lopp är just den
+ *   uppbyggnad grenen behöver.
+ * - **Användaren är inte nybörjare.** Teknik går inte att ta igen på slutet.
+ * - **Loppet saknar volymriktmärke.** Den volymen byggs i månader.
+ * - **Uppbyggnaden har inte börjat.** Veckan ligger före grenens egen
+ *   specifika fas och nedtrappning.
+ */
+export function isDeferred(
+  sport: TrainedSport,
+  week: WeekSkeleton,
+  input: PlanInput,
+  races: readonly PlacedRace[],
+): boolean {
+  const kan: readonly string[] = rules.deferredSports.sports;
+  if (!kan.includes(sport)) return false;
+
+  // Veckans fokusgren är vad veckan handlar om.
+  if (week.focusRaceId !== null && raceById(week.focusRaceId).sport === sport) return false;
+
+  if (input.levels[sport] === 'new') return false;
+
+  const race = races.find((kandidat) => raceById(kandidat.id).sport === sport);
+  if (race === undefined) return false;
+
+  if (raceById(race.id).volumeMilestoneKm !== undefined) return false;
+
+  // Avklarade lopp hanteras av R-36, inte här.
+  if (race.date < week.startDate) return false;
+
+  const uppbyggnad = race.taperWeeks + race.specificWeeks;
+  return race.weekIndex - (week.index - 1) > uppbyggnad;
 }
 
 /**
@@ -589,8 +659,15 @@ function seasonSharesWithNewBonus(
   month: number,
   input: PlanInput,
   sports: readonly TrainedSport[],
+  week: WeekSkeleton,
+  races: readonly PlacedRace[],
 ): number[] {
-  const utgång = seasonShares(month, sports, input);
+  const utgång = seasonShares(month, sports, input, week, races);
+
+  // Skulle varje gren vara uppskjuten finns inget att fördela. Det ska inte
+  // kunna hända — fokusgrenen skjuts aldrig upp — men en tom vecka vore ett
+  // sämre fel än en jämn fördelning.
+  if (utgång.every((andel) => andel === 0)) return sports.map(() => 1 / sports.length);
 
   const nya = sports.filter((sport) => isNew(input.levels[sport]));
   if (nya.length === 0 || nya.length === sports.length) return utgång;
@@ -646,4 +723,18 @@ function distribute(
   }
 
   return Object.fromEntries(sports.map((sport, i) => [sport, tilldelat[i] as number]));
+}
+
+/**
+ * Grenarna som ännu inte börjat tränas den här veckan (R-39).
+ *
+ * Finns för att tester och gränssnitt ska kunna fråga utan att räkna om
+ * reglerna själva.
+ */
+export function deferredSportsIn(input: PlanInput, week: WeekSkeleton): Set<TrainedSport> {
+  const races = placeRaces(input);
+
+  return new Set(
+    sportsInPlan(input).filter((sport) => isDeferred(sport, week, input, races)),
+  );
 }

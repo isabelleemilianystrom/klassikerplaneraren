@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sportsInPlan, weekBudgets } from '../src/engine/budget.ts';
+import { deferredSportsIn, sportsInPlan, weekBudgets } from '../src/engine/budget.ts';
 import { raceById, rules } from '../src/engine/config.ts';
 import { monthOf } from '../src/engine/dates.ts';
 import { buildWeeks } from '../src/engine/weeks.ts';
@@ -258,11 +258,13 @@ describe('R-08: fördelning i specifik fas', () => {
     // P5 har bara Vätternrundan och Vansbrosimningen: cykel och simning.
     expect(sportsInPlan(P5)).toEqual(['bike', 'swim']);
 
+    // R-39: simningen är uppskjuten tidigt i planen, och då tar cykeln allt.
     const specifik = veckorMedBudget(P5).find(
       ({ vecka, budget }) =>
         vecka.phase === 'specific' &&
         vecka.focusRaceId === 'vatternrundan' &&
-        budget.enduranceMinutes > 0,
+        budget.enduranceMinutes > 0 &&
+        deferredSportsIn(P5, vecka).size === 0,
     );
 
     const minuter = specifik?.budget.enduranceMinutes as number;
@@ -327,6 +329,8 @@ describe('R-09: fördelning i basfasen', () => {
       if (vecka.phase !== 'base' || budget.enduranceMinutes === 0) continue;
       // Efter ett avklarat lopp gäller R-36 i stället.
       if (!allaLoppKvar(P2, vecka)) continue;
+      // Har en gren inte börjat tränas gäller R-39.
+      if (deferredSportsIn(P2, vecka).size > 0) continue;
 
       const vikter = säsongsvikter(monthOf(vecka.startDate), P2);
       if (!utanLöptak(budget, budget.enduranceMinutes * vikter.run)) continue;
@@ -432,7 +436,12 @@ describe('R-09: fördelning i basfasen', () => {
       const vikter = säsongsvikter(monthOf(bas?.vecka.startDate as string), input);
       const golv = (minuter / 4) * rules.sportSplit.base.minShareOfEvenSplit;
 
+      const uppskjutna = deferredSportsIn(input, bas?.vecka as never);
+
       for (const sport of sporter) {
+        // R-39: en gren som inte börjat tränas har inget golv.
+        if (uppskjutna.has(sport)) continue;
+
         const fick = bas?.budget.bySport[sport] as number;
         // Grenen ska ha minst golvet, eller minst sin säsongsvikt när den är
         // lägre än golvet. En minut i marginal för avrundningen.
@@ -452,7 +461,12 @@ describe('R-09: fördelning i basfasen', () => {
       );
       if (bas === undefined) continue;
 
+      const uppskjutna = deferredSportsIn(profil, bas.vecka);
+
       for (const sport of sporter) {
+        // R-39: en gren som ännu inte börjat tränas får inget — det är poängen.
+        if (uppskjutna.has(sport)) continue;
+
         expect(bas.budget.bySport[sport], `${namn}: ${sport}`).toBeGreaterThan(0);
       }
     }
@@ -697,12 +711,17 @@ describe('R-32: säsongen styr fördelningen', () => {
         // eftersom loppet och öppningspasset redan är veckans tid i den.
         if (budget.raceMinutes > 0) continue;
 
+        const uppskjutna = deferredSportsIn(profil, vecka);
+
         for (const sport of sporter) {
           // R-36: en gren vars lopp är avklarat ska inte längre tränas.
           const loppKvar = profil.races.some(
             (race) => raceById(race.id).sport === sport && race.date >= vecka.startDate,
           );
           if (!loppKvar) continue;
+
+          // R-39: och en som ännu inte börjat.
+          if (uppskjutna.has(sport)) continue;
 
           expect(budget.bySport[sport], `${namn} v${vecka.index} ${sport}`).toBeGreaterThan(0);
         }
@@ -1006,6 +1025,88 @@ describe('R-38: målet med loppet', () => {
     for (const gren of ['ski', 'bike', 'swim', 'run'] as const) {
       const skillnad = Math.abs((tid[gren] as number) - (klara[gren] as number));
       expect(skillnad / (tid[gren] as number), gren).toBeLessThan(0.1);
+    }
+  });
+});
+
+describe('R-39: grenar som får vänta', () => {
+  /** Total tid i en gren fram till och med en viss vecka. */
+  function tidFramTill(input: PlanInput, sport: 'swim' | 'bike' | 'run' | 'ski', vecka: number) {
+    return veckorMedBudget(input)
+      .filter(({ vecka: v }) => v.index <= vecka)
+      .reduce((summa, { budget }) => summa + (budget.bySport[sport] ?? 0), 0);
+  }
+
+  it('ger ingen simning alls före Vasaloppet åt den som kan simma', () => {
+    // Din poäng: en erfaren simmare behöver inte simma i november för ett lopp
+    // i juli. P2 är erfaren i allt, och Vasaloppet går vecka 18.
+    expect(tidFramTill(P2, 'swim', 18)).toBe(0);
+  });
+
+  it('rör inte nybörjaren', () => {
+    // P1 är ny i simning. Teknik går inte att ta igen på slutet, så simningen
+    // börjar direkt.
+    expect(tidFramTill(P1, 'swim', 18)).toBeGreaterThan(10 * 60);
+  });
+
+  it('börjar träna grenen när dess uppbyggnad börjar', () => {
+    const efter = veckorMedBudget(P2).filter(
+      ({ vecka }) => deferredSportsIn(P2, vecka).size === 0 && vecka.index > 18,
+    );
+
+    expect(efter.length).toBeGreaterThan(0);
+    expect(efter.some(({ budget }) => (budget.bySport.swim ?? 0) > 0)).toBe(true);
+  });
+
+  it('skjuter aldrig upp cykeln', () => {
+    // Vätternrundans tusen kilometer måste byggas i månader (R-34).
+    for (const { vecka } of veckorMedBudget(P2)) {
+      expect(deferredSportsIn(P2, vecka).has('bike'), `vecka ${vecka.index}`).toBe(false);
+    }
+  });
+
+  it('skjuter aldrig upp löpningen', () => {
+    // Trettio kilometer terräng kräver också uppbyggnad. Listan i
+    // deferredSports.sports är kort med flit.
+    for (const { vecka } of veckorMedBudget(P2)) {
+      expect(deferredSportsIn(P2, vecka).has('run'), `vecka ${vecka.index}`).toBe(false);
+    }
+  });
+
+  it('skjuter aldrig upp veckans fokusgren', () => {
+    // Basperioden mot ett lopp är just den uppbyggnad grenen behöver.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka } of veckorMedBudget(profil)) {
+        if (vecka.focusRaceId === null) continue;
+
+        const fokus = raceById(vecka.focusRaceId).sport;
+        expect(
+          deferredSportsIn(profil, vecka).has(fokus as 'swim'),
+          `${namn} vecka ${vecka.index}`,
+        ).toBe(false);
+      }
+    }
+  });
+
+  it('tappar inga minuter när en gren väntar', () => {
+    // Tiden går till de grenar som faktiskt tränas, den försvinner inte.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        expect(
+          summaAvSporter(budget.bySport) + budget.unplacedMinutes,
+          `${namn} vecka ${vecka.index}`,
+        ).toBe(budget.enduranceMinutes);
+      }
+    }
+  });
+
+  it('ger löptaket inga minuter till en gren som väntar', () => {
+    // Samma läcka som R-36 hade: taket flyttar tid till grenen med minst, och
+    // det är just den som väntar.
+    for (const { vecka, budget } of veckorMedBudget(P2)) {
+      for (const sport of deferredSportsIn(P2, vecka)) {
+        expect(budget.bySport[sport] ?? 0, `vecka ${vecka.index} ${sport}`).toBe(0);
+      }
     }
   });
 });

@@ -291,6 +291,36 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   I profil P5, där Vätternrundan är på tid och Vansbrosimningen bara ska klaras, flyttar regeln
   **tretton timmar** från simningen till cykeln över planens trettiofem veckor.
 
+- **R-39** (tillagd 2026-10-29) **En gren behöver inte tränas från dag ett.** Står grenen i
+  `deferredSports.sports` kan den vänta tills dess egen uppbyggnad börjar. **I dag står bara
+  simning där.**
+
+  Skälet: simning är en färdighet man har eller inte har, och Vansbrosimningen tar drygt en
+  timme. En erfaren simmare behöver inte simma i november för ett lopp i juli. Löpning och
+  cykel står inte med — trettio respektive trehundrafemton kilometer kräver uppbyggnad i
+  månader.
+
+  Fem villkor måste gälla samtidigt:
+
+  1. Grenen står i listan.
+  2. Grenen är **inte veckans fokus** — basperioden mot ett lopp är just den uppbyggnad
+     grenen behöver.
+  3. Användaren är **inte nybörjare** i grenen. Teknik går inte att ta igen på slutet.
+  4. Loppet saknar **volymriktmärke** (R-34). Den volymen byggs i månader.
+  5. Grenens egen **uppbyggnad har inte börjat** — veckan ligger mer än `taperWeeks +
+     specificWeeks` före loppveckan.
+
+  Villkor 2 och 4 kan nuvarande konfiguration inte utlösa, eftersom bara simning står i listan.
+  De är skyddsräcken för den dag listan växer, och `tests/config.test.ts` kontrollerar att
+  listan aldrig innehåller en gren med volymriktmärke eller ett lopp längre än två timmar.
+
+  Tiden går till de grenar som faktiskt tränas — den försvinner inte. Löptaket i R-14 får
+  heller inte skicka minuter till en gren som väntar; till skillnad från en avklarad gren
+  (R-36) finns här inget säsongsundantag.
+
+  För profil P2, som är erfaren i allt, går simningen från **fjorton timmar och tjugoåtta pass**
+  före Vasaloppet till **noll**. Profil P1, som är ny i simning, är oförändrad.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -636,6 +666,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Återhämtningen efter ett lopp finns kvar och kortas bara så att den inte går in i nästa loppvecka (R-03) *(tillagd 2026-10-28)*
 - En gren man bara vill ta sig i mål i får mindre tid än en man siktar på en tid i, men aldrig noll (R-38) *(tillagd 2026-10-29)*
 - Inget simpass beskriver ansträngningen med hur mycket man kan prata (R-15) *(tillagd 2026-10-29)*
+- En gren som väntar får noll minuter, också via löptaket, och veckans fokusgren väntar aldrig (R-39) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
 - Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
@@ -682,6 +713,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Start 9, 10 och 11 veckor före loppet: varning, ingen varning, ingen varning (R-35) (tillagt 2026-10-28)
 - Veckan efter Vasaloppet: cykeln är huvudgren och skidorna har högst 10 procent (R-36) (tillagt 2026-10-28)
 - Samma mål på alla lopp ändrar ingenting; det är skillnaden mellan loppen som räknas (R-38) (tillagt 2026-10-29)
+- Erfaren simmare: noll simning före Vasaloppet. Nybörjare: oförändrat (R-39) (tillagt 2026-10-29)
 - Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
 - Profil utan utrustning: skidpassen blir stavgång, simpassen torrövningar, och inget pass stryks (R-17, R-18) (tillagt 2026-10-28)

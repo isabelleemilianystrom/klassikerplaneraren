@@ -386,5 +386,12 @@
     "_rule": "R-38",
     "note": "Den som bara vill ta sig i mål behöver vattenvana och teknik, inte volym. Den som vill slå en tid behöver bådadera. Målet \"finish\" sänker därför grenens andel av veckan och flyttar tiden till de lopp användaren faktiskt siktar på. Teknikpassen rörs aldrig — det är de som gör loppet görbart, och de är billigast i tid.",
     "finishWeightFactor": 0.6
+  },
+  "deferredSports": {
+    "_rule": "R-39",
+    "note": "Man behöver inte träna alla grenar från dag ett. Simningen kan vänta: det är en färdighet man har eller inte har, och Vansbrosimningen tar drygt en timme. Listan är uttrycklig och kort med flit — löpning och cykel står inte med, eftersom 30 respektive 315 kilometer kräver uppbyggnad i månader. Fyra villkor måste gälla samtidigt, se R-39.",
+    "sports": [
+      "swim"
+    ]
   }
 }
