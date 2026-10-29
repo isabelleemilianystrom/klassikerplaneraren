@@ -201,7 +201,17 @@
         "maxZone": 2
       }
     },
-    "noHardDaysBackToBack": true
+    "noHardDaysBackToBack": true,
+    "zoneTextBySport": {
+      "_rule": "R-15",
+      "note": "Pratprovet går inte att använda i vattnet. För simning beskrivs ansträngningen med andningen i stället — hur ofta man behöver andas och om man kan hålla samma tag.",
+      "swim": {
+        "1": "Mycket lugnt",
+        "2": "Lugnt – du andas var tredje tag och håller samma rytm hela passet",
+        "3": "Måttligt – du behöver andas varannat tag",
+        "4": "Hårt – du andas varje tag"
+      }
+    }
   },
   "blocks": {
     "_rule": "R-03, R-27",

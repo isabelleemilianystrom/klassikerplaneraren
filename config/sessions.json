@@ -59,6 +59,10 @@
     "bike.long": {
       "title": "Långpass på cykel",
       "instruction": "Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt."
+    },
+    "swim.easy": {
+      "title": "Lugnt pass i vattnet",
+      "instruction": "Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden."
     }
   },
   "substitutes": {

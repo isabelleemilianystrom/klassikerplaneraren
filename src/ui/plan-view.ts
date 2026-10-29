@@ -87,10 +87,17 @@ export function formatDay(date: IsoDate, weekdayIso: number): string {
  * parentes: den som vet vad zonerna betyder hittar den, och den som inte vet
  * får beskrivningen först.
  */
-export function formatZone(zone: Zone | null): string | null {
+export function formatZone(zone: Zone | null, sport?: Session['sport']): string | null {
   if (zone === null) return null;
 
-  const text = rules.intensity.zoneText[String(zone) as '1'];
+  const nyckel = String(zone) as '1';
+
+  // Simning mäts på andningen, inte på hur mycket man kan prata.
+  const text =
+    sport === 'swim'
+      ? rules.intensity.zoneTextBySport.swim[nyckel]
+      : rules.intensity.zoneText[nyckel];
+
   return `${text} (zon ${zone})`;
 }
 

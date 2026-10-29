@@ -240,7 +240,7 @@ function Veckovy({ plan }: { plan: WeekPlan }) {
  */
 function Pass({ session }: { session: Session }) {
   const gren = sessionSport(session);
-  const zon = formatZone(session.zone);
+  const zon = formatZone(session.zone, session.sport);
 
   if (session.type === 'rest') {
     return <p className="text-neutral-600">{PLAN.rest}</p>;

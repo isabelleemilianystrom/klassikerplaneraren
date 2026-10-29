@@ -14,7 +14,7 @@ import { weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
 import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
 import { courseAdvice, midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
-import type { PlanInput, Zone } from '../src/engine/types.ts';
+import type { PlanInput, Session, Zone } from '../src/engine/types.ts';
 import { PROFILES } from '../tests/profiles.ts';
 
 const DAGNAMN = ['', 'mån', 'tis', 'ons', 'tors', 'fre', 'lör', 'sön'] as const;
@@ -42,9 +42,16 @@ function tid(minuter: number): string {
   return rest === 0 ? `${timmar} h` : `${timmar} h ${rest} min`;
 }
 
-function zonText(zone: Zone | null): string {
+function zonText(zone: Zone | null, sport: Session['sport']): string {
   if (zone === null) return '';
-  return `zon ${zone} (${rules.intensity.zoneText[String(zone) as '1']})`;
+
+  const nyckel = String(zone) as '1';
+  const text =
+    sport === 'swim'
+      ? rules.intensity.zoneTextBySport.swim[nyckel]
+      : rules.intensity.zoneText[nyckel];
+
+  return `zon ${zone} (${text})`;
 }
 
 /** Profilens indata i ord, så att en plan går att läsa utan att öppna koden. */
@@ -105,7 +112,7 @@ function skrivVecka(plan: WeekPlan): string[] {
     // backe — Längdskidor" är inte en motsägelse: bor man där det inte finns
     // snö är det så man tränar för Vasaloppet, och det är bra träning.
     const sport = session.sport === null ? '' : SPORTNAMN[session.sport];
-    const zon = zonText(session.zone);
+    const zon = zonText(session.zone, session.sport);
 
     rader.push(
       `  ${dag.padEnd(12)} ${tid(session.minutes).padEnd(10)} ${session.title}` +

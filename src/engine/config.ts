@@ -210,6 +210,17 @@ export const rulesSchema = z.object({
       '3': z.string().min(1),
       '4': z.string().min(1),
     }),
+    /** R-15: grenar där pratprovet inte fungerar, som simning. */
+    zoneTextBySport: z.object({
+      _rule: z.string(),
+      note: z.string(),
+      swim: z.object({
+        '1': z.string().min(1),
+        '2': z.string().min(1),
+        '3': z.string().min(1),
+        '4': z.string().min(1),
+      }),
+    }),
     byPhase: z.object({
       base: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
       specific: z.object({

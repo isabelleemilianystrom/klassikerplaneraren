@@ -365,6 +365,17 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 | 4 | Hårt – bara några ord i taget |
 
 - **R-15** Bas: alla pass i zon 1–2 utom ett pass i zon 3 per vecka. Specifik: ett pass i zon 3 och ett intervallpass i zon 4 per vecka; nivå Ny i sporten får bara zon 3. Nedtrappning: korta inslag i zon 3 — **högst 20 minuter**, `maxHardMinutes` i `config/rules.json` *(preciserad 2026-10-28)*. Utan en siffra blev det ett helt tröskelpass på upp till två timmar veckan före loppet, vilket motsäger både regelns ord och arrangörens råd att träna mindre och lugnare den sista veckan. De minuter som kapas bort flyttas till lugna pass, så veckans tid är oförändrad (R-29). Återhämtning: bara zon 1–2.
+
+  **Pratprovet fungerar inte i vattnet** *(tillagt 2026-10-29)*. Zontexterna i tabellen ovan beskriver ansträngning med hur mycket man kan prata, vilket går på skidor, cykel och i löpning — men inte när man simmar. Simningen har därför egna zontexter i `intensity.zoneTextBySport.swim`, som mäter på **andningen** i stället:
+
+  | Zon | Text för simning |
+  | --- | --- |
+  | 1 | Mycket lugnt |
+  | 2 | Lugnt – du andas var tredje tag och håller samma rytm hela passet |
+  | 3 | Måttligt – du behöver andas varannat tag |
+  | 4 | Hårt – du andas varje tag |
+
+  Simningens lugna pass har också en egen instruktion, av samma skäl.
 - **R-16** Aldrig pass i zon 3–4 två dagar i rad.
 
 **Ersättningar, teknik och säsong**
@@ -624,6 +635,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Aldrig pass i zon 3–4 två dagar i rad (R-16)
 - Återhämtningen efter ett lopp finns kvar och kortas bara så att den inte går in i nästa loppvecka (R-03) *(tillagd 2026-10-28)*
 - En gren man bara vill ta sig i mål i får mindre tid än en man siktar på en tid i, men aldrig noll (R-38) *(tillagd 2026-10-29)*
+- Inget simpass beskriver ansträngningen med hur mycket man kan prata (R-15) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
 - Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*

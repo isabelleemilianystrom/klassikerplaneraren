@@ -200,3 +200,38 @@ describe('planvyn för alla profiler', () => {
     }
   });
 });
+
+describe('R-15: pratprovet fungerar inte i vattnet', () => {
+  it('beskriver simningens zoner med andningen', () => {
+    // Man kan inte prata när man simmar.
+    for (const zon of [2, 3, 4] as const) {
+      const text = formatZone(zon, 'swim') as string;
+
+      expect(text, `zon ${zon}`).not.toMatch(/prata/);
+      expect(text, `zon ${zon}`).toMatch(/andas|andning/);
+    }
+  });
+
+  it('behåller pratprovet för grenar på land', () => {
+    for (const gren of ['ski', 'bike', 'run'] as const) {
+      expect(formatZone(2, gren)).toMatch(/prata/);
+    }
+  });
+
+  it('använder landtexten när grenen inte anges', () => {
+    expect(formatZone(2)).toBe(formatZone(2, 'run'));
+  });
+
+  it('ger inget simpass en text om att prata', () => {
+    for (const profil of [P1, P2]) {
+      for (const plan of buildWeekPlans(profil)) {
+        for (const session of plan.sessions) {
+          if (session.sport !== 'swim' || session.zone === null) continue;
+
+          expect(formatZone(session.zone, 'swim'), session.id).not.toMatch(/prata/);
+          expect(session.instruction, session.id).not.toMatch(/prata/);
+        }
+      }
+    }
+  });
+});
