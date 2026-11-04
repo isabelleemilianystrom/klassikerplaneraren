@@ -1085,7 +1085,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Datum: ISO-vecka 53 och årsskiftet 2026–2027, sommartid 28 mars 2027, och skottåret 2028 — en vårstart lägger Vasaloppet i mars 2028, så februari 2028 ligger inne i planen (ändrad 2026-10-28)
 - Förklaringar: varje kombination av fas och lopp har en text, ingen text överskrider sin längdgräns, och ingen plan saknar förklaring
 - Konfiguration: alla filer i `config/` validerar mot sina scheman
-- **Slumpad egenskapstestning** *(tillagd 2026-10-27)*: minst 200 slumpade men giltiga indata körs mot samtliga invarianter. Fem profiler räcker inte — i v0 var det slumptestningen som avslöjade att en gren aldrig tränades, vilket P1–P5 hade missat
+- **Slumpad egenskapstestning** *(tillagd 2026-10-27, **byggd 2026-11-04**)*: minst 200 slumpade men giltiga indata körs mot samtliga invarianter. Fem profiler räcker inte — i v0 var det slumptestningen som avslöjade att en gren aldrig tränades, vilket P1–P5 hade missat.
+
+  Byggd som `npm run invariants`: generatorn i `tests/generators.ts`, de 34 motorinvarianterna i `tests/invariants.ts`, körningen i `scripts/check-invariants.ts`. Slumpen är seedad, så varje brott går att köra om med sitt seed. **Ännu ett skript och inte ett test** — den går röd, och CLAUDE.md förbjuder att committa röda tester. Fynden står nedan; när de är åtgärdade flyttas kontrollerna till `tests/properties.test.ts`.
 - Plan med ett enda lopp: hela veckotiden går till den sporten, ingen andel blir ofördelad (R-08)
 - Två lopp samma vecka: båda markeras, båda räknas som belastning, inget lopp försvinner (R-27)
 - Lopp som spänner över mer än tolv månader ger varningen i R-26 men ändå en plan
@@ -1153,6 +1155,27 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - [x] Varje fas har en granskad förklaring *(2026-10-29; en text per fas enligt A-02, krympt från en per fas och lopp)*
 - [x] Varje passtyp har en granskad instruktion *(2026-10-29)*
 - [x] README beskriver idé, hur man kör projektet och var kravspecen finns *(2026-10-29)*
+
+### Fynd ur den slumpade egenskapstestningen *(2026-11-04)*
+
+Första körningen: 34 invarianter mot 200 slumpade indata plus de sex profilerna. **Sex invarianter brutna.** Sviten på 462 tester var grön samtidigt — det är hela skälet att slumptestningen stod i kravspecen.
+
+Ingen av dem är åtgärdad. Etapp 1 skulle hitta, inte fixa.
+
+| # | Invariant | Omfattning | Vad det är |
+| --- | --- | --- | --- |
+| **F-1** | Inga pass före startdatum (R-01) | **172 av 200 planer**, i snitt 2,9 pass | Vecka 1 börjar på måndagen i startveckan, så en start mitt i veckan ger pass på dagar som redan passerat |
+| **F-2** | Oplacerad tid är mindre än ett pass (R-29) | **128 av 200 planer**, upp till 106 min/vecka | Med många timmar och få grenar kapas varje pass av långpassets längd, och resten får inte plats |
+| **F-3** | Ingen ny löpare får löppass två dagar i rad (R-14) | 35 planer | Reservutgången i `bestDateFor` tar vilken dag som helst när ingen är tillåten |
+| **F-4** | Löpningens långpass växer högst 15 %/vecka (R-46) | 56 planer, upp till +29 % | Korta faser tvingar kurvan att klättra snabbare än taket |
+| **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
+| **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
+
+**F-1 är den som förklarar varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
+
+**F-3 och F-6 är samma sak**, och den stod redan i kodanalysen 2026-11-03: `bestDateFor` faller tillbaka på vilken dag som helst när inget villkor går att uppfylla, utan att signalera. Det är etapp 2 i planen.
+
+**F-5 är en regelkrock, inte en bugg.** Den behöver samma sorts beslut som Lidingöloppet fick: vilken regel som ger vika. Hör till Isabelle.
 
 ## 10. Backlog i ordning
 

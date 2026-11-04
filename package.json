@@ -15,7 +15,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run test:run",
-    "profiles": "node --disable-warning=ExperimentalWarning scripts/print-profiles.ts"
+    "profiles": "node --disable-warning=ExperimentalWarning scripts/print-profiles.ts",
+    "invariants": "node --disable-warning=ExperimentalWarning scripts/check-invariants.ts"
   },
   "dependencies": {
     "date-fns": "^4.4.0",
