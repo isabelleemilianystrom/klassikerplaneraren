@@ -8,9 +8,8 @@
  * ignorerad av git — texten är genererad och hör inte i repot.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { weekBudgets } from '../src/engine/budget.ts';
 import { raceById, rules } from '../src/engine/config.ts';
-import { weekdayOf } from '../src/engine/dates.ts';
+import { addDays, weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
 import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
 import { courseAdvice, midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
@@ -139,32 +138,63 @@ function skrivVecka(plan: WeekPlan): string[] {
   return rader;
 }
 
-/** En rad per vecka: fas, tid och fördelning mellan sporterna. */
+/**
+ * En rad per vecka: fas, tid och minuterna som faktiskt blev pass.
+ *
+ * Kolumnerna räknas ur **passen**, inte ur budgeten. Budgeten säger vad grenen
+ * tilldelades innan passen byggdes, och sedan R-40 och R-42 flyttas minuter
+ * mellan grenar efter det: ett golv fylls på från andra grenar, en gren som
+ * inte rymmer ett helt pass får noll, och det som inte får plats redovisas som
+ * oplacerad tid. Tidigare skrev den här tabellen ut budgeten, och då stämde
+ * två tredjedelar av siffrorna inte med veckan längre ner i filen — en gren
+ * kunde visa tid utan att ha ett enda pass.
+ *
+ * Loppet och öppningspasset räknas inte med: de ligger utanför budgeten
+ * (R-04, R-25), och veckans tid står ändå i tidskolumnen.
+ */
 function skrivÖversikt(input: PlanInput, planer: readonly WeekPlan[]): string[] {
-  const budgetar = weekBudgets(input);
+  void input;
 
   const rader = [
     'Översikt',
     '--------',
     '',
-    '  v  datum       fas            tid         skidor  cykel   simning löpning styrka',
+    '  Minuterna är passens, inte budgetens. "oplac." är tid som inte fick plats (R-29).',
+    '',
+    '  v  datum       fas            tid         skidor  cykel   simning löpning styrka  oplac.',
   ];
 
-  for (const [i, plan] of planer.entries()) {
-    const b = budgetar[i];
-    if (b === undefined) continue;
+  for (const plan of planer) {
+    const öppningspass = plan.sessions.filter((session) =>
+      plan.sessions.some(
+        (kandidat) =>
+          kandidat.type === 'race' &&
+          kandidat.sport === session.sport &&
+          kandidat.date === addDays(session.date, 1),
+      ),
+    );
 
-    const kol = (minuter: number | undefined) =>
-      (minuter === undefined || minuter === 0 ? '-' : String(minuter)).padEnd(8);
+    const träning = plan.sessions.filter(
+      (session) =>
+        session.type !== 'rest' && session.type !== 'race' && !öppningspass.includes(session),
+    );
+
+    const minuterI = (gren: string): number =>
+      träning
+        .filter((session) => session.sport === gren)
+        .reduce((summa, session) => summa + session.minutes, 0);
+
+    const kol = (minuter: number) => (minuter === 0 ? '-' : String(minuter)).padEnd(8);
 
     rader.push(
       `  ${String(plan.week.index).padStart(2)} ${plan.week.startDate}  ` +
         `${FASNAMN[plan.week.phase].padEnd(14)} ${tid(plan.totalMinutes).padEnd(12)}` +
-        kol(b.bySport.ski) +
-        kol(b.bySport.bike) +
-        kol(b.bySport.swim) +
-        kol(b.bySport.run) +
-        kol(b.strengthMinutes),
+        kol(minuterI('ski')) +
+        kol(minuterI('bike')) +
+        kol(minuterI('swim')) +
+        kol(minuterI('run')) +
+        kol(minuterI('strength')) +
+        (plan.budget.unplacedMinutes === 0 ? '-' : String(plan.budget.unplacedMinutes)),
     );
   }
 
