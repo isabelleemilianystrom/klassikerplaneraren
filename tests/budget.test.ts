@@ -4,7 +4,7 @@ import { deferredSportsIn,
 import { raceById, rules } from '../src/engine/config.ts';
 import { monthOf } from '../src/engine/dates.ts';
 import { buildWeeks } from '../src/engine/weeks.ts';
-import type { PlanInput, TrainedSport } from '../src/engine/types.ts';
+import type { PlanInput, RaceId, TrainedSport } from '../src/engine/types.ts';
 import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
 
 /** Veckorna och deras budgetar parvis — testerna behöver nästan alltid båda. */
@@ -1177,12 +1177,109 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
 
   it('pausar inte veckan som bär loppet', () => {
     // Loppveckan har sin egen regel (R-04): bara loppet och öppningspasset.
-    const loppveckan = veckorMedBudget(P1).find(({ vecka }) =>
-      vecka.raceIds.includes('vasaloppet'),
+    // Räknas den som en fokusvecka blir det fyra i stället för tre.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka } of veckorMedBudget(profil)) {
+        if (vecka.raceIds.length === 0) continue;
+        expect(pausedSportsIn(profil, vecka).size, `${namn} v${vecka.index}`).toBe(0);
+      }
+    }
+  });
+
+  /**
+   * En plan med given start och given loppordning.
+   *
+   * En svensk klassiker går att börja när som helst på året, så vilket lopp
+   * som är först och vilket som är sist varierar. R-45 är knutet till loppet i
+   * `races.json`, inte till en position i planen, och det ska gälla oavsett
+   * ordning.
+   */
+  function medOrdning(start: string, lopp: [RaceId, string][]): PlanInput {
+    return {
+      ...P1,
+      today: start as PlanInput['today'],
+      startDate: start as PlanInput['startDate'],
+      races: lopp.map(([id, date]) => ({
+        id,
+        date: date as PlanInput['startDate'],
+        goal: 'finish' as const,
+      })),
+    };
+  }
+
+  function fokusveckor(input: PlanInput) {
+    return veckorMedBudget(input).filter(({ vecka }) => pausedSportsIn(input, vecka).size > 0);
+  }
+
+  it('ger tre fokusveckor oavsett var Vasaloppet ligger i planen', () => {
+    const ordningar: [string, string, [RaceId, string][]][] = [
+      ['Vasaloppet först', '2026-11-02', [
+        ['vasaloppet', '2027-03-07'],
+        ['vatternrundan', '2027-06-18'],
+        ['vansbrosimningen', '2027-07-10'],
+        ['lidingoloppet', '2027-09-25'],
+      ]],
+      ['Vasaloppet sist, vårstart', '2027-05-03', [
+        ['vatternrundan', '2027-06-18'],
+        ['vansbrosimningen', '2027-07-10'],
+        ['lidingoloppet', '2027-09-25'],
+        ['vasaloppet', '2028-03-05'],
+      ]],
+      ['Vasaloppet i mitten, höststart', '2027-08-02', [
+        ['lidingoloppet', '2027-09-25'],
+        ['vasaloppet', '2028-03-05'],
+        ['vatternrundan', '2028-06-16'],
+        ['vansbrosimningen', '2028-07-08'],
+      ]],
+    ];
+
+    for (const [namn, start, lopp] of ordningar) {
+      const input = medOrdning(start, lopp);
+      const flaggade = fokusveckor(input);
+
+      expect(flaggade.length, namn).toBe(VECKOR);
+
+      // Varje fokusvecka har Vasaloppet som fokus och bara skidor kvar.
+      for (const { vecka, budget } of flaggade) {
+        expect(vecka.focusRaceId, `${namn} v${vecka.index}`).toBe('vasaloppet');
+        expect(budget.bySport.ski, `${namn} v${vecka.index}`).toBe(budget.enduranceMinutes);
+      }
+
+      // Fokusveckorna ligger omedelbart före loppveckan, var den än hamnar.
+      const loppveckan = veckorMedBudget(input).find(({ vecka }) =>
+        vecka.raceIds.includes('vasaloppet'),
+      )?.vecka.index as number;
+
+      const index = flaggade.map(({ vecka }) => vecka.index).sort((a, b) => a - b);
+      expect(index, namn).toEqual([loppveckan - 3, loppveckan - 2, loppveckan - 1]);
+    }
+  });
+
+  it('ger färre fokusveckor när planen börjar närmare loppet än tre veckor', () => {
+    // Startar man två veckor före Vasaloppet finns inte tre veckor att ta.
+    // Planen ska bli kortare, inte trasig.
+    const input = medOrdning('2027-02-22', [
+      ['vasaloppet', '2027-03-07'],
+      ['vatternrundan', '2027-06-18'],
+      ['vansbrosimningen', '2027-07-10'],
+      ['lidingoloppet', '2027-09-25'],
+    ]);
+
+    const flaggade = fokusveckor(input);
+
+    expect(flaggade.length).toBeGreaterThan(0);
+    expect(flaggade.length).toBeLessThan(VECKOR);
+    for (const { vecka, budget } of flaggade) {
+      expect(budget.bySport.ski, `v${vecka.index}`).toBe(budget.enduranceMinutes);
+    }
+  });
+
+  it('flaggar exakt tre veckor före Vasaloppet, inte fyra', () => {
+    const flaggade = veckorMedBudget(P1).filter(
+      ({ vecka }) => pausedSportsIn(P1, vecka).size > 0,
     );
 
-    expect(loppveckan).toBeDefined();
-    expect(loppveckan?.budget.enduranceMinutes).toBe(0);
+    expect(flaggade.length).toBe(VECKOR);
   });
 
   it('tappar inga minuter när grenarna pausas', () => {

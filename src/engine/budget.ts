@@ -421,9 +421,11 @@ function fullFocusSportIn(
   const lopp = races.find((kandidat) => kandidat.id === week.focusRaceId);
   if (lopp === undefined) return null;
 
-  // Veckor kvar till loppveckan. Noll är loppveckan själv.
+  // Veckor kvar till loppveckan. Noll är loppveckan själv, och den är
+  // oförändrad: där gäller R-04, bara loppet och öppningspasset. Räknas den
+  // med blir det fyra flaggade veckor i stället för tre.
   const kvar = lopp.weekIndex - (week.index - 1);
-  if (kvar < 0 || kvar > fullFocusWeeks) return null;
+  if (kvar < 1 || kvar > fullFocusWeeks) return null;
 
   const sport = config.sport as TrainedSport;
   return sports.includes(sport) ? sport : null;

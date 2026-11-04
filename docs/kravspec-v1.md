@@ -516,7 +516,13 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   det ena loppets slutspurt inte stänga av det andras uppbyggnad. Loppveckan själv är
   oförändrad: där gäller R-04, bara loppet och öppningspasset.
 
-  **Regeln väger tyngre än R-21, R-31, R-32 och R-39.** En gren som annars skulle tränas varje
+  **Regeln är knuten till loppet, inte till en position i planen.** En svensk klassiker går att
+  börja när som helst på året, så vilket lopp som är först och vilket som är sist varierar
+  (R-02). Fokusveckorna ligger omedelbart före Vasaloppets loppvecka vare sig det är planens
+  första lopp, dess sista eller något i mitten — kontrollerat för alla tre ordningarna. Börjar
+  planen närmare loppet än tre veckor blir det färre fokusveckor, inte en trasig plan.
+
+  **Regeln väger tyngre än R-21, R-31, R-32, R-36 och R-39.** En gren som annars skulle tränas varje
   vecka — en nybörjargren med teknikpass, eller en gren vars egen uppbyggnad börjat — pausas
   ändå. Tre veckor är kort nog att tekniken sitter kvar.
 
@@ -937,6 +943,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Ett pass som bytt gren har inga alternativ; ett som bara bytt plats behåller dem (R-20, R-37) *(tillagd 2026-11-04)*
 - Varje pass i zon 3–4 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
 - De sista veckorna före ett lopp med `fullFocusWeeks` får loppets gren hela konditionstiden, och de övriga noll (R-45) *(tillagd 2026-11-04)*
+- Fokusveckorna ligger omedelbart före loppveckan oavsett var i planen loppet hamnar, och loppveckan själv är aldrig en av dem (R-02, R-45) *(tillagd 2026-11-04)*
 - En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
@@ -981,6 +988,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - De tre veckorna före Vasaloppet: allt är skidor, och simning och cykel är noll — också för nybörjaren (R-45) (tillagt 2026-11-04)
 - Fyra veckor före Vasaloppet: ingenting pausat (R-45) (tillagt 2026-11-04)
 - Veckorna före Vätternrundan: ingenting pausat, eftersom loppet saknar talet (R-45) (tillagt 2026-11-04)
+- Vasaloppet först, sist och i mitten: tre fokusveckor i alla tre fallen, alltid direkt före loppveckan (R-02, R-45) (tillagt 2026-11-04)
+- Start två veckor före Vasaloppet: en fokusvecka, inte tre (R-45) (tillagt 2026-11-04)
 - Nedtrappningsvecka mot Vansbrosimningen: inget kvalitetspass alls, eftersom simningens golv är högre än taket på hårda minuter (R-15, R-40, R-42) (tillagt 2026-11-04)
 - Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
 - Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)
