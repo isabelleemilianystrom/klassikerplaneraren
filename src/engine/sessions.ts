@@ -414,31 +414,47 @@ function longSession(
   const { maxShareOfWeek } = rules.longSession;
   const { startShareOfCap, endShareOfCap } = kurva;
 
-  // Hur långt genom fasen veckan ligger: 1/n i första veckan, 1 i den sista.
-  const iFasen = allWeeks.filter((kandidat) => kandidat.phaseId === week.phaseId);
-  const position = iFasen.findIndex((kandidat) => kandidat.index === week.index) + 1;
-  const andelGenomFasen = position / iFasen.length;
-
-  const växande = cap * (startShareOfCap + (endShareOfCap - startShareOfCap) * andelGenomFasen);
-
-  // R-13: de sista veckorna före loppet får långpasset låna tid från de andra
-  // grenarna, upp till taket i R-28. Annars binds det av grenens andel i R-08
-  // och hinner aldrig bli långt nog — ett långpass på tre timmar inför 315
-  // kilometer på cykel är inte en förberedelse, det är en gissning.
-  const veckorKvarIFasen = iFasen.length - position;
-  const fårLåna = veckorKvarIFasen < rules.longSession.borrowInFinalWeeks;
-
   // Långpasset ska vara veckans längsta pass. Med en plats per dag (R-42) är
   // veckans tid delad på platserna vad ett vanligt pass blir, och ett
   // långpass kortare än det är precis felet från v0: där låg långpasset sist
   // i kön och blev alltid för kort.
   const snitt = slots <= 0 ? 0 : Math.ceil(budget.enduranceMinutes / slots);
 
-  // Grenens egen andel får aldrig hålla långpasset under ett vanligt pass.
-  // Gör den det lånar långpasset upp till snittet — annars kapar långpassets
-  // längd varje annat pass i veckan, och timmar försvinner (R-29). Det är
-  // samma lån som de sista veckorna i fasen, bara mindre.
-  const grenensTid = fårLåna ? budget.enduranceMinutes : Math.max(tillgängligt, snitt);
+  // Hur långt genom fasen veckan ligger: 1/n i första veckan, 1 i den sista.
+  const iFasen = allWeeks.filter((kandidat) => kandidat.phaseId === week.phaseId);
+  const position = iFasen.findIndex((kandidat) => kandidat.index === week.index) + 1;
+  const andelGenomFasen = position / iFasen.length;
+
+  // Långpasset trappas upp varje vecka genom fasen (R-13, R-46). Kurvan går
+  // från sin startandel till sin slutandel — men aldrig under veckans snitt,
+  // eftersom långpasset ska vara veckans längsta pass (R-42).
+  //
+  // Snittet är **startpunkten**, inte ett golv under kurvan. Som golv blev
+  // kurvan platt tills den hann upp och hoppade sedan: långpasset mot
+  // Lidingöloppet låg på 75 minuter fyra veckor i rad och gick därefter till
+  // 122 på en vecka. Det är sextiotre procent, och en sådan ökning är precis
+  // vad en upptrappning finns för att undvika.
+  const start = Math.max(cap * startShareOfCap, snitt);
+  const slut = Math.max(cap * endShareOfCap, start);
+  const växande = start + (slut - start) * andelGenomFasen;
+
+  // R-13: de sista veckorna före loppet får långpasset låna tid från de andra
+  // grenarna, upp till taket i R-28. Annars binds det av grenens andel i R-08
+  // och hinner aldrig bli långt nog — ett långpass på tre timmar inför 315
+  // kilometer på cykel är inte en förberedelse, det är en gissning.
+  // R-46: lånet följer kurvan hela fasen, inte bara de sista veckorna.
+  //
+  // Förut slogs det på som en knapp fyra veckor före loppet. Dessförinnan var
+  // långpasset bundet av grenens egen andel i R-08 — mot Lidingöloppet låg det
+  // på 75 minuter fyra veckor i rad — och när lånet slogs på hoppade det till
+  // 122. Sextiotre procent på en vecka är precis vad en upptrappning finns för
+  // att undvika, och löpning är den gren som sliter mest.
+  //
+  // Taket på 70 procent av veckan (R-28) och grenens eget tak (R-13) gäller
+  // fortfarande, och de lånade minuterna tas från de övriga grenarna i
+  // proportion till deras tid, så veckans totala tid är oförändrad (R-29).
+  void tillgängligt;
+  const grenensTid = budget.enduranceMinutes;
 
   // R-40: ett långpass är inget undantag från grenens golv. Ett simpass på
   // femtio minuter är lika mycket besvär att ta sig till som ett på sextio.
@@ -464,7 +480,7 @@ function longSession(
   const utrymme = Math.max(budget.enduranceMinutes - reserv, golv);
 
   const minuter = Math.min(
-    Math.max(Math.round(växande), snitt),
+    Math.round(växande),
     cap,
     Math.floor(budget.enduranceMinutes * maxShareOfWeek),
     grenensTid,

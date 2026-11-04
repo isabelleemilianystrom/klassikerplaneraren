@@ -170,7 +170,6 @@ export const rulesSchema = z.object({
      * Antal sista veckor i en specifik fas där långpasset får låna tid från de
      * andra grenarna, upp till `maxShareOfWeek`. Se R-13.
      */
-    borrowInFinalWeeks: z.number().int().nonnegative(),
   }),
   seasonWeights: z
     .object({

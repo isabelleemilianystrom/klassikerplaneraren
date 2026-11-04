@@ -1789,3 +1789,143 @@ describe('R-44: taket för ett ersättningspass', () => {
     }
   });
 });
+
+
+describe('R-46: långpasset trappas upp varje vecka', () => {
+  /** Långpassen i ordning, med veckan och fasen de hör till. */
+  function långpass(input: PlanInput) {
+    return buildWeekPlans(input)
+      .map((plan) => ({ plan, lång: träning(plan).find((session) => session.type === 'long') }))
+      .filter((rad) => rad.lång !== undefined);
+  }
+
+  /** Par av långpass i samma fas, där inget av dem är en avlastningsvecka. */
+  function påFöljande(input: PlanInput) {
+    const rader = långpass(input);
+    const par = [];
+
+    for (let i = 1; i < rader.length; i += 1) {
+      const a = rader[i - 1] as (typeof rader)[number];
+      const b = rader[i] as (typeof rader)[number];
+
+      if (a.plan.week.phaseId !== b.plan.week.phaseId) continue;
+      if (a.plan.week.isDeload || b.plan.week.isDeload) continue;
+      if (a.lång?.sport !== b.lång?.sport) continue;
+
+      par.push({ a, b });
+    }
+
+    return par;
+  }
+
+  it('låter långpasset aldrig krympa inom en fas', () => {
+    // Trappas det upp ska det gå uppåt. En vecka som går bakåt mitt i en
+    // uppbyggnad är en plan som inte går att lita på.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      const par = påFöljande(profil);
+      expect(par.length, namn).toBeGreaterThan(0);
+
+      for (const { a, b } of par) {
+        expect(
+          b.lång?.minutes,
+          `${namn} v${a.plan.week.index}→v${b.plan.week.index} ${a.lång?.sport}`,
+        ).toBeGreaterThanOrEqual(a.lång?.minutes as number);
+      }
+    }
+  });
+
+  it('låter löpningens långpass växa högst femton procent i veckan', () => {
+    // Löpning sliter mest, och det är där upptrappningen betyder något.
+    // Före 2026-11-04 låg långpasset mot Lidingöloppet på 75 minuter fyra
+    // veckor i rad och hoppade sedan till 122 — sextiotre procent.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { a, b } of påFöljande(profil)) {
+        if (a.lång?.sport !== 'run') continue;
+
+        const ökning = ((b.lång?.minutes as number) - (a.lång?.minutes as number)) /
+          (a.lång?.minutes as number);
+
+        expect(
+          ökning,
+          `${namn} v${a.plan.week.index}→v${b.plan.week.index}: ${a.lång?.minutes} → ${b.lång?.minutes}`,
+        ).toBeLessThanOrEqual(0.15);
+      }
+    }
+  });
+
+  it('ligger aldrig stilla fyra veckor i rad och hoppar sedan', () => {
+    // Det var formen felet hade: platt, platt, platt, platt, hopp.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      const rader = långpass(profil);
+
+      for (let i = 4; i < rader.length; i += 1) {
+        const fönster = rader.slice(i - 4, i + 1);
+        const sammaFas = fönster.every(
+          (rad) => rad.plan.week.phaseId === fönster[0]?.plan.week.phaseId,
+        );
+        if (!sammaFas) continue;
+
+        const längder = fönster.map((rad) => rad.lång?.minutes as number);
+        const platta = längder.slice(0, 4).every((m) => m === längder[0]);
+        if (!platta) continue;
+
+        // Fyra lika veckor får följas av högst en liten ökning.
+        const sista = längder[4] as number;
+        expect(
+          (sista - (längder[0] as number)) / (längder[0] as number),
+          `${namn} v${fönster[0]?.plan.week.index}: ${längder.join(' → ')}`,
+        ).toBeLessThanOrEqual(0.15);
+      }
+    }
+  });
+
+  it('når grenens tak före loppet', () => {
+    // Upptrappningen ska komma hela vägen fram, inte stanna halvvägs.
+    const tak = rules.longSession.capMinutesBySport;
+
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const race of profil.races) {
+        const sport = raceById(race.id).sport;
+        if (sport === 'swim') continue;
+
+        const längsta = Math.max(
+          0,
+          ...långpass(profil)
+            .filter((rad) => rad.lång?.sport === sport && rad.plan.week.startDate < race.date)
+            .map((rad) => rad.lång?.minutes as number),
+        );
+
+        if (längsta === 0) continue;
+
+        // Två tak gäller: grenens eget i R-13 och sjuttio procent av veckans
+        // konditionstid i R-28. Det senare binder för den som har sex timmar
+        // i veckan — ett långpass på fem timmar ryms inte i en sextimmarsvecka
+        // hur bra upptrappningen än är.
+        const störstaVecka = Math.max(
+          ...buildWeekPlans(profil).map(({ budget }) => budget.enduranceMinutes),
+        );
+        const nåbart = Math.min(
+          tak[sport as 'run'],
+          Math.floor(störstaVecka * rules.longSession.maxShareOfWeek),
+        );
+
+        // P4 har sex veckor på sig och kommer inte fram; de övriga ska.
+        const andel = namn === 'P4' ? 0.6 : 0.85;
+        expect(längsta / nåbart, `${namn} ${race.id}`).toBeGreaterThanOrEqual(andel);
+      }
+    }
+  });
+
+  it('erbjuder cykel som alternativ till löpningens långpass', () => {
+    // Din poäng: man kan cykla i stället för att springa. Det sliter mindre.
+    const löplångpass = Object.values(PROFILES).flatMap((profil) =>
+      långpass(profil).filter((rad) => rad.lång?.sport === 'run'),
+    );
+
+    expect(löplångpass.length).toBeGreaterThan(0);
+    for (const rad of löplångpass) {
+      const cykel = rad.lång?.alternatives.find((alternativ) => alternativ.sport === 'bike');
+      expect(cykel, `v${rad.plan.week.index}`).toBeDefined();
+    }
+  });
+});

@@ -105,7 +105,6 @@
       7
     ],
     "minMinutes": 45,
-    "borrowInFinalWeeks": 4,
     "growthByPhase": {
       "base": {
         "startShareOfCap": 0.25,

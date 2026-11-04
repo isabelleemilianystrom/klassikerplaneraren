@@ -572,6 +572,49 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   veckan blev fem skidpass à 68 minuter plus ett kort tempopass. Den oplacerade tiden i de sex
   profilerna sjönk samtidigt från 91 till 81 minuter.
 
+- **R-46** (tillagd 2026-11-04) **Långpasset trappas upp varje vecka.** Inom en fas växer
+  långpasset vecka för vecka och **krymper aldrig**. Lånet från de andra grenarna (R-13) följer
+  tillväxtkurvan genom hela fasen, inte bara de sista veckorna.
+
+  Skälet: en upptrappning minskar skaderisken, och det är hoppen som är farliga. Förut slogs
+  lånet på som en knapp fyra veckor före loppet. Dessförinnan var långpasset bundet av grenens
+  egen andel i R-08, och mot Lidingöloppet gav det den här formen:
+
+  | | Före | Efter |
+  | --- | --- | --- |
+  | Långpass i löpning, vecka för vecka | 75, 75, 75, —, 75, **122**, 131, 132, 150 | 75, 84, 94, 103, 113, 122, 131, 132, 150 |
+  | Största veckoökning | **+63 %** | +12 % |
+
+  Fyra veckor stillastående följt av sextiotre procents ökning är precis vad en upptrappning
+  finns för att undvika — och löpning är den gren som sliter mest.
+
+  **Mätt utfall per gren** *(2026-11-04, de sex profilerna)*: största veckoökning av långpasset
+  är **+12 % i löpning**, +51 % i cykel och +93 % i skidor. Att cykel och skidor hoppar mer är
+  avsiktligt: där går långpassen att lägga utan att slita ut kroppen (R-32), och hoppen ligger i
+  korta specifika faser där kurvan måste klättra från halva taket till hela på tre veckor. I
+  löpningen, där det betyder något, är upptrappningen jämn.
+
+  Två tak gäller fortfarande och kan binda före kurvan: grenens eget i R-13 och sjuttio procent
+  av veckans konditionstid i R-28. Den som har sex timmar i veckan når därför högst 210 minuter,
+  inte cykelns tak på 300 — ett långpass på fem timmar ryms inte i en sextimmarsvecka.
+
+  `longSession.borrowInFinalWeeks` utgick samtidigt: lånet gäller hela fasen, så talet hade
+  ingen läsare kvar.
+
+- **R-47** (tillagd 2026-11-04) **Nästa lopps uppbyggnad börjar direkt efter det förra.** När
+  ett lopp är avklarat och dess återhämtningsveckor är slut växlar fokus till **nästa lopp i
+  datumordning** — inte till ett bestämt lopp. Efter Vansbrosimningen är det Lidingöloppet, om
+  Vansbro inte är planens sista lopp.
+
+  Det följer av R-02: en svensk klassiker går att börja när som helst på året, så vilket lopp
+  som kommer efter vilket varierar. Kontrollerat 2026-11-04 för både höststart (P1: Vansbro
+  vecka 36, återhämtning vecka 37, Lidingöuppbyggnad från vecka 38) och vårstart (P6: Vansbro
+  vecka 10, återhämtning vecka 11, Lidingöuppbyggnad från vecka 12).
+
+  **Och man får cykla i stället för att springa.** Varje långpass i löpning erbjuder cykel som
+  alternativ med noteringen *"sliter mindre på kroppen"* (R-37). Passet är det primära och
+  grenen ett val — det gäller särskilt löpningen, som sliter mest.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -623,7 +666,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
   Nedtrappning och återhämtning har inget långpass. Räcker grenens tid inte till `longSession.minMinutes` blir det inget långpass den veckan — hellre inget än ett som bara heter så.
 
-  **De sista veckorna får långpasset låna tid från de andra grenarna** *(tillagd 2026-10-28)*, upp till taket på 70 procent i R-28. Antalet veckor står i `longSession.borrowInFinalWeeks`. Utan lånet binds långpasset av grenens andel i R-08 och hinner aldrig bli långt nog: Vasaloppets längsta pass stannade på 45 procent av loppets tid och Vätternrundans på 28 procent. Ett långpass på tre timmar inför 315 kilometer på cykel är inte en förberedelse. Lånet tas från de övriga grenarna i proportion till deras tid, så veckans totala tid är oförändrad (R-29). Det följer också arrangörens eget råd: träna mer specifikt perioden närmast varje tävling.
+  **Långpasset får låna tid från de andra grenarna** *(tillagd 2026-10-28, utökad till hela fasen 2026-11-04 — se R-46)*, upp till taket på 70 procent i R-28. Utan lånet binds långpasset av grenens andel i R-08 och hinner aldrig bli långt nog: Vasaloppets längsta pass stannade på 45 procent av loppets tid och Vätternrundans på 28 procent. Ett långpass på tre timmar inför 315 kilometer på cykel är inte en förberedelse. Lånet tas från de övriga grenarna i proportion till deras tid, så veckans totala tid är oförändrad (R-29). Det följer också arrangörens eget råd: träna mer specifikt perioden närmast varje tävling.
 - **R-28** (tillagd 2026-10-27) Långpasset får ta högst 70 % av veckans tid, utöver taken i R-13. Vid T = 6 timmar skulle ett cykelpass på 300 minuter annars vara 83 % av veckan.
 - **R-30** (tillagd 2026-10-27) Varje pass har en titel och en instruktion från `config/sessions.json`. **En instruktion per passtyp, 8 totalt**; sportspecifika varianter läggs till bara där sporten ändrar innehållet. Saknas en kombination som motorn kan producera är det ett testfel, inte ett tomt fält. *(utökad 2026-10-28)* Grenspecifika varianter finns nu också där **loppet** ändrar vad passet innehåller, inte bara där grenen gör det: löpningens långpass och lugna pass nämner kuperad terräng och mjukt underlag eftersom Lidingöloppet är terränglöpning, och cykelns långpass nämner klungkörning — som ett **tips**, eftersom alla inte har någon att cykla med, och med ett uttalat tillägg att passet duger lika bra ensamt.
 
@@ -985,6 +1028,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Fokusveckorna ligger omedelbart före loppveckan oavsett var i planen loppet hamnar, och loppveckan själv är aldrig en av dem (R-02, R-45) *(tillagd 2026-11-04)*
 - En pausad vecka blir aldrig referens för löptaket i R-14 *(tillagd 2026-11-04)*
 - Löptaket i R-14 väger tyngre än pausen i R-45: en pausad gren får ta emot det taket skär bort *(tillagd 2026-11-04)*
+- Långpasset krymper aldrig inom en fas, och i löpning växer det högst femton procent i veckan (R-46) *(tillagd 2026-11-04)*
+- Varje långpass i löpning erbjuder cykel som alternativ (R-37, R-47) *(tillagd 2026-11-04)*
+- Fokus växlar till nästa lopp i datumordning när det förras återhämtning är slut (R-02, R-47) *(tillagd 2026-11-04)*
 - En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
@@ -1033,6 +1079,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Start två veckor före Vasaloppet: en fokusvecka, inte tre (R-45) (tillagt 2026-11-04)
 - Fokusveckor finns inför både Vasaloppet och Vätternrundan, inte bara ett av dem (R-45) (tillagt 2026-11-04)
 - Fokusgrenen får hela veckan när den inte är löpning; Lidingöloppet saknar därför talet (R-14, R-45) (tillagt 2026-11-04)
+- Långpasset i löpning mot Lidingöloppet: stiger varje vecka, aldrig fyra platta veckor följt av ett hopp (R-46) (tillagt 2026-11-04)
+- Upptrappningen når grenens tak före loppet, utom för den som har för kort tid (R-46) (tillagt 2026-11-04)
+- Efter Vansbrosimningens återhämtning är nästa veckas fokus Lidingöloppet, både vid höststart och vårstart (R-47) (tillagt 2026-11-04)
 - Nedtrappningsvecka mot Vansbrosimningen: inget kvalitetspass alls, eftersom simningens golv är högre än taket på hårda minuter (R-15, R-40, R-42) (tillagt 2026-11-04)
 - Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
 - Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)
