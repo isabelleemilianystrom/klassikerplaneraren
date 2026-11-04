@@ -80,8 +80,13 @@
     },
     "bike.indoor": {
       "_rule": "R-20",
-      "title": "Cykel, t.ex. spinning på gym",
-      "instruction": "Samma tid och samma zon som cykelpasset. Spinning, trainer eller motionscykel fungerar lika bra för konditionen."
+      "title": "Cykel inomhus",
+      "instruction": "Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret."
+    },
+    "ski.rollerSkis": {
+      "_rule": "R-17",
+      "title": "Rullskidor",
+      "instruction": "Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer."
     }
   },
   "strengthExercises": {

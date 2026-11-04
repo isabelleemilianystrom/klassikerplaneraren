@@ -25,8 +25,10 @@ const KEY = 'klassikerplaneraren';
  *
  * 1 — första versionen, med `PlanInput` i schemaVersion 2.
  * 2 — målsättning per lopp (R-38). `PlanInput` är nu schemaVersion 3.
+ * 3 — utrustningen är bara komplementen: simhall och cykel utgick, snö blev
+ *     en fråga om månaden (R-17, R-20). `PlanInput` är nu schemaVersion 4.
  */
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
 /** Det som sparas. Planen räknas om vid inläsning, den sparas inte. */
 interface Saved {
@@ -166,7 +168,7 @@ function isPlanInput(värde: unknown): värde is PlanInput {
   if (typeof värde !== 'object' || värde === null) return false;
   const input = värde as Partial<PlanInput>;
 
-  if (input.schemaVersion !== 3) return false;
+  if (input.schemaVersion !== 4) return false;
   if (typeof input.startDate !== 'string' || !isIsoDate(input.startDate)) return false;
   if (typeof input.today !== 'string' || !isIsoDate(input.today)) return false;
 
@@ -187,7 +189,7 @@ function isPlanInput(värde: unknown): värde is PlanInput {
   if (dagar.longSession === dagar.rest) return false;
 
   if (typeof input.equipment !== 'object' || input.equipment === null) return false;
-  for (const flagga of ['snowOrRollerSkis', 'skiErg', 'pool', 'bike'] as const) {
+  for (const flagga of ['rollerSkis', 'skiErg', 'indoorTrainer'] as const) {
     if (typeof input.equipment[flagga] !== 'boolean') return false;
   }
 

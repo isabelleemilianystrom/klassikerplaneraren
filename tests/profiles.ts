@@ -19,11 +19,18 @@ const LOPP = {
 /** Söndag långpass, måndag vila — det formuläret föreslår. */
 const VANLIGA_DAGAR = { longSession: 7, rest: 1 } as const;
 
-const INGEN_UTRUSTNING = {
-  snowOrRollerSkis: false,
+/**
+ * Inga komplement.
+ *
+ * Skidor och cykel är förutsatta — ska man göra en klassiker behöver man kunna
+ * träna på det man ska. Det här är den som bara har grundutrustningen: utan
+ * snö blir skidpassen stavgång i backe (R-17), och cykelpassen körs ute året
+ * om (R-20).
+ */
+const INGA_KOMPLEMENT = {
+  rollerSkis: false,
   skiErg: false,
-  pool: false,
-  bike: false,
+  indoorTrainer: false,
 } as const;
 
 /**
@@ -41,14 +48,14 @@ const ALLA_FYRA = [
 
 /** P1 Förstagångsklassikern: alla fyra, 6 h, ny i skidor och simning. */
 export const P1: PlanInput = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
   levels: { ski: 'new', swim: 'new', bike: 'experienced', run: 'experienced' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
-  equipment: { ...INGEN_UTRUSTNING, pool: true, bike: true },
+  equipment: INGA_KOMPLEMENT,
 };
 
 /**
@@ -58,14 +65,14 @@ export const P1: PlanInput = {
  * namnet betyder, och det gör att regeln prövas i båda riktningarna.
  */
 export const P2: PlanInput = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA.map((race) => ({ ...race, goal: 'time' as const })),
   levels: { ski: 'advanced', swim: 'advanced', bike: 'advanced', run: 'advanced' },
   hoursPerWeek: 10,
   preferredDays: VANLIGA_DAGAR,
-  equipment: { snowOrRollerSkis: true, skiErg: true, pool: true, bike: true },
+  equipment: { rollerSkis: true, skiErg: true, indoorTrainer: true },
 };
 
 /**
@@ -76,14 +83,14 @@ export const P2: PlanInput = {
  * eftersom tiden inte räcker till allt på en gång.
  */
 export const P3: PlanInput = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
   levels: { ski: 'experienced', swim: 'experienced', bike: 'experienced', run: 'experienced' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
-  equipment: { ...INGEN_UTRUSTNING, bike: true },
+  equipment: INGA_KOMPLEMENT,
 };
 
 /**
@@ -94,14 +101,14 @@ export const P3: PlanInput = {
  * enda sport (R-08).
  */
 export const P4: PlanInput = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   today: START_DATE,
   startDate: START_DATE,
   races: [{ id: 'vasaloppet', date: '2026-12-13', goal: 'finish' }],
   levels: { ski: 'new' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
-  equipment: INGEN_UTRUSTNING,
+  equipment: INGA_KOMPLEMENT,
 };
 
 /**
@@ -111,7 +118,7 @@ export const P4: PlanInput = {
  * återhämtningsvecka och det andra få en veckas nedtrappning.
  */
 export const P5: PlanInput = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   today: START_DATE,
   startDate: START_DATE,
   races: [
@@ -122,7 +129,8 @@ export const P5: PlanInput = {
   levels: { bike: 'experienced', swim: 'experienced' },
   hoursPerWeek: 8,
   preferredDays: VANLIGA_DAGAR,
-  equipment: { ...INGEN_UTRUSTNING, pool: true, bike: true },
+  // Jagar tid på cykeln och tränar inomhus på vintern (R-20).
+  equipment: { ...INGA_KOMPLEMENT, indoorTrainer: true },
 };
 
 /**
@@ -135,7 +143,7 @@ export const P5: PlanInput = {
  * P1, och för att planen sträcker sig över både ett årsskifte och ett skottår.
  */
 export const P6: PlanInput = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   today: '2027-05-03',
   startDate: '2027-05-03',
   // Loppen står med flit i den ordning man brukar rabbla klassikern, inte i
@@ -152,7 +160,8 @@ export const P6: PlanInput = {
   // Arbetar helger: långpasset på onsdag och vilodagen på söndag. Profilen är
   // därmed den som prövar att de valda dagarna faktiskt används.
   preferredDays: { longSession: 3, rest: 7 },
-  equipment: { ...INGEN_UTRUSTNING, pool: true, bike: true },
+  // Har rullskidor men ingen stakmaskin — prövar den vägen i R-17.
+  equipment: { ...INGA_KOMPLEMENT, rollerSkis: true },
 };
 
 export const PROFILES = { P1, P2, P3, P4, P5, P6 } as const;

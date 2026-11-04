@@ -4,7 +4,7 @@ import { monthOf } from '../src/engine/dates.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
 import { courseAdvice } from '../src/engine/warnings.ts';
 import type { PlanInput, Session } from '../src/engine/types.ts';
-import { P1, P2, P3, P4, PROFILES } from './profiles.ts';
+import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
 
 /** Alla pass i en profil, vila undantagen. */
 function pass(input: PlanInput): Session[] {
@@ -19,12 +19,33 @@ function allaPass(): [string, Session[]][] {
 
 const ÖPPET_VATTEN = rules.season.openWaterMonths;
 
-describe('R-17: skidor utan snö eller rullskidor', () => {
-  it('ger stavgång i backe åt den som inte har något', () => {
-    // P4 har ingen utrustning alls. Bor man där det inte finns snö är stavgång
-    // i backe hur man tränar för Vasaloppet — det är bra träning, inte en
-    // nödlösning.
-    const skidpass = pass(P4).filter((s) => s.sport === 'ski' && s.type !== 'race');
+describe('R-17: skidor utanför vintern', () => {
+  const VINTER = rules.season.winterMonths;
+
+  /** Skidpassen utanför vintern, där det inte finns snö att åka på. */
+  function utanSnö(input: PlanInput) {
+    return pass(input).filter(
+      (s) => s.sport === 'ski' && s.type !== 'race' && !VINTER.includes(monthOf(s.date)),
+    );
+  }
+
+  it('rör inte skidpassen under vintern — då finns det snö', () => {
+    // Snö är det enda som begränsar skidträningen, och snö är en fråga om
+    // månaden. Under season.winterMonths åker alla skidor, oavsett vad de äger.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const session of pass(profil)) {
+        if (session.sport !== 'ski' || session.type === 'race') continue;
+        if (!VINTER.includes(monthOf(session.date))) continue;
+
+        expect(session.substitutedAs, `${namn} ${session.id} ${session.date}`).toBeUndefined();
+      }
+    }
+  });
+
+  it('ger stavgång i backe åt den som inte har något komplement', () => {
+    // P1 har inga komplement och planen går över ett helt år. P4 duger inte
+    // här: dess sex veckor ligger helt i november–december, alltså i vintern.
+    const skidpass = utanSnö(P1);
 
     expect(skidpass.length).toBeGreaterThan(0);
     for (const session of skidpass) {
@@ -33,13 +54,24 @@ describe('R-17: skidor utan snö eller rullskidor', () => {
     }
   });
 
-  it('ger stakmaskin före stavgång när användaren har en', () => {
+  it('ger rullskidor före stakmaskin och stavgång', () => {
+    // Rullskidor ligger närmast snö: tekniken är densamma. P6 har dem och
+    // ingen stakmaskin.
+    const skidpass = utanSnö(P6);
+
+    expect(skidpass.length).toBeGreaterThan(0);
+    for (const session of skidpass) {
+      expect(session.substitutedAs, session.id).toBe('ski.rollerSkis');
+    }
+  });
+
+  it('ger stakmaskin före stavgång när användaren har en men inga rullskidor', () => {
     const medStakmaskin: PlanInput = {
-      ...P4,
-      equipment: { snowOrRollerSkis: false, skiErg: true, pool: false, bike: false },
+      ...P1,
+      equipment: { rollerSkis: false, skiErg: true, indoorTrainer: false },
     };
 
-    const skidpass = pass(medStakmaskin).filter((s) => s.sport === 'ski' && s.type !== 'race');
+    const skidpass = utanSnö(medStakmaskin);
 
     expect(skidpass.length).toBeGreaterThan(0);
     for (const session of skidpass) {
@@ -47,10 +79,12 @@ describe('R-17: skidor utan snö eller rullskidor', () => {
     }
   });
 
-  it('rör inte skidpassen för den som har snö eller rullskidor', () => {
-    for (const session of pass(P2)) {
-      if (session.sport !== 'ski') continue;
-      expect(session.substitutedAs, session.id).toBeUndefined();
+  it('väljer rullskidor framför stakmaskin när användaren har båda', () => {
+    const skidpass = utanSnö(P2);
+
+    expect(skidpass.length).toBeGreaterThan(0);
+    for (const session of skidpass) {
+      expect(session.substitutedAs, session.id).toBe('ski.rollerSkis');
     }
   });
 
@@ -93,7 +127,7 @@ describe('R-18 borttagen: simpass ersätts aldrig', () => {
     // rörlighetsträning men behöll zon 4. De ersättningar som finns kvar är
     // likvärdig träning — stavgång i backe i zon 4 är riktigt backarbete, och
     // spinning i zon 4 är riktiga intervaller.
-    const likvärdiga = ['ski.skiErg', 'ski.poleWalk', 'bike.indoor'];
+    const likvärdiga = ['ski.rollerSkis', 'ski.skiErg', 'ski.poleWalk', 'bike.indoor'];
 
     for (const [namn, profil] of Object.entries(PROFILES)) {
       for (const session of pass(profil)) {
@@ -106,19 +140,46 @@ describe('R-18 borttagen: simpass ersätts aldrig', () => {
   });
 });
 
-describe('R-20: cykel utan cykel', () => {
-  it('ger spinning', () => {
-    const utanCykel: PlanInput = {
-      ...P2,
-      equipment: { snowOrRollerSkis: true, skiErg: true, pool: true, bike: false },
-    };
+describe('R-20: cykel inomhus på vintern', () => {
+  const VINTER = rules.season.winterMonths;
 
-    const cykelpass = pass(utanCykel).filter((s) => s.sport === 'bike' && s.type !== 'race');
+  function cykelpass(input: PlanInput) {
+    return pass(input).filter((s) => s.sport === 'bike' && s.type !== 'race');
+  }
 
-    expect(cykelpass.length).toBeGreaterThan(0);
-    for (const session of cykelpass) {
-      expect(session.substitutedAs, session.id).toBe('bike.indoor');
+  it('lägger vinterns cykelpass inomhus för den som har en trainer', () => {
+    // P5 jagar tid på cykeln och har en trainer. Det är svårt att cykla
+    // landsväg i januari, och då är tiden i sadeln lättare att styra inomhus.
+    const vinter = cykelpass(P5).filter((s) => VINTER.includes(monthOf(s.date)));
+
+    expect(vinter.length).toBeGreaterThan(0);
+    for (const session of vinter) {
+      expect(session.substitutedAs, `${session.id} ${session.date}`).toBe('bike.indoor');
       expect(session.title).toBe(sessionTexts.substitutes['bike.indoor']?.title);
+    }
+  });
+
+  it('lämnar sommarens cykelpass ute, också för den som har trainer', () => {
+    const sommar = cykelpass(P5).filter((s) => !VINTER.includes(monthOf(s.date)));
+
+    expect(sommar.length).toBeGreaterThan(0);
+    for (const session of sommar) {
+      expect(session.substitutedAs, `${session.id} ${session.date}`).toBeUndefined();
+    }
+  });
+
+  it('ersätter inte cykelpasset för den som saknar trainer', () => {
+    // Alla som gör en klassiker har cykel, så det finns inget att ersätta.
+    // Saknas trainern planeras passet som vanligt cykelpass — året om.
+    for (const session of cykelpass(P3)) {
+      expect(session.substitutedAs, `${session.id} ${session.date}`).toBeUndefined();
+    }
+  });
+
+  it('behåller grenen när passet görs inomhus', () => {
+    for (const session of pass(P5)) {
+      if (session.substitutedAs !== 'bike.indoor') continue;
+      expect(session.sport, session.id).toBe('bike');
     }
   });
 });
@@ -148,14 +209,30 @@ describe('ersättningarna i stort', () => {
     }
   });
 
-  it('ger inga alternativ till ett ersatt pass', () => {
-    // Ersättningen är redan ett byte. Tre sätt att göra samma pass är ett för
-    // många.
+  it('ger inga alternativ till ett pass som bytt gren', () => {
+    // En riktig ersättning är redan ett byte. Tre sätt att göra samma pass är
+    // ett för många.
     for (const [namn, sessions] of allaPass()) {
       for (const session of sessions) {
         if (session.substitutedAs === undefined) continue;
+        if (!session.substitutedAs.startsWith('ski.')) continue;
+
         expect(session.alternatives, `${namn} ${session.id}`).toEqual([]);
       }
+    }
+  });
+
+  it('behåller alternativen när passet bara bytt plats (R-20)', () => {
+    // Ett cykelpass inomhus är fortfarande ett cykelpass. Alternativen till
+    // det är lika giltiga som ute, och att sudda dem vore att straffa den som
+    // har en trainer.
+    const inomhus = pass(P5).filter((s) => s.substitutedAs === 'bike.indoor');
+
+    expect(inomhus.length).toBeGreaterThan(0);
+    expect(inomhus.some((s) => s.alternatives.length > 0)).toBe(true);
+
+    for (const session of inomhus) {
+      expect(session.sport, session.id).toBe('bike');
     }
   });
 
@@ -175,19 +252,20 @@ describe('ersättningarna i stort', () => {
   it('gör alla sex profiler genomförbara', () => {
     // Före regeln fick P3 skid- och simpass utan utrustning, och P4 skidpass
     // utan skidor. Nu ska inget pass kräva något användaren inte har.
-    for (const [namn, profil] of Object.entries(PROFILES)) {
-      const utrustning = profil.equipment as unknown as Record<string, boolean>;
+    const VINTER = rules.season.winterMonths;
 
+    for (const [namn, profil] of Object.entries(PROFILES)) {
       for (const session of pass(profil)) {
         if (session.sport === null || session.type === 'race') continue;
         if (session.substitutedAs !== undefined) continue;
-        if (ÖPPET_VATTEN.includes(monthOf(session.date)) && session.sport === 'swim') continue;
 
-        const krav = rules.substitutions.requiredEquipment[session.sport];
-        if (krav === undefined) continue;
+        // Ett skidpass som inte är ersatt måste ligga i vintern — snö är det
+        // enda som gör skidpasset görbart som det är.
+        const snögren: readonly string[] = rules.substitutions.snowSports;
+        if (!snögren.includes(session.sport)) continue;
 
         expect(
-          krav.some((flagga) => utrustning[flagga] === true),
+          VINTER.includes(monthOf(session.date)),
           `${namn} ${session.id} ${session.sport} ${session.date}`,
         ).toBe(true);
       }

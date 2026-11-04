@@ -427,9 +427,17 @@ describe('R-30: titel och instruktion', () => {
   });
 
   it('nämner klungkörning som ett tips i cykelns långpass, inte som ett krav', () => {
+    // Utomhus: inomhus på trainer finns ingen klunga att ligga i, och då står
+    // tipset inte där (R-20). Vätternrundans uppbyggnad ligger ändå i vår och
+    // försommar, så långpassen som räknas är ute.
     const cykelLångpass = buildWeekPlans(P2)
       .flatMap((plan) => plan.sessions)
-      .find((session) => session.type === 'long' && session.sport === 'bike');
+      .find(
+        (session) =>
+          session.type === 'long' &&
+          session.sport === 'bike' &&
+          session.substitutedAs === undefined,
+      );
 
     expect(cykelLångpass?.instruction).toMatch(/klunga/i);
     // Det ska stå att passet duger ensamt — inte alla har någon att cykla med.
@@ -1120,12 +1128,16 @@ describe('R-37: passet är det primära, grenen är ett val', () => {
     }
   });
 
-  it('erbjuder inte en gren användaren saknar utrustning för', () => {
-    // P4 har ingen utrustning alls: inga skidor, ingen stakmaskin, ingen cykel.
-    for (const session of buildWeekPlans(P4).flatMap((plan) => plan.sessions)) {
+  it('erbjuder inte skidor till den som varken har snö eller något att åka på', () => {
+    // Cykel erbjuds alltid: alla som gör en klassiker har cykel. Skidor kräver
+    // snö — alltså vintern — eller rullskidor eller stakmaskin.
+    const vinter = rules.season.winterMonths;
+
+    for (const session of buildWeekPlans(P1).flatMap((plan) => plan.sessions)) {
       const grenar = session.alternatives.map((a) => a.sport);
-      expect(grenar, session.id).not.toContain('bike');
-      expect(grenar, session.id).not.toContain('ski');
+      if (vinter.includes(Number(session.date.slice(5, 7)))) continue;
+
+      expect(grenar, `${session.id} ${session.date}`).not.toContain('ski');
     }
   });
 
@@ -1133,7 +1145,7 @@ describe('R-37: passet är det primära, grenen är ett val', () => {
     // Minst en av grenens flaggor räcker.
     const medStakmaskin: PlanInput = {
       ...P2,
-      equipment: { snowOrRollerSkis: false, skiErg: true, pool: true, bike: true },
+      equipment: { rollerSkis: false, skiErg: true, indoorTrainer: true },
     };
 
     const vinter = buildWeekPlans(medStakmaskin)
@@ -1381,14 +1393,14 @@ describe('R-40: golv per gren', () => {
     // Vätternrundan tre veckor före Vansbro, så Vansbro får aldrig egna
     // specifika veckor (R-03) och därmed inget simlångpass att pröva.
     const baraVansbro: PlanInput = {
-      schemaVersion: 3,
+      schemaVersion: 4,
       today: '2026-11-02',
       startDate: '2026-11-02',
       races: [{ id: 'vansbrosimningen', date: '2027-07-10', goal: 'time' }],
       levels: { swim: 'experienced' },
       hoursPerWeek: 6,
       preferredDays: { longSession: 6 as Weekday, rest: 1 as Weekday },
-      equipment: { snowOrRollerSkis: false, skiErg: false, pool: true, bike: false },
+      equipment: { rollerSkis: false, skiErg: false, indoorTrainer: false },
     };
 
     const långpass = buildWeekPlans(baraVansbro)
@@ -1668,10 +1680,16 @@ describe('R-43: två lugna dagar efter ett hårt pass', () => {
 });
 
 describe('R-44: taket för ett ersättningspass', () => {
-  /** Bor i Skåne: har stakmaskin, men ingen snö och inga rullskidor. */
+  /**
+   * Har stakmaskin men inga rullskidor.
+   *
+   * Vårstarten (P6) är det som ger långa skidpass utanför vintern — där håller
+   * skidorna igång mot ett Vasaloppet i mars året därpå, och då finns ingen
+   * snö. Vasaloppets egen uppbyggnad ligger helt inom november–mars.
+   */
   const skåne: PlanInput = {
-    ...P2,
-    equipment: { snowOrRollerSkis: false, skiErg: true, pool: true, bike: true },
+    ...P6,
+    equipment: { rollerSkis: false, skiErg: true, indoorTrainer: false },
   };
 
   const TAK = 90;

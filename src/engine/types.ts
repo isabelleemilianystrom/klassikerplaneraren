@@ -63,20 +63,29 @@ export interface PreferredDays {
 }
 
 export interface PlanInput {
-  schemaVersion: 3;
+  schemaVersion: 4;
   today: IsoDate;
   startDate: IsoDate;
   /** Varje lopp med sitt datum och vad användaren vill med det (R-38). */
   races: { id: RaceId; date: IsoDate; goal: RaceGoal }[];
   levels: Partial<Record<TrainedSport, Level>>;
-  /** 3–15 timmar, heltal. */
+  /** 6–15 timmar, heltal (R-41). */
   hoursPerWeek: number;
   preferredDays: PreferredDays;
+  /**
+   * Extra utrustning som kompletterar träningen.
+   *
+   * Skidor och cykel är förutsatta: ska man göra en svensk klassiker behöver
+   * man kunna träna på det man ska. Det enda som begränsar är snön, och den
+   * är en fråga om månaden (R-17) — inte om vad användaren äger.
+   */
   equipment: {
-    snowOrRollerSkis: boolean;
+    /** Rullskidor: skidträning utan snö (R-17). */
+    rollerSkis: boolean;
+    /** Stakmaskin (R-17). */
     skiErg: boolean;
-    pool: boolean;
-    bike: boolean;
+    /** Trainer eller spinning: cykelträning inomhus på vintern (R-20). */
+    indoorTrainer: boolean;
   };
 }
 
@@ -143,7 +152,7 @@ export interface Week {
 }
 
 export interface Plan {
-  schemaVersion: 3;
+  schemaVersion: 4;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;

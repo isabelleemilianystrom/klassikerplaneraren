@@ -73,16 +73,15 @@ export const WEEKDAYS: { value: Weekday; name: string }[] = [
 /** Utrustningsfrågorna i steg 3. */
 export const EQUIPMENT: { key: string; label: string; help: string }[] = [
   {
-    key: 'snowOrRollerSkis',
-    label: 'Snö eller rullskidor',
-    help: 'Kommer du åt ett spår på vintern, eller har du rullskidor?',
+    key: 'rollerSkis',
+    label: 'Rullskidor',
+    help: 'Skidträning när det inte finns snö. Tekniken är densamma.',
   },
   { key: 'skiErg', label: 'Stakmaskin', help: 'Finns det en på gymmet du använder?' },
-  { key: 'pool', label: 'Simhall', help: 'Kommer du åt en bassäng regelbundet?' },
   {
-    key: 'bike',
-    label: 'Landsvägscykel eller trainer',
-    help: 'Egen cykel, eller en trainer att cykla inomhus på.',
+    key: 'indoorTrainer',
+    label: 'Trainer eller spinning',
+    help: 'Något att cykla på inomhus under vintern.',
   },
 ];
 
@@ -160,10 +159,11 @@ export const FORM = {
     longSessionHelp: 'Det längsta passet i veckan. Välj en dag du brukar ha tid.',
     restLabel: 'Vilken dag vill du vara helt ledig?',
     restHelp: 'Den dagen läggs ingen träning. Vilan är en del av programmet.',
-    equipmentHeading: 'Vad har du tillgång till?',
+    equipmentHeading: 'Har du något av det här?',
     equipmentHelp:
-      'Svara nej om du är osäker. Saknas något byter programmet ut passet mot något som ger ' +
-      'samma träning – skidor blir till exempel stavgång i backe.',
+      'Skidor och cykel räknar vi med att du har. Det här är sådant som kompletterar: svara ' +
+      'nej om du är osäker. Utan snö blir skidpassen stavgång i backe, och det är bra ' +
+      'skidträning – inte en nödlösning.',
     errors: {
       sameDay: 'Långpasset och vilodagen kan inte vara samma dag.',
       // Siffrorna kommer ur konfigurationen (R-41), så texten inte kan säga

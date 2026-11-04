@@ -240,13 +240,20 @@
     "openerMaxZone": 2
   },
   "season": {
-    "_rule": "R-17, R-18, R-19",
+    "_rule": "R-17, R-19, R-20, R-32",
+    "_winterMonths": "Vintern: månaderna skidpass planeras på snö och cykelpass görs inomhus. Samma månader som R-32:s vintersäsong. Utanför dem görs skidpassen som rullskidor, stakmaskin eller stavgång i backe (R-17); under dem görs cykelpassen på trainer eller spinning för den som har tillgång (R-20).",
+    "winterMonths": [
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
     "openWaterMonths": [
       6,
       7,
       8
-    ],
-    "swimDrylandBeforeMonth": 6
+    ]
   },
   "classicWindow": {
     "_rule": "R-26",
@@ -319,33 +326,32 @@
     },
     "requiresAnyEquipment": {
       "ski": [
-        "snowOrRollerSkis",
+        "rollerSkis",
         "skiErg"
-      ],
-      "bike": [
-        "bike"
       ]
     },
     "notes": {
       "ski": "om det finns snö",
       "bike": "sliter mindre på kroppen",
       "run": ""
-    }
+    },
+    "_requiresAnyEquipment": "Skidor som alternativ kräver något att åka på utanför vintern. Inom season.winterMonths finns snö och då krävs ingenting. Cykel står inte med: alla som gör en klassiker har cykel."
   },
   "substitutions": {
-    "_rule": "R-17, R-19, R-20",
-    "_swim": "R-18 borttagen 2026-11-04: simpass ersätts inte. Kan man inte simma behöver man lära sig det i en simhall, och det går inte att träna bort med gummiband. Saknas simhall är det användarens sak att lösa. openWaterSports är kvar — den styr säkerhetstexten i R-19.",
-    "note": "Ett pass i en gren användaren saknar utrustning för görs på ett annat sätt, det stryks inte. requiredEquipment säger vad grenen kräver för att kunna göras som tänkt; saknas det väljs den första ersättningen i bySport vars egen utrustning finns. Den sista i listan kräver ingenting och gäller alltid som sista utväg.",
-    "requiredEquipment": {
-      "ski": [
-        "snowOrRollerSkis"
-      ],
-      "bike": [
-        "bike"
-      ]
-    },
+    "_rule": "R-17, R-20",
+    "note": "Ska man göra en svensk klassiker behöver man kunna träna på det man ska, så cykel och skidor är förutsatta. Det enda som begränsar är snön, och den är en fråga om månaden (season.winterMonths). Utanför vintern görs skidpasset som rullskidor om användaren har dem, annars stakmaskin, annars stavgång i backe — alla tre är skidträning och passet behåller grenen.",
+    "_snowSports": "Grenar som kräver snö för att göras som de är. Utanför season.winterMonths ersätts de.",
+    "snowSports": [
+      "ski"
+    ],
     "bySport": {
       "ski": [
+        {
+          "key": "ski.rollerSkis",
+          "needs": [
+            "rollerSkis"
+          ]
+        },
         {
           "key": "ski.skiErg",
           "needs": [
@@ -359,13 +365,18 @@
           "key": "ski.poleWalk",
           "needs": []
         }
-      ],
-      "bike": [
-        {
-          "key": "bike.indoor",
-          "needs": []
-        }
       ]
+    },
+    "_seasonVariants": "R-20: samma träning på en annan plats, inte en ersättning för något som saknas. Cykelpass under season.winterMonths görs inomhus för den som har en trainer eller kommer åt spinning. Saknas den planeras passet som vanligt cykelpass — alla har cykel.",
+    "seasonVariants": {
+      "inWinter": {
+        "bike": {
+          "key": "bike.indoor",
+          "needs": [
+            "indoorTrainer"
+          ]
+        }
+      }
     },
     "openWaterSports": [
       "swim"

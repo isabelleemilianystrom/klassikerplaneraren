@@ -1504,19 +1504,62 @@ function splitNoteFor(
     .replace('{other}', resten.title.toLowerCase());
 }
 
+/**
+ * Ersättningen passet ska göras som, eller undefined (R-17, R-20).
+ *
+ * Två olika fall, och de är inte samma sak:
+ *
+ *  1. **Grenen går inte att göra som den är.** Det gäller skidor utanför
+ *     vintern: utan snö blir passet rullskidor om användaren har dem, annars
+ *     stakmaskin, annars stavgång i backe. Alla tre är skidträning och passet
+ *     behåller grenen — stavgång i backe är hur man tränar för Vasaloppet där
+ *     det inte finns snö, inte en nödlösning.
+ *  2. **Samma träning på en annan plats.** Det gäller cykeln under vintern:
+ *     har användaren en trainer eller kommer åt spinning görs passet inomhus.
+ *     Saknas den planeras det som vanligt cykelpass — alla som gör en
+ *     klassiker har cykel, så det finns inget att ersätta.
+ */
+interface Substitute {
+  key: string;
+  maxMinutes?: number | undefined;
+  overflowKey?: string | undefined;
+  /** Sant för en säsongsvariant: samma gren, annan plats (R-20). */
+  sameSport: boolean;
+}
+
+function substituteFor(session: Session, input: PlanInput): Substitute | undefined {
+  if (session.sport === null) return undefined;
+
+  const utrustning = input.equipment as Record<string, boolean>;
+  const har = (flaggor: readonly string[]): boolean =>
+    flaggor.every((flagga) => utrustning[flagga] === true);
+
+  // Fall 2: säsongsvarianten.
+  if (isWinter(session.date)) {
+    const variant = rules.substitutions.seasonVariants.inWinter[session.sport];
+    if (variant !== undefined && har(variant.needs)) return { ...variant, sameSport: true };
+  }
+
+  // Fall 1: grenen kräver snö och det är inte vinter.
+  const snögrenar: readonly string[] = rules.substitutions.snowSports;
+  if (!snögrenar.includes(session.sport) || isWinter(session.date)) return undefined;
+
+  const kandidater = rules.substitutions.bySport[session.sport];
+  const vald = kandidater?.find((kandidat) => har(kandidat.needs));
+
+  return vald === undefined ? undefined : { ...vald, sameSport: false };
+}
+
+/** Sant för ett datum i vintern, när det finns snö att åka på (R-17, R-20). */
+function isWinter(date: IsoDate): boolean {
+  return rules.season.winterMonths.includes(monthOf(date));
+}
+
 function withSubstitution(session: Session, input: PlanInput): Session {
   if (session.sport === null || session.type === 'race' || session.type === 'rest') {
     return session;
   }
-  if (hasRequiredEquipment(session.sport, session.date, input)) return session;
-
-  const kandidater = rules.substitutions.bySport[session.sport];
-  if (kandidater === undefined) return session;
-
-  const utrustning = input.equipment as Record<string, boolean>;
-  const vald = kandidater.find((kandidat) =>
-    kandidat.needs.every((flagga) => utrustning[flagga] === true),
-  );
+  const vald = substituteFor(session, input);
   if (vald === undefined) return session;
 
   const text = sessionTexts.substitutes[vald.key];
@@ -1529,30 +1572,13 @@ function withSubstitution(session: Session, input: PlanInput): Session {
     title: text.title,
     instruction: text.instruction + splitNoteFor(vald, text, session.minutes),
     substitutedAs: vald.key,
-    // Ersättningen är redan ett byte av gren. Att dessutom lista alternativ
-    // skulle ge tre sätt att göra samma pass, vilket är ett för många.
-    alternatives: [],
+    // En riktig ersättning är redan ett byte av gren. Att dessutom lista
+    // alternativ skulle ge tre sätt att göra samma pass, vilket är ett för
+    // många. En säsongsvariant är däremot samma gren på en annan plats — ett
+    // cykelpass inomhus är fortfarande ett cykelpass, och alternativen till
+    // det är lika giltiga som ute.
+    alternatives: vald.sameSport ? session.alternatives : [],
   };
-}
-
-/**
- * Sant när grenen går att göra som tänkt (R-17, R-18, R-19, R-20).
- *
- * Simning juni till augusti går i öppet vatten och kräver ingen simhall. Det
- * är dessutom det Vansbrosimningen faktiskt är.
- */
-function hasRequiredEquipment(
-  sport: Exclude<Session['sport'], null>,
-  date: IsoDate,
-  input: PlanInput,
-): boolean {
-  if (isOpenWater(sport, date)) return true;
-
-  const krav = rules.substitutions.requiredEquipment[sport];
-  if (krav === undefined) return true;
-
-  const utrustning = input.equipment as Record<string, boolean>;
-  return krav.some((flagga) => utrustning[flagga] === true);
 }
 
 /** Sant för ett pass som planeras i öppet vatten (R-19). */
@@ -1605,7 +1631,7 @@ function alternativesFor(session: Session, input: PlanInput): SessionAlternative
   return regler.interchangeable
     .filter((kandidat): kandidat is TrainedSport => kandidat !== session.sport)
     .filter((kandidat) => inSeason(kandidat, månad))
-    .filter((kandidat) => hasEquipmentFor(kandidat, input))
+    .filter((kandidat) => hasEquipmentFor(kandidat, input, session.date))
     .map((kandidat) => ({
       sport: kandidat,
       title: alternativeTitle(kandidat, session.type),
@@ -1626,9 +1652,13 @@ function inSeason(sport: TrainedSport, month: number): boolean {
  * rullskidor, eller med en stakmaskin. Grenar som inte kräver något —
  * löpning — går alltid.
  */
-function hasEquipmentFor(sport: TrainedSport, input: PlanInput): boolean {
+function hasEquipmentFor(sport: TrainedSport, input: PlanInput, date: IsoDate): boolean {
   const krav = rules.sessionAlternatives.requiresAnyEquipment[sport];
   if (krav === undefined) return true;
+
+  // Inom vintern finns snö, och då krävs ingen utrustning för att åka skidor.
+  const snögrenar: readonly string[] = rules.substitutions.snowSports;
+  if (snögrenar.includes(sport) && isWinter(date)) return true;
 
   const utrustning = input.equipment as Record<string, boolean>;
   return krav.some((flagga) => utrustning[flagga] === true);

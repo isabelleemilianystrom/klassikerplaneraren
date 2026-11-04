@@ -159,7 +159,7 @@ export function toPlanInput(state: FormState, today: string): PlanInput | null {
   if (Object.keys(validateAll(state)).length > 0) return null;
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     today,
     startDate: state.startDate,
     races: selectedRaces(state).map((race) => ({
@@ -173,10 +173,9 @@ export function toPlanInput(state: FormState, today: string): PlanInput | null {
     hoursPerWeek: state.hoursPerWeek,
     preferredDays: { longSession: state.longSessionDay, rest: state.restDay },
     equipment: {
-      snowOrRollerSkis: state.equipment.snowOrRollerSkis === true,
+      rollerSkis: state.equipment.rollerSkis === true,
       skiErg: state.equipment.skiErg === true,
-      pool: state.equipment.pool === true,
-      bike: state.equipment.bike === true,
+      indoorTrainer: state.equipment.indoorTrainer === true,
     },
   };
 }

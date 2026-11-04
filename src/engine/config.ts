@@ -271,8 +271,10 @@ export const rulesSchema = z.object({
   }),
   season: z.object({
     _rule: z.string(),
+    _winterMonths: z.string(),
+    /** Månaderna skidpass görs på snö och cykelpass inomhus (R-17, R-20). */
+    winterMonths: z.array(z.number().int().min(1).max(12)).min(1),
     openWaterMonths: z.array(z.number().int().min(1).max(12)).min(1),
-    swimDrylandBeforeMonth: z.number().int().min(1).max(12),
   }),
   /** R-21: teknikpass och kursrekommendation för nybörjaren. */
   technique: z.object({
@@ -287,7 +289,9 @@ export const rulesSchema = z.object({
     _rule: z.string(),
     note: z.string(),
     /** Vad grenen kräver för att kunna göras som tänkt. */
-    requiredEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
+    _snowSports: z.string(),
+    /** Grenar som kräver snö och ersätts utanför season.winterMonths (R-17). */
+    snowSports: z.array(sport),
     /** Ersättningar i prioritetsordning. Nyckeln finns i sessions.json. */
     bySport: z.partialRecord(
       sport,
@@ -305,6 +309,14 @@ export const rulesSchema = z.object({
         )
         .min(1),
     ),
+    _seasonVariants: z.string(),
+    /** Samma träning på annan plats under en säsong (R-20). */
+    seasonVariants: z.object({
+      inWinter: z.partialRecord(
+        sport,
+        z.object({ key: z.string().min(1), needs: z.array(z.string().min(1)).min(1) }),
+      ),
+    }),
     /** Grenar som går i öppet vatten under season.openWaterMonths. */
     openWaterSports: z.array(sport),
   }),
@@ -317,6 +329,7 @@ export const rulesSchema = z.object({
     /** Månader grenen går att utöva. Saknas grenen gäller den året om. */
     seasonalMonths: z.partialRecord(sport, z.array(z.number().int().min(1).max(12)).min(1)),
     /** Grenen kräver minst en av dessa utrustningsflaggor. */
+    _requiresAnyEquipment: z.string(),
     requiresAnyEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
     notes: z.partialRecord(sport, z.string()),
   }),

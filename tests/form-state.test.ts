@@ -195,7 +195,7 @@ describe('formuläret till en plan', () => {
     const input = toPlanInput(ifyllt(), IDAG);
 
     expect(input).not.toBeNull();
-    expect(input?.schemaVersion).toBe(3);
+    expect(input?.schemaVersion).toBe(4);
     expect(input?.races).toEqual([{ id: 'vasaloppet', date: '2027-03-07', goal: 'finish' }]);
     expect(input?.levels).toEqual({ ski: 'experienced' });
     expect(input?.preferredDays).toEqual({ longSession: 7, rest: 1 });
@@ -226,7 +226,7 @@ describe('formuläret till en plan', () => {
       ...initialState(IDAG),
       races: initialState(IDAG).races.map((race) => ({ ...race, selected: true })),
       levels: { ski: 'new', bike: 'experienced', swim: 'new', run: 'experienced' },
-      equipment: { snowOrRollerSkis: true, skiErg: false, pool: true, bike: true },
+      equipment: { rollerSkis: true, skiErg: false, indoorTrainer: true },
     };
 
     expect(validateAll(alla)).toEqual({});

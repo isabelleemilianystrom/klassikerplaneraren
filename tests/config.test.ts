@@ -229,7 +229,7 @@ describe('config/sessions.json', () => {
     // och gummiband är inte simträning — ett pass som hette "Simträning på
     // land" i zon 4 var en motsägelse.
     expect(rules.substitutions.bySport.swim).toBeUndefined();
-    expect(rules.substitutions.requiredEquipment.swim).toBeUndefined();
+    expect(rules.substitutions.snowSports).not.toContain('swim');
 
     for (const nyckel of Object.keys(sessions.substitutes)) {
       expect(nyckel.startsWith('swim.'), `${nyckel} ska inte finnas`).toBe(false);
