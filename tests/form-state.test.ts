@@ -206,8 +206,31 @@ describe('formuläret till en plan', () => {
     const planer = buildWeekPlans(input as never);
 
     expect(planer.length).toBeGreaterThan(0);
-    for (const plan of planer) {
-      expect(plan.sessions.length).toBe(7);
+
+    // Varje vecka har en rad per dag. Den första kan vara kortare: planen
+    // börjar på måndagen i startdatumets vecka (R-01), och dagarna före
+    // startdatumet är inte träningsdagar — de har redan passerat.
+    for (const [i, plan] of planer.entries()) {
+      if (i === 0) {
+        expect(plan.sessions.length).toBeGreaterThan(0);
+        expect(plan.sessions.length).toBeLessThanOrEqual(7);
+        continue;
+      }
+      expect(plan.sessions.length, `vecka ${plan.week.index}`).toBe(7);
+    }
+  });
+
+  it('lägger inga pass före startdatumet', () => {
+    // F-1 ur den slumpade egenskapstestningen: 172 av 200 planer hade pass på
+    // dagar som redan passerat, eftersom alla sex referensprofiler råkade
+    // börja på en måndag.
+    const state = ifyllt();
+    const input = toPlanInput(state, IDAG);
+
+    for (const plan of buildWeekPlans(input as never)) {
+      for (const session of plan.sessions) {
+        expect(session.date >= state.startDate, `${session.id} ${session.date}`).toBe(true);
+      }
     }
   });
 

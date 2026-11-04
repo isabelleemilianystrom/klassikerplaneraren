@@ -574,6 +574,13 @@ export const INVARIANTS: readonly Invariant[] = [
           (önskad.type === 'race' || öppningspass(p).includes(önskad));
 
         if (upptagen) continue;
+
+        // Och den kan ha passerat: planen börjar på måndagen i startdatumets
+        // vecka (R-01), så den första veckan kan sakna veckodagar helt.
+        const finns = p.sessions.some(
+          (s) => weekdayOf(s.date) === input.preferredDays.longSession,
+        );
+        if (!finns) continue;
         brott.push(`v${p.week.index}: långpasset på ${lång.date}, valde dag ${input.preferredDays.longSession}`);
       }
 
@@ -725,6 +732,11 @@ export const INVARIANTS: readonly Invariant[] = [
 
         if (a.week.phaseId !== b.week.phaseId) continue;
         if (a.week.isDeload || b.week.isDeload) continue;
+
+        // En avkortad första vecka (R-01) har färre platser, och då blir dess
+        // långpass en större andel av en mindre vecka. Jämförelsen är därför
+        // inte meningsfull över den gränsen.
+        if (a.sessions.length < 7) continue;
 
         const la = träning(a).find((s) => s.type === 'long');
         const lb = träning(b).find((s) => s.type === 'long');

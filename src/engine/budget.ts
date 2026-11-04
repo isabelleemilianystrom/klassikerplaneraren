@@ -8,7 +8,7 @@
  * Rena funktioner, inga sidoeffekter. Alla siffror kommer ur `config/rules.json`.
  */
 import { raceById, rules } from './config.ts';
-import { monthOf } from './dates.ts';
+import { addDays, monthOf } from './dates.ts';
 import type { Level, Phase, PlanInput, RaceGoal, TrainedSport } from './types.ts';
 import type { PlacedRace, WeekSkeleton } from './weeks.ts';
 import { buildWeeks, placeRaces } from './weeks.ts';
@@ -319,6 +319,43 @@ function applyNewLevelLimits(
  * taket för planens två första veckor. Taket ligger sist eftersom R-07 säger
  * "högst" — det är ett tak, inte en andel som räknas ovanpå.
  */
+/**
+ * Dagar i veckan som ligger på eller efter startdatumet (R-01).
+ *
+ * Sju i alla veckor utom den första. Börjar man mitt i veckan är den första
+ * veckan kortare, och då ska både tiden och antalet pass följa med.
+ */
+export function daysAvailableIn(week: WeekSkeleton, input: PlanInput): number {
+  if (week.startDate >= input.startDate) return 7;
+
+  const dagar = [0, 1, 2, 3, 4, 5, 6].map((steg) => addDays(week.startDate, steg));
+  return dagar.filter((datum) => datum >= input.startDate).length;
+}
+
+/**
+ * Träningsdagar veckan faktiskt har kvar (R-01, R-11).
+ *
+ * Normalt det R-11 säger utifrån timmarna. Är veckan avkortad begränsas den
+ * av dagarna som finns, minus den vilodag veckan alltid ska ha. En start på en
+ * söndag ger därför noll: den enda dagen som återstår är vilodagen.
+ */
+export function trainingDaysAvailableIn(week: WeekSkeleton, input: PlanInput): number {
+  const önskat = trainingDayCount(input.hoursPerWeek);
+  const dagar = daysAvailableIn(week, input);
+  if (dagar === 7) return önskat;
+
+  return Math.max(0, Math.min(önskat, dagar - rules.trainingDays.minRestDays));
+}
+/** Antal träningsdagar veckan ska ha utifrån timmarna (R-11). */
+function trainingDayCount(hoursPerWeek: number): number {
+  const rad = rules.trainingDays.byHoursPerWeek.find(
+    (kandidat) => hoursPerWeek <= kandidat.upToHours,
+  );
+
+  return rad?.days ?? (rules.trainingDays.byHoursPerWeek.at(-1)?.days as number);
+}
+
+
 function phaseBudget(week: WeekSkeleton, input: PlanInput, races: readonly PlacedRace[]): number {
   const T = input.hoursPerWeek * 60;
   let minuter = T * phaseShare(week, races);
@@ -330,6 +367,17 @@ function phaseBudget(week: WeekSkeleton, input: PlanInput, races: readonly Place
   if (week.index <= rules.weekTime.firstWeeks.count) {
     minuter = Math.min(minuter, T * rules.weekTime.firstWeeks.maxShare);
   }
+
+  // R-01: veckan börjar på måndagen i startdatumets vecka, så börjar man en
+  // fredag är veckans tre första dagar redan passerade. Veckan får då bara
+  // den del av tiden som dagarna räcker till — en plan som lägger en hel
+  // veckas träning på tre dagar är en plan som inte går att följa, och en som
+  // lägger pass på gårdagen är värre än det (fynd F-1).
+  //
+  // Skalas efter **träningsdagar**, inte kalenderdagar: veckan ska ha minst en
+  // vilodag (R-11), så en start på en söndag lämnar noll träningsdagar och
+  // därmed noll tid. Annars byggdes pass som inte hade någon dag att ligga på.
+  minuter *= trainingDaysAvailableIn(week, input) / trainingDayCount(input.hoursPerWeek);
 
   return Math.round(minuter);
 }

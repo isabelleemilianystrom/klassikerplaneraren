@@ -228,6 +228,16 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 **Struktur och faser**
 
 - **R-01** Planen går från måndagen i startdatumets vecka till söndagen i veckan med sista loppet. Veckor börjar på måndag.
+
+  **Den första veckan kan vara avkortad** *(tillagd 2026-11-04)*. Börjar man en fredag ligger veckans tre första dagar före startdatumet, och de är inte träningsdagar — de har redan passerat. Veckan får då bara den del av tiden som träningsdagarna räcker till, och tre saker gäller bara den veckan:
+
+  1. **Inga pass före startdatumet.** Det var fynd F-1: 172 av 200 slumpade planer hade pass på dagar som passerat, eftersom alla sex referensprofiler råkade börja på en måndag. Nu 0 av 200.
+  2. **Inget långpass om den valda dagen har passerat.** Reservdagen är veckans sista, och ligger nästa veckas långpass på en måndag hamnar två långpass intill varandra (R-43). Upptrappningen börjar i vecka 2.
+  3. **Inget hårt pass.** Placeringen ser bara bakåt, inte framåt, så ett hårt pass på stubbveckans sista dagar hamnade intill nästa veckas långpass. Kvalitetsarbetet börjar också i vecka 2.
+
+  En start på en **söndag** ger noll träningsdagar: den enda dagen som återstår är den vilodag veckan alltid ska ha (R-11). Veckan blir då helt tom, och planen börjar på riktigt i vecka 2.
+
+  Alternativet — att låta planen börja på nästa måndag i stället — prövades och förkastades: ett lopp som ligger mellan startdatumet och nästa måndag försvann då ur planen.
 - **R-02** Varje vecka får en fas utifrån närmaste kommande lopp: Återhämtning (veckorna direkt efter ett lopp), Nedtrappning (sista veckorna före loppet), Specifik (veckorna före nedtrappningen) och Bas (övrig tid). Ordningen gäller i den prioriteten.
 - **R-03** *(ändrad 2026-10-28)* Ligger två lopp mindre än fyra veckor isär får det andra
   loppet en veckas nedtrappning i stället för sin vanliga, så att nedtrappningen inte kräver
@@ -1164,14 +1174,20 @@ Ingen av dem är åtgärdad. Etapp 1 skulle hitta, inte fixa.
 
 | # | Invariant | Omfattning | Vad det är |
 | --- | --- | --- | --- |
-| **F-1** | Inga pass före startdatum (R-01) | **172 av 200 planer**, i snitt 2,9 pass | Vecka 1 börjar på måndagen i startveckan, så en start mitt i veckan ger pass på dagar som redan passerat |
-| **F-2** | Oplacerad tid är mindre än ett pass (R-29) | **128 av 200 planer**, upp till 106 min/vecka | Med många timmar och få grenar kapas varje pass av långpassets längd, och resten får inte plats |
+| ~~**F-1**~~ | ~~Inga pass före startdatum (R-01)~~ | **Åtgärdad 2026-11-04** | 0 av 200 planer. Den första veckan är nu avkortad — se R-01 |
+| **F-2** | Oplacerad tid är mindre än ett pass (R-29) | **139 av 200 planer**, upp till 106 min/vecka | Med många timmar och få grenar kapas varje pass av långpassets längd, och resten får inte plats. Den avkortade första veckan står för en procent av minuterna |
 | **F-3** | Ingen ny löpare får löppass två dagar i rad (R-14) | 35 planer | Reservutgången i `bestDateFor` tar vilken dag som helst när ingen är tillåten |
 | **F-4** | Löpningens långpass växer högst 15 %/vecka (R-46) | 56 planer, upp till +29 % | Korta faser tvingar kurvan att klättra snabbare än taket |
 | **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
 | **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
 
-**F-1 är den som förklarar varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
+**F-1 förklarade varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
+
+**F-1 åtgärdades 2026-11-04**, och vägen dit är värd att minnas: det första försöket med en avkortad vecka gav fyra nya brott och **krascher i 18 av 200 planer** — `bestDateFor` returnerade `undefined` när veckan inte hade någon laglig dag kvar. Det andra försöket, att börja planen på nästa måndag, tappade ett lopp som låg mellan startdatumet och måndagen. Det tredje höll: delvecka med tiden skalad efter träningsdagar, inget långpass och inget hårt pass i stubbveckan, och ett platstak som inte kan tvinga fram pass utan dagar.
+
+Längs vägen rättades tre buggar som inte hade med F-1 att göra: platsräkningens golv på en plats, fokusgrenens platsbehov som kunde överskrida veckans platser, och den tysta reservutgången i `bestDateFor` som nu returnerar null i stället för att krascha.
+
+**F-2 steg från 128 till 139 planer** som följd: den avkortade första veckan har svårt att få sina minuter till hela pass. Den står för en procent av den oplacerade tiden, resten är F-2:s egen orsak.
 
 **F-3 och F-6 är samma sak**, och den stod redan i kodanalysen 2026-11-03: `bestDateFor` faller tillbaka på vilken dag som helst när inget villkor går att uppfylla, utan att signalera. Det är etapp 2 i planen.
 

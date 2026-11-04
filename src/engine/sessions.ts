@@ -165,7 +165,7 @@ function buildWeekPlan(
   allWeeks: readonly WeekSkeleton[],
   before: CarriedOver,
 ): WeekPlan {
-  const dates = weekDates(week);
+  const dates = weekDates(week, input);
   const pending: PendingSession[] = [];
 
   const raceDates = new Set<IsoDate>();
@@ -193,7 +193,10 @@ function buildWeekPlan(
     openerDates,
     planeradePerDag(dates, pending),
   );
-  const platser = Math.max(1, dagar.length - styrka.length);
+  // Noll är ett giltigt svar: en avkortad första vecka (R-01) kan ha alla
+  // dagar upptagna av styrkan, och då ska inga konditionspass byggas. Ett golv
+  // på en plats tvingade fram pass som fick staplas på en upptagen dag.
+  const platser = Math.max(0, dagar.length - styrka.length);
 
   // 3. Långpasset (R-13, R-28).
   const long = longSession(
@@ -219,9 +222,11 @@ function buildWeekPlan(
   // den har dagar kvar när styrkan och långpasset tagit sina. Byggs det fler
   // måste placeringen lägga två på samma dag, och då faller både den regeln
   // och R-14 om löpning två dagar i rad.
-  const kvarPlatser = Math.max(1, platser - (long === null ? 0 : 1));
+  const kvarPlatser = Math.max(0, platser - (long === null ? 0 : 1));
 
-  pending.push(...enduranceSessions(week, budget, input, long, races, kvarPlatser));
+  pending.push(
+    ...enduranceSessions(week, budget, input, long, races, kvarPlatser, dates.length === 7),
+  );
 
   const placed = placeOnDays(pending, week, input, dates, raceDates, openerDates, before);
   const withTexts = placed.map((session, i) => withTitleAndInstruction(session, week, i, input));
@@ -281,9 +286,21 @@ function planeradePerDag(
   return karta;
 }
 
-/** Veckans sju datum, måndag till söndag. */
-function weekDates(week: WeekSkeleton): IsoDate[] {
-  return [0, 1, 2, 3, 4, 5, 6].map((offset) => addDays(week.startDate, offset));
+/**
+ * Veckans datum, måndag till söndag — utom de som redan passerat (R-01).
+ *
+ * Planen börjar på måndagen i startdatumets vecka, så den första veckan kan
+ * ha dagar före startdatumet. De är inte träningsdagar: en plan som visar
+ * pass på gårdagen är en plan man inte kan följa, och det var det F-1 ur den
+ * slumpade egenskapstestningen hittade — 172 av 200 planer, eftersom alla sex
+ * referensprofiler råkade börja på en måndag.
+ *
+ * Veckan blir då kortare, och `phaseBudget` skalar tiden efter det.
+ */
+function weekDates(week: WeekSkeleton, input: PlanInput): IsoDate[] {
+  return [0, 1, 2, 3, 4, 5, 6]
+    .map((offset) => addDays(week.startDate, offset))
+    .filter((datum) => datum >= input.startDate);
 }
 
 /** Loppdagen innehåller bara loppet (R-04). */
@@ -526,6 +543,12 @@ function longSessionDate(
   const vald = fria.find((datum) => weekdayOf(datum) === preferredDays.longSession);
   if (vald !== undefined) return vald;
 
+  // Är veckan avkortad (R-01) har den valda dagen passerat, inte blivit
+  // upptagen. Då blir det inget långpass: reservdagen är veckans sista, och
+  // ligger nästa veckas långpass på en måndag hamnar två långpass intill
+  // varandra — vilket bryter mot R-43. Upptrappningen börjar i vecka 2.
+  if (dates.length < 7) return null;
+
   const standard = fria.filter((datum) =>
     rules.longSession.allowedWeekdays.includes(weekdayOf(datum)),
   );
@@ -561,7 +584,10 @@ function enduranceSessions(
   long: PendingSession | null,
   races: readonly PlacedRace[],
   slots: number,
+  fullWeek: boolean,
 ): PendingSession[] {
+  if (slots <= 0) return [];
+
   const kvarPerSport = remainingBySport(budget, long);
 
   // R-31: taket per vecka gäller också när färre pass delar på samma tid.
@@ -602,7 +628,14 @@ function enduranceSessions(
   const fokusHarPlats =
     fokusgren !== null && (platsPerSport.get(fokusgren) ?? 0) >= fokusBehov && fokusBehov > 0;
 
-  const hårda = fokusHarPlats ? hardSessionPlan(week, input, fokusgren as TrainedSport) : new Map();
+  // En avkortad första vecka (R-01) får inget hårt pass. Placeringen ser bara
+  // bakåt, inte framåt, så ett hårt pass på stubbveckans sista dagar hamnade
+  // intill nästa veckas långpass och bröt mot R-43. Kvalitetsarbetet börjar i
+  // vecka 2, precis som långpasset.
+  const hårda =
+    fokusHarPlats && fullWeek
+      ? hardSessionPlan(week, input, fokusgren as TrainedSport)
+      : new Map<TrainedSport, HardSession[]>();
 
   const resultat: PendingSession[] = [];
 
@@ -886,8 +919,13 @@ function shareSlots(
 
   // Fokusgrenen får sitt behov först: en plats till teknikpasset om grenen
   // kräver det, och en till kvalitetspasset. Veckan handlar om den grenen.
+  // Behovet får aldrig överskrida de platser veckan faktiskt har. I en
+  // avkortad första vecka (R-01) kan en enda plats finnas, och då staplades
+  // teknikpasset och kvalitetspasset på samma dag.
   const iPlanen = focus !== null && resultat.has(focus);
-  if (iPlanen && focusNeeds > 1) resultat.set(focus as TrainedSport, focusNeeds);
+  if (iPlanen && focusNeeds > 1) {
+    resultat.set(focus as TrainedSport, Math.max(1, Math.min(focusNeeds, slots)));
+  }
 
   const taget = [...resultat.values()].reduce((a, b) => a + b, 0);
   let kvar = slots - taget;
@@ -1171,7 +1209,14 @@ function placeOnDays(
 
   for (const session of övriga) {
     const dag = bestDateFor(session, lediga, perDag, input, before);
-    (perDag.get(dag) as PendingSession[]).push(session);
+
+    // Saknar veckan dagar helt går passet inte att lägga. Det hände i en
+    // avkortad första vecka, och resultatet var en krasch i stället för en
+    // plan — det värsta möjliga utfallet (fynd F-1).
+    const dagens = dag === null ? undefined : perDag.get(dag);
+    if (dagens === undefined) continue;
+
+    dagens.push(session);
   }
 
   return toSessions(week, dates, perDag);
@@ -1281,11 +1326,12 @@ function bestDateFor(
   perDag: ReadonlyMap<IsoDate, readonly PendingSession[]>,
   input: PlanInput,
   before: CarriedOver,
-): IsoDate {
+): IsoDate | null {
   const tillåtna = dates.filter((datum) =>
     allowedOn(session, datum, perDag, input, before),
   );
   const urval = tillåtna.length > 0 ? tillåtna : dates;
+  if (urval.length === 0) return null;
 
   return [...urval].sort((a, b) => {
     const tidA = minutesOn(a, perDag);
