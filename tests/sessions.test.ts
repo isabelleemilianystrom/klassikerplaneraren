@@ -1145,7 +1145,7 @@ describe('R-37: passet är det primära, grenen är ett val', () => {
     // Minst en av grenens flaggor räcker.
     const medStakmaskin: PlanInput = {
       ...P2,
-      equipment: { rollerSkis: false, skiErg: true, indoorTrainer: true },
+      equipment: { snow: false, rollerSkis: false, skiErg: true, indoorTrainer: true },
     };
 
     const vinter = buildWeekPlans(medStakmaskin)
@@ -1393,14 +1393,14 @@ describe('R-40: golv per gren', () => {
     // Vätternrundan tre veckor före Vansbro, så Vansbro får aldrig egna
     // specifika veckor (R-03) och därmed inget simlångpass att pröva.
     const baraVansbro: PlanInput = {
-      schemaVersion: 4,
+      schemaVersion: 5,
       today: '2026-11-02',
       startDate: '2026-11-02',
       races: [{ id: 'vansbrosimningen', date: '2027-07-10', goal: 'time' }],
       levels: { swim: 'experienced' },
       hoursPerWeek: 6,
       preferredDays: { longSession: 6 as Weekday, rest: 1 as Weekday },
-      equipment: { rollerSkis: false, skiErg: false, indoorTrainer: false },
+      equipment: { snow: false, rollerSkis: false, skiErg: false, indoorTrainer: false },
     };
 
     const långpass = buildWeekPlans(baraVansbro)
@@ -1681,15 +1681,14 @@ describe('R-43: två lugna dagar efter ett hårt pass', () => {
 
 describe('R-44: taket för ett ersättningspass', () => {
   /**
-   * Har stakmaskin men inga rullskidor.
+   * Bor i Skåne: har stakmaskin men inga rullskidor, och kommer inte åt snö.
    *
-   * Vårstarten (P6) är det som ger långa skidpass utanför vintern — där håller
-   * skidorna igång mot ett Vasaloppet i mars året därpå, och då finns ingen
-   * snö. Vasaloppets egen uppbyggnad ligger helt inom november–mars.
+   * Då ersätts Vasaloppets egna långpass, och de är de längsta i planen — det
+   * är där taket på nittio minuter betyder något.
    */
   const skåne: PlanInput = {
-    ...P6,
-    equipment: { rollerSkis: false, skiErg: true, indoorTrainer: false },
+    ...P2,
+    equipment: { snow: false, rollerSkis: false, skiErg: true, indoorTrainer: true },
   };
 
   const TAK = 90;

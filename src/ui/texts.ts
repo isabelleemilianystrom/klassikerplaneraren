@@ -73,6 +73,11 @@ export const WEEKDAYS: { value: Weekday; name: string }[] = [
 /** Utrustningsfrågorna i steg 3. */
 export const EQUIPMENT: { key: string; label: string; help: string }[] = [
   {
+    key: 'snow',
+    label: 'Skidspår på vintern',
+    help: 'Kommer du åt snö där du bor, eller reser du dit?',
+  },
+  {
     key: 'rollerSkis',
     label: 'Rullskidor',
     help: 'Skidträning när det inte finns snö. Tekniken är densamma.',
@@ -161,9 +166,10 @@ export const FORM = {
     restHelp: 'Den dagen läggs ingen träning. Vilan är en del av programmet.',
     equipmentHeading: 'Har du något av det här?',
     equipmentHelp:
-      'Skidor och cykel räknar vi med att du har. Det här är sådant som kompletterar: svara ' +
-      'nej om du är osäker. Utan snö blir skidpassen stavgång i backe, och det är bra ' +
-      'skidträning – inte en nödlösning.',
+      'Skidor och cykel räknar vi med att du har. Det här är tillgången och det som ' +
+      'kompletterar: svara nej om du är osäker. Utan snö blir skidpassen rullskidor, ' +
+      'stakmaskin eller stavgång i backe – och stavgång i backe är bra skidträning, inte en ' +
+      'nödlösning.',
     errors: {
       sameDay: 'Långpasset och vilodagen kan inte vara samma dag.',
       // Siffrorna kommer ur konfigurationen (R-41), så texten inte kan säga

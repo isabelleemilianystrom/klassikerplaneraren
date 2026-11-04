@@ -63,7 +63,7 @@ export interface PreferredDays {
 }
 
 export interface PlanInput {
-  schemaVersion: 4;
+  schemaVersion: 5;
   today: IsoDate;
   startDate: IsoDate;
   /** Varje lopp med sitt datum och vad användaren vill med det (R-38). */
@@ -80,6 +80,14 @@ export interface PlanInput {
    * är en fråga om månaden (R-17) — inte om vad användaren äger.
    */
   equipment: {
+    /**
+     * Tillgång till ett skidspår på vintern (R-17).
+     *
+     * Inte utrustning utan tillgång, men den hör till samma fråga i
+     * formuläret. Snö kräver både en vintermånad och ett ja här: november
+     * räddar ingen som bor i Skåne.
+     */
+    snow: boolean;
     /** Rullskidor: skidträning utan snö (R-17). */
     rollerSkis: boolean;
     /** Stakmaskin (R-17). */
@@ -152,7 +160,7 @@ export interface Week {
 }
 
 export interface Plan {
-  schemaVersion: 4;
+  schemaVersion: 5;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;

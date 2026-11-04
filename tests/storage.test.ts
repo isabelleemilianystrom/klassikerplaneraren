@@ -171,7 +171,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     // Det här är v0-felet: versionen stämde, formen gjorde det inte.
     const { form, input } = ifyllt();
     const svar = läs(
-      JSON.stringify({ storageVersion: 3, input: { ...input, schemaVersion: 1 }, form }),
+      JSON.stringify({ storageVersion: 4, input: { ...input, schemaVersion: 1 }, form }),
     );
 
     expect(svar).toEqual({ status: 'discarded', reason: 'bad-input' });
@@ -184,7 +184,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
       const trasig = { ...input };
       delete (trasig as Record<string, unknown>)[fält];
 
-      const svar = läs(JSON.stringify({ storageVersion: 3, input: trasig, form }));
+      const svar = läs(JSON.stringify({ storageVersion: 4, input: trasig, form }));
       expect(svar.status, fält).toBe('discarded');
     }
   });
@@ -192,7 +192,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
   it('kastar indata med ett ogiltigt datum', () => {
     const { form, input } = ifyllt();
     const svar = läs(
-      JSON.stringify({ storageVersion: 3, input: { ...input, startDate: 'i går' }, form }),
+      JSON.stringify({ storageVersion: 4, input: { ...input, startDate: 'i går' }, form }),
     );
 
     expect(svar).toEqual({ status: 'discarded', reason: 'bad-input' });
@@ -200,7 +200,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
 
   it('kastar indata utan lopp', () => {
     const { form, input } = ifyllt();
-    const svar = läs(JSON.stringify({ storageVersion: 3, input: { ...input, races: [] }, form }));
+    const svar = läs(JSON.stringify({ storageVersion: 4, input: { ...input, races: [] }, form }));
 
     expect(svar.status).toBe('discarded');
   });
@@ -210,7 +210,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     const { form, input } = ifyllt();
     const svar = läs(
       JSON.stringify({
-        storageVersion: 3,
+        storageVersion: 4,
         input: { ...input, preferredDays: { longSession: 3, rest: 3 } },
         form,
       }),
@@ -223,7 +223,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     const { form, input } = ifyllt();
     const svar = läs(
       JSON.stringify({
-        storageVersion: 3,
+        storageVersion: 4,
         input: { ...input, equipment: { rollerSkis: 'ja' } },
         form,
       }),
@@ -234,7 +234,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
 
   it('kastar ett trasigt formulärtillstånd', () => {
     const { input } = ifyllt();
-    const svar = läs(JSON.stringify({ storageVersion: 3, input, form: { startDate: 42 } }));
+    const svar = läs(JSON.stringify({ storageVersion: 4, input, form: { startDate: 42 } }));
 
     expect(svar).toEqual({ status: 'discarded', reason: 'bad-form' });
   });
@@ -256,7 +256,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
 
   it('släpper igenom en giltig plan', () => {
     const { form, input } = ifyllt();
-    const svar = läs(JSON.stringify({ storageVersion: 3, input, form }));
+    const svar = läs(JSON.stringify({ storageVersion: 4, input, form }));
 
     expect(svar.status).toBe('ok');
     expect(lagring.har(NYCKEL)).toBe(true);

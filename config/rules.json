@@ -335,11 +335,11 @@
       "bike": "sliter mindre på kroppen",
       "run": ""
     },
-    "_requiresAnyEquipment": "Skidor som alternativ kräver något att åka på utanför vintern. Inom season.winterMonths finns snö och då krävs ingenting. Cykel står inte med: alla som gör en klassiker har cykel."
+    "_requiresAnyEquipment": "Skidor som alternativ kräver något att åka på. Finns snö (vintermånad plus tillgång) krävs ingenting. Cykel står inte med: alla som gör en klassiker har cykel."
   },
   "substitutions": {
     "_rule": "R-17, R-20",
-    "note": "Ska man göra en svensk klassiker behöver man kunna träna på det man ska, så cykel och skidor är förutsatta. Det enda som begränsar är snön, och den är en fråga om månaden (season.winterMonths). Utanför vintern görs skidpasset som rullskidor om användaren har dem, annars stakmaskin, annars stavgång i backe — alla tre är skidträning och passet behåller grenen.",
+    "note": "Ska man göra en svensk klassiker behöver man kunna träna på det man ska, så cykel och skidor är förutsatta. Det enda som begränsar är snön, och snö kräver både en vintermånad (season.winterMonths) och tillgång till ett spår (snowNeeds). Saknas något av dem görs skidpasset som rullskidor om användaren har dem, annars stakmaskin, annars stavgång i backe — alla tre är skidträning och passet behåller grenen.",
     "_snowSports": "Grenar som kräver snö för att göras som de är. Utanför season.winterMonths ersätts de.",
     "snowSports": [
       "ski"
@@ -367,7 +367,7 @@
         }
       ]
     },
-    "_seasonVariants": "R-20: samma träning på en annan plats, inte en ersättning för något som saknas. Cykelpass under season.winterMonths görs inomhus för den som har en trainer eller kommer åt spinning. Saknas den planeras passet som vanligt cykelpass — alla har cykel.",
+    "_seasonVariants": "R-20: samma träning på en annan plats, inte en ersättning för något som saknas. Cykelpass under season.winterMonths görs inomhus för den som har en trainer eller kommer åt spinning. Det styrs av månaden ensam — en trainer i januari handlar om vintern, inte om snö. Saknas den planeras passet som vanligt cykelpass.",
     "seasonVariants": {
       "inWinter": {
         "bike": {
@@ -380,6 +380,10 @@
     },
     "openWaterSports": [
       "swim"
+    ],
+    "_snowNeeds": "R-17: vad som krävs utöver en vintermånad för att det ska finnas snö att åka på. November till mars räddar inte den som bor där det aldrig ligger snö.",
+    "snowNeeds": [
+      "snow"
     ]
   },
   "technique": {

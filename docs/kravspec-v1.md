@@ -107,7 +107,7 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
   togs bort**, tillsammans med cykelfrågan. Skidor och cykel är förutsatta och simhallen styr
   ingenting — kvar är bara komplementen rullskidor, stakmaskin och trainer (R-17, R-20).
 
-- [ ] **9. Snön följer månaden — men inte alla har ett spår.** *(Hittad 2026-11-04 när
+- [x] **9. Snön följer månaden — men inte alla har ett spår.** *(Hittad 2026-11-04 när
   utrustningsfrågorna gjordes om.)* Snö är nu en fråga om månaden: november–mars planeras
   skidpassen som skidpass för alla. Följden är att **profil P1 får 43 timmar längdskidor den
   perioden utan något alternativ**, fast hon inte har rullskidor eller stakmaskin. P3 och P4
@@ -119,9 +119,13 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
   stakmaskin, stavgång i backe. Alternativet är att låta det stå: den som inte kommer åt snö
   får själv byta passet, precis som den som saknar simhall.
 
-  En följd om det står: **taket på 90 minuter i stakmaskin (R-44) går nästan aldrig av**, för
-  skidpassen ersätts bara utanför vintern och då är de korta. Det längsta ersatta skidpasset i
-  profilerna är 105 minuter, i vårstarten P6.
+  **Besvarad 2026-11-04: frågan lades tillbaka.** Snö kräver nu både vintermånad och ett ja på
+  "Kommer du åt snö där du bor, eller reser du dit?". Cykelns inomhusvariant styrs fortfarande
+  av månaden ensam — en trainer i januari handlar om mörker och väglag, inte om snö.
+
+  Följden: P4 får stavgång i backe för alla femton skidpassen i november–december, och
+  **taket på 90 minuter i stakmaskin (R-44) går av igen** — en profil med stakmaskin men utan
+  spår får fjorton pass över taket, det längsta 240 minuter.
 
 - [x] **6. Demon.** Besvarad 2026-10-29: **högst fem minuter.** Det styr demomanuset i avsnitt 11 och vad som måste finnas. Fem minuter räcker till startsidan, formuläret ifyllt live, översikten och en öppnad vecka. Fasförklaringarna (T-12) hinner knappt visas och är därmed inte kritiska för demon.
 
@@ -160,7 +164,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-01 | Startsida med kort förklaring, betatext, ansvarsfriskrivning, åldersgräns (18 år) och knappen "Skapa mitt program" | Måste | Givet att jag öppnar appen utan sparad plan, så ser jag förklaringen, texterna från avsnitt 8 och knappen som startar formuläret |
 | K-02 | Steg 1: välj minst ett av de fyra loppen och ange datum och mål — ta sig i mål eller sikta på en tid — för varje valt lopp *(mål tillagt 2026-10-29)*; startdatum är idag men kan ändras | Måste | Inget lopp valt eller ett loppdatum före startdatumet ger ett felmeddelande vid fältet, och jag kommer inte vidare |
 | K-03 | Steg 2: nivå per sport som ingår i valda lopp – Ny, Van eller Erfaren – med beskrivningarna i avsnitt 5 | Måste | Varje sport har exakt en vald nivå innan jag kommer vidare; förvalt är "Van" |
-| K-04 | Steg 3: timmar per vecka (6–15, heltal), vilken dag långpasset ska ligga på, vilken dag som är vilodag, och utrustning: rullskidor, stakmaskin, trainer eller spinning (ja/nej för varje) *(ändrad 2026-11-04: simhall och cykel utgick, snö blev en fråga om månaden — se R-17)* | Måste | Alla fält har standardvärden (6 timmar, söndag långpass, måndag vila, nej på utrustning); värden utanför 6–15 kan inte väljas; samma dag för långpass och vila ger ett felmeddelande vid fältet och jag kommer inte vidare |
+| K-04 | Steg 3: timmar per vecka (6–15, heltal), vilken dag långpasset ska ligga på, vilken dag som är vilodag, och tillgång och utrustning: skidspår på vintern, rullskidor, stakmaskin, trainer eller spinning (ja/nej för varje) *(ändrad 2026-11-04: simhall och cykel utgick eftersom de är förutsatta; snöfrågan är kvar och krävs tillsammans med vintermånaden — se R-17)* | Måste | Alla fält har standardvärden (6 timmar, söndag långpass, måndag vila, nej på utrustning); värden utanför 6–15 kan inte väljas; samma dag för långpass och vila ger ett felmeddelande vid fältet och jag kommer inte vidare |
 | K-05 | Generering: regelmotorn skapar planen direkt, med förklaringarna på plats från början | Måste | Planen med sina förklaringar visas inom 2 s efter att jag skickat formuläret, utan att något laddas i efterhand |
 | K-06 | Översikt: alla veckor från start till sista lopp med veckonummer, datumintervall, fas, total tid och markering av loppveckor | Måste | Antalet veckor stämmer med perioden; varje loppvecka är markerad med loppets namn |
 | K-07 | Veckovy: sju dagar med pass; varje pass visar sport, typ, minuter, intensitet i vardagsspråk och zon samt en kort instruktion; vilodagar visas som vila | Måste | Varje dag i veckan visas; intensitet visas som t.ex. "Lugnt – du ska kunna prata hela meningar (zon 2)" |
@@ -562,11 +566,14 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 
 **Ersättningar, teknik och säsong**
 
-- **R-17** *(omskriven 2026-11-04)* **Skidor utanför vintern.** Snö är det enda som begränsar
-  träningen, och snö är en fråga om **månaden**: inom `season.winterMonths` (november–mars)
-  planeras skidpassen som skidpass. Utanför dem görs passet som **rullskidor** om användaren
-  har dem, annars **stakmaskin**, annars **stavgång i backe** — i den ordningen, med samma tid
-  och samma zon.
+- **R-17** *(omskriven 2026-11-04)* **Skidor utan snö.** Snö är det enda som begränsar
+  träningen, och snö kräver **två saker**: en månad i `season.winterMonths` (november–mars)
+  **och** att användaren kommer åt ett spår (`substitutions.snowNeeds`). Saknas något av dem
+  görs passet som **rullskidor** om användaren har dem, annars **stakmaskin**, annars
+  **stavgång i backe** — i den ordningen, med samma tid och samma zon.
+
+  Båda villkoren behövs: november till mars räddar inte den som bor där det aldrig ligger snö,
+  och ett spår hjälper inte i juli.
 
   Passet **behåller grenen**: det tränar fortfarande mot Vasaloppet, och det ska synas i
   planen. Stavgång i backe är skidträning, inte en nödlösning — bor man där det inte finns snö
@@ -576,9 +583,8 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   Skidor och cykel är i övrigt **förutsatta**: ska man göra en svensk klassiker behöver man
   kunna träna på det man ska. Utrustningsfrågorna gäller bara komplement — se K-04.
 
-  **Känd gräns, se öppen fråga 9:** eftersom snön följer månaden antas alla komma åt ett spår
-  november–mars. Profil P1 får 43 timmar längdskidor den perioden utan något alternativ, fast
-  hon inte har några komplement. Bor man i Skåne stämmer det inte.
+  Profil **P4 kommer inte åt snö**, och får därför stavgång i backe för alla femton skidpassen
+  i november–december. Det är Skåne-fallet, och det är vad frågan finns för.
 - **R-18** ~~Simning utan simhall: simpass ersätts med torrövningar för simteknik utanför
   `season.openWaterMonths`.~~ **Borttagen 2026-11-04.** Simpass ersätts inte längre. Kan man
   inte simma behöver man lära sig det, och det görs i en simhall — gummiband och rörlighet för
@@ -721,14 +727,14 @@ type SessionType = 'easy' | 'long' | 'tempo' | 'intervals' | 'technique' | 'stre
 type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;   // ISO: 1 = måndag, 7 = söndag
 
 interface PlanInput {
-  schemaVersion: 4;           // höjd 2026-10-29: mål per lopp tillkom (R-38)
+  schemaVersion: 5;           // höjd 2026-10-29: mål per lopp tillkom (R-38)
   today: string;              // YYYY-MM-DD
   startDate: string;          // YYYY-MM-DD
   races: { id: RaceId; date: string; goal: 'finish' | 'time' }[];   // R-38
   levels: Partial<Record<'ski' | 'bike' | 'swim' | 'run', Level>>;
   hoursPerWeek: number;       // 6–15 (R-41)
-  // equipment: bara komplementen (R-17, R-20). Skidor och cykel är förutsatta,
-  // och snö är en fråga om månaden. Ändrad 2026-11-04; schemaVersion 3 → 4.
+  // equipment: snötillgång plus komplementen (R-17, R-20). Skidor och cykel är
+  // förutsatta. Ändrad 2026-11-04; schemaVersion 3 → 5 i två steg samma dag.
   preferredDays: { longSession: Weekday; rest: Weekday };   // måste vara olika
   equipment: { snowOrRollerSkis: boolean; skiErg: boolean; pool: boolean; bike: boolean };
 }
@@ -766,7 +772,7 @@ interface Week {
 }
 
 interface Plan {
-  schemaVersion: 4;
+  schemaVersion: 5;
   rulesVersion: string;
   promptVersion: string | null;
   input: PlanInput;
@@ -877,7 +883,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Reglerna om dagar i rad i R-14 och R-16 håller också över veckogränsen, söndag till måndag *(tillagd 2026-10-28)*
 - Löptiden ökar högst 10 % mellan veckor, utom efter avlastning (R-14)
 - Inga pass före startdatum eller efter sista loppet, och loppdagen innehåller bara loppet (R-01, R-04)
-- Inget skidpass utanför vintern står som skidpass: det görs som rullskidor, stakmaskin eller stavgång i backe, med tid och zon kvar (R-17) *(ändrad 2026-11-04)*
+- Ett skidpass står som skidpass bara när det finns snö — vintermånad och ett spår. Annars görs det som rullskidor, stakmaskin eller stavgång i backe, med tid och zon kvar (R-17) *(ändrad 2026-11-04)*
 - Ett pass som bytt gren har inga alternativ; ett som bara bytt plats behåller dem (R-20, R-37) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
@@ -925,7 +931,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Nedtrappningsvecka mot Vansbrosimningen: inget simpass på tjugo minuter, och veckans korta inslag i högre fart finns kvar (R-15, R-40) (tillagt 2026-10-29)
 - Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
-- Profil utan komplement: skidpassen utanför vintern blir stavgång, simpassen planeras som simpass, och inget pass stryks (R-17) *(ändrat 2026-11-04)*
+- Profil utan spår och utan komplement: skidpassen blir stavgång i backe, också i januari (R-17) *(ändrat 2026-11-04)*
+- Profil med spår: skidpassen i november–mars är orörda, och först utanför dem ersätts de (R-17) (tillagt 2026-11-04)
 - Profil med rullskidor och stakmaskin: rullskidorna väljs först (R-17) (tillagt 2026-11-04)
 - Cykelpass i januari med trainer: inomhus. Samma pass i juni: ute. Utan trainer: ute året om (R-20) (tillagt 2026-11-04)
 - Samma profil med stakmaskin: skidpassen blir stakmaskin i stället för stavgång (R-17) (tillagt 2026-10-28)

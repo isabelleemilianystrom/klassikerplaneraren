@@ -28,6 +28,7 @@ const VANLIGA_DAGAR = { longSession: 7, rest: 1 } as const;
  * om (R-20).
  */
 const INGA_KOMPLEMENT = {
+  snow: false,
   rollerSkis: false,
   skiErg: false,
   indoorTrainer: false,
@@ -48,14 +49,14 @@ const ALLA_FYRA = [
 
 /** P1 Förstagångsklassikern: alla fyra, 6 h, ny i skidor och simning. */
 export const P1: PlanInput = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
   levels: { ski: 'new', swim: 'new', bike: 'experienced', run: 'experienced' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
-  equipment: INGA_KOMPLEMENT,
+  equipment: { ...INGA_KOMPLEMENT, snow: true },
 };
 
 /**
@@ -65,14 +66,14 @@ export const P1: PlanInput = {
  * namnet betyder, och det gör att regeln prövas i båda riktningarna.
  */
 export const P2: PlanInput = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA.map((race) => ({ ...race, goal: 'time' as const })),
   levels: { ski: 'advanced', swim: 'advanced', bike: 'advanced', run: 'advanced' },
   hoursPerWeek: 10,
   preferredDays: VANLIGA_DAGAR,
-  equipment: { rollerSkis: true, skiErg: true, indoorTrainer: true },
+  equipment: { snow: true, rollerSkis: true, skiErg: true, indoorTrainer: true },
 };
 
 /**
@@ -83,14 +84,14 @@ export const P2: PlanInput = {
  * eftersom tiden inte räcker till allt på en gång.
  */
 export const P3: PlanInput = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   today: START_DATE,
   startDate: START_DATE,
   races: ALLA_FYRA,
   levels: { ski: 'experienced', swim: 'experienced', bike: 'experienced', run: 'experienced' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
-  equipment: INGA_KOMPLEMENT,
+  equipment: { ...INGA_KOMPLEMENT, snow: true },
 };
 
 /**
@@ -101,13 +102,14 @@ export const P3: PlanInput = {
  * enda sport (R-08).
  */
 export const P4: PlanInput = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   today: START_DATE,
   startDate: START_DATE,
   races: [{ id: 'vasaloppet', date: '2026-12-13', goal: 'finish' }],
   levels: { ski: 'new' },
   hoursPerWeek: 6,
   preferredDays: VANLIGA_DAGAR,
+  // Kommer inte åt snö: prövar hela kedjan ner till stavgång i backe (R-17).
   equipment: INGA_KOMPLEMENT,
 };
 
@@ -118,7 +120,7 @@ export const P4: PlanInput = {
  * återhämtningsvecka och det andra få en veckas nedtrappning.
  */
 export const P5: PlanInput = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   today: START_DATE,
   startDate: START_DATE,
   races: [
@@ -143,7 +145,7 @@ export const P5: PlanInput = {
  * P1, och för att planen sträcker sig över både ett årsskifte och ett skottår.
  */
 export const P6: PlanInput = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   today: '2027-05-03',
   startDate: '2027-05-03',
   // Loppen står med flit i den ordning man brukar rabbla klassikern, inte i
@@ -161,7 +163,7 @@ export const P6: PlanInput = {
   // därmed den som prövar att de valda dagarna faktiskt används.
   preferredDays: { longSession: 3, rest: 7 },
   // Har rullskidor men ingen stakmaskin — prövar den vägen i R-17.
-  equipment: { ...INGA_KOMPLEMENT, rollerSkis: true },
+  equipment: { ...INGA_KOMPLEMENT, snow: true, rollerSkis: true },
 };
 
 export const PROFILES = { P1, P2, P3, P4, P5, P6 } as const;

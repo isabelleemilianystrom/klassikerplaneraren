@@ -1540,9 +1540,9 @@ function substituteFor(session: Session, input: PlanInput): Substitute | undefin
     if (variant !== undefined && har(variant.needs)) return { ...variant, sameSport: true };
   }
 
-  // Fall 1: grenen kräver snö och det är inte vinter.
+  // Fall 1: grenen kräver snö, och snö finns inte.
   const snögrenar: readonly string[] = rules.substitutions.snowSports;
-  if (!snögrenar.includes(session.sport) || isWinter(session.date)) return undefined;
+  if (!snögrenar.includes(session.sport) || hasSnow(session.date, input)) return undefined;
 
   const kandidater = rules.substitutions.bySport[session.sport];
   const vald = kandidater?.find((kandidat) => har(kandidat.needs));
@@ -1550,9 +1550,29 @@ function substituteFor(session: Session, input: PlanInput): Substitute | undefin
   return vald === undefined ? undefined : { ...vald, sameSport: false };
 }
 
-/** Sant för ett datum i vintern, när det finns snö att åka på (R-17, R-20). */
+/**
+ * Sant för ett datum i vintern (R-20).
+ *
+ * Bara månaden. Det är vintern som avgör om cykelpasset görs inomhus — en
+ * trainer i januari handlar om mörker och väglag, inte om snötillgång.
+ */
 function isWinter(date: IsoDate): boolean {
   return rules.season.winterMonths.includes(monthOf(date));
+}
+
+/**
+ * Sant när det finns snö att åka skidor på (R-17).
+ *
+ * Två villkor: en vintermånad **och** tillgång till ett spår. Bara månaden
+ * räcker inte — bor man i Skåne ligger det ingen snö i januari heller, och en
+ * plan som lägger fyrtiotre timmar längdskidor där är en plan som inte går att
+ * följa.
+ */
+function hasSnow(date: IsoDate, input: PlanInput): boolean {
+  if (!isWinter(date)) return false;
+
+  const utrustning = input.equipment as Record<string, boolean>;
+  return rules.substitutions.snowNeeds.every((flagga) => utrustning[flagga] === true);
 }
 
 function withSubstitution(session: Session, input: PlanInput): Session {
@@ -1656,9 +1676,9 @@ function hasEquipmentFor(sport: TrainedSport, input: PlanInput, date: IsoDate): 
   const krav = rules.sessionAlternatives.requiresAnyEquipment[sport];
   if (krav === undefined) return true;
 
-  // Inom vintern finns snö, och då krävs ingen utrustning för att åka skidor.
+  // Finns snö krävs ingen utrustning för att åka skidor.
   const snögrenar: readonly string[] = rules.substitutions.snowSports;
-  if (snögrenar.includes(sport) && isWinter(date)) return true;
+  if (snögrenar.includes(sport) && hasSnow(date, input)) return true;
 
   const utrustning = input.equipment as Record<string, boolean>;
   return krav.some((flagga) => utrustning[flagga] === true);

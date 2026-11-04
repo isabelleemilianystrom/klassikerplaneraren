@@ -29,16 +29,31 @@ describe('R-17: skidor utanför vintern', () => {
     );
   }
 
-  it('rör inte skidpassen under vintern — då finns det snö', () => {
-    // Snö är det enda som begränsar skidträningen, och snö är en fråga om
-    // månaden. Under season.winterMonths åker alla skidor, oavsett vad de äger.
+  it('rör inte skidpassen under vintern för den som kommer åt ett spår', () => {
+    // Snö kräver två saker: en vintermånad och tillgång till ett spår.
     for (const [namn, profil] of Object.entries(PROFILES)) {
+      if (profil.equipment.snow !== true) continue;
+
       for (const session of pass(profil)) {
         if (session.sport !== 'ski' || session.type === 'race') continue;
         if (!VINTER.includes(monthOf(session.date))) continue;
 
         expect(session.substitutedAs, `${namn} ${session.id} ${session.date}`).toBeUndefined();
       }
+    }
+  });
+
+  it('ersätter vinterns skidpass för den som inte kommer åt snö', () => {
+    // November till mars räddar inte den som bor i Skåne. P4 har varken spår
+    // eller komplement, så varje skidpass blir stavgång i backe — också i
+    // januari.
+    const vinter = pass(P4).filter(
+      (s) => s.sport === 'ski' && s.type !== 'race' && VINTER.includes(monthOf(s.date)),
+    );
+
+    expect(vinter.length).toBeGreaterThan(0);
+    for (const session of vinter) {
+      expect(session.substitutedAs, `${session.id} ${session.date}`).toBe('ski.poleWalk');
     }
   });
 
@@ -68,7 +83,7 @@ describe('R-17: skidor utanför vintern', () => {
   it('ger stakmaskin före stavgång när användaren har en men inga rullskidor', () => {
     const medStakmaskin: PlanInput = {
       ...P1,
-      equipment: { rollerSkis: false, skiErg: true, indoorTrainer: false },
+      equipment: { snow: false, rollerSkis: false, skiErg: true, indoorTrainer: false },
     };
 
     const skidpass = utanSnö(medStakmaskin);

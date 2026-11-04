@@ -289,6 +289,9 @@ export const rulesSchema = z.object({
     _rule: z.string(),
     note: z.string(),
     /** Vad grenen kräver för att kunna göras som tänkt. */
+    _snowNeeds: z.string(),
+    /** Vad som krävs utöver en vintermånad för att det finns snö (R-17). */
+    snowNeeds: z.array(z.string().min(1)).min(1),
     _snowSports: z.string(),
     /** Grenar som kräver snö och ersätts utanför season.winterMonths (R-17). */
     snowSports: z.array(sport),
