@@ -888,9 +888,20 @@ describe('R-15: nedtrappningen har bara korta inslag i zon 3', () => {
 
   it('ger nedtrappningen minst ett kort inslag i zon 3 när tiden räcker', () => {
     // R-15 säger att inslagen ska finnas, inte bara att de ska vara korta.
-    const nedtrappning = buildWeekPlans(P2).filter(
-      ({ week, budget }) => week.phase === 'taper' && budget.enduranceMinutes > TAK * 2,
-    );
+    //
+    // Undantaget är en vecka vars fokusgren har ett högre golv än taket på
+    // hårda minuter: ett simpass är aldrig kortare än sextio minuter (R-40)
+    // och ett hårt pass i nedtrappningen aldrig längre än tjugo. Då finns
+    // inget hårt pass att lägga, och kvalitetspasset ligger i fokusgrenen
+    // eller ingen alls (R-42) — det flyttar inte till cykeln.
+    const nedtrappning = buildWeekPlans(P2).filter(({ week, budget }) => {
+      if (week.phase !== 'taper' || budget.enduranceMinutes <= TAK * 2) return false;
+      if (week.focusRaceId === null) return false;
+
+      const fokus = raceById(week.focusRaceId).sport;
+      const golv: Record<string, number> = rules.session.minMinutesBySport;
+      return (golv[fokus] ?? rules.session.minMinutes) <= TAK;
+    });
 
     expect(nedtrappning.length).toBeGreaterThan(0);
     for (const plan of nedtrappning) {
@@ -899,6 +910,22 @@ describe('R-15: nedtrappningen har bara korta inslag i zon 3', () => {
       );
       expect(hårda.length, `vecka ${plan.week.index}`).toBe(1);
       expect(hårda[0]?.minutes, `vecka ${plan.week.index}`).toBe(TAK);
+    }
+  });
+
+  it('flyttar inte nedtrappningens inslag till en annan gren', () => {
+    // Före 2026-11-04 hamnade det i cykeln när simningens golv krockade med
+    // taket. Kvalitetspasset hör till fokusgrenen, så nu blir det inget pass.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        if (plan.week.phase !== 'taper' || plan.week.focusRaceId === null) continue;
+
+        const fokus = raceById(plan.week.focusRaceId).sport;
+        for (const session of träning(plan)) {
+          if (session.zone === null || session.zone < 3 || session.type === 'race') continue;
+          expect(session.sport, `${namn} v${plan.week.index} ${session.id}`).toBe(fokus);
+        }
+      }
     }
   });
 
@@ -1588,28 +1615,45 @@ describe('R-42: en dag styrka, en dag långpass, en dag intervaller', () => {
     }
   });
 
-  it('ger veckan ett hårt pass när tiden räcker till det', () => {
-    // P1 är ny i både skidor och simning. I de tunnaste basveckorna räcker
-    // tiden till ett simpass och fokusgrenen, och då finns ingen plats kvar
-    // till intervaller — teknik går före, eftersom den inte går att komma
-    // ikapp på slutet. Profilen prövas därför lösare än de övriga.
+  it('lägger varje kvalitetspass i veckans fokusgren', () => {
+    // Det är regeln: veckan handlar om ett lopp, och kvalitetspasset tränar
+    // mot det loppet. Före 2026-11-04 flyttade passet till en gren som hade en
+    // plats ledig, och då låg intervallerna på cykel i en vecka som var
+    // loppspecifik mot Lidingöloppet.
     for (const [namn, planer] of alla()) {
-      let med = 0;
-      let borde = 0;
-
       for (const plan of planer) {
-        const fas = rules.intensity.byPhase[plan.week.phase];
-        if (fas.hardSessionsPerWeek === 0) continue;
-        if (plan.week.raceIds.length > 0 || plan.budget.enduranceMinutes === 0) continue;
+        if (plan.week.focusRaceId === null) continue;
+        const fokus = raceById(plan.week.focusRaceId).sport;
 
-        borde += 1;
-        if (träning(plan).some((session) => session.zone !== null && session.zone >= 3)) med += 1;
+        for (const session of träning(plan)) {
+          if (session.zone === null || session.zone < 3 || session.type === 'race') continue;
+          expect(session.sport, `${namn} v${plan.week.index} ${session.id}`).toBe(fokus);
+        }
       }
-
-      if (borde === 0) continue;
-      const gräns = namn === 'P1' ? 0.45 : 1;
-      expect(med / borde, `${namn}: ${med} av ${borde}`).toBeGreaterThanOrEqual(gräns);
     }
+  });
+
+  it('ger veckan ett kvalitetspass när fokusgrenen har plats till det', () => {
+    // Priset för regeln ovan: räcker fokusgrenens tid inte till både
+    // teknikpass och kvalitetspass får veckan inget kvalitetspass — teknik går
+    // före, den går inte att komma ikapp på slutet (R-21).
+    //
+    // P2 har tio timmar och plats till båda i stort sett varje vecka. De
+    // tunnare profilerna prövas på regeln, inte på frekvensen.
+    let med = 0;
+    let borde = 0;
+
+    for (const plan of buildWeekPlans(P2)) {
+      const fas = rules.intensity.byPhase[plan.week.phase];
+      if (fas.hardSessionsPerWeek === 0) continue;
+      if (plan.week.raceIds.length > 0 || plan.budget.enduranceMinutes === 0) continue;
+
+      borde += 1;
+      if (träning(plan).some((session) => session.zone !== null && session.zone >= 3)) med += 1;
+    }
+
+    expect(borde).toBeGreaterThan(0);
+    expect(med / borde, `P2: ${med} av ${borde}`).toBeGreaterThanOrEqual(0.95);
   });
 
   it('ger aldrig fler pass än veckan har träningsdagar', () => {

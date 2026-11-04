@@ -395,10 +395,11 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
      både rotationen och fokusgrenens återstod, och långpasset lämnar plats för den. Simning
      går inte att komma ikapp de sista veckorna, och en gren som aldrig tränas är precis det
      som gick fel i v0.
-  3. **Krockar golvet med taket på hårda minuter i nedtrappningen (R-15)** läggs veckans korta
-     inslag i högre fart i en annan gren veckan ändå tränar. Finns ingen sådan gren behåller
-     passet sin längd och görs lugnt. Farten ska sitta i kroppen; kroppen bryr sig inte om i
-     vilken gren den fick den.
+  3. **Krockar golvet med taket på hårda minuter i nedtrappningen (R-15)** blir det inget
+     kvalitetspass den veckan *(ändrad 2026-11-04)*. Tidigare lades inslaget i en annan gren,
+     men kvalitetspasset hör till fokusgrenen (R-42) — ett tröskelpass på cykel i
+     nedtrappningen mot Vansbrosimningen tränar inte mot Vansbrosimningen. Nedtrappningen
+     handlar ändå om att vila in sig.
   4. **Golvet och taket går inte alltid att hålla samtidigt.** 106 minuter simning blir
      antingen ett pass på 106 minuter eller två på 53, och båda bryter en regel. Då gäller
      taket, och de minuter som blir över går till en annan gren (R-29). Går de inte dit heller
@@ -428,9 +429,18 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
      `config/rules.json`: `minutesPerSession: 60`, `ownDay: true`, ett pass i veckan.
   2. **Långpassdagen** ligger på den dag användaren valt (R-13) och bär veckans längsta pass.
      Inget annat pass i veckan får vara längre än långpasset — i någon gren.
-  3. **Kvalitetsdagen** bär veckans hårda pass. I specifik fas är det **intervallpasset i
-     zon 4**; i grundperioden tröskelpasset i zon 3, eftersom zon 4 inte hör hemma där än.
-     Passet får en egen plats och ligger först i kön när dagarna delas ut.
+  3. **Kvalitetsdagen** bär veckans hårda pass, och det ligger **alltid i veckans fokusgren**
+     *(skärpt 2026-11-04)*. I specifik fas är det **intervallpasset i zon 4**; i grundperioden
+     tröskelpasset i zon 3, eftersom zon 4 inte hör hemma där än. Passet får en egen plats i
+     fokusgrenen — utöver teknikpasset om grenen har ett — och ligger först i kön när dagarna
+     delas ut.
+
+     **Finns ingen plats i fokusgrenen får veckan inget kvalitetspass.** Det flyttar inte till
+     en annan gren. Veckan handlar om ett lopp, och ett intervallpass på cykel i en vecka som
+     är loppspecifik mot Lidingöloppet tränar inte mot Lidingöloppet. Två fall gör det
+     omöjligt: fokusgrenens tid räcker inte till både teknikpass och kvalitetspass, eller
+     grenens golv är högre än fasens tak på hårda minuter (R-15 mot R-40 i nedtrappningen mot
+     Vansbrosimningen).
   4. **En dag bär ett pass.** Antalet pass är därför aldrig fler än veckan har träningsdagar
      (R-11), och grenarna får platser efter hur mycket tid de har. Minuter som inte får plats
      flyttar till en annan gren (R-29) eller redovisas som oplacerad tid.
@@ -445,11 +455,26 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   annat pass i veckan, och timmar försvinner. Det är samma lån som de sista veckorna i fasen
   (R-13), bara mindre.
 
-  **Känd gräns:** en nybörjare i **två** grenar på sex timmar i veckan får ingen kvalitetsdag i
-  de tunnaste basveckorna. Där räcker tiden till ett simpass på en timme (R-40) och
-  fokusgrenens långpass, och inget mer. Teknik går före intensitet — den går inte att komma
-  ikapp på slutet (R-21). För profil P1 gäller det ungefär halva grundperioden; de övriga fem
-  profilerna får sin kvalitetsdag varje vecka.
+  **Känd gräns, priset för att passet stannar i fokusgrenen** *(mätt 2026-11-04)*:
+
+  | Profil | Veckor som vill ha ett kvalitetspass | Har det | I fokusgrenen |
+  | --- | --- | --- | --- |
+  | P2 (10 h) | 38 | **37** | 37 |
+  | P5 (8 h) | 32 | 28 | 28 |
+  | P6 (8 h) | 36 | 22 | 22 |
+  | P3 (6 h) | 38 | 17 | 17 |
+  | P1 (6 h, ny i två grenar) | 38 | **9** | 9 |
+
+  Inget pass ligger utanför fokusgrenen. Men i en vecka där fokusgrenens tid går till
+  långpasset och teknikpasset finns inget kvar till kvalitetspasset, och då blir veckan utan.
+  Teknik går före intensitet — den går inte att komma ikapp på slutet (R-21), och ett
+  intervallpass går att ta igen nästa vecka.
+
+  **Vad som skulle höja siffrorna:** låta kvalitetspasset låna tid från de andra grenarna,
+  precis som långpasset gör de sista veckorna i fasen (R-13). Ett försök 2026-11-04 krympte
+  långpasset utan att kvalitetspasset blev av, och sextio minuter blev oplacerade i stället —
+  det kräver att grenens minsta tid efter långpasset reserveras i R-08, inte bara att
+  långpasset kortas. Ligger kvar som möjlig förbättring, inte som ett fel.
 
 - **R-43** (tillagd 2026-10-29) **Två lugna dagar efter ett hårt pass.** Efter en belastad dag
   följer **två dagar som varken bär ett hårt pass eller långpasset**. Talet står i
@@ -885,6 +910,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Inga pass före startdatum eller efter sista loppet, och loppdagen innehåller bara loppet (R-01, R-04)
 - Ett skidpass står som skidpass bara när det finns snö — vintermånad och ett spår. Annars görs det som rullskidor, stakmaskin eller stavgång i backe, med tid och zon kvar (R-17) *(ändrad 2026-11-04)*
 - Ett pass som bytt gren har inga alternativ; ett som bara bytt plats behåller dem (R-20, R-37) *(tillagd 2026-11-04)*
+- Varje pass i zon 3–4 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
 - Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
@@ -924,6 +950,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Sex timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
 - Fem timmar i veckan går inte att välja, och sex gör det (R-41) (tillagt 2026-10-29)
 - Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 4 (R-42) (tillagt 2026-10-29)
+- Kvalitetspasset ligger i fokusgrenen i varje vecka som har ett, och veckan är utan hellre än att passet flyttar (R-42) (tillagt 2026-11-04)
+- Nedtrappningsvecka mot Vansbrosimningen: inget kvalitetspass alls, eftersom simningens golv är högre än taket på hårda minuter (R-15, R-40, R-42) (tillagt 2026-11-04)
 - Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
 - Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)
 - Golvet på sex timmar räcker till volymriktmärket på 1000 km när hela året finns kvar (R-34, R-41) (tillagt 2026-10-29)

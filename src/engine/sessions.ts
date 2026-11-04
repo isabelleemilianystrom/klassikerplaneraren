@@ -555,21 +555,34 @@ function enduranceSessions(
     takPerSport.set(sport, Math.max(0, gräns.maxMinutesPerWeek - iLångpasset));
   }
 
-  const fördelat = foldAwayTooSmallSports(kvarPerSport, week, input, races, slots, takPerSport);
+  // R-42: kvalitetspasset ligger i veckans fokusgren. Grenen behöver då en
+  // plats till det passet utöver teknikpasset (R-21) — har den bara en, och
+  // den går till tekniken, finns inget hårt pass kvar att lägga.
+  const fokusgren = focusSportOf(week);
+  const fokusBehov = fokusgren === null ? 0 : focusSlotsNeeded(fokusgren, week, input);
+
+  // Fokusgrenens extra platser tas från de övriga grenarna, inte från luften.
+  const maxSporter = Math.max(1, slots - Math.max(0, fokusBehov - 1));
+
+  const fördelat = foldAwayTooSmallSports(
+    kvarPerSport,
+    week,
+    input,
+    races,
+    maxSporter,
+    takPerSport,
+  );
   // Platserna delas ut: varje gren som kom med får en, och det som blir över
   // går till grenarna med mest tid. Så blir det aldrig fler pass än dagar.
-  const platsPerSport = shareSlots(fördelat, slots);
+  const platsPerSport = shareSlots(fördelat, slots, fokusgren, fokusBehov);
 
-  // R-42: en dag i veckan ska vara intervaller. Passet behöver därför en egen
-  // plats — har grenen bara en plats och den går till teknikpasset (R-21)
-  // finns inget hårt pass kvar att lägga, och veckan blir helt utan kvalitet.
-  // Det hände i 32 av 38 veckor för en nybörjare på skidor.
-  const medLedigPlats = fördelat.filter(([sport]) => {
-    const teknik = needsTechnique(sport, week.phase, input) ? rules.technique.sessionsPerWeek : 0;
-    return (platsPerSport.get(sport) ?? 0) > teknik;
-  });
+  // Kvalitetspasset läggs bara om fokusgrenen faktiskt har en plats kvar till
+  // det när teknikpasset tagit sin. Räcker veckan inte till båda går tekniken
+  // före — den går inte att komma ikapp på slutet (R-21).
+  const fokusHarPlats =
+    fokusgren !== null && (platsPerSport.get(fokusgren) ?? 0) >= fokusBehov && fokusBehov > 0;
 
-  const hårda = hardSessionPlan(week, input, medLedigPlats);
+  const hårda = fokusHarPlats ? hardSessionPlan(week, input, fokusgren as TrainedSport) : new Map();
 
   const resultat: PendingSession[] = [];
 
@@ -810,6 +823,31 @@ function remainingBySport(
  * en fast ordning gör att samma gren alltid väljs bort — och då tränas en
  * fjärde gren aldrig, vilket är värst för den som är nybörjare i just den.
  */
+/** Veckans fokusgren, eller null när veckan inte har något fokuslopp. */
+function focusSportOf(week: WeekSkeleton): TrainedSport | null {
+  if (week.focusRaceId === null) return null;
+  return raceById(week.focusRaceId).sport as TrainedSport;
+}
+
+/**
+ * Platser fokusgrenen behöver (R-21, R-42).
+ *
+ * En för kvalitetspasset, och en till om grenen också ska ha ett teknikpass.
+ * Noll när fasen inte har något hårt pass — då behöver fokusgrenen inget
+ * särskilt och delar platser med de övriga.
+ */
+function focusSlotsNeeded(sport: TrainedSport, week: WeekSkeleton, input: PlanInput): number {
+  if (rules.intensity.byPhase[week.phase].hardSessionsPerWeek === 0) return 0;
+
+  // Krockar grenens golv med fasens tak på hårda minuter finns inget hårt
+  // pass att lägga, och då behövs ingen extra plats.
+  const tak = maxHardMinutes(week.phase);
+  if (tak !== null && sessionFloor(sport) > tak) return 0;
+
+  const teknik = needsTechnique(sport, week.phase, input) ? rules.technique.sessionsPerWeek : 0;
+  return teknik + 1;
+}
+
 /**
  * Veckans platser fördelade på grenarna (R-42).
  *
@@ -821,10 +859,18 @@ function remainingBySport(
 function shareSlots(
   bySport: readonly [TrainedSport, number][],
   slots: number,
+  focus: TrainedSport | null,
+  focusNeeds: number,
 ): Map<TrainedSport, number> {
   const resultat = new Map<TrainedSport, number>(bySport.map(([sport]) => [sport, 1]));
 
-  let kvar = slots - bySport.length;
+  // Fokusgrenen får sitt behov först: en plats till teknikpasset om grenen
+  // kräver det, och en till kvalitetspasset. Veckan handlar om den grenen.
+  const iPlanen = focus !== null && resultat.has(focus);
+  if (iPlanen && focusNeeds > 1) resultat.set(focus as TrainedSport, focusNeeds);
+
+  const taget = [...resultat.values()].reduce((a, b) => a + b, 0);
+  let kvar = slots - taget;
   const ordnade = [...bySport].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
   // Varv efter varv, så att den största grenen inte tar alla platser på en gång.
@@ -1036,7 +1082,7 @@ interface HardSession {
 function hardSessionPlan(
   week: WeekSkeleton,
   input: PlanInput,
-  available: readonly [TrainedSport, number][],
+  sport: TrainedSport,
 ): Map<TrainedSport, HardSession[]> {
   const plan = new Map<TrainedSport, HardSession[]>();
   const fas = rules.intensity.byPhase[week.phase];
@@ -1045,9 +1091,12 @@ function hardSessionPlan(
   // Utan fokuslopp finns ingen sport som veckan handlar om, och därmed inget
   // pass som ska vara hårt.
   if (week.focusRaceId === null) return plan;
-  const fokusgren = raceById(week.focusRaceId).sport as TrainedSport;
-  const sport = hardSessionSport(fokusgren, week.phase, available);
-  if (sport === null) return plan;
+  // R-15 och R-40 kan krocka: i nedtrappningen får ett hårt pass vara högst
+  // tjugo minuter, och ett simpass är aldrig kortare än sextio. Då finns inget
+  // hårt pass att lägga i den grenen, och veckan får inget — kvalitetspasset
+  // ligger i fokusgrenen eller ingen alls.
+  const tak = maxHardMinutes(week.phase);
+  if (tak !== null && sessionFloor(sport) > tak) return plan;
 
   const maxZone = maxZoneFor(week.phase, input.levels[sport]);
   const hårda: HardSession[] = [];
@@ -1061,39 +1110,6 @@ function hardSessionPlan(
 
   plan.set(sport, hårda.slice(0, fas.hardSessionsPerWeek));
   return plan;
-}
-
-/**
- * Grenen veckans hårda inslag läggs i (R-15, R-40).
- *
- * Normalt fokusgrenen — det är den veckan handlar om. Men i nedtrappningen får
- * ett hårt pass vara högst tjugo minuter, och i en gren med eget golv finns
- * inget sådant pass: ett simpass på tjugo minuter är en resa till simhallen
- * för tjugo minuters träning. Då läggs inslaget i en annan gren veckan ändå
- * tränar. Farten ska sitta i kroppen, och kroppen bryr sig inte om i vilken
- * gren den fick den.
- */
-function hardSessionSport(
-  focus: TrainedSport,
-  phase: Phase,
-  available: readonly [TrainedSport, number][],
-): TrainedSport | null {
-  const tak = maxHardMinutes(phase);
-  const rymsIFokus = tak === null || sessionFloor(focus) <= tak;
-  const fokusHarPlats = available.some(([gren]) => gren === focus);
-
-  if (rymsIFokus && fokusHarPlats) return focus;
-
-  // Den gren som har mest tid i veckan får inslaget. Namnet avgör vid lika
-  // tid, så att samma indata alltid ger samma plan.
-  const kandidater = available
-    .filter(([gren]) => gren !== focus && (tak === null || sessionFloor(gren) <= tak))
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-
-  // Finns ingen gren med en ledig plats blir det inget hårt pass. Det är
-  // bättre än att tränga bort teknikpasset, som är det en nybörjare behöver
-  // mest — teknik går inte att komma ikapp på slutet.
-  return kandidater[0]?.[0] ?? (fokusHarPlats ? focus : null);
 }
 
 /** Fasens högsta zon, nedsatt för den som är ny i sporten (R-15). */
