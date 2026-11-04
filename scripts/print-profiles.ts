@@ -14,6 +14,7 @@ import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
 import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
 import { courseAdvice, midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
 import type { PlanInput, Session, Zone } from '../src/engine/types.ts';
+import { EQUIPMENT } from '../src/ui/texts.ts';
 import { PROFILES } from '../tests/profiles.ts';
 
 const DAGNAMN = ['', 'mån', 'tis', 'ons', 'tors', 'fre', 'lör', 'sön'] as const;
@@ -64,10 +65,12 @@ function beskrivProfil(namn: string, input: PlanInput): string[] {
     .map(([sport, nivå]) => `${SPORTNAMN[sport as 'ski']}: ${nivå}`)
     .join(', ');
 
+  // Etiketterna ur formuläret, inte nycklarna. Den som läser filen ska se
+  // samma ord som användaren svarade på.
   const utrustning =
     Object.entries(input.equipment)
       .filter(([, har]) => har)
-      .map(([namn]) => namn)
+      .map(([nyckel]) => EQUIPMENT.find((fråga) => fråga.key === nyckel)?.label ?? nyckel)
       .join(', ') || 'ingen';
 
   return [
