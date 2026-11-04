@@ -30,7 +30,8 @@
       "taperWeeks": 2,
       "recoveryWeeks": 2,
       "specificWeeks": 8,
-      "volumeMilestoneKm": 1000
+      "volumeMilestoneKm": 1000,
+      "fullFocusWeeks": 3
     },
     {
       "id": "vansbrosimningen",
@@ -43,7 +44,8 @@
       ],
       "taperWeeks": 1,
       "recoveryWeeks": 1,
-      "specificWeeks": 6
+      "specificWeeks": 6,
+      "fullFocusWeeks": 2
     },
     {
       "id": "lidingoloppet",
@@ -59,5 +61,5 @@
       "specificWeeks": 8
     }
   ],
-  "_fullFocusWeeks": "R-45: antal veckor före loppveckan där hela konditionstiden går till loppets gren och de övriga pausas. Står bara på Vasaloppet i dag. Saknas talet pausas ingenting."
+  "_fullFocusWeeks": "R-45: antal veckor före loppveckan där hela konditionstiden går till loppets gren och de övriga pausas. Talet är taperWeeks + 1 — nedtrappningen plus den sista loppspecifika veckan. Lidingöloppet saknar talet med flit: löptaket i R-14 begränsar hur mycket löptiden får öka från en vecka till nästa, och en vecka med bara löpning går därför inte att genomföra. Saknas talet pausas ingenting."
 }

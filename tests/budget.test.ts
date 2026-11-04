@@ -1120,12 +1120,28 @@ describe('R-39: grenar som får vänta', () => {
 describe('R-45: fullt fokus de sista veckorna före loppet', () => {
   const VECKOR = raceById('vasaloppet').fullFocusWeeks as number;
 
-  it('har talet i konfigurationen, bara på Vasaloppet', () => {
+  it('har talet i konfigurationen för varje lopp, som taperWeeks plus en', () => {
+    // Nedtrappningen plus den sista loppspecifika veckan. De två långa loppen
+    // får tre veckor, de två korta två.
     expect(VECKOR).toBe(3);
 
-    for (const id of ['vatternrundan', 'vansbrosimningen', 'lidingoloppet'] as const) {
-      expect(raceById(id).fullFocusWeeks, id).toBeUndefined();
+    const väntat = {
+      vasaloppet: 3,
+      vatternrundan: 3,
+      vansbrosimningen: 2,
+    } as const;
+
+    for (const [id, tal] of Object.entries(väntat)) {
+      const race = raceById(id as RaceId);
+      expect(race.fullFocusWeeks, id).toBe(tal);
+      expect(race.fullFocusWeeks, `${id}: taperWeeks + 1`).toBe(race.taperWeeks + 1);
     }
+
+    // Lidingöloppet saknar talet med flit: R-14 begränsar hur mycket löptiden
+    // får öka, så en vecka med bara löpning går inte att genomföra. Med talet
+    // satt till 2 fick löpningen trettiotvå procent av veckan i stället för
+    // hundra, och utan löpreferensen rättad växte den till åtta timmar.
+    expect(raceById('lidingoloppet').fullFocusWeeks).toBeUndefined();
   });
 
   it('ger skidorna hela veckan de tre veckorna före Vasaloppet', () => {
@@ -1166,12 +1182,48 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
     expect((fyraFöre?.budget.bySport.swim ?? 0) > 0).toBe(true);
   });
 
-  it('pausar ingenting inför de lopp som saknar talet', () => {
-    // Bara Vasaloppet har fullFocusWeeks. Veckorna före Vätternrundan ska
-    // alltså ha flera grenar.
-    for (const { vecka } of veckorMedBudget(P1)) {
-      if (vecka.focusRaceId === 'vasaloppet' || vecka.focusRaceId === null) continue;
-      expect(pausedSportsIn(P1, vecka).size, `v${vecka.index}`).toBe(0);
+  it('pausar de andra grenarna inför varje lopp, inte bara Vasaloppet', () => {
+    // Regeln gäller alla fyra loppen. Grenen som blir kvar är fokusloppets.
+    const sedda = new Set<string>();
+
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        const pausade = pausedSportsIn(profil, vecka);
+        if (pausade.size === 0) continue;
+
+        const fokus = raceById(vecka.focusRaceId as RaceId).sport;
+        sedda.add(vecka.focusRaceId as string);
+
+        expect(pausade.has(fokus as never), `${namn} v${vecka.index}`).toBe(false);
+
+        // Fokusgrenen har merparten av veckan. Full hundra procent går inte
+        // att kräva: löptaket i R-14 får skära bort minuter och lägga dem i
+        // en pausad gren, eftersom skaderisken väger tyngre än fokus.
+        const andel = (budget.bySport[fokus as never] ?? 0) / budget.enduranceMinutes;
+        expect(andel, `${namn} v${vecka.index} ${fokus}`).toBeGreaterThan(0.85);
+      }
+    }
+
+    // Vasaloppet och Vätternrundan ska ha prövats. Vansbrosimningen ligger
+    // tre veckor efter Vätternrundan i 2027-kalendern, så dess veckor tillhör
+    // Vätternrundans block (R-03) och den får inga egna fokusveckor, och
+    // Lidingöloppet saknar talet med flit.
+    expect([...sedda].sort()).toEqual(['vasaloppet', 'vatternrundan']);
+  });
+
+  it('ger fokusgrenen hela veckan när löptaket inte är i vägen', () => {
+    // Skidor och cykel har inget tak som R-14, så där blir det hundra procent.
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        if (pausedSportsIn(profil, vecka).size === 0) continue;
+
+        const fokus = raceById(vecka.focusRaceId as RaceId).sport;
+        if (fokus === 'run') continue;
+
+        expect(budget.bySport[fokus as never], `${namn} v${vecka.index}`).toBe(
+          budget.enduranceMinutes,
+        );
+      }
     }
   });
 
@@ -1235,7 +1287,9 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
 
     for (const [namn, start, lopp] of ordningar) {
       const input = medOrdning(start, lopp);
-      const flaggade = fokusveckor(input);
+      const flaggade = fokusveckor(input).filter(
+        ({ vecka }) => vecka.focusRaceId === 'vasaloppet',
+      );
 
       expect(flaggade.length, namn).toBe(VECKOR);
 
@@ -1265,7 +1319,9 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
       ['lidingoloppet', '2027-09-25'],
     ]);
 
-    const flaggade = fokusveckor(input);
+    const flaggade = fokusveckor(input).filter(
+      ({ vecka }) => vecka.focusRaceId === 'vasaloppet',
+    );
 
     expect(flaggade.length).toBeGreaterThan(0);
     expect(flaggade.length).toBeLessThan(VECKOR);
@@ -1276,7 +1332,7 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
 
   it('flaggar exakt tre veckor före Vasaloppet, inte fyra', () => {
     const flaggade = veckorMedBudget(P1).filter(
-      ({ vecka }) => pausedSportsIn(P1, vecka).size > 0,
+      ({ vecka }) => pausedSportsIn(P1, vecka).size > 0 && vecka.focusRaceId === 'vasaloppet',
     );
 
     expect(flaggade.length).toBe(VECKOR);

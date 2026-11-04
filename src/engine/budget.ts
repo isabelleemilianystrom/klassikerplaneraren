@@ -77,11 +77,18 @@ export function weekBudgets(input: PlanInput): WeekBudget[] {
     const budget = weekBudget(week, input, races, sports, runReference);
     resultat.push(budget);
 
+    // R-45: en vecka där löpningen är pausad säger heller ingenting om vad
+    // kroppen är van vid. Blir den referens tror R-14 att löptiden var noll,
+    // och då stängs taket av helt — löpningen växte till åtta timmar veckan
+    // därpå, vilket är precis det taket finns för att förhindra.
+    const pausad = fullFocusSportIn(week, sports, races);
+
     const normalVecka =
       (week.phase === 'base' || week.phase === 'specific') &&
       !week.isDeload &&
       week.raceIds.length === 0 &&
-      budget.enduranceMinutes > 0;
+      budget.enduranceMinutes > 0 &&
+      (pausad === null || pausad === 'run');
 
     if (normalVecka) runReference = budget.bySport.run ?? runReference;
   }
@@ -111,6 +118,8 @@ function weekBudget(
   const strengthMinutes = Math.min(kvar, strengthBudget(week.phase));
   const enduranceMinutes = kvar - strengthMinutes;
 
+  const fulltFokus = fullFocusSportIn(week, sports, races);
+
   const bySport = capRunVolume(
     splitBetweenSports(enduranceMinutes, week, input, sports, races),
     runReference,
@@ -118,6 +127,7 @@ function weekBudget(
     input,
     finishedSports(week, races),
     new Set(sports.filter((sport) => isDeferred(sport, week, input, races))),
+    fulltFokus === null ? new Set() : new Set(sports.filter((sport) => sport !== fulltFokus)),
   );
   const placerat = Object.values(bySport).reduce((a, b) => a + b, 0);
 
@@ -158,6 +168,7 @@ function capRunVolume(
   input: PlanInput,
   finished: ReadonlySet<TrainedSport>,
   deferred: ReadonlySet<TrainedSport>,
+  paused: ReadonlySet<TrainedSport>,
 ): Partial<Record<TrainedSport, number>> {
   const nu = bySport.run;
   if (nu === undefined || runReference === null || runReference === 0) return bySport;
@@ -181,6 +192,12 @@ function capRunVolume(
     // Till skillnad från en avklarad gren finns här inget säsongsundantag —
     // poängen är att grenen inte ska tränas än.
     if (deferred.has(sport)) return 0;
+
+    // R-45 mot R-14: en pausad gren får ta emot det löptaket skär bort.
+    // Pausen handlar om fokus, taket om skaderisk, och skaderisken väger
+    // tyngre. Alternativet vore att löpningen tredubblades de två sista
+    // veckorna före Lidingöloppet, eller att veckans tid krympte.
+    void paused;
 
     // R-36: en avklarad gren får träna i sin egen säsong, men inte utanför.
     if (finished.has(sport) && !isOwnSeason(sport, monthOf(week.startDate))) return 0;

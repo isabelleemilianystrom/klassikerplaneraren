@@ -127,6 +127,21 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
   **taket på 90 minuter i stakmaskin (R-44) går av igen** — en profil med stakmaskin men utan
   spår får fjorton pass över taket, det längsta 240 minuter.
 
+- [ ] **10. Fullt fokus före Lidingöloppet.** *(Hittad 2026-11-04 när R-45 utökades till alla
+  lopp.)* Principen gäller alla fyra loppen, men för Lidingöloppet krockar den med löptaket i
+  R-14. Med `fullFocusWeeks: 2` fick löpningen bara **32 procent** av veckan — taket höll
+  tillbaka den och resten gick till de grenar som skulle vara pausade. Pausen blev en paus på
+  pappret.
+
+  **Förslag: låt det stå som det är.** R-14 finns för att löpning sliter mer, och ett test i
+  sviten säger uttryckligen att det lades in för att stoppa en vecka där löpningen växte från
+  nittio minuter till åtta timmar. De två sista veckorna före ett trettio kilometer långt
+  terränglopp är inte rätt tillfälle att tredubbla löpvolymen.
+
+  Alternativet är att låta pausen gälla och de överblivna minuterna **försvinna** — veckan blir
+  då kortare än användaren valt, vilket bryter mot R-29. Eller att höja löptaket inför
+  Lidingöloppet, vilket är en skaderegel och ditt beslut.
+
 - [x] **6. Demon.** Besvarad 2026-10-29: **högst fem minuter.** Det styr demomanuset i avsnitt 11 och vad som måste finnas. Fem minuter räcker till startsidan, formuläret ifyllt live, översikten och en öppnad vecka. Fasförklaringarna (T-12) hinner knappt visas och är därmed inte kritiska för demon.
 
 ### Not till fråga 3: vad beslutet ändrar
@@ -505,12 +520,31 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-45** (tillagd 2026-11-04) **Fullt fokus de sista veckorna före ett lopp.** Ett lopp kan ha
   ett tal för hur många veckor före loppveckan som hela konditionstiden går till loppets gren.
   De övriga grenarna **pausas** de veckorna. Talet står per lopp i `races.json` som
-  `fullFocusWeeks`. **I dag har bara Vasaloppet ett: 3 veckor.** Saknas talet pausas
-  ingenting.
+  `fullFocusWeeks`, och talet är **`taperWeeks` + 1**: nedtrappningen plus den sista
+  loppspecifika veckan. *(Utökad 2026-11-04 från bara Vasaloppet till alla lopp.)*
+
+  | Lopp | Veckor | Varför |
+  | --- | --- | --- |
+  | Vasaloppet | **3** | taperWeeks 2 + 1 |
+  | Vätternrundan | **3** | taperWeeks 2 + 1 |
+  | Vansbrosimningen | **2** | taperWeeks 1 + 1 |
+  | Lidingöloppet | *inget* | se nedan |
 
   Skälet: tre veckor före Vasaloppet gör ingen nytta i bassängen. Det som avgör på nittio
   kilometer är skidtid, och de timmarna gör mer nytta där. Simningen och cyklingen tappar
   ingenting på tre veckors paus — men skidorna vinner tre veckor till.
+
+  **Lidingöloppet saknar talet med flit.** Löptaket i R-14 begränsar hur mycket löptiden får
+  öka från en vecka till nästa, eftersom löpning sliter mer än skidor och cykel. En vecka med
+  bara löpning går därför inte att genomföra: med talet satt till 2 fick löpningen **trettiotvå
+  procent** av veckan i stället för hundra, för taket höll tillbaka den och resten gick till de
+  grenar som skulle vara pausade. Pausen blev alltså en paus bara på pappret. R-14 lades in för
+  att stoppa en vecka där löpningen växte från nittio minuter till **åtta timmar**, och den
+  regeln väger tyngre. *(Öppen fråga 10.)*
+
+  **Vansbrosimningen har talet men får inga fokusveckor** i 2027-kalendern: loppet ligger tre
+  veckor efter Vätternrundan, så dess veckor tillhör Vätternrundans block (R-03). Talet står
+  där för kalendrar där loppen ligger längre isär.
 
   Regeln gäller bara veckor som har loppet som **fokuslopp**. Ligger två lopp tätt (R-03) ska
   det ena loppets slutspurt inte stänga av det andras uppbyggnad. Loppveckan själv är
@@ -525,6 +559,11 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   **Regeln väger tyngre än R-21, R-31, R-32, R-36 och R-39.** En gren som annars skulle tränas varje
   vecka — en nybörjargren med teknikpass, eller en gren vars egen uppbyggnad börjat — pausas
   ändå. Tre veckor är kort nog att tekniken sitter kvar.
+
+  **En andra följd, hittad 2026-11-04:** en vecka där en gren är pausad får inte bli referens
+  för R-14. Blev den det trodde löptaket att löptiden var noll, och då stängdes taket av helt —
+  löpningen växte till åtta timmar veckan därpå. Pausade veckor hoppas nu över på samma sätt som
+  avlastning, nedtrappning och loppveckor.
 
   **En följd som kostade tid att hitta:** när en gren äger hela veckan ska dess tid delas på
   veckans dagar, inte på två pass. Nedtrappningsveckan före Vasaloppet blev först **ett
@@ -944,6 +983,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Varje pass i zon 3–4 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
 - De sista veckorna före ett lopp med `fullFocusWeeks` får loppets gren hela konditionstiden, och de övriga noll (R-45) *(tillagd 2026-11-04)*
 - Fokusveckorna ligger omedelbart före loppveckan oavsett var i planen loppet hamnar, och loppveckan själv är aldrig en av dem (R-02, R-45) *(tillagd 2026-11-04)*
+- En pausad vecka blir aldrig referens för löptaket i R-14 *(tillagd 2026-11-04)*
+- Löptaket i R-14 väger tyngre än pausen i R-45: en pausad gren får ta emot det taket skär bort *(tillagd 2026-11-04)*
 - En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
@@ -990,6 +1031,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Veckorna före Vätternrundan: ingenting pausat, eftersom loppet saknar talet (R-45) (tillagt 2026-11-04)
 - Vasaloppet först, sist och i mitten: tre fokusveckor i alla tre fallen, alltid direkt före loppveckan (R-02, R-45) (tillagt 2026-11-04)
 - Start två veckor före Vasaloppet: en fokusvecka, inte tre (R-45) (tillagt 2026-11-04)
+- Fokusveckor finns inför både Vasaloppet och Vätternrundan, inte bara ett av dem (R-45) (tillagt 2026-11-04)
+- Fokusgrenen får hela veckan när den inte är löpning; Lidingöloppet saknar därför talet (R-14, R-45) (tillagt 2026-11-04)
 - Nedtrappningsvecka mot Vansbrosimningen: inget kvalitetspass alls, eftersom simningens golv är högre än taket på hårda minuter (R-15, R-40, R-42) (tillagt 2026-11-04)
 - Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
 - Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)
