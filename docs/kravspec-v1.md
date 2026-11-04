@@ -615,6 +615,32 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   alternativ med noteringen *"sliter mindre på kroppen"* (R-37). Passet är det primära och
   grenen ett val — det gäller särskilt löpningen, som sliter mest.
 
+- **R-48** (tillagd 2026-11-04) **Uppmuntran på långpasset när riktmärket inte nås.** Når planen
+  inte ett lopps volymriktmärke (R-34) får **långpassen i den grenen före loppet** ett tillägg i
+  sin instruktion: har dagen mer tid än planen räknat med är det det här passet som ska
+  förlängas. Texten står i `warnings.volumeMilestone.sessionEncouragement`.
+
+  Skälet: varningen i R-34 står i planens topp, men beslutet tas på **passet**. Den som har
+  begränsat med tid når inte tusen kilometer på cykel före Vätternrundan, och då är det värt att
+  säga var de extra minuterna gör mest nytta — i långpasset, inte i ett extra pass.
+
+  **Tonen är ett erbjudande, inte ett krav.** Användaren har valt sina timmar själv och planen
+  räcker för att klara distansen. Lärdomen från v0 gäller: en varning ska betyda "det här når
+  inte ditt mål", aldrig "du tränar för lite". Texten säger därför uttryckligen att planen räcker,
+  och ett test underkänner formuleringar som "du måste", "du borde" och "för lite".
+
+  **Motorn ändrar aldrig planen för att nå ett riktmärke.** R-48 lägger till text, ingenting
+  annat — passlängder, tider och zoner är oförändrade. Tillägget läggs på efter att veckorna är
+  byggda, eftersom det kräver hela planen för att räknas ut.
+
+  Uppmuntran står bara på **långpass**, bara i den gren som missar sitt riktmärke, och bara på
+  pass **före** loppet. Efter loppet är riktmärket inte längre något att närma sig.
+
+  Mätt 2026-11-04: ingen av de sex profilerna med full förberedelsetid får uppmuntran längre —
+  upptrappningen i R-46 tog P1 från 900 till över tusen kilometer. Den som startar i januari med
+  sex timmar i veckan hamnar på 992 km och får uppmuntran på elva pass; vårstarten P6, som bara
+  har sex och en halv vecka till Vätternrundan, får den på fem.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -756,7 +782,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-24** Vasaloppet med nivå Ny i skidor och varken snö, rullskidor eller stakmaskin: "Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet."
 
 - **R-26** (tillagd 2026-10-27) Spänner loppen över mer än tolv månader: "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader." Planen skapas ändå. Kontrollen är det som gör planen till en klassikerplan och inte bara ett träningsprogram.
-- **R-34** (tillagd 2026-10-28) Planen når inte ett lopps volymriktmärke: "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor." Tonen är medveten: varningen betyder "det här når inte riktmärket", aldrig "du tränar för lite".
+- **R-34** (tillagd 2026-10-28) Planen når inte ett lopps volymriktmärke: "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor." Tonen är medveten: varningen betyder "det här når inte riktmärket", aldrig "du tränar för lite". *(2026-11-04: samma besked finns nu också på långpasset, se R-48.)*
 - **R-35** (tillagd 2026-10-28) **Mindre än tio veckor till första loppet.** Varningen lyder:
   "Det är {weeks} till {race}. Ett helt program börjar med en grundperiod på flera månader, och
   den hinner du inte – du hoppar in mitt i programmet, i den loppspecifika delen. Planen är lagd
@@ -1030,6 +1056,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Löptaket i R-14 väger tyngre än pausen i R-45: en pausad gren får ta emot det taket skär bort *(tillagd 2026-11-04)*
 - Långpasset krymper aldrig inom en fas, och i löpning växer det högst femton procent i veckan (R-46) *(tillagd 2026-11-04)*
 - Varje långpass i löpning erbjuder cykel som alternativ (R-37, R-47) *(tillagd 2026-11-04)*
+- Uppmuntran i R-48 står bara på långpass, bara i grenen som missar riktmärket och bara före loppet *(tillagd 2026-11-04)*
+- R-48 ändrar bara text: inga passlängder, tider eller zoner rörs *(tillagd 2026-11-04)*
+- Varje gren har exakt ett lopp — tre ställen i motorn letar upp "grenens lopp" och tar det första *(tillagd 2026-11-04)*
 - Fokus växlar till nästa lopp i datumordning när det förras återhämtning är slut (R-02, R-47) *(tillagd 2026-11-04)*
 - En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
@@ -1082,6 +1111,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Långpasset i löpning mot Lidingöloppet: stiger varje vecka, aldrig fyra platta veckor följt av ett hopp (R-46) (tillagt 2026-11-04)
 - Upptrappningen når grenens tak före loppet, utom för den som har för kort tid (R-46) (tillagt 2026-11-04)
 - Efter Vansbrosimningens återhämtning är nästa veckas fokus Lidingöloppet, både vid höststart och vårstart (R-47) (tillagt 2026-11-04)
+- Start i januari med sex timmar: 992 km mot riktmärkets 1000, och elva långpass på cykel bär uppmuntran (R-48) (tillagt 2026-11-04)
+- Profil som når riktmärket: ingen uppmuntran någonstans (R-48) (tillagt 2026-11-04)
 - Nedtrappningsvecka mot Vansbrosimningen: inget kvalitetspass alls, eftersom simningens golv är högre än taket på hårda minuter (R-15, R-40, R-42) (tillagt 2026-11-04)
 - Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
 - Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)

@@ -138,3 +138,60 @@ function sportName(sport: TrainedSport): string {
   };
   return namn[sport];
 }
+
+/**
+ * Planen med uppmuntran på långpassen i de grenar som inte når riktmärket (R-48).
+ *
+ * Den som har begränsat med tid når inte tusen kilometer på cykel före
+ * Vätternrundan, och det säger varningen i R-34 redan. Men varningen står i
+ * planens topp, och det är på **passet** beslutet tas: har dagen mer tid än
+ * planen räknat med är det långpasset som ska förlängas, inte ett extra pass
+ * som ska läggas till.
+ *
+ * Tonen är ett erbjudande. Användaren har valt sina timmar själv, och planen
+ * räcker för att klara distansen — det här är för de dagar då tiden råkar
+ * finnas. Lärdomen från v0: en varning ska betyda "det här når inte ditt mål",
+ * aldrig "du tränar för lite".
+ *
+ * Uppmuntran läggs bara på långpass i grenen, och bara på pass före loppet.
+ * Efter loppet är riktmärket inte längre något att närma sig.
+ */
+export function withVolumeEncouragement(
+  plans: readonly WeekPlan[],
+  input: PlanInput,
+): WeekPlan[] {
+  const missade = volumeChecks(input, plans).filter((check) => !check.reached);
+  if (missade.length === 0) return [...plans];
+
+  const { sessionEncouragement } = rules.warnings.volumeMilestone;
+
+  return plans.map((plan) => ({
+    ...plan,
+    sessions: plan.sessions.map((session) => {
+      if (session.type !== 'long' || session.sport === null) return session;
+
+      const check = missade.find((kandidat) => kandidat.sport === session.sport);
+      if (check === undefined) return session;
+
+      const race = raceById(check.raceId);
+      if (session.date >= raceDateIn(input, check.raceId)) return session;
+
+      return {
+        ...session,
+        instruction:
+          session.instruction +
+          sessionEncouragement
+            .replace('{race}', race.name)
+            .replace('{milestone}', String(check.milestoneKm)),
+      };
+    }),
+  }));
+}
+
+/** Loppets datum i den här planen. */
+function raceDateIn(input: PlanInput, raceId: RaceId): string {
+  const race = input.races.find((kandidat) => kandidat.id === raceId);
+  if (race === undefined) throw new Error(`Loppet ${raceId} finns inte i planen`);
+
+  return race.date;
+}

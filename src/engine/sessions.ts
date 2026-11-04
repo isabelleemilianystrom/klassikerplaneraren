@@ -19,6 +19,7 @@
  * Rena funktioner, inga sidoeffekter. Alla siffror kommer ur `config/rules.json`.
  */
 import { isDeferred, newLevelLimit, weekBudgets, type WeekBudget } from './budget.ts';
+import { withVolumeEncouragement } from './volume.ts';
 import { raceById, rules, sessions as sessionTexts } from './config.ts';
 import { addDays, monthOf, weekdayOf } from './dates.ts';
 import type {
@@ -98,7 +99,10 @@ export function buildWeekPlans(input: PlanInput): WeekPlan[] {
     före = carryOver(plan);
   }
 
-  return resultat;
+  // R-48: sist läggs uppmuntran på långpassen i de grenar där planen inte når
+  // sitt volymriktmärke. Den behöver hela planen för att räknas ut, så den
+  // kommer efter att veckorna är byggda — inte inne i dem.
+  return withVolumeEncouragement(resultat, input);
 }
 
 /**

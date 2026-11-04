@@ -236,6 +236,27 @@ describe('config/sessions.json', () => {
     }
   });
 
+  it('har exakt ett lopp per gren', () => {
+    // Tre ställen i motorn letar upp "grenens lopp" med find() och tar det
+    // första: R-39:s uppskjutning, R-38:s målsättning och R-40:s veckokrav.
+    // Med två lopp i samma gren skulle de tysta välja ett av dem.
+    //
+    // Det är också det som gör datumvaktet i R-48 onåbart: ett långpass ligger
+    // alltid i veckans fokusgren, och en gren är fokus bara i sitt eget lopps
+    // block — alltså före loppet. Finge en gren två lopp skulle vaktet behövas.
+    const perGren = new Map<string, string[]>();
+
+    for (const race of races.races) {
+      const lista = perGren.get(race.sport) ?? [];
+      lista.push(race.id);
+      perGren.set(race.sport, lista);
+    }
+
+    for (const [gren, lopp] of perGren) {
+      expect(lopp.length, `${gren}: ${lopp.join(', ')}`).toBe(1);
+    }
+  });
+
   it('har säkerhetstexten för öppet vatten ordagrant från avsnitt 8', () => {
     expect(sessions.safetyNotes.openWater.text).toBe(
       'Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.',

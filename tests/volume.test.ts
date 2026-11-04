@@ -177,3 +177,101 @@ describe('R-34: varningstexten', () => {
     }
   });
 });
+
+
+describe('R-48: uppmuntran på långpasset när riktmärket inte nås', () => {
+  const TEXT = rules.warnings.volumeMilestone.sessionEncouragement;
+
+  /** En plan med knapp tid: P1 men med start i januari. */
+  const knappTid: PlanInput = { ...P1, startDate: '2027-01-04', today: '2027-01-04' };
+
+  function pass(input: PlanInput) {
+    return buildWeekPlans(input).flatMap((plan) => plan.sessions);
+  }
+
+  function medUppmuntran(input: PlanInput) {
+    const bit = TEXT.trim().slice(0, 30);
+    return pass(input).filter((session) => session.instruction?.includes(bit) === true);
+  }
+
+  it('har texten i konfigurationen med sina platshållare', () => {
+    expect(TEXT).toContain('{race}');
+    expect(TEXT).toContain('{milestone}');
+
+    // Tonen: ett erbjudande, inte ett krav. Planen räcker ändå.
+    expect(TEXT).toContain('klara distansen');
+    expect(TEXT).not.toMatch(/du måste|du borde|för lite|otillräckligt/i);
+  });
+
+  it('lägger uppmuntran på långpassen när planen inte når riktmärket', () => {
+    const check = kontroller(knappTid)[0];
+    expect(check?.reached).toBe(false);
+
+    const uppmuntrade = medUppmuntran(knappTid);
+    expect(uppmuntrade.length).toBeGreaterThan(0);
+
+    for (const session of uppmuntrade) {
+      expect(session.type, session.id).toBe('long');
+      expect(session.sport, session.id).toBe(check?.sport);
+    }
+  });
+
+  it('nämner loppet och riktmärket, utan platshållare kvar', () => {
+    const check = kontroller(knappTid)[0];
+
+    for (const session of medUppmuntran(knappTid)) {
+      expect(session.instruction, session.id).toContain(raceById(check?.raceId as never).name);
+      expect(session.instruction, session.id).toContain(String(check?.milestoneKm));
+      expect(session.instruction, session.id).not.toMatch(/\{\w+\}/);
+    }
+  });
+
+  it('säger ingenting när riktmärket nås', () => {
+    // P2 cyklar långt över tusen kilometer. Att uppmuntra henne till mer vore
+    // att göra varningen till brus.
+    const check = kontroller(P2)[0];
+    expect(check?.reached).toBe(true);
+    expect(medUppmuntran(P2)).toEqual([]);
+  });
+
+  it('lägger ingen uppmuntran på pass efter loppet', () => {
+    // Efter loppet är riktmärket inte längre något att närma sig.
+    const lopp = knappTid.races.find((race) => race.id === 'vatternrundan')?.date as string;
+
+    for (const session of medUppmuntran(knappTid)) {
+      expect(session.date < lopp, `${session.id} ${session.date}`).toBe(true);
+    }
+  });
+
+  it('lägger ingen uppmuntran på ett vanligt pass eller en annan gren', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      const missade = kontroller(profil).filter((check) => !check.reached);
+      const grenar = new Set(missade.map((check) => check.sport));
+
+      for (const session of medUppmuntran(profil)) {
+        expect(session.type, `${namn} ${session.id}`).toBe('long');
+        expect(grenar.has(session.sport as never), `${namn} ${session.id}`).toBe(true);
+      }
+    }
+  });
+
+  it('ändrar inte planen, bara texten', () => {
+    // Motorn når aldrig ett riktmärke genom att lägga till träning. Uppmuntran
+    // är ett erbjudande till användaren, inte en ändring av programmet.
+    const planer = buildWeekPlans(knappTid);
+    const totalt = planer.reduce((summa, plan) => summa + plan.totalMinutes, 0);
+    const långpass = planer.flatMap((plan) =>
+      plan.sessions.filter((session) => session.type === 'long'),
+    );
+
+    expect(medUppmuntran(knappTid).length).toBeGreaterThan(0);
+    expect(totalt).toBeGreaterThan(0);
+
+    // Inget långpass är längre än taken tillåter — uppmuntran rör inte tiden.
+    for (const session of långpass) {
+      if (session.sport === null) continue;
+      const tak = rules.longSession.capMinutesBySport[session.sport as 'bike'];
+      expect(session.minutes, session.id).toBeLessThanOrEqual(tak);
+    }
+  });
+});

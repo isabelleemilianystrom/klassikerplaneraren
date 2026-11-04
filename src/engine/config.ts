@@ -374,7 +374,13 @@ export const rulesSchema = z.object({
     shortPreparation: z.object({ weeksThreshold: z.number().int().positive(), text: z.string().min(1) }),
     skiTechnique: z.object({ text: z.string().min(1) }),
     outsideClassicWindow: z.object({ text: z.string().min(1) }),
-    volumeMilestone: z.object({ _rule: z.string(), text: z.string().min(1) }),
+    volumeMilestone: z.object({
+      _rule: z.string(),
+      text: z.string().min(1),
+      _sessionEncouragement: z.string(),
+      /** Läggs till på långpasset när riktmärket inte nås (R-48). */
+      sessionEncouragement: z.string().min(1),
+    }),
     midProgramme: z.object({
       _rule: z.string(),
       weeksThreshold: z.number().int().positive(),

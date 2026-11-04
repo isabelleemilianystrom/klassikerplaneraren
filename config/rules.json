@@ -272,7 +272,9 @@
     },
     "volumeMilestone": {
       "_rule": "R-34",
-      "text": "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor."
+      "text": "Med dina timmar hinner du ungefär {km} km på {sport} före {race}. Många siktar på {milestone} km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor.",
+      "_sessionEncouragement": "R-48: läggs till på långpasset i grenen när planen inte når riktmärket. Tonen är ett erbjudande, inte ett krav: den som har begränsat med tid har valt sina timmar själv, och planen räcker för att klara distansen. Det här är för de dagar då tiden råkar finnas.",
+      "sessionEncouragement": " Har du tid över i dag är det här passet du ska förlänga — det är de sammanlagda kilometrarna som bär dig genom {race}, inte ett enskilt pass. Planen räcker för att du ska klara distansen; det här är om du vill närma dig {milestone} km."
     },
     "midProgramme": {
       "_rule": "R-35",
