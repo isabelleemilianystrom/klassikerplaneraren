@@ -218,9 +218,21 @@ describe('config/sessions.json', () => {
     expect(Object.keys(sessions.types).sort()).toEqual([...alla].sort());
   });
 
-  it('har ersättningar för varje gren som kan sakna utrustning (R-17, R-18, R-20)', () => {
-    for (const nyckel of ['ski.skiErg', 'ski.poleWalk', 'swim.dryland', 'bike.indoor']) {
+  it('har ersättningar för varje gren som kan sakna utrustning (R-17, R-20)', () => {
+    for (const nyckel of ['ski.skiErg', 'ski.poleWalk', 'bike.indoor']) {
       expect(sessions.substitutes[nyckel], `ersättningen ${nyckel} saknas`).toBeDefined();
+    }
+  });
+
+  it('har ingen ersättning för simning (R-18 borttagen)', () => {
+    // Simpass ersätts inte. Kan man inte simma lär man sig det i en simhall,
+    // och gummiband är inte simträning — ett pass som hette "Simträning på
+    // land" i zon 4 var en motsägelse.
+    expect(rules.substitutions.bySport.swim).toBeUndefined();
+    expect(rules.substitutions.requiredEquipment.swim).toBeUndefined();
+
+    for (const nyckel of Object.keys(sessions.substitutes)) {
+      expect(nyckel.startsWith('swim.'), `${nyckel} ska inte finnas`).toBe(false);
     }
   });
 

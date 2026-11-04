@@ -78,11 +78,6 @@
       "title": "Stavgång i backe",
       "instruction": "Samma tid och samma zon som skidpasset. Gå i uppförsbacke med stavar och tryck ifrån med armarna i varje steg."
     },
-    "swim.dryland": {
-      "_rule": "R-18",
-      "title": "Simträning på land",
-      "instruction": "Rörlighet för axlar och bröstrygg, plus gummiband för simtaget. Det ersätter inte tid i vattnet, men håller rörelsen vid liv tills du kommer åt en bassäng."
-    },
     "bike.indoor": {
       "_rule": "R-20",
       "title": "Cykel, t.ex. spinning på gym",

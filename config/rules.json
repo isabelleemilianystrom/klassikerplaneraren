@@ -333,14 +333,12 @@
     }
   },
   "substitutions": {
-    "_rule": "R-17, R-18, R-19, R-20",
+    "_rule": "R-17, R-19, R-20",
+    "_swim": "R-18 borttagen 2026-11-04: simpass ersätts inte. Kan man inte simma behöver man lära sig det i en simhall, och det går inte att träna bort med gummiband. Saknas simhall är det användarens sak att lösa. openWaterSports är kvar — den styr säkerhetstexten i R-19.",
     "note": "Ett pass i en gren användaren saknar utrustning för görs på ett annat sätt, det stryks inte. requiredEquipment säger vad grenen kräver för att kunna göras som tänkt; saknas det väljs den första ersättningen i bySport vars egen utrustning finns. Den sista i listan kräver ingenting och gäller alltid som sista utväg.",
     "requiredEquipment": {
       "ski": [
         "snowOrRollerSkis"
-      ],
-      "swim": [
-        "pool"
       ],
       "bike": [
         "bike"
@@ -359,12 +357,6 @@
         },
         {
           "key": "ski.poleWalk",
-          "needs": []
-        }
-      ],
-      "swim": [
-        {
-          "key": "swim.dryland",
           "needs": []
         }
       ],

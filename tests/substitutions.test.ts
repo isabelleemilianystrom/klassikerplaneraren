@@ -63,34 +63,45 @@ describe('R-17: skidor utan snö eller rullskidor', () => {
   });
 });
 
-describe('R-18 och R-19: simning utan simhall', () => {
-  it('ger torrövningar utanför öppet vatten-säsongen', () => {
-    const simpass = pass(P3).filter(
-      (s) =>
-        s.sport === 'swim' && s.type !== 'race' && !ÖPPET_VATTEN.includes(monthOf(s.date)),
-    );
+describe('R-18 borttagen: simpass ersätts aldrig', () => {
+  it('ersätter inte simpass för den som saknar simhall, någon månad', () => {
+    // P3 har bara cykel. Före 2026-11-04 blev hennes simpass torrövningar med
+    // gummiband, och två av dem hamnade i zon 4 — rubriken sa hårda
+    // intervaller och instruktionen beskrev rörlighetsträning.
+    //
+    // Nu planeras simpass som simpass. Kan man inte simma behöver man lära sig
+    // det i en simhall, och saknas den är det användarens sak att lösa.
+    const simpass = pass(P3).filter((s) => s.sport === 'swim' && s.type !== 'race');
 
     expect(simpass.length).toBeGreaterThan(0);
     for (const session of simpass) {
-      expect(session.substitutedAs, `${session.id} ${session.date}`).toBe('swim.dryland');
+      expect(session.substitutedAs, `${session.id} ${session.date}`).toBeUndefined();
     }
   });
 
-  it('kräver ingen simhall i öppet vatten juni till augusti', () => {
-    const sommarsim = pass(P3).filter(
-      (s) => s.sport === 'swim' && s.type !== 'race' && ÖPPET_VATTEN.includes(monthOf(s.date)),
-    );
-
-    expect(sommarsim.length).toBeGreaterThan(0);
-    for (const session of sommarsim) {
-      expect(session.substitutedAs, session.id).toBeUndefined();
+  it('ersätter inte simpass för någon av profilerna, med eller utan simhall', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const session of pass(profil)) {
+        if (session.sport !== 'swim') continue;
+        expect(session.substitutedAs, `${namn} ${session.id}`).toBeUndefined();
+      }
     }
   });
 
-  it('rör inte simpassen för den som har simhall', () => {
-    for (const session of pass(P1)) {
-      if (session.sport !== 'swim') continue;
-      expect(session.substitutedAs, session.id).toBeUndefined();
+  it('låter inget ersatt pass motsäga sin egen instruktion', () => {
+    // Det var det som gjorde torrövningarna fel: ett hårt pass blev
+    // rörlighetsträning men behöll zon 4. De ersättningar som finns kvar är
+    // likvärdig träning — stavgång i backe i zon 4 är riktigt backarbete, och
+    // spinning i zon 4 är riktiga intervaller.
+    const likvärdiga = ['ski.skiErg', 'ski.poleWalk', 'bike.indoor'];
+
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const session of pass(profil)) {
+        if (session.substitutedAs === undefined) continue;
+        if (session.zone === null || session.zone < 3) continue;
+
+        expect(likvärdiga, `${namn} ${session.id}`).toContain(session.substitutedAs);
+      }
     }
   });
 });

@@ -98,6 +98,13 @@ Isabelle besvarar frågorna här i dokumentet. Claude Code får inte anta ett sv
 
   **R-26 var den enda av de fyra varningarna som saknades på riktigt** och är nu byggd.
 
+- [ ] **8. Simhallsfrågan i formuläret.** *(Hittad 2026-11-04 när R-18 togs bort.)* `pool` var
+  den enda utrustning simningen behövde, och med R-18 borta styr den ingenting i planen.
+  Frågan "har du tillgång till simhall?" står kvar i steg 3 men påverkar inte vad användaren
+  får. **Förslag: ta bort frågan** — ett formulär som frågar om något som inte spelar någon
+  roll gör resten av frågorna mindre trovärdiga. Alternativet är att låta den stå, eftersom
+  den säger något om vad appen bryr sig om. Blockerar inget.
+
 - [x] **6. Demon.** Besvarad 2026-10-29: **högst fem minuter.** Det styr demomanuset i avsnitt 11 och vad som måste finnas. Fem minuter räcker till startsidan, formuläret ifyllt live, översikten och en öppnad vecka. Fasförklaringarna (T-12) hinner knappt visas och är därmed inte kritiska för demon.
 
 ### Not till fråga 3: vad beslutet ändrar
@@ -538,8 +545,16 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 **Ersättningar, teknik och säsong**
 
 - **R-17** Skidor utan snö eller rullskidor: stakmaskin om användaren har en, annars stavgång i backe med samma tid och zon. *(preciserad 2026-10-28)* Passet **behåller grenen**: det tränar fortfarande mot Vasaloppet, och det ska synas i planen. Stavgång i backe är skidträning, inte en nödlösning — bor man där det inte finns snö är det så man tränar för Vasaloppet, och det är bra träning. Gränssnittet ska därför visa "Stavgång i backe — Längdskidor", aldrig "i stället för längdskidor".
-- **R-18** Simning utan simhall: före juni ersätts simpass med torrövningar för simteknik, och en varning visas om att simträning behövs. *(preciserad 2026-10-28)* Undantaget är `season.openWaterMonths`, juni till augusti: då simmar man i öppet vatten och behöver ingen simhall, och det är dessutom vad Vansbrosimningen faktiskt är. Utanför de månaderna — inte bara före juni — blir simpassen torrövningar för den som saknar simhall. I oktober finns varken bassäng eller öppet vatten.
-- **R-19** Pass i öppet vatten planeras bara juni–augusti och har alltid säkerhetstexten från avsnitt 8. *(preciserad 2026-10-28)* Simpass juni till augusti planeras som öppet vatten och bär säkerhetstexten i fältet `safetyNote`. Texten sätts aldrig på ett ersatt pass: torrövningar på land behöver ingen varning om köldchock.
+- **R-18** ~~Simning utan simhall: simpass ersätts med torrövningar för simteknik utanför
+  `season.openWaterMonths`.~~ **Borttagen 2026-11-04.** Simpass ersätts inte längre. Kan man
+  inte simma behöver man lära sig det, och det görs i en simhall — gummiband och rörlighet för
+  axlarna är inte simträning, och ett pass som heter "Simträning på land" i zon 4 är en
+  motsägelse. Saknas simhall är det användarens sak att lösa. Simpassen planeras som simpass,
+  och R-21:s kursråd står kvar för den som är ny i grenen.
+
+  Följden: `equipment.pool` påverkar inte längre planen alls. Frågan står kvar i formuläret
+  (K-04) men styr ingenting — se öppen fråga 8 i avsnitt 3.
+- **R-19** Pass i öppet vatten planeras bara juni–augusti och har alltid säkerhetstexten från avsnitt 8. *(preciserad 2026-10-28)* Simpass juni till augusti planeras som öppet vatten och bär säkerhetstexten i fältet `safetyNote`. Texten sätts aldrig på ett ersatt pass — ett skidpass som blivit stavgång i backe behöver ingen varning om köldchock. *(2026-11-04: simpass ersätts inte längre, se R-18.)*
 - **R-20** Cykel utan landsvägscykel eller trainer: passet blir "cykel, t.ex. spinning på gym" och en varning visas.
 - **R-21** Nivå Ny i skidor eller simning: ett teknikpass per vecka i den sporten under bas och specifik fas, och en rekommendation om kurs i översikten. *(preciserad 2026-10-28)* Teknikpasset tas **före** veckans hårda pass — är man nybörjare avgör tekniken mer än intensiteten. Kursrekommendationen ges bara för grenar vars lopp faktiskt ingår i planen; ett simråd till den som inte ska simma Vansbrosimningen är bara brus. Texterna ligger i `technique.courseAdvice` i `config/rules.json`.
 
@@ -864,9 +879,10 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Nedtrappningsvecka mot Vansbrosimningen: inget simpass på tjugo minuter, och veckans korta inslag i högre fart finns kvar (R-15, R-40) (tillagt 2026-10-29)
 - Hela flödet vid 360 px: startsida, tre formulärsteg, planvy och öppnad vecka — ingen vågrät scroll, ingen tryckyta under 44 px (K-12) (tillagt 2026-10-29)
 - Cykellångpass i mars erbjuder längdskidor som alternativ; samma pass i april gör det inte (R-37) (tillagt 2026-10-28)
-- Profil utan utrustning: skidpassen blir stavgång, simpassen torrövningar, och inget pass stryks (R-17, R-18) (tillagt 2026-10-28)
+- Profil utan utrustning: skidpassen blir stavgång, simpassen planeras som simpass, och inget pass stryks (R-17) *(ändrat 2026-11-04: R-18 borttagen)*
 - Samma profil med stakmaskin: skidpassen blir stakmaskin i stället för stavgång (R-17) (tillagt 2026-10-28)
-- Simpass i juli utan simhall: ingen ersättning, eftersom öppet vatten inte kräver bassäng (R-19) (tillagt 2026-10-28)
+- Simpass utan simhall ersätts aldrig, någon månad (R-18 borttagen 2026-11-04)
+- Inget pass bär en zon som motsäger sin instruktion: ingen ersättning finns kvar som gör ett hårt pass till rörlighetsträning (R-15, R-18) (tillagt 2026-11-04)
 - Lidingöloppets block när de tre andra loppen är avklarade: löpningen växer högst 10 procent i veckan (R-14) (tillagt 2026-10-28)
 - Sparad plan i ett gammalt eller trasigt format: kastas, rensas och ger ett meddelande — aldrig en tom sida (K-15)
 - Sparad plan med rätt versionsnummer men fel form: kastas också — det var v0:s fel (K-15) (tillagt 2026-10-28)
