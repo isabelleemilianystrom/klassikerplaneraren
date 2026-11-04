@@ -15,7 +15,8 @@
       ],
       "taperWeeks": 2,
       "recoveryWeeks": 2,
-      "specificWeeks": 8
+      "specificWeeks": 8,
+      "fullFocusWeeks": 3
     },
     {
       "id": "vatternrundan",
@@ -57,5 +58,6 @@
       "recoveryWeeks": 1,
       "specificWeeks": 8
     }
-  ]
+  ],
+  "_fullFocusWeeks": "R-45: antal veckor före loppveckan där hela konditionstiden går till loppets gren och de övriga pausas. Står bara på Vasaloppet i dag. Saknas talet pausas ingenting."
 }

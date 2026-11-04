@@ -1470,7 +1470,11 @@ describe('R-40: golv per gren', () => {
   it('ger nybörjaren sin timme i vattnet varje vecka, också när långpasset är stort', () => {
     // R-31 och R-40 tillsammans: nybörjarkursen är en timme i veckan, och
     // långpasset ska lämna plats för den. Simning går inte att komma ikapp.
-    const veckor = buildWeekPlans(P1).filter(({ budget }) => budget.enduranceMinutes > 0);
+    // Undantaget är de sista veckorna före Vasaloppet, där allt är skidor
+    // (R-45). Simningen pausas då, och grenen har noll minuter att lägga.
+    const veckor = buildWeekPlans(P1).filter(
+      ({ budget }) => budget.enduranceMinutes > 0 && (budget.bySport.swim ?? 0) > 0,
+    );
 
     expect(veckor.length).toBeGreaterThan(0);
     for (const plan of veckor) {

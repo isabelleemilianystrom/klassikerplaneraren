@@ -1045,11 +1045,12 @@ function splitIntoSessions(
 
   const taket = Math.min(maxLength, sessionCeiling(sport));
 
-  // Så många pass att inget blir längre än taket — men aldrig så många att
-  // något blir kortare än golvet, och aldrig fler än R-31 tillåter.
-  const förTaket = Math.ceil(minutes / taket);
+  // Grenen använder de platser den fått, så länge varje pass håller golvet.
+  // Att föreslå två långa pass när veckan har sex dagar ger ett pass på fem
+  // timmar och fyra vilodagar — det hände i nedtrappningen före Vasaloppet,
+  // när R-45 gav skidorna hela veckan.
   const flest = Math.min(Math.floor(minutes / golv), maxSessions);
-  const antal = Math.max(1, Math.min(flest, Math.max(2, förTaket)));
+  const antal = Math.max(1, flest);
 
   const grund = Math.floor(minutes / antal);
   const rest = minutes - grund * antal;

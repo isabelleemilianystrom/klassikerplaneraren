@@ -502,6 +502,31 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   Det sliter på armbågar och axlar jämfört med att åka skidor, och är dessutom tungt att hålla
   ut. Stavgång i backe är fullgod skidträning (R-17), så delningen kostar ingenting.
 
+- **R-45** (tillagd 2026-11-04) **Fullt fokus de sista veckorna före ett lopp.** Ett lopp kan ha
+  ett tal för hur många veckor före loppveckan som hela konditionstiden går till loppets gren.
+  De övriga grenarna **pausas** de veckorna. Talet står per lopp i `races.json` som
+  `fullFocusWeeks`. **I dag har bara Vasaloppet ett: 3 veckor.** Saknas talet pausas
+  ingenting.
+
+  Skälet: tre veckor före Vasaloppet gör ingen nytta i bassängen. Det som avgör på nittio
+  kilometer är skidtid, och de timmarna gör mer nytta där. Simningen och cyklingen tappar
+  ingenting på tre veckors paus — men skidorna vinner tre veckor till.
+
+  Regeln gäller bara veckor som har loppet som **fokuslopp**. Ligger två lopp tätt (R-03) ska
+  det ena loppets slutspurt inte stänga av det andras uppbyggnad. Loppveckan själv är
+  oförändrad: där gäller R-04, bara loppet och öppningspasset.
+
+  **Regeln väger tyngre än R-21, R-31, R-32 och R-39.** En gren som annars skulle tränas varje
+  vecka — en nybörjargren med teknikpass, eller en gren vars egen uppbyggnad börjat — pausas
+  ändå. Tre veckor är kort nog att tekniken sitter kvar.
+
+  **En följd som kostade tid att hitta:** när en gren äger hela veckan ska dess tid delas på
+  veckans dagar, inte på två pass. Nedtrappningsveckan före Vasaloppet blev först **ett
+  skidpass på fem timmar och fyra vilodagar**, eftersom uppdelningen föredrog två pass — en
+  regel som var rimlig när en gren hade en liten andel. Nu används de platser grenen fått, och
+  veckan blev fem skidpass à 68 minuter plus ett kort tempopass. Den oplacerade tiden i de sex
+  profilerna sjönk samtidigt från 91 till 81 minuter.
+
 - **R-33** (tillagd 2026-10-28) **Teknikpass under återhämtningen.** Pass i en teknikgren blir
   teknikpass i stället för vanliga pass under återhämtningsveckorna. Grenarna står i
   `recovery.techniqueSports` i `config/rules.json` och är simning och längdskidor.
@@ -911,6 +936,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Ett skidpass står som skidpass bara när det finns snö — vintermånad och ett spår. Annars görs det som rullskidor, stakmaskin eller stavgång i backe, med tid och zon kvar (R-17) *(ändrad 2026-11-04)*
 - Ett pass som bytt gren har inga alternativ; ett som bara bytt plats behåller dem (R-20, R-37) *(tillagd 2026-11-04)*
 - Varje pass i zon 3–4 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
+- De sista veckorna före ett lopp med `fullFocusWeeks` får loppets gren hela konditionstiden, och de övriga noll (R-45) *(tillagd 2026-11-04)*
+- En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
 - Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
@@ -951,6 +978,9 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Fem timmar i veckan går inte att välja, och sex gör det (R-41) (tillagt 2026-10-29)
 - Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 4 (R-42) (tillagt 2026-10-29)
 - Kvalitetspasset ligger i fokusgrenen i varje vecka som har ett, och veckan är utan hellre än att passet flyttar (R-42) (tillagt 2026-11-04)
+- De tre veckorna före Vasaloppet: allt är skidor, och simning och cykel är noll — också för nybörjaren (R-45) (tillagt 2026-11-04)
+- Fyra veckor före Vasaloppet: ingenting pausat (R-45) (tillagt 2026-11-04)
+- Veckorna före Vätternrundan: ingenting pausat, eftersom loppet saknar talet (R-45) (tillagt 2026-11-04)
 - Nedtrappningsvecka mot Vansbrosimningen: inget kvalitetspass alls, eftersom simningens golv är högre än taket på hårda minuter (R-15, R-40, R-42) (tillagt 2026-11-04)
 - Nybörjare i två grenar på sex timmar: teknik går före kvalitetsdagen i de tunnaste basveckorna (R-21, R-42) (tillagt 2026-10-29)
 - Stakmaskin utan snö: ett långpass över 90 min delas i instruktionen, ett under 90 min gör det inte (R-44) (tillagt 2026-10-29)

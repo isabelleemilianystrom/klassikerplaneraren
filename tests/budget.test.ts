@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { deferredSportsIn, sportsInPlan, weekBudgets } from '../src/engine/budget.ts';
+import { deferredSportsIn,
+  pausedSportsIn, sportsInPlan, weekBudgets } from '../src/engine/budget.ts';
 import { raceById, rules } from '../src/engine/config.ts';
 import { monthOf } from '../src/engine/dates.ts';
 import { buildWeeks } from '../src/engine/weeks.ts';
@@ -712,6 +713,7 @@ describe('R-32: säsongen styr fördelningen', () => {
         if (budget.raceMinutes > 0) continue;
 
         const uppskjutna = deferredSportsIn(profil, vecka);
+        const pausade = pausedSportsIn(profil, vecka);
 
         for (const sport of sporter) {
           // R-36: en gren vars lopp är avklarat ska inte längre tränas.
@@ -722,6 +724,9 @@ describe('R-32: säsongen styr fördelningen', () => {
 
           // R-39: och en som ännu inte börjat.
           if (uppskjutna.has(sport)) continue;
+
+          // R-45: och en som är pausad för att loppet är nära.
+          if (pausade.has(sport)) continue;
 
           expect(budget.bySport[sport], `${namn} v${vecka.index} ${sport}`).toBeGreaterThan(0);
         }
@@ -1045,8 +1050,9 @@ describe('R-39: grenar som får vänta', () => {
 
   it('rör inte nybörjaren', () => {
     // P1 är ny i simning. Teknik går inte att ta igen på slutet, så simningen
-    // börjar direkt.
-    expect(tidFramTill(P1, 'swim', 18)).toBeGreaterThan(10 * 60);
+    // börjar direkt — utom de tre veckorna närmast Vasaloppet, där allt är
+    // skidor (R-45).
+    expect(tidFramTill(P1, 'swim', 18)).toBeGreaterThan(8 * 60);
   });
 
   it('börjar träna grenen när dess uppbyggnad börjar', () => {
@@ -1106,6 +1112,88 @@ describe('R-39: grenar som får vänta', () => {
     for (const { vecka, budget } of veckorMedBudget(P2)) {
       for (const sport of deferredSportsIn(P2, vecka)) {
         expect(budget.bySport[sport] ?? 0, `vecka ${vecka.index} ${sport}`).toBe(0);
+      }
+    }
+  });
+});
+
+describe('R-45: fullt fokus de sista veckorna före loppet', () => {
+  const VECKOR = raceById('vasaloppet').fullFocusWeeks as number;
+
+  it('har talet i konfigurationen, bara på Vasaloppet', () => {
+    expect(VECKOR).toBe(3);
+
+    for (const id of ['vatternrundan', 'vansbrosimningen', 'lidingoloppet'] as const) {
+      expect(raceById(id).fullFocusWeeks, id).toBeUndefined();
+    }
+  });
+
+  it('ger skidorna hela veckan de tre veckorna före Vasaloppet', () => {
+    // Tre veckor före Vasaloppet gör ingen nytta i bassängen. Det som avgör
+    // är skidtid, och de timmarna gör mer nytta där.
+    const vasaVecka = veckorMedBudget(P1).find(({ vecka }) =>
+      vecka.raceIds.includes('vasaloppet'),
+    )?.vecka.index as number;
+
+    expect(vasaVecka).toBeGreaterThan(0);
+
+    const fokusveckor = veckorMedBudget(P1).filter(
+      ({ vecka, budget }) =>
+        vecka.index >= vasaVecka - VECKOR && vecka.index < vasaVecka && budget.enduranceMinutes > 0,
+    );
+
+    expect(fokusveckor.length).toBe(VECKOR);
+    for (const { vecka, budget } of fokusveckor) {
+      expect(budget.bySport.ski, `v${vecka.index} skidor`).toBe(budget.enduranceMinutes);
+
+      for (const sport of ['bike', 'swim', 'run'] as const) {
+        expect(budget.bySport[sport] ?? 0, `v${vecka.index} ${sport}`).toBe(0);
+      }
+    }
+  });
+
+  it('pausar ingenting fyra veckor före', () => {
+    const vasaVecka = veckorMedBudget(P1).find(({ vecka }) =>
+      vecka.raceIds.includes('vasaloppet'),
+    )?.vecka.index as number;
+
+    const fyraFöre = veckorMedBudget(P1).find(
+      ({ vecka }) => vecka.index === vasaVecka - VECKOR - 1,
+    );
+
+    expect(fyraFöre).toBeDefined();
+    expect(pausedSportsIn(P1, fyraFöre?.vecka as never).size).toBe(0);
+    expect((fyraFöre?.budget.bySport.swim ?? 0) > 0).toBe(true);
+  });
+
+  it('pausar ingenting inför de lopp som saknar talet', () => {
+    // Bara Vasaloppet har fullFocusWeeks. Veckorna före Vätternrundan ska
+    // alltså ha flera grenar.
+    for (const { vecka } of veckorMedBudget(P1)) {
+      if (vecka.focusRaceId === 'vasaloppet' || vecka.focusRaceId === null) continue;
+      expect(pausedSportsIn(P1, vecka).size, `v${vecka.index}`).toBe(0);
+    }
+  });
+
+  it('pausar inte veckan som bär loppet', () => {
+    // Loppveckan har sin egen regel (R-04): bara loppet och öppningspasset.
+    const loppveckan = veckorMedBudget(P1).find(({ vecka }) =>
+      vecka.raceIds.includes('vasaloppet'),
+    );
+
+    expect(loppveckan).toBeDefined();
+    expect(loppveckan?.budget.enduranceMinutes).toBe(0);
+  });
+
+  it('tappar inga minuter när grenarna pausas', () => {
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      for (const { vecka, budget } of veckorMedBudget(profil)) {
+        if (pausedSportsIn(profil, vecka).size === 0) continue;
+
+        const summa = Object.values(budget.bySport).reduce((a, b) => a + b, 0);
+        expect(summa + budget.unplacedMinutes, `${namn} v${vecka.index}`).toBe(
+          budget.enduranceMinutes,
+        );
       }
     }
   });

@@ -34,6 +34,7 @@ const textEntry = z.object({
 });
 
 export const racesSchema = z.object({
+  _fullFocusWeeks: z.string(),
   schemaVersion: z.literal(1),
   source: z.string().min(1),
   checkedOn: isoDate,
@@ -65,6 +66,8 @@ export const racesSchema = z.object({
          * alla pass tillsammans. Saknas talet ges ingen varning. Se R-34.
          */
         volumeMilestoneKm: z.number().positive().optional(),
+        /** Veckor före loppet där de övriga grenarna pausas (R-45). */
+        fullFocusWeeks: z.number().int().positive().optional(),
         taperWeeks: z.number().int().positive(),
         recoveryWeeks: z.number().int().nonnegative(),
         specificWeeks: z.number().int().positive(),

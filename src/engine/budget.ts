@@ -366,6 +366,14 @@ function splitBetweenSports(
 
   const månad = monthOf(week.startDate);
 
+  // R-45: de sista veckorna före ett lopp går hela tiden till loppets gren.
+  // Då finns inget att fördela och inget att vikta — övriga grenar pausas.
+  const fulltFokus = fullFocusSportIn(week, sports, races);
+  if (fulltFokus !== null) {
+    const andelar = sports.map((sport) => (sport === fulltFokus ? 1 : 0));
+    return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
+  }
+
   const grund =
     week.phase === 'specific' || week.phase === 'taper'
       ? specificShares(week, sports, månad, input, races)
@@ -387,6 +395,40 @@ function splitBetweenSports(
  * aldrig lämnas ofördelad. Ett cykelblock i maj lägger alltså sin
  * underhållstid på skidor och löpning olika mycket beroende på månad.
  */
+/**
+ * Grenen som tar hela veckan, eller null (R-45).
+ *
+ * De sista veckorna före ett lopp är det fullt fokus på det, och då pausas de
+ * andra grenarna. Tre veckor före Vasaloppet gör ingen nytta i bassängen —
+ * det som avgör är skidtid, och de timmarna gör mer nytta där.
+ *
+ * Antalet veckor står per lopp i `races.json` som `fullFocusWeeks`. Saknas
+ * talet pausas ingenting. Veckan måste också ha loppet som sitt fokus: ligger
+ * två lopp tätt (R-03) ska det ena loppets slutspurt inte stänga av det andras
+ * uppbyggnad.
+ */
+function fullFocusSportIn(
+  week: WeekSkeleton,
+  sports: readonly TrainedSport[],
+  races: readonly PlacedRace[],
+): TrainedSport | null {
+  if (week.focusRaceId === null) return null;
+
+  const config = raceById(week.focusRaceId);
+  const { fullFocusWeeks } = config;
+  if (fullFocusWeeks === undefined) return null;
+
+  const lopp = races.find((kandidat) => kandidat.id === week.focusRaceId);
+  if (lopp === undefined) return null;
+
+  // Veckor kvar till loppveckan. Noll är loppveckan själv.
+  const kvar = lopp.weekIndex - (week.index - 1);
+  if (kvar < 0 || kvar > fullFocusWeeks) return null;
+
+  const sport = config.sport as TrainedSport;
+  return sports.includes(sport) ? sport : null;
+}
+
 function specificShares(
   week: WeekSkeleton,
   sports: readonly TrainedSport[],
@@ -723,6 +765,22 @@ function distribute(
   }
 
   return Object.fromEntries(sports.map((sport, i) => [sport, tilldelat[i] as number]));
+}
+
+/**
+ * Grenarna som är pausade den här veckan för att loppet är nära (R-45).
+ *
+ * Finns för att tester och gränssnitt ska kunna fråga utan att räkna om
+ * reglerna själva.
+ */
+export function pausedSportsIn(
+  input: PlanInput,
+  week: WeekSkeleton,
+): Set<TrainedSport> {
+  const sports = sportsInPlan(input);
+  const fokus = fullFocusSportIn(week, sports, placeRaces(input));
+
+  return fokus === null ? new Set() : new Set(sports.filter((sport) => sport !== fokus));
 }
 
 /**
