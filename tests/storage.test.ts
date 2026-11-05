@@ -357,3 +357,67 @@ describe('K-13: ändra svar', () => {
     expect(läst.hoursPerWeek).toBeGreaterThan(0);
   });
 });
+
+describe('K-15: lagringen är lika sträng som formuläret', () => {
+  /** Lägger in rå data och läser tillbaka den. */
+  function läs(rått: string) {
+    lagring.sätt(NYCKEL, rått);
+    return load();
+  }
+
+  /** En sparad post med ett fält bytt mot något formuläret inte kan skapa. */
+  function medÄndradIndata(ändring: Record<string, unknown>): string {
+    const { form, input } = ifyllt();
+    return JSON.stringify({ storageVersion: 4, input: { ...input, ...ändring }, form });
+  }
+
+  it('kastar ett okänt lopp-id i stället för att låta motorn kasta', () => {
+    // Förut gick ett okänt id igenom, och motorn kastade när planen byggdes.
+    // Då visades ett byggfel — men "det sparade programmet kunde inte öppnas"
+    // är rätt besked för en trasig sparad post.
+    const svar = läs(medÄndradIndata({ races: [{ id: 'tour-de-france', date: '2027-03-07', goal: 'finish' }] }));
+
+    expect(svar.status).toBe('discarded');
+    expect(svar.status === 'discarded' && svar.reason).toBe('bad-input');
+  });
+
+  it('kastar samma lopp två gånger', () => {
+    const dubblett = [
+      { id: 'vasaloppet', date: '2027-03-07', goal: 'finish' },
+      { id: 'vasaloppet', date: '2027-03-07', goal: 'finish' },
+    ];
+
+    expect(läs(medÄndradIndata({ races: dubblett })).status).toBe('discarded');
+  });
+
+  it('kastar en nivå som inte är en nivå, och en gren som inte är en gren', () => {
+    expect(läs(medÄndradIndata({ levels: { ski: 'banan' } })).status).toBe('discarded');
+    expect(läs(medÄndradIndata({ levels: { curling: 'new' } })).status).toBe('discarded');
+  });
+
+  it('kastar timmar utanför intervallet', () => {
+    for (const timmar of [1000000, 0, -5, 6.5]) {
+      expect(läs(medÄndradIndata({ hoursPerWeek: timmar })).status, `${timmar} h`).toBe('discarded');
+    }
+  });
+
+  it('kastar ett formulärtillstånd med ett datum som inte är ett datum', () => {
+    const { form, input } = ifyllt();
+    const trasigtForm = { ...form, startDate: 'i tisdags' };
+    const svar = läs(JSON.stringify({ storageVersion: 4, input, form: trasigtForm }));
+
+    expect(svar.status).toBe('discarded');
+    expect(svar.status === 'discarded' && svar.reason).toBe('bad-form');
+  });
+
+  it('släpper igenom ett tomt loppdatum i formuläret', () => {
+    // Ett lopp som inte är valt har inget datum än. Det är giltigt.
+    const { form, input } = ifyllt();
+    const medTomt = {
+      ...form,
+      races: form.races.map((race, i) => (i === 0 ? { ...race, date: '' } : race)),
+    };
+
+    expect(läs(JSON.stringify({ storageVersion: 4, input, form: medTomt })).status).toBe('ok');
+  });
+});

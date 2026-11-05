@@ -56,9 +56,30 @@ function prövaEn(seed: number | string, input: PlanInput): Brott[] {
   return brott;
 }
 
+/**
+ * Ett heltal ur ett kommandoradsargument, eller standardvärdet.
+ *
+ * `Number('abc')` ger NaN, och `Array.from({ length: NaN })` ger en tom lista
+ * — skriptet körde då utan att pröva någonting och såg ut att lyckas. Ett
+ * orimligt stort tal hänger i stället. Hellre ett tydligt fel.
+ */
+function heltalArgument(värde: string | undefined, standard: number, namn: string): number {
+  if (värde === undefined) return standard;
+
+  const tal = Number(värde);
+  const rimligt = Number.isInteger(tal) && tal > 0 && tal <= 100_000;
+
+  if (!rimligt) {
+    console.error(`${namn} ska vara ett heltal mellan 1 och 100 000, inte "${värde}"`);
+    process.exit(1);
+  }
+
+  return tal;
+}
+
 function main(): void {
-  const antal = Number(process.argv[2] ?? 200);
-  const förstaSeed = Number(process.argv[3] ?? 1);
+  const antal = heltalArgument(process.argv[2], 200, 'antal indata');
+  const förstaSeed = heltalArgument(process.argv[3], 1, 'första seed');
 
   console.log('Invarianter mot slumpad indata');
   console.log('==============================\n');

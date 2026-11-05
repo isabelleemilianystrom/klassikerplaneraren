@@ -257,6 +257,17 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
      timmar som inte är ett heltal inom intervallet. En handskriven `hoursPerWeek: 1000000`
      gav sextio miljoner minuter att dela ut per vecka och låste också webbläsaren.
 
+  **Lagringen validerar lika strängt som formuläret** *(skärpt 2026-11-05)*. Den är appens enda
+  otrodda indata — allt annat kommer från repot eller från formuläret — och kontrollerade förut
+  bara att fälten hade rätt *typ*. Nu kastas en sparad plan som bär ett okänt lopp-id, samma
+  lopp två gånger, en nivå som inte är en nivå, en gren som inte finns, timmar utanför
+  intervallet, eller ett datum som inte är ett datum. Tomt loppdatum är fortfarande giltigt i
+  formulärtillståndet: ett lopp som inte är valt har inget datum än.
+
+  Skälet att kasta i stället för att låta motorn kasta: "det sparade programmet kunde inte
+  öppnas" är rätt besked för en trasig sparad post, och det visas på startsidan i stället för
+  som ett byggfel i formuläret.
+
   Alla tre vägrar på **noll millisekunder** i stället för att hänga. Motorns kast når användaren
   som ett meddelande i formuläret (K-15).
 - **R-02** Varje vecka får en fas utifrån närmaste kommande lopp: Återhämtning (veckorna direkt efter ett lopp), Nedtrappning (sista veckorna före loppet), Specifik (veckorna före nedtrappningen) och Bas (övrig tid). Ordningen gäller i den prioriteten.
@@ -1096,7 +1107,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
 - Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
-- Sparad data valideras fält för fält, inte bara på versionsnumret, och kastas när något inte stämmer (K-15) *(tillagd 2026-10-28)*
+- Sparad data valideras fält för fält och **till innehåll**, inte bara på versionsnumret och typen, och kastas när något inte stämmer (K-15) *(skärpt 2026-11-05)*
+- Utrustningsfrågorna i formuläret och flaggorna i datamodellen är exakt samma mängd (K-04) *(tillagd 2026-11-05)*
 - Appen fungerar när localStorage saknas, inte går att skriva till eller inte går att läsa (K-10) *(tillagd 2026-10-28)*
 - Startsidan ritas alltid, också när den sparade planen är trasig — aldrig en tom sida (K-15) *(tillagd 2026-10-28)*
 - Texterna i avsnitt 8 används ordagrant: ett test läser kravspecen och jämför, så att de två inte kan glida isär (K-01, K-11) *(tillagd 2026-10-29)*
@@ -1135,6 +1147,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Fem timmar i veckan går inte att välja, och sex gör det (R-41) (tillagt 2026-10-29)
 - Loppdatum 2927 i stället för 2027: formuläret säger till, och motorn vägrar bygga i stället för att hänga (R-01) (tillagt 2026-11-05)
 - Sparad plan med `hoursPerWeek` utanför intervallet kastas vid inläsning (R-41, K-15) (tillagt 2026-11-05)
+- Sparad plan med okänt lopp-id, dubblett, ogiltig nivå eller ogiltigt datum kastas vid inläsning (K-15) (tillagt 2026-11-05)
+- Varje utrustningsfråga har ett standardvärde och når hela vägen till planen (K-04) (tillagt 2026-11-05)
 - Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 4 (R-42) (tillagt 2026-10-29)
 - Kvalitetspasset ligger i fokusgrenen i varje vecka som har ett, och veckan är utan hellre än att passet flyttar (R-42) (tillagt 2026-11-04)
 - De tre veckorna före Vasaloppet: allt är skidor, och simning och cykel är noll — också för nybörjaren (R-45) (tillagt 2026-11-04)

@@ -11,7 +11,7 @@
  */
 import { nextRaceDate, raceById, races, rules } from '../engine/config.ts';
 import { addWeeks, isIsoDate } from '../engine/dates.ts';
-import { FORM } from './texts.ts';
+import { EQUIPMENT, FORM } from './texts.ts';
 import type { Level, PlanInput, RaceGoal, RaceId, TrainedSport, Weekday } from '../engine/types.ts';
 
 /** Ett valt lopp i formuläret. Datumet är en sträng så länge det skrivs. */
@@ -52,9 +52,11 @@ export function initialState(today: string): FormState {
     hoursPerWeek: 6,
     longSessionDay: 7,
     restDay: 1,
-    equipment: Object.fromEntries(
-      ['snowOrRollerSkis', 'skiErg', 'pool', 'bike'].map((flagga) => [flagga, false]),
-    ),
+    // Härleds ur frågorna i steg 3, inte ur en egen lista. Listan stod kvar
+    // med `snowOrRollerSkis`, `pool` och `bike` efter att modellen bytt form
+    // 2026-11-04: de tre nya flaggorna saknades och ritades som omarkerade,
+    // vilket råkade bli rätt. Nu kan de inte glida isär.
+    equipment: Object.fromEntries(EQUIPMENT.map((fråga) => [fråga.key, false])),
   };
 }
 

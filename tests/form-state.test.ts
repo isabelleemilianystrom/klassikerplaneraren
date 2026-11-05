@@ -3,8 +3,9 @@ import { rules } from '../src/engine/config.ts';
 import { addWeeks } from '../src/engine/dates.ts';
 import { weekCount } from '../src/engine/weeks.ts';
 import { PROFILES } from './profiles.ts';
-import { FORM } from '../src/ui/texts.ts';
+import { EQUIPMENT, FORM } from '../src/ui/texts.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
+import type { PlanInput } from '../src/engine/types.ts';
 import {
   hoursRange,
   initialState,
@@ -359,6 +360,52 @@ describe('R-01: planen har ett tak, så en felskrivning inte låser appen', () =
     for (const timmar of [1000000, 0, -5, 6.5]) {
       const input = { ...toPlanInput(ifyllt(), IDAG), hoursPerWeek: timmar };
       expect(() => buildWeekPlans(input as never), `${timmar} h`).toThrow(/heltal mellan/);
+    }
+  });
+});
+
+describe('K-04: utrustningsfrågorna och modellen kan inte glida isär', () => {
+  it('ger varje fråga ett standardvärde', () => {
+    // S-9: listan i initialState stod kvar med snowOrRollerSkis, pool och
+    // bike efter att modellen bytt form 2026-11-04. De tre nya flaggorna
+    // saknades och ritades som omarkerade — vilket råkade bli rätt. Nu
+    // härleds standardvärdena ur frågorna.
+    const state = initialState(IDAG);
+
+    for (const fråga of EQUIPMENT) {
+      expect(state.equipment[fråga.key], fråga.key).toBe(false);
+    }
+  });
+
+  it('har inga döda nycklar i standardvärdena', () => {
+    const state = initialState(IDAG);
+    const döda = Object.keys(state.equipment).filter(
+      (nyckel) => !EQUIPMENT.some((fråga) => fråga.key === nyckel),
+    );
+
+    expect(döda).toEqual([]);
+  });
+
+  it('frågar om exakt de flaggor motorn läser', () => {
+    // Den riktiga kopplingen: varje fråga ska nå fram till planen, och varje
+    // flagga motorn läser ska ha en fråga. Går de isär svarar användaren på
+    // något som inte används, eller används något hon inte svarat på.
+    const input = toPlanInput(ifyllt(), IDAG) as PlanInput;
+
+    expect(Object.keys(input.equipment).sort()).toEqual(
+      EQUIPMENT.map((fråga) => fråga.key).sort(),
+    );
+  });
+
+  it('bär svaret hela vägen från frågan till planen', () => {
+    const state: FormState = {
+      ...ifyllt(),
+      equipment: Object.fromEntries(EQUIPMENT.map((fråga) => [fråga.key, true])),
+    };
+
+    const input = toPlanInput(state, IDAG) as PlanInput;
+    for (const fråga of EQUIPMENT) {
+      expect(input.equipment[fråga.key as 'snow'], fråga.key).toBe(true);
     }
   });
 });

@@ -14,6 +14,7 @@
  * - Går något fel kastas datan, lagringen rensas och användaren får veta varför.
  *   **Men formuläret ritas alltid.**
  */
+import { races } from '../engine/config.ts';
 import { isIsoDate } from '../engine/dates.ts';
 import type { PlanInput } from '../engine/types.ts';
 import { hoursRange, type FormState } from './form-state.ts';
@@ -175,11 +176,22 @@ function isPlanInput(värde: unknown): värde is PlanInput {
   if (typeof input.today !== 'string' || !isIsoDate(input.today)) return false;
 
   if (!Array.isArray(input.races) || input.races.length === 0) return false;
+
+  // Ett okänt id gör att motorn kastar när planen byggs. Hellre kasta den
+  // sparade planen här och visa "kunde inte öppnas" än ett byggfel senare.
+  const kända = new Set(races.races.map((race) => race.id));
+  const sedda = new Set<string>();
+
   for (const race of input.races) {
     if (typeof race !== 'object' || race === null) return false;
-    if (typeof race.id !== 'string') return false;
+    if (typeof race.id !== 'string' || !kända.has(race.id as never)) return false;
     if (typeof race.date !== 'string' || !isIsoDate(race.date)) return false;
     if (race.goal !== 'finish' && race.goal !== 'time') return false;
+
+    // Högst ett lopp per gren. Formuläret kan inte skapa dubbletter, och de
+    // skulle ge en plan med samma lopp två gånger.
+    if (sedda.has(race.id)) return false;
+    sedda.add(race.id);
   }
 
   // R-41: heltal inom intervallet, inte bara ett tal. En handskriven
@@ -188,7 +200,7 @@ function isPlanInput(värde: unknown): värde is PlanInput {
   if (typeof input.hoursPerWeek !== 'number' || !Number.isInteger(input.hoursPerWeek)) return false;
   const timmar = hoursRange();
   if (input.hoursPerWeek < timmar.min || input.hoursPerWeek > timmar.max) return false;
-  if (typeof input.levels !== 'object' || input.levels === null) return false;
+  if (!ärNivåer(input.levels)) return false;
 
   if (typeof input.preferredDays !== 'object' || input.preferredDays === null) return false;
   const dagar = input.preferredDays;
@@ -208,23 +220,51 @@ function isFormState(värde: unknown): värde is FormState {
   if (typeof värde !== 'object' || värde === null) return false;
   const form = värde as Partial<FormState>;
 
-  if (typeof form.startDate !== 'string') return false;
+  // Lika strängt som `isPlanInput`: samma data, samma krav. Tomt datum är
+  // dock giltigt i formuläret — ett lopp som inte är valt har inget datum än.
+  if (typeof form.startDate !== 'string' || !ärDatumEllerTomt(form.startDate)) return false;
   if (!Array.isArray(form.races)) return false;
 
   for (const race of form.races) {
     if (typeof race !== 'object' || race === null) return false;
     if (typeof race.id !== 'string') return false;
     if (typeof race.selected !== 'boolean') return false;
-    if (typeof race.date !== 'string') return false;
+    if (typeof race.date !== 'string' || !ärDatumEllerTomt(race.date)) return false;
     if (race.goal !== 'finish' && race.goal !== 'time') return false;
   }
 
   if (typeof form.hoursPerWeek !== 'number') return false;
   if (!isWeekday(form.longSessionDay) || !isWeekday(form.restDay)) return false;
-  if (typeof form.levels !== 'object' || form.levels === null) return false;
+  if (!ärNivåer(form.levels)) return false;
   if (typeof form.equipment !== 'object' || form.equipment === null) return false;
 
   return true;
+}
+
+/**
+ * Sant för ett objekt där varje nyckel är en gren och varje värde en nivå.
+ *
+ * Förut kontrollerades bara att det *var* ett objekt, så `{ ski: 'banan' }`
+ * gick igenom. Ett okänt värde beter sig som "inte nybörjare" i motorn och ger
+ * en plan som ser riktig ut men inte är det användaren svarade.
+ */
+function ärNivåer(värde: unknown): boolean {
+  if (typeof värde !== 'object' || värde === null) return false;
+
+  const grenar: readonly string[] = ['ski', 'bike', 'swim', 'run'];
+  const nivåer: readonly string[] = ['new', 'experienced', 'advanced'];
+
+  for (const [gren, nivå] of Object.entries(värde)) {
+    if (!grenar.includes(gren)) return false;
+    if (typeof nivå !== 'string' || !nivåer.includes(nivå)) return false;
+  }
+
+  return true;
+}
+
+/** Sant för ett ISO-datum eller tom sträng — ett lopp utan valt datum. */
+function ärDatumEllerTomt(värde: string): boolean {
+  return värde === '' || isIsoDate(värde);
 }
 
 function isWeekday(värde: unknown): boolean {
