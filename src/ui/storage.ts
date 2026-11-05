@@ -16,7 +16,7 @@
  */
 import { isIsoDate } from '../engine/dates.ts';
 import type { PlanInput } from '../engine/types.ts';
-import type { FormState } from './form-state.ts';
+import { hoursRange, type FormState } from './form-state.ts';
 
 const KEY = 'klassikerplaneraren';
 
@@ -182,7 +182,12 @@ function isPlanInput(värde: unknown): värde is PlanInput {
     if (race.goal !== 'finish' && race.goal !== 'time') return false;
   }
 
-  if (typeof input.hoursPerWeek !== 'number' || !Number.isFinite(input.hoursPerWeek)) return false;
+  // R-41: heltal inom intervallet, inte bara ett tal. En handskriven
+  // `hoursPerWeek: 1000000` gav sextio miljoner minuter att dela ut per vecka
+  // och låste webbläsaren.
+  if (typeof input.hoursPerWeek !== 'number' || !Number.isInteger(input.hoursPerWeek)) return false;
+  const timmar = hoursRange();
+  if (input.hoursPerWeek < timmar.min || input.hoursPerWeek > timmar.max) return false;
   if (typeof input.levels !== 'object' || input.levels === null) return false;
 
   if (typeof input.preferredDays !== 'object' || input.preferredDays === null) return false;

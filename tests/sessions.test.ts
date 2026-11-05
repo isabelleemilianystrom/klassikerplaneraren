@@ -572,8 +572,17 @@ describe('determinism', () => {
     expect(buildWeekPlans(baklänges)).toEqual(buildWeekPlans(P6));
   });
 
-  it('ger en plan för varje timtal mellan 3 och 15', () => {
-    for (let timmar = 3; timmar <= 15; timmar += 1) {
+  it('ger en plan för varje tillåtet timtal', () => {
+    // Intervallet läses ur konfigurationen. Testet loopade från tre timmar
+    // ända tills skyddsräcket i R-41 kom på plats — golvet höjdes till sex
+    // den 29 oktober, men ingenting upprätthöll det förrän nu.
+    const min = rules.weeklyHours.min;
+    const max = rules.trainingDays.byHoursPerWeek.at(-1)?.upToHours as number;
+
+    expect(min).toBe(6);
+    expect(max).toBe(15);
+
+    for (let timmar = min; timmar <= max; timmar += 1) {
       const input: PlanInput = { ...P1, hoursPerWeek: timmar };
       const planer = buildWeekPlans(input);
       expect(planer.length, `${timmar} h`).toBeGreaterThan(0);

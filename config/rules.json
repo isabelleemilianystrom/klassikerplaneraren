@@ -21,7 +21,9 @@
     "firstWeeks": {
       "count": 2,
       "maxShare": 0.6
-    }
+    },
+    "_maxPlanWeeks": "R-01: längsta plan motorn bygger. Inte en träningsregel utan ett skyddsräcke mot indata som inte går att bygga: ett felskrivet årtal (2927 i stället för 2027) gav 46 978 veckor och låste webbläsaren. Den längsta riktiga planen i profilerna är 47 veckor, så 104 — två år — är mer än dubbelt upp. En klassiker ska dessutom genomföras inom tolv månader (R-26).",
+    "maxPlanWeeks": 104
   },
   "raceLoad": {
     "_rule": "R-25",

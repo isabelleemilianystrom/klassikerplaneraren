@@ -141,6 +141,10 @@ export const FORM = {
       noRace: 'Välj minst ett lopp för att komma vidare.',
       dateMissing: 'Ange ett datum för loppet.',
       dateBeforeStart: 'Loppet kan inte gå före din första träningsdag.',
+      // Visar det sista tillåtna datumet i stället för en regel att tolka. En
+      // felskrivning i årtalet är lätt att göra och svår att se.
+      dateTooFar: (senast: string): string =>
+        `Det datumet ligger för långt fram. Välj senast ${senast} – kontrollera årtalet.`,
       dateInvalid: 'Skriv datumet som ÅÅÅÅ-MM-DD.',
       startDateInvalid: 'Skriv datumet som ÅÅÅÅ-MM-DD.',
     },

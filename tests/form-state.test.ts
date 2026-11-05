@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { rules } from '../src/engine/config.ts';
+import { addWeeks } from '../src/engine/dates.ts';
+import { weekCount } from '../src/engine/weeks.ts';
+import { PROFILES } from './profiles.ts';
 import { FORM } from '../src/ui/texts.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
 import {
@@ -9,6 +12,7 @@ import {
   sportsToRate,
   toPlanInput,
   validateAll,
+  latestRaceDate,
   validateStep1,
   validateStep2,
   validateStep3,
@@ -281,5 +285,80 @@ describe('K-15: motorn kan misslyckas, och då ska användaren få veta', () => 
     const trasig = { ...toPlanInput(ifyllt(), IDAG), races: [{ id: 'tour-de-france', date: '2027-03-07', goal: 'finish' }] };
 
     expect(() => buildWeekPlans(trasig as never)).toThrow(/tour-de-france/);
+  });
+});
+
+describe('R-01: planen har ett tak, så en felskrivning inte låser appen', () => {
+  const TAK = rules.weekTime.maxPlanWeeks;
+
+  it('har taket i konfigurationen, med gott om marginal', () => {
+    // Den längsta riktiga planen i profilerna är 47 veckor. Taket ska vara
+    // generöst — det är ett skyddsräcke, inte en träningsregel.
+    expect(TAK).toBe(104);
+    expect(rules.weekTime._maxPlanWeeks).toContain('skyddsräcke');
+
+    for (const [namn, profil] of Object.entries(PROFILES)) {
+      expect(weekCount(profil), namn).toBeLessThan(TAK);
+    }
+  });
+
+  it('räknar ut sista tillåtna loppdatum ur taket', () => {
+    const senast = latestRaceDate('2026-11-05');
+
+    expect(senast).toBe(addWeeks('2026-11-05', TAK - 1));
+    expect(latestRaceDate('inte ett datum')).toBeNull();
+  });
+
+  it('underkänner ett loppdatum längre fram än taket', () => {
+    // Felskrivningen: 2927 i stället för 2027. Den gav 46 978 veckor och
+    // låste webbläsaren, eftersom hängningen är synkron och inget catch
+    // hinner emellan.
+    const state: FormState = {
+      ...ifyllt(),
+      startDate: '2026-11-05',
+      races: ifyllt().races.map((race) =>
+        race.id === 'vasaloppet' ? { ...race, selected: true, date: '2927-03-07' } : race,
+      ),
+    };
+
+    const fel = validateStep1(state);
+    const text = fel['date-vasaloppet'];
+
+    expect(text).toBeDefined();
+    // Meddelandet ska säga vilket datum som är det sista tillåtna, inte en
+    // regel att tolka.
+    expect(text).toContain(latestRaceDate('2026-11-05'));
+    expect(text).toMatch(/årtalet/);
+  });
+
+  it('släpper igenom ett datum precis på gränsen', () => {
+    const senast = latestRaceDate('2026-11-05') as string;
+    const state: FormState = {
+      ...ifyllt(),
+      startDate: '2026-11-05',
+      races: ifyllt().races.map((race) =>
+        race.id === 'vasaloppet' ? { ...race, selected: true, date: senast } : race,
+      ),
+    };
+
+    expect(validateStep1(state)[`date-vasaloppet`]).toBeUndefined();
+  });
+
+  it('motorn vägrar bygga en plan över taket, i stället för att hänga', () => {
+    const förLångt = {
+      ...toPlanInput(ifyllt(), IDAG),
+      races: [{ id: 'vasaloppet', date: '2927-03-07', goal: 'finish' }],
+    };
+
+    expect(() => buildWeekPlans(förLångt as never)).toThrow(/46978 veckor|mer än taket/);
+  });
+
+  it('motorn vägrar timmar utanför intervallet', () => {
+    // Samma sorts hängning från andra sidan: sextio miljoner minuter att
+    // dela ut per vecka.
+    for (const timmar of [1000000, 0, -5, 6.5]) {
+      const input = { ...toPlanInput(ifyllt(), IDAG), hoursPerWeek: timmar };
+      expect(() => buildWeekPlans(input as never), `${timmar} h`).toThrow(/heltal mellan/);
+    }
   });
 });

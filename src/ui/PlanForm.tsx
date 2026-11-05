@@ -24,6 +24,7 @@ import {
   type FieldErrors,
   type FormState,
   type RaceChoice,
+  latestRaceDate,
 } from './form-state.ts';
 import { EQUIPMENT, FORM, LEVELS, raceLabel, SPORT_NAMES, WEEKDAYS } from './texts.ts';
 
@@ -173,6 +174,8 @@ function Steg1({ state, setState, felFör }: StegProps) {
                     <input
                       type="date"
                       value={race.date}
+                      min={state.startDate}
+                      max={latestRaceDate(state.startDate) ?? undefined}
                       onChange={(e) => byggOm(race.id, { date: e.target.value })}
                       className="mt-1 block rounded-lg border border-neutral-300 px-3 py-2.5 text-base text-neutral-900"
                     />

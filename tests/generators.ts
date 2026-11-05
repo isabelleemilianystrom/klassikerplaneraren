@@ -18,7 +18,7 @@
  * **Slumpen är seedad.** Med `Math.random` blir CI instabilt och ett brott går
  * inte att återskapa. Varje indata bär sitt seed, så ett fynd kan köras om.
  */
-import { raceById, races } from '../src/engine/config.ts';
+import { raceById, races, rules } from '../src/engine/config.ts';
 import { requireIsoDate } from '../src/engine/dates.ts';
 import type { IsoDate, Level, PlanInput, RaceGoal, RaceId, Weekday } from '../src/engine/types.ts';
 
@@ -91,13 +91,24 @@ function lopp(slump: () => number, startDate: IsoDate): PlanInput['races'] {
   const antal = 1 + Math.floor(slump() * alla.length);
   const valda = blandade.slice(0, antal);
 
-  // Första loppet ligger 1–60 veckor efter starten, resten 1–30 veckor efter
+  // Första loppet ligger 1–40 veckor efter starten, resten 1–20 veckor efter
   // det föregående. Då blir både "hoppar in mitt i programmet" (R-35) och
   // "lopp tätt ihop" (R-03) vanliga utfall.
-  let datum = dagarEfter(startDate, 7 * (1 + Math.floor(slump() * 60)));
+  //
+  // Taket håller planen inom `weekTime.maxPlanWeeks` (R-01): fyra lopp med
+  // det gamla spannet kunde hamna 150 veckor fram, vilket formuläret
+  // underkänner — och generatorns "giltig" betyder det formuläret släpper
+  // igenom, ingenting annat.
+  const sistaVeckan = rules.weekTime.maxPlanWeeks - 1;
+  let datum = dagarEfter(startDate, 7 * (1 + Math.floor(slump() * 40)));
 
   return valda.map((id, i) => {
-    if (i > 0) datum = dagarEfter(datum, 7 * (1 + Math.floor(slump() * 30)));
+    if (i > 0) datum = dagarEfter(datum, 7 * (1 + Math.floor(slump() * 20)));
+
+    // Klipp vid taket: hellre två lopp samma vecka än en plan formuläret
+    // aldrig hade släppt fram.
+    const gräns = dagarEfter(startDate, 7 * sistaVeckan);
+    if (datum > gräns) datum = gräns;
 
     return {
       id,

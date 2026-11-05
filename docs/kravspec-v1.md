@@ -238,6 +238,27 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   En start på en **söndag** ger noll träningsdagar: den enda dagen som återstår är den vilodag veckan alltid ska ha (R-11). Veckan blir då helt tom, och planen börjar på riktigt i vecka 2.
 
   Alternativet — att låta planen börja på nästa måndag i stället — prövades och förkastades: ett lopp som ligger mellan startdatumet och nästa måndag försvann då ur planen.
+
+  **Planen har ett tak: `weekTime.maxPlanWeeks`, i dag 104 veckor** *(tillagt 2026-11-05)*.
+  Taket är inte en träningsregel utan ett skyddsräcke. Ett felskrivet årtal — **2927 i stället
+  för 2027** — gav 46 978 veckor och låste webbläsaren. Hängningen är synkron, så inget
+  `catch` hinner emellan; den enda platsen att stoppa den är före bygget. Den längsta riktiga
+  planen i profilerna är 47 veckor, så 104 är mer än dubbelt upp, och en klassiker ska dessutom
+  genomföras inom tolv månader (R-26).
+
+  Taket upprätthålls i tre lager:
+
+  1. **Formuläret** underkänner ett loppdatum förbi taket och visar det sista tillåtna datumet,
+     inte en regel att tolka: *"Det datumet ligger för långt fram. Välj senast 2028-10-26 –
+     kontrollera årtalet."* Fältet får också `min` och `max`, så webbläsaren hjälper till.
+  2. **Lagringen** kastar en sparad plan vars timmar ligger utanför R-41:s intervall. Då visas
+     "det sparade programmet kunde inte öppnas" i stället för ett byggfel.
+  3. **Motorn** vägrar bygga: `buildWeeks` kastar över taket, och `buildWeekPlans` kastar på
+     timmar som inte är ett heltal inom intervallet. En handskriven `hoursPerWeek: 1000000`
+     gav sextio miljoner minuter att dela ut per vecka och låste också webbläsaren.
+
+  Alla tre vägrar på **noll millisekunder** i stället för att hänga. Motorns kast når användaren
+  som ett meddelande i formuläret (K-15).
 - **R-02** Varje vecka får en fas utifrån närmaste kommande lopp: Återhämtning (veckorna direkt efter ett lopp), Nedtrappning (sista veckorna före loppet), Specifik (veckorna före nedtrappningen) och Bas (övrig tid). Ordningen gäller i den prioriteten.
 - **R-03** *(ändrad 2026-10-28)* Ligger två lopp mindre än fyra veckor isär får det andra
   loppet en veckas nedtrappning i stället för sin vanliga, så att nedtrappningen inte kräver
@@ -1057,6 +1078,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Reglerna om dagar i rad i R-14 och R-16 håller också över veckogränsen, söndag till måndag *(tillagd 2026-10-28)*
 - Löptiden ökar högst 10 % mellan veckor, utom efter avlastning (R-14)
 - Inga pass före startdatum eller efter sista loppet, och loppdagen innehåller bara loppet (R-01, R-04)
+- Planen är aldrig längre än `weekTime.maxPlanWeeks`, och varken formulär, lagring eller motor släpper igenom indata som skulle bli det (R-01) *(tillagd 2026-11-05)*
 - Ett skidpass står som skidpass bara när det finns snö — vintermånad och ett spår. Annars görs det som rullskidor, stakmaskin eller stavgång i backe, med tid och zon kvar (R-17) *(ändrad 2026-11-04)*
 - Ett pass som bytt gren har inga alternativ; ett som bara bytt plats behåller dem (R-20, R-37) *(tillagd 2026-11-04)*
 - Varje pass i zon 3–4 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
@@ -1111,6 +1133,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Erfaren simmare: noll simning före Vasaloppet. Nybörjare: oförändrat (R-39) (tillagt 2026-10-29)
 - Sex timmar i veckan: simningen blir hela pass de veckor den finns, inte tjugominuterspass varje vecka (R-40) (tillagt 2026-10-29)
 - Fem timmar i veckan går inte att välja, och sex gör det (R-41) (tillagt 2026-10-29)
+- Loppdatum 2927 i stället för 2027: formuläret säger till, och motorn vägrar bygga i stället för att hänga (R-01) (tillagt 2026-11-05)
+- Sparad plan med `hoursPerWeek` utanför intervallet kastas vid inläsning (R-41, K-15) (tillagt 2026-11-05)
 - Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 4 (R-42) (tillagt 2026-10-29)
 - Kvalitetspasset ligger i fokusgrenen i varje vecka som har ett, och veckan är utan hellre än att passet flyttar (R-42) (tillagt 2026-11-04)
 - De tre veckorna före Vasaloppet: allt är skidor, och simning och cykel är noll — också för nybörjaren (R-45) (tillagt 2026-11-04)

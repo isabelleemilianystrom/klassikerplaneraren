@@ -82,6 +82,9 @@ export const rulesSchema = z.object({
   note: z.string(),
   weekTime: z.object({
     _rule: z.string(),
+    _maxPlanWeeks: z.string(),
+    /** Längsta plan motorn bygger — ett skyddsräcke, inte en träningsregel (R-01). */
+    maxPlanWeeks: z.number().int().positive(),
     phaseShare: z.object({ base: share, specific: share, recovery: share }),
     taperShare: z.object({ firstWeek: share, secondWeek: share, singleWeek: share }),
     deload: z.object({ everyNthWeek: z.number().int().positive(), share }),

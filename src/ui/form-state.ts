@@ -10,7 +10,7 @@
  * att bygga en `PlanInput`.
  */
 import { nextRaceDate, raceById, races, rules } from '../engine/config.ts';
-import { isIsoDate } from '../engine/dates.ts';
+import { addWeeks, isIsoDate } from '../engine/dates.ts';
 import { FORM } from './texts.ts';
 import type { Level, PlanInput, RaceGoal, RaceId, TrainedSport, Weekday } from '../engine/types.ts';
 
@@ -99,10 +99,32 @@ export function validateStep1(state: FormState): FieldErrors {
     // K-02: ett loppdatum före startdatumet går inte.
     if (isIsoDate(state.startDate) && race.date < state.startDate) {
       fel[`date-${race.id}`] = FORM.step1.errors.dateBeforeStart;
+      continue;
+    }
+
+    // R-01: och inte ett som ligger så långt fram att planen inte går att
+    // bygga. Ett felskrivet årtal — 2927 i stället för 2027 — gav 46 978
+    // veckor och låste webbläsaren.
+    const senast = latestRaceDate(state.startDate);
+    if (senast !== null && race.date > senast) {
+      fel[`date-${race.id}`] = FORM.step1.errors.dateTooFar(senast);
     }
   }
 
   return fel;
+}
+
+/**
+ * Sista loppdatum som går att bygga en plan till (R-01).
+ *
+ * Planen går från startdatumets vecka till veckan med sista loppet, och taket
+ * på antalet veckor står i `weekTime.maxPlanWeeks`. Returnerar null när
+ * startdatumet inte är ett datum — då är det det felet som ska visas först.
+ */
+export function latestRaceDate(startDate: string): string | null {
+  if (!isIsoDate(startDate)) return null;
+
+  return addWeeks(startDate, rules.weekTime.maxPlanWeeks - 1);
 }
 
 /** Felen i steg 2 (K-03). */

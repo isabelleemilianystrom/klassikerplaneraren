@@ -106,6 +106,18 @@ export function buildWeeks(input: PlanInput): WeekSkeleton[] {
   const races = placeRaces(input);
   const antal = weekCount(input);
 
+  // R-01: en plan längre än taket går inte att bygga, och ska inte försökas.
+  // Ett felskrivet årtal — 2927 i stället för 2027 — gav 46 978 veckor och
+  // låste webbläsaren. Hängningen är synkron, så inget `catch` hinner emellan;
+  // den enda platsen att stoppa den är före bygget.
+  const { maxPlanWeeks } = rules.weekTime;
+  if (antal > maxPlanWeeks) {
+    throw new Error(
+      `Planen blir ${antal} veckor, vilket är mer än taket på ${maxPlanWeeks}. ` +
+        'Kontrollera loppdatumen — ligger något ovanligt långt fram?',
+    );
+  }
+
   const veckor: WeekSkeleton[] = [];
   let sedanAvlastning = 0;
 

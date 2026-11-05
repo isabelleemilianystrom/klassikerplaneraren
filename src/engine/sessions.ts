@@ -95,11 +95,30 @@ function requireDistinctDays(preferredDays: PreferredDays): void {
   }
 }
 
+/**
+ * Timmarna måste vara ett heltal inom R-41:s intervall.
+ *
+ * Formuläret håller gränsen redan, men lagringen är otrodd indata: en
+ * handskriven `hoursPerWeek: 1000000` gav sextio miljoner minuter att dela ut
+ * per vecka och låste webbläsaren. Motorn vägrar hellre än att försöka.
+ */
+function requirePlannableHours(hoursPerWeek: number): void {
+  const { byHoursPerWeek } = rules.trainingDays;
+  const max = byHoursPerWeek.at(-1)?.upToHours ?? 15;
+  const min = rules.weeklyHours.min;
+
+  const rimligt = Number.isInteger(hoursPerWeek) && hoursPerWeek >= min && hoursPerWeek <= max;
+  if (rimligt) return;
+
+  throw new Error(`Timmar per vecka ska vara ett heltal mellan ${min} och ${max}, inte ${hoursPerWeek}`);
+}
+
 /** Hela planens veckor med pass. */
 export { trainingDayCount } from './placement.ts';
 
 export function buildWeekPlans(input: PlanInput): WeekPlan[] {
   requireDistinctDays(input.preferredDays);
+  requirePlannableHours(input.hoursPerWeek);
 
   const weeks = buildWeeks(input);
   const budgets = weekBudgets(input);
