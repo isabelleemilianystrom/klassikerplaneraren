@@ -6,7 +6,8 @@ Vansbrosimningen 3 km simning, Lidingöloppet 30 km terränglöpning).
 
 **Period:** 29 oktober – 5 november 2026 · **27 commits**
 
-**Läget efter:** 481 tester, lint, typkontroll och bygge gröna. 49 träningsregler, 4 164 rader
+**Läget efter:** 481 tester, lint, typkontroll och bygge gröna. 46 invarianter mot 200 slumpade
+planer. 49 träningsregler, 4 164 rader
 i regelmotorn.
 
 ---
@@ -130,6 +131,30 @@ skälet utskrivet. När den väl byggdes den 4 november hittade den **sex brutna
 > på måndagen före — så planen visade träning på dagar som redan passerat. **172 av 200
 > slumpade planer**, i snitt 2,9 pass i det förflutna.
 
+**Och harnessen var själv ofullständig.** Vid genomgången den 5 november visade det sig att
+tolv av kravspecens invarianter aldrig kommit med i den — och inte de minsta: att veckans tid
+håller sig under fasens tak, att andelarna mellan grenarna summerar till veckans tid, och att en
+avklarad gren slutar tränas. De 34 som fanns hittade sex brott. De tolv som saknades var inte
+rena, de var oprövade: två av dem hittade brott direkt.
+
+> **F-7:** `applyFinishedRaces` nollar en avklarad grens tid och ger den till veckans fokusgren,
+> precis som R-36 säger. Men nybörjartaket körs *efteråt* och delar ut sitt överskott "en i taget
+> till den sport som har mest utrymme kvar" — och den sporten *är* den R-36 just nollat. I P1:s
+> loppvecka i juli ger det 35 minuter skidor, ett halvår efter Vasaloppet. **130 av 200 planer.**
+>
+> Spärren finns redan skriven en gång, för löptaket i R-14: "aldrig till en gren vars lopp är
+> avklarat och som är utanför sin säsong". Nybörjartaket behöver samma mening.
+
+**Tre av mina tolv invarianter var felformulerade**, och att hitta det kostade ingenting:
+varje ny invariant prövades först mot de sex profilerna, som är genomgångna för hand. Två av
+felen var regelsamverkan jag glömt — ett avklarat skidlopp flyttar tiden med flit (R-36), och
+nybörjarbonusen (R-09) tar tio procentenheter från den vana grenen, så är man van på skidor och
+ny på cykel går cykeln om i en vintervecka. Som den ska.
+
+**Men den premissen höll inte hela vägen.** `check-invariants.ts` skrev ut att röd mot
+profilerna *betyder* felformulerad invariant. R-36 är röd mot alla sex och är ändå ett riktigt
+fynd — profilerna hade burit felet hela tiden. Skriptet säger "oftast" nu.
+
 **Att fixen tog tre försök** hör också hit. Första försöket med en avkortad första vecka gav
 fyra nya invariantbrott och **krascher i 18 av 200 planer**. Andra försöket — börja på nästa
 måndag — tappade ett lopp som låg mellan startdatumet och måndagen. Tredje höll. Agenten
@@ -149,7 +174,7 @@ npm run check      481 tester, lint och typkontroll gröna
 npm run build      ✓ Compiled successfully
 npm run dev        kör lokalt på localhost:3000
 npm run profiles   skriver alla sex referensplanerna som läsbar text
-npm run invariants 34 invarianter mot 200 slumpade indata
+npm run invariants 46 invarianter mot 200 slumpade indata
 ```
 
 Verifieringen efter varje steg gick via tre lager:
@@ -271,7 +296,7 @@ dokumenterat val. Den enda luckan var ett `writeFileSync` i ett utvecklingsskrip
 
 | | |
 | --- | --- |
-| **Fyra invariantbrott** | F-2 till F-6 (F-1 löst) står i kravspecens avsnitt 9 med omfattning och orsak. F-3 och F-6 är samma sak: den tysta reservutgången i `bestDateFor` |
+| **Sex invariantbrott** | F-2 till F-8 (F-1 löst) står i kravspecens avsnitt 9 med omfattning och orsak. F-3 och F-6 är samma sak: den tysta reservutgången i `bestDateFor`. **F-7** är nybörjartakets omfördelning som går förbi R-36 — den har en färdig förlaga i R-14 och är den jag tar först. **F-8** är ett regelbeslut: i en avlastningsvecka har en nybörjargren bara ett pass kvar, och långpasset tar det från teknikpasset |
 | **Öppen fråga 10** | Fullt fokus före Lidingöloppet krockar med löptaket i R-14 — ett beslut om vilken skaderegel som väger tyngst |
 | **Tre träningstal i kod** | `zone >= 3`, intervallzonerna, helgdefinitionen |
 | **Säkerhetsheaders** | Väntar på värdvalet |
@@ -291,8 +316,13 @@ på. Men fyra av de fem allvarligaste felen var sådana den själv hade infört 
 tidigare och inte kom ihåg.
 
 **Det som faktiskt fångade felen var inte granskningarna utan slumptestningen.** Tre
-granskningar hittade struktur och risker. 200 slumpade planer hittade sex brutna invarianter som
-462 tester hade missat — däribland att varje profil råkade börja på en måndag.
+granskningar hittade struktur och risker. 200 slumpade planer hittade åtta brutna invarianter som
+481 tester hade missat — däribland att varje profil råkade börja på en måndag, och att skidor
+tränades i juli ett halvår efter Vasaloppet.
+
+**Och testverktyget behöver samma misstro som koden.** Harnessen var grön på 34 invarianter och
+kändes färdig. Den saknade tolv, och två av dem hittade brott första gången de kördes. Ett test
+som inte finns ser ut precis som ett test som går igenom.
 
 **Att kräva bitidentisk utdata gjorde refaktoreringarna ofarliga.** Två omfattande ändringar i
 motorn, noll beteendeförändring, bevisat med md5-summor efter varje steg. Det var också så den
