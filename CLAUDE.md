@@ -119,7 +119,13 @@ Appen är helt statisk, så den kan driftas var som helst som serverar filer. Bl
 
 ## Hemligheter
 
-API-nyckeln ligger i `.env.local` och i Vercels miljövariabler. `.env*` finns i `.gitignore`. **Nyckeln får bara läsas från serverkod** — aldrig i en komponent som skickas till webbläsaren. Inga hemligheter i repot, någonsin.
+**Det finns ingen API-nyckel, och appen behöver ingen.** Öppen fråga 3 i kravspecen avgjordes den 2026-10-27: förklaringarna förgenereras under utvecklingen och sparas i appen, så det görs inga AI-anrop i körtid. Det finns varken `.env.local`, `process.env` eller något anrop ut i hela kodbasen — kontrollerat 2026-11-05. *(Det här avsnittet beskrev fram till dess en nyckel som aldrig funnits; texten skrevs före beslutet och uppdaterades inte.)*
+
+Det som gäller i stället:
+
+- **Inga hemligheter i repot, någonsin.** `.env` och `.env.*` ligger i `.gitignore` och ska stanna där, även om de inte används i dag.
+- **Behövs en nyckel någon gång** — ett riktigt AI-anrop är backloggat till en senare version — är det ett beslut som ska tas först, eftersom det bryter mot både nollkostnadskravet och "inga serveranrop". Fråga.
+- **Får appen någon gång serverkod** gäller det som stod här förut: en nyckel läses bara från serverkod, aldrig i en komponent som skickas till webbläsaren.
 
 ## Lärdomar från v0 som fortfarande gäller
 

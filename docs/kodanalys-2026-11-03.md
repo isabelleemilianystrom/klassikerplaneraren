@@ -1,5 +1,26 @@
 # Kodanalys 2026-11-03
 
+> **Status 2026-11-05: delvis åtgärdad. Siffrorna nedan gäller den 3 november, inte i dag.**
+>
+> Dokumentet är en ögonblicksbild och skrivs med flit inte om — det är så det går att
+> se vad genomgången faktiskt hittade. Det här är vad som hänt sedan:
+>
+> | Fynd | Status i dag |
+> | --- | --- |
+> | `sessions.ts` bär för mycket — 1641 rader | **Åtgärdat 2026-11-04.** Delad i sju filer. `sessions.ts` är **333 rader**; de övriga är `endurance.ts` 557, `placement.ts` 362, `session-texts.ts` 262, `session-limits.ts` 163, `long-session.ts` 169 och `week-context.ts`. Md5-jämförelse av `out/*.txt` före och efter visade identiska planer |
+> | `longSession` har 10 parametrar | **Åtgärdat 2026-11-04.** Två: `(ctx: WeekContext, days: WeekDays)`. Funktionen gick från 117 till 47 rader |
+> | Övriga parameterlistor | **Delvis.** `placeOnDays`, `capRunVolume` och `enduranceSessions` har 7 kvar, `foldAwayTooSmallSports` och `buildWeekPlan` 6. `WeekContext` finns nu och är vägen in för dem som ska krympas härnäst |
+> | `bestDateFor`:s tysta reservutgång | **Halvt.** Den kraschar inte längre — returnerar `null` i stället för `undefined` — men väljer fortfarande vilken dag som helst när ingen är tillåten, utan att signalera. Det är fynd **F-3** och **F-6** i kravspecens avsnitt 9, och fortfarande öppet |
+> | Ingen slumpad egenskapstestning | **Åtgärdat 2026-11-04.** `npm run invariants` kör nu **46 invarianter** mot 200 seedade indata. Första körningen hittade sex brott med sviten grön; genomgången 2026-11-05 la till tolv invarianter som fattades och hittade två till (**F-7**, **F-8**) |
+> | Lagringen validerade bara formen, inte innehållet | **Åtgärdat 2026-11-04.** `isPlanInput` kontrollerar kända lopp-id, dubbletter, giltiga nivåer och timmar inom spannet |
+>
+> **Tillstånd 2026-11-05:** 481 tester gröna, lint, typkontroll och bygge gröna. 49 träningsregler
+> (R-01–R-48, två strukna), 16 637 rader i `src`, `tests`, `config` och `docs`.
+>
+> Det som *inte* är åtgärdat står kvar nedan och gäller fortfarande: den duplicerade
+> logiken mellan `budget.ts` och motorns passfiler, de sex reglerna som bor i två filer,
+> och `budget.ts` själv på 864 rader — den är nu motorns största fil.
+
 Genomgång av kodbasen med fokus på kodkvalitet och framtida underhåll. **Det här är en
 analys, inte en plan.** Inga lösningar eller refaktoreringar föreslås — dokumentet beskriver
 vad som finns och vad det kostar, så att besluten kan tas separat.
@@ -16,7 +37,8 @@ mutationsprov. Det som är empiriskt kontrollerat är utmärkt med *(kontrollera
 
 ### `sessions.ts` bär för mycket
 
-**1641 rader och 26 av 44 regler.** Filen gör fem olika saker: sätter samman veckan,
+**1641 rader och 26 av 44 regler.** *(Delad 2026-11-04 — se statusrutan högst upp.)*
+Filen gör fem olika saker: sätter samman veckan,
 dimensionerar långpasset, delar konditionstiden i pass, fördelar passen på dagar, och sätter
 titlar, ersättningar och säkerhetstexter.
 
@@ -28,7 +50,7 @@ flesta inte handlade om det som ändrades.
 
 | Funktion | Parametrar |
 | --- | --- |
-| `longSession` (`sessions.ts:392`) | **10** |
+| `longSession` (`sessions.ts:392`) | **10** *(nu 2, i `long-session.ts`)* |
 | `foldAwayTooSmallSports` (`sessions.ts:874`) | 8 |
 | `placeOnDays` | 7 |
 | `buildWeekPlan`, `enduranceSessions`, `trainingDates`, `bestDateFor`, `allowedOn` | 6 |
