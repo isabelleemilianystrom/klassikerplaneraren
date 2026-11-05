@@ -1240,7 +1240,7 @@ F-1 är åtgärdad. Resten är inte. Etapp 1 skulle hitta, inte fixa.
 | **F-4** | Löpningens långpass växer högst 15 %/vecka (R-46) | 56 planer, upp till +29 % | Korta faser tvingar kurvan att klättra snabbare än taket |
 | **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
 | **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
-| **F-7** | En avklarad gren tränas bara i sin egen säsong (R-36) | **130 av 200 planer**, 826 brott, upp till 44 % av veckan | Nybörjartakets överskott delas ut till grenen med mest utrymme, och det är den gren R-36 just nollat |
+| **F-7** | En avklarad gren tränas bara i sin egen säsong (R-36) | 130 planer, 826 brott → **77 planer, 412 brott** | Nybörjartakets överskott delas ut till grenen med mest utrymme, och det är den gren R-36 just nollat. **Halvt åtgärdad 2026-11-05** — resten blockerad bakom F-3, se nedan |
 | **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | **45 av 200 planer, 522 veckor** — 436 simning, 86 skidor | Grenen har bara ett pass och långpasset tar det. I simningen är det R-31:s tak mot R-40:s golv; i skidorna att långpasset tar hela grenens tid. **Avgjord 2026-11-05** — se R-21 |
 
 **F-1 förklarade varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
@@ -1255,7 +1255,33 @@ Längs vägen rättades tre buggar som inte hade med F-1 att göra: platsräknin
 
 **F-5 är en regelkrock, inte en bugg.** Den behöver samma sorts beslut som Lidingöloppet fick: vilken regel som ger vika. Hör till Isabelle.
 
-**F-7 är en ordningsbugg, och R-14 har redan spärren skriven.** `applyFinishedRaces` i `src/engine/budget.ts:708` gör rätt: den nollar den avklarade grenen och ger tiden till veckans fokusgren. Men `applyNewLevelLimits` på rad 267 körs efteråt, och den delar ut nybörjartakets överskott "en i taget till den sport som har mest utrymme kvar" — utan att veta något om R-36. Grenen med mest utrymme *är* den R-36 just nollat.
+**F-7 är halvt åtgärdad 2026-11-05.** Säsongsdelen är gjord: en avklarad gren utanför sin säsong
+får nu taket noll i `applyNewLevelLimits`, vilket både trimmar bort tid den fått och hindrar den
+från att ta emot någon annans. P1:s skidor i juli gick från 35 minuter till noll, och brotten från
+826 till 412 i 77 planer i stället för 130.
+
+**Två lärdomar ur fixen.** Den första: spärren i `capRunVolume` har *tre* delar, och jag tog först
+bara R-36-delen. Då rann de trimmade minuterna i stället in i en gren som väntar och gav **51 nya
+brott mot R-39 i 21 planer** — ett fynd jag själv införde och som harnessen fångade direkt.
+Delarna hör ihop: ett tak noll hindrar både att grenen får tid och att den tar emot någon annans.
+
+Den andra: **resten av F-7 är blockerad bakom F-3.** I sin egen säsong ska grenen bara behålla
+`keepShareInOwnSeason` — tio procent — och det är den gränsen som gäller, inte nybörjartaket.
+Utan den klättrar simningen efter Vansbro upp till sitt tak på 80 minuter, 44 procent av veckan.
+Taket är en rad kod. Men det frigör så mycket tid i veckorna efter ett lopp att den hamnar på
+löpningen, och då bryts R-14 i *placeringen*: **sex riktade tester gick röda**, bland dem två som
+säger att en ny löpare aldrig får löppass två dagar i rad. Orsaken är `bestDateFor`:s tysta
+reservutgång på `src/engine/placement.ts:222` — `tillåtna.length > 0 ? tillåtna : dates` — som
+struntar i samtliga dagregler samtidigt när ingen dag går att använda. Det är F-3, och den måste
+göras först.
+
+**Kostnaden för den halva som är gjord**, ärligt redovisad: R-14:s brott steg från 535 till 637,
+och de drabbade planerna från 35 till 37 — seed 33 och 120 är nya, ingen plan blev ren. Samma
+orsak: minuterna jag tar från skidorna i juli hamnar på löpningen och placeras två dagar i rad.
+Oplacerad tid (F-2) steg från 1313 till 1340 brott, vilket är väntat: en gren som kapas till noll
+måste lämna sina minuter någonstans.
+
+**Den ursprungliga diagnosen, för protokollet.** `applyFinishedRaces` i `src/engine/budget.ts:708` gör rätt: den nollar den avklarade grenen och ger tiden till veckans fokusgren. Men `applyNewLevelLimits` på rad 267 körs efteråt, och den delar ut nybörjartakets överskott "en i taget till den sport som har mest utrymme kvar" — utan att veta något om R-36. Grenen med mest utrymme *är* den R-36 just nollat.
 
 Det syns tydligast i en loppvecka: i P1:s vecka 36 går Vansbrosimningen, simningens nybörjartak på 80 minuter äts upp av loppet och öppningspasset, och de frigjorda minuterna går till skidor, cykel och löpning med 35 minuter var. Skidor i juli, ett halvår efter Vasaloppet. R-36 säger "utanför sin säsong får den ingenting".
 

@@ -269,9 +269,53 @@ function applyNewLevelLimits(
   input: PlanInput,
   sports: readonly TrainedSport[],
   week: WeekSkeleton,
+  races: readonly PlacedRace[],
+  enduranceMinutes: number,
 ): Partial<Record<TrainedSport, number>> {
+  const klara = finishedSports(week, races);
+  const månad = monthOf(week.startDate);
+
   const tak = new Map<TrainedSport, number>();
   for (const sport of sports) {
+    // Fynd F-7. `applyFinishedRaces` nollar en avklarad gren och ger tiden till
+    // veckans fokusgren precis som R-36 säger — men den här funktionen körs
+    // *efteråt* och delade ut sitt överskott "en i taget till den sport som har
+    // mest utrymme kvar". Grenen med mest utrymme var den R-36 just nollat. I
+    // P1:s loppvecka i juli gav det 35 minuter skidor, ett halvår efter
+    // Vasaloppet.
+    //
+    // Spärren finns sedan tidigare i `capRunVolume` för löptaket i R-14, och
+    // den har tre delar. Första försöket tog bara R-36-delen, och då rann de
+    // trimmade minuterna i stället in i en gren som väntar — 51 brott mot R-39
+    // i 21 planer. Delarna hör ihop: ett tak noll hindrar både att grenen får
+    // tid och att den tar emot någon annans.
+
+    // R-39: en gren som ännu inte börjat tränas tar inte emot något alls. Till
+    // skillnad från en avklarad gren finns här inget säsongsundantag.
+    if (isDeferred(sport, week, input, races)) {
+      tak.set(sport, 0);
+      continue;
+    }
+
+    // R-36: utanför sin säsong får en avklarad gren ingenting. Det var det här
+    // F-7 handlade om — skidor i juli, ett halvår efter Vasaloppet.
+    if (klara.has(sport) && !isOwnSeason(sport, månad)) {
+      tak.set(sport, 0);
+      continue;
+    }
+
+    // I sin *egen* säsong ska grenen bara behålla `keepShareInOwnSeason`, och
+    // den halvan är medvetet inte gjord här. Taket skulle vara enkelt att sätta
+    // — `Math.floor(enduranceMinutes * rules.afterRace.keepShareInOwnSeason)` —
+    // men det frigör så mycket tid i veckorna efter ett lopp att den hamnar på
+    // löpningen, och då bryts R-14 i placeringen: sex riktade tester gick röda
+    // och `bestDateFor` gav löppass två dagar i rad till en ny löpare.
+    //
+    // Det är fynd F-3, den tysta reservutgången, och den ligger före i kön.
+    // Återstoden är 125 brott i 21 planer, alla av formen "simning behåller
+    // 44 procent efter Vansbro i juli" — se F-7 i kravspecens avsnitt 9.
+    void enduranceMinutes;
+
     const gräns = newLevelLimit(sport, input);
     if (gräns === null) continue;
 
@@ -436,7 +480,14 @@ function splitBetweenSports(
   const fulltFokus = fullFocusSportIn(week, sports, races);
   if (fulltFokus !== null) {
     const andelar = sports.map((sport) => (sport === fulltFokus ? 1 : 0));
-    return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
+    return applyNewLevelLimits(
+      distribute(minutes, sports, andelar),
+      input,
+      sports,
+      week,
+      races,
+      minutes,
+    );
   }
 
   const grund =
@@ -447,7 +498,14 @@ function splitBetweenSports(
   // R-36: en gren vars lopp är avklarat lämnar plats åt nästa lopps gren.
   const andelar = applyFinishedRaces(grund, sports, week, races, månad);
 
-  return applyNewLevelLimits(distribute(minutes, sports, andelar), input, sports, week);
+  return applyNewLevelLimits(
+      distribute(minutes, sports, andelar),
+      input,
+      sports,
+      week,
+      races,
+      minutes,
+    );
 }
 
 /**
