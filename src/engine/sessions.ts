@@ -57,6 +57,7 @@ import {
 } from './placement.ts';
 import { withTitleAndInstruction } from './session-texts.ts';
 import { withVolumeEncouragement } from './volume.ts';
+import type { WeekContext, WeekDays } from './week-context.ts';
 import { buildWeeks, placeRaces, type PlacedRace, type WeekSkeleton } from './weeks.ts';
 
 /** En vecka med sina pass. */
@@ -171,18 +172,15 @@ function buildWeekPlan(
   const platser = Math.max(0, dagar.length - styrka.length);
 
   // 3. Långpasset (R-13, R-28).
-  const long = longSession(
-    week,
-    budget,
-    dates,
+  const ctx: WeekContext = { week, allWeeks, budget, input, races, slots: platser };
+  const days: WeekDays = {
+    all: dates,
     raceDates,
     openerDates,
-    allWeeks,
-    input.preferredDays,
-    input,
-    races,
-    platser,
-  );
+    preferred: input.preferredDays,
+  };
+
+  const long = longSession(ctx, days);
   if (long !== null) pending.push(long);
 
   // 4. Styrkan (R-10, R-42). Egen dag, så den tar en av veckans dagar.

@@ -1,0 +1,784 @@
+P5
+==
+
+Startdatum        2026-11-02
+Lopp              Vätternrundan 2027-06-18, Vansbrosimningen 2027-07-02
+Nivåer            Cykel: experienced, Simning: experienced
+Timmar per vecka  8
+Långpass          sön
+Vilodag           mån
+Utrustning        Trainer eller spinning
+
+Volymriktmärken (R-34)
+-----------------------
+
+  Vätternrundan: 156 h ≈ 3900 km av 1000 km  (nått)
+
+
+Översikt
+--------
+
+  Minuterna är passens, inte budgetens. "oplac." är tid som inte fick plats (R-29).
+
+  v  datum       fas            tid         skidor  cykel   simning löpning styrka  oplac.
+   1 2026-11-02  Bas            4 h 48 min  -       228     -       -       60      -
+   2 2026-11-09  Bas            4 h 48 min  -       228     -       -       60      -
+   3 2026-11-16  Bas            6 h         -       300     -       -       60      -
+   4 2026-11-23  Bas            4 h 12 min  -       192     -       -       60      -
+   5 2026-11-30  Bas            6 h         -       300     -       -       60      -
+   6 2026-12-07  Bas            6 h         -       300     -       -       60      -
+   7 2026-12-14  Bas            6 h         -       300     -       -       60      -
+   8 2026-12-21  Bas            4 h 12 min  -       192     -       -       60      -
+   9 2026-12-28  Bas            6 h         -       300     -       -       60      -
+  10 2027-01-04  Bas            6 h         -       300     -       -       60      -
+  11 2027-01-11  Bas            6 h         -       300     -       -       60      -
+  12 2027-01-18  Bas            4 h 12 min  -       192     -       -       60      -
+  13 2027-01-25  Bas            6 h         -       300     -       -       60      -
+  14 2027-02-01  Bas            6 h         -       300     -       -       60      -
+  15 2027-02-08  Bas            6 h         -       300     -       -       60      -
+  16 2027-02-15  Bas            4 h 12 min  -       192     -       -       60      -
+  17 2027-02-22  Bas            6 h         -       300     -       -       60      -
+  18 2027-03-01  Bas            6 h         -       300     -       -       60      -
+  19 2027-03-08  Bas            6 h         -       300     -       -       60      -
+  20 2027-03-15  Bas            4 h 12 min  -       192     -       -       60      -
+  21 2027-03-22  Bas            6 h         -       300     -       -       60      -
+  22 2027-03-29  Bas            6 h         -       300     -       -       60      -
+  23 2027-04-05  Bas            6 h         -       300     -       -       60      -
+  24 2027-04-12  Specifik       5 h 36 min  -       276     -       -       60      -
+  25 2027-04-19  Specifik       8 h         -       420     -       -       60      -
+  26 2027-04-26  Specifik       8 h         -       420     -       -       60      -
+  27 2027-05-03  Specifik       8 h         -       420     -       -       60      -
+  28 2027-05-10  Specifik       5 h 36 min  -       193     83      -       60      -
+  29 2027-05-17  Specifik       8 h         -       263     157     -       60      -
+  30 2027-05-24  Specifik       8 h         -       420     -       -       60      -
+  31 2027-05-31  Specifik       8 h         -       420     -       -       60      -
+  32 2027-06-07  Nedtrappning   4 h 48 min  -       288     -       -       -       -
+  33 2027-06-14  Nedtrappning   11 h 25 min -       -       -       -       -       -
+  34 2027-06-21  Återhämtning   4 h         -       180     60      -       -       -
+  35 2027-06-28  Nedtrappning   4 h 25 min  -       -       165     -       -       -
+
+Vecka för vecka
+---------------
+
+Vecka 1 — 2026-11-02
+  Bas mot Vätternrundan
+  Planerad tid 4 h 48 min
+
+  mån 02/11    Vila
+  tis 03/11    50 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  ons 04/11    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tors 05/11   50 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 06/11    Vila
+  lör 07/11    50 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 08/11    1 h 18 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 2 — 2026-11-09
+  Bas mot Vätternrundan
+  Planerad tid 4 h 48 min
+
+  mån 09/11    Vila
+  tis 10/11    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 11/11    49 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 12/11   49 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 13/11    Vila
+  lör 14/11    48 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 15/11    1 h 22 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 3 — 2026-11-16
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 16/11    Vila
+  tis 17/11    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 18/11    1 h 12 min Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 19/11   1 h 12 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 20/11    Vila
+  lör 21/11    1 h 11 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 22/11    1 h 25 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 4 — 2026-11-23
+  Bas mot Vätternrundan, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 23/11    Vila
+  tis 24/11    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 25/11    35 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 26/11   35 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 27/11    Vila
+  lör 28/11    34 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 29/11    1 h 28 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 5 — 2026-11-30
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 30/11    Vila
+  tis 01/12    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 02/12    1 h 10 min Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 03/12   1 h 10 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 04/12    Vila
+  lör 05/12    1 h 9 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 06/12    1 h 31 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 6 — 2026-12-07
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 07/12    Vila
+  tis 08/12    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 09/12    1 h 9 min  Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 10/12   1 h 8 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 11/12    Vila
+  lör 12/12    1 h 8 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 13/12    1 h 35 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 7 — 2026-12-14
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 14/12    Vila
+  tis 15/12    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 16/12    1 h 8 min  Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 17/12   1 h 7 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 18/12    Vila
+  lör 19/12    1 h 7 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 20/12    1 h 38 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 8 — 2026-12-21
+  Bas mot Vätternrundan, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 21/12    Vila
+  tis 22/12    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 23/12    31 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 24/12   30 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 25/12    Vila
+  lör 26/12    30 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 27/12    1 h 41 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 9 — 2026-12-28
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 28/12    Vila
+  tis 29/12    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 30/12    1 h 6 min  Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 31/12   1 h 5 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 01/01    Vila
+  lör 02/01    1 h 5 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 03/01    1 h 44 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 10 — 2027-01-04
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 04/01    Vila
+  tis 05/01    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 06/01    1 h 4 min  Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 07/01   1 h 4 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 08/01    Vila
+  lör 09/01    1 h 4 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 10/01    1 h 48 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 11 — 2027-01-11
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 11/01    Vila
+  tis 12/01    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 13/01    1 h 3 min  Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 14/01   1 h 3 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 15/01    Vila
+  lör 16/01    1 h 3 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 17/01    1 h 51 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 12 — 2027-01-18
+  Bas mot Vätternrundan, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 18/01    Vila
+  tis 19/01    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 20/01    26 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 21/01   26 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 22/01    Vila
+  lör 23/01    26 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 24/01    1 h 54 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 13 — 2027-01-25
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 25/01    Vila
+  tis 26/01    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 27/01    1 h 1 min  Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 28/01   1 h 1 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 29/01    Vila
+  lör 30/01    1 h 1 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 31/01    1 h 57 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 14 — 2027-02-01
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 01/02    Vila
+  tis 02/02    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 03/02    1 h        Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 04/02   1 h        Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 05/02    Vila
+  lör 06/02    59 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 07/02    2 h 1 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 15 — 2027-02-08
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 08/02    Vila
+  tis 09/02    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 10/02    59 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 11/02   59 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 12/02    Vila
+  lör 13/02    58 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 14/02    2 h 4 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 16 — 2027-02-15
+  Bas mot Vätternrundan, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 15/02    Vila
+  tis 16/02    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 17/02    22 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 18/02   22 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 19/02    Vila
+  lör 20/02    21 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 21/02    2 h 7 min  Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 17 — 2027-02-22
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 22/02    Vila
+  tis 23/02    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 24/02    57 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 25/02   57 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 26/02    Vila
+  lör 27/02    56 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 28/02    2 h 10 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 18 — 2027-03-01
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 01/03    Vila
+  tis 02/03    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 03/03    56 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 04/03   55 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 05/03    Vila
+  lör 06/03    55 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 07/03    2 h 14 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 19 — 2027-03-08
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 08/03    Vila
+  tis 09/03    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 10/03    55 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 11/03   54 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 12/03    Vila
+  lör 13/03    54 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 14/03    2 h 17 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 20 — 2027-03-15
+  Bas mot Vätternrundan, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 15/03    Vila
+  tis 16/03    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 17/03    29 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 18/03   29 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 19/03    Vila
+  lör 20/03    Vila
+  sön 21/03    2 h 14 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 21 — 2027-03-22
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 22/03    Vila
+  tis 23/03    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 24/03    53 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 25/03   52 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  fre 26/03    Vila
+  lör 27/03    52 min     Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  sön 28/03    2 h 23 min Cykel inomhus — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+
+Vecka 22 — 2027-03-29
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 29/03    Vila
+  tis 30/03    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 31/03    51 min     Cykel inomhus — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret.
+               Kan också göras som: Löpning
+  tors 01/04   51 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 02/04    Vila
+  lör 03/04    51 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 04/04    2 h 27 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 23 — 2027-04-05
+  Bas mot Vätternrundan
+  Planerad tid 6 h
+
+  mån 05/04    Vila
+  tis 06/04    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 07/04    50 min     Tröskelpass — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 08/04   50 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 09/04    Vila
+  lör 10/04    50 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 11/04    2 h 30 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 24 — 2027-04-12
+  Specifik mot Vätternrundan, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 12/04    Vila
+  tis 13/04    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 14/04    36 min     Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 15/04   36 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 16/04    Vila
+  lör 17/04    35 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 18/04    2 h 49 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 25 — 2027-04-19
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 19/04    Vila
+  tis 20/04    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 21/04    1 h 18 min Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 22/04   1 h 17 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 23/04    Vila
+  lör 24/04    1 h 17 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 25/04    3 h 8 min  Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 26 — 2027-04-26
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 26/04    Vila
+  tis 27/04    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 28/04    1 h 12 min Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 29/04   1 h 11 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 30/04    Vila
+  lör 01/05    1 h 11 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 02/05    3 h 26 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 27 — 2027-05-03
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 03/05    Vila
+  tis 04/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 05/05    1 h 5 min  Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 06/05   1 h 5 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 07/05    Vila
+  lör 08/05    1 h 5 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 09/05    3 h 45 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 28 — 2027-05-10
+  Specifik mot Vätternrundan, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 10/05    Vila
+  tis 11/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 12/05    1 h 23 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 13/05   Vila
+  fre 14/05    Vila
+  lör 15/05    Vila
+  sön 16/05    3 h 13 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 29 — 2027-05-17
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 17/05    Vila
+  tis 18/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 19/05    1 h 19 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 20/05   1 h 18 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  fre 21/05    Vila
+  lör 22/05    Vila
+  sön 23/05    4 h 23 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 30 — 2027-05-24
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 24/05    Vila
+  tis 25/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 26/05    47 min     Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 27/05   46 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 28/05    Vila
+  lör 29/05    46 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 30/05    4 h 41 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 31 — 2027-05-31
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 31/05    Vila
+  tis 01/06    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  ons 02/06    42 min     Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 03/06   42 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 04/06    Vila
+  lör 05/06    42 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 06/06    4 h 54 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt.
+               Kan också göras som: Löpning
+
+Vecka 32 — 2027-06-07
+  Nedtrappning mot Vätternrundan
+  Planerad tid 4 h 48 min
+
+  mån 07/06    Vila
+  tis 08/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 09/06    20 min     Tröskelpass — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  tors 10/06   1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 11/06    Vila
+  lör 12/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 13/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+
+Vecka 33 — 2027-06-14
+  Nedtrappning mot Vätternrundan
+  Planerad tid 11 h 25 min varav lopp 11 h
+
+  mån 14/06    Vila
+  tis 15/06    Vila
+  ons 16/06    Vila
+  tors 17/06   25 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 18/06    11 h       Lopp — Cykel
+               I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver. Leta upp en klunga som håller ditt tempo och ligg med. Det sparar mycket energi över trettio mil. Ät och drick innan du känner att du behöver det.
+  lör 19/06    Vila
+  sön 20/06    Vila
+
+Vecka 34 — 2027-06-21
+  Återhämtning mot Vätternrundan
+  Planerad tid 4 h
+
+  mån 21/06    Vila
+  tis 22/06    1 h        Simteknik — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Korta längder med fokus på en sak i taget: armtag, andning, position i vattnet. Vila mellan längderna så att tekniken håller. Öva också på att lyfta blicken framåt mitt i ett armtag — det är så du håller kursen i öppet vatten.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+  ons 23/06    1 h        Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  tors 24/06   1 h        Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 25/06    Vila
+  lör 26/06    1 h        Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 27/06    Vila
+
+Vecka 35 — 2027-06-28
+  Nedtrappning mot Vansbrosimningen
+  Planerad tid 4 h 25 min varav lopp 1 h 15 min
+
+  mån 28/06    Vila
+  tis 29/06    1 h 23 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 30/06    1 h 22 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 01/07   25 min     Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  fre 02/07    1 h 15 min Lopp — Simning
+               I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver. Den första dryga kilometern simmar du motströms i Vanån. Gå inte ut för hårt där — får du mjölksyra i armarna direkt blir resten av loppet långt. Sedan vänder det och du får strömmen med dig.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+  lör 03/07    Vila
+  sön 04/07    Vila

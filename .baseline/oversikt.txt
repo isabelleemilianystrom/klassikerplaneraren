@@ -1,0 +1,9 @@
+Referensprofiler
+================
+
+P1   47 veckor, 6 h/vecka, totalt 231 h  →  out/P1.txt
+P2   47 veckor, 10 h/vecka, totalt 371 h  →  out/P2.txt
+P3   47 veckor, 6 h/vecka, totalt 231 h  →  out/P3.txt
+P4    6 veckor, 6 h/vecka, totalt 28 h  →  out/P4.txt
+P5   35 veckor, 8 h/vecka, totalt 210 h  →  out/P5.txt
+P6   44 veckor, 8 h/vecka, totalt 275 h  →  out/P6.txt

@@ -1,0 +1,951 @@
+P6
+==
+
+Startdatum        2027-05-03
+Lopp              Vätternrundan 2027-06-18, Vansbrosimningen 2027-07-10, Lidingöloppet 2027-09-25, Vasaloppet 2028-03-05
+Nivåer            Längdskidor: new, Simning: experienced, Cykel: experienced, Löpning: experienced
+Timmar per vecka  8
+Långpass          ons
+Vilodag           sön
+Utrustning        Skidspår på vintern, Rullskidor
+
+Varningar
+---------
+
+  Det är 6 veckor till Vätternrundan. Ett helt program börjar med en grundperiod på flera månader, och den hinner du inte – du hoppar in mitt i programmet, i den loppspecifika delen. Planen är lagd för att du ska klara distansen, inte för att du ska slå en tid.
+  Du är ny på längdskidor. Teknik avgör mer än kondition i Vasaloppet – försök komma ut på snö och gå gärna en skidkurs före loppet.
+
+Volymriktmärken (R-34)
+-----------------------
+
+  Vätternrundan: 26 h ≈ 653 km av 1000 km  (nås inte)
+
+  Med dina timmar hinner du ungefär 653 km på cykel före Vätternrundan. Många siktar på 1000 km innan loppet. Planen är lagd för att du ska klara distansen, men vill du komma närmare riktmärket behöver du fler timmar eller fler veckor.
+
+Översikt
+--------
+
+  Minuterna är passens, inte budgetens. "oplac." är tid som inte fick plats (R-29).
+
+  v  datum       fas            tid         skidor  cykel   simning löpning styrka  oplac.
+   1 2027-05-03  Specifik       4 h 48 min  31      159     -       38      60      -
+   2 2027-05-10  Specifik       4 h 48 min  31      159     -       38      60      -
+   3 2027-05-17  Specifik       8 h         62      240     60      58      60      -
+   4 2027-05-24  Specifik       5 h 36 min  -       276     -       -       60      -
+   5 2027-05-31  Specifik       8 h         -       420     -       -       60      -
+   6 2027-06-07  Nedtrappning   4 h 48 min  -       288     -       -       -       -
+   7 2027-06-14  Nedtrappning   11 h 25 min -       -       -       -       -       -
+   8 2027-06-21  Återhämtning   4 h         30      104     60      46      -       -
+   9 2027-06-28  Återhämtning   4 h         30      104     60      46      -       -
+  10 2027-07-05  Nedtrappning   4 h 25 min  20      20      125     -       -       -
+  11 2027-07-12  Återhämtning   4 h         65      39      90      46      -       -
+  12 2027-07-19  Bas            6 h         75      75      75      75      60      -
+  13 2027-07-26  Specifik       8 h         110     109     90      111     60      -
+  14 2027-08-02  Specifik       8 h         107     107     90      116     60      -
+  15 2027-08-09  Specifik       5 h 36 min  58      55      60      103     60      -
+  16 2027-08-16  Specifik       8 h         101     101     90      128     60      -
+  17 2027-08-23  Specifik       8 h         98      99      90      133     60      -
+  18 2027-08-30  Specifik       8 h         96      95      90      139     60      -
+  19 2027-09-06  Specifik       5 h 36 min  68      67      -       141     60      -
+  20 2027-09-13  Specifik       8 h         90      90      90      150     60      -
+  21 2027-09-20  Nedtrappning   4 h 15 min  -       -       -       20      -       10
+  22 2027-09-27  Återhämtning   4 h         72      27      -       141     -       -
+  23 2027-10-04  Bas            6 h         237     -       -       63      60      -
+  24 2027-10-11  Bas            6 h         249     -       -       51      60      -
+  25 2027-10-18  Bas            6 h         258     -       -       42      60      -
+  26 2027-10-25  Bas            4 h 12 min  169     -       -       23      60      -
+  27 2027-11-01  Bas            6 h         270     -       -       30      60      -
+  28 2027-11-08  Bas            6 h         270     -       -       30      60      -
+  29 2027-11-15  Bas            6 h         270     -       -       30      60      -
+  30 2027-11-22  Bas            4 h 12 min  192     -       -       -       60      -
+  31 2027-11-29  Bas            6 h         270     -       -       30      60      -
+  32 2027-12-06  Bas            6 h         270     -       -       30      60      -
+  33 2027-12-13  Bas            6 h         270     -       -       30      60      -
+  34 2027-12-20  Bas            4 h 12 min  192     -       -       -       60      -
+  35 2027-12-27  Specifik       8 h         387     -       -       33      60      -
+  36 2028-01-03  Specifik       8 h         384     -       -       36      60      -
+  37 2028-01-10  Specifik       8 h         381     -       -       39      60      -
+  38 2028-01-17  Specifik       5 h 36 min  248     -       -       28      60      -
+  39 2028-01-24  Specifik       8 h         378     -       -       42      60      -
+  40 2028-01-31  Specifik       8 h         378     -       -       42      60      -
+  41 2028-02-07  Specifik       8 h         420     -       -       -       60      -
+  42 2028-02-14  Specifik       5 h 36 min  276     -       -       -       60      -
+  43 2028-02-21  Nedtrappning   4 h 48 min  288     -       -       -       -       -
+  44 2028-02-28  Nedtrappning   7 h 25 min  -       -       -       -       -       -
+
+Vecka för vecka
+---------------
+
+Vecka 1 — 2027-05-03
+  Specifik mot Vätternrundan
+  Planerad tid 4 h 48 min
+
+  mån 03/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 04/05    31 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 05/05    2 h 39 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt. Har du tid över i dag är det här passet du ska förlänga — det är de sammanlagda kilometrarna som bär dig genom Vätternrundan, inte ett enskilt pass. Planen räcker för att du ska klara distansen; det här är om du vill närma dig 1000 km.
+               Kan också göras som: Löpning
+  tors 06/05   Vila
+  fre 07/05    38 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 08/05    Vila
+  sön 09/05    Vila
+
+Vecka 2 — 2027-05-10
+  Specifik mot Vätternrundan
+  Planerad tid 4 h 48 min
+
+  mån 10/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 11/05    38 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  ons 12/05    2 h 39 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt. Har du tid över i dag är det här passet du ska förlänga — det är de sammanlagda kilometrarna som bär dig genom Vätternrundan, inte ett enskilt pass. Planen räcker för att du ska klara distansen; det här är om du vill närma dig 1000 km.
+               Kan också göras som: Löpning
+  tors 13/05   Vila
+  fre 14/05    31 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 15/05    Vila
+  sön 16/05    Vila
+
+Vecka 3 — 2027-05-17
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 17/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 18/05    1 h        Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 19/05    4 h        Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt. Har du tid över i dag är det här passet du ska förlänga — det är de sammanlagda kilometrarna som bär dig genom Vätternrundan, inte ett enskilt pass. Planen räcker för att du ska klara distansen; det här är om du vill närma dig 1000 km.
+               Kan också göras som: Löpning
+  tors 20/05   Vila
+  fre 21/05    58 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 22/05    1 h 2 min  Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 23/05    Vila
+
+Vecka 4 — 2027-05-24
+  Specifik mot Vätternrundan, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 24/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 25/05    28 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 26/05    3 h 13 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt. Har du tid över i dag är det här passet du ska förlänga — det är de sammanlagda kilometrarna som bär dig genom Vätternrundan, inte ett enskilt pass. Planen räcker för att du ska klara distansen; det här är om du vill närma dig 1000 km.
+               Kan också göras som: Löpning
+  tors 27/05   Vila
+  fre 28/05    27 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  lör 29/05    28 min     Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  sön 30/05    Vila
+
+Vecka 5 — 2027-05-31
+  Specifik mot Vätternrundan
+  Planerad tid 8 h
+
+  mån 31/05    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 01/06    42 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 02/06    4 h 54 min Långpass på cykel — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i sadeln är viktigare än farten. Tips: Vätternrundan körs i klunga, så har du tillfälle att cykla med andra är det värt att öva på att ligga i grupp och att läsa på tävlingens regler för hur man kör. Går det inte är passet precis lika bra ensamt. Har du tid över i dag är det här passet du ska förlänga — det är de sammanlagda kilometrarna som bär dig genom Vätternrundan, inte ett enskilt pass. Planen räcker för att du ska klara distansen; det här är om du vill närma dig 1000 km.
+               Kan också göras som: Löpning
+  tors 03/06   Vila
+  fre 04/06    42 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  lör 05/06    42 min     Intervaller — Cykel, zon 4 (Hårt – bara några ord i taget)
+               Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  sön 06/06    Vila
+
+Vecka 6 — 2027-06-07
+  Nedtrappning mot Vätternrundan
+  Planerad tid 4 h 48 min
+
+  mån 07/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  tis 08/06    20 min     Tröskelpass — Cykel, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Löpning
+  ons 09/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  tors 10/06   Vila
+  fre 11/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  lör 12/06    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 13/06    Vila
+
+Vecka 7 — 2027-06-14
+  Nedtrappning mot Vätternrundan
+  Planerad tid 11 h 25 min varav lopp 11 h
+
+  mån 14/06    Vila
+  tis 15/06    Vila
+  ons 16/06    Vila
+  tors 17/06   25 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 18/06    11 h       Lopp — Cykel
+               I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver. Leta upp en klunga som håller ditt tempo och ligg med. Det sparar mycket energi över trettio mil. Ät och drick innan du känner att du behöver det.
+  lör 19/06    Vila
+  sön 20/06    Vila
+
+Vecka 8 — 2027-06-21
+  Återhämtning mot Vätternrundan
+  Planerad tid 4 h
+
+  mån 21/06    1 h        Simteknik — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Korta längder med fokus på en sak i taget: armtag, andning, position i vattnet. Vila mellan längderna så att tekniken håller. Öva också på att lyfta blicken framåt mitt i ett armtag — det är så du håller kursen i öppet vatten.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+  tis 22/06    52 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 23/06    52 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  tors 24/06   Vila
+  fre 25/06    46 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 26/06    30 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 27/06    Vila
+
+Vecka 9 — 2027-06-28
+  Återhämtning mot Vätternrundan
+  Planerad tid 4 h
+
+  mån 28/06    1 h        Simteknik — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Korta längder med fokus på en sak i taget: armtag, andning, position i vattnet. Vila mellan längderna så att tekniken håller. Öva också på att lyfta blicken framåt mitt i ett armtag — det är så du håller kursen i öppet vatten.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+  tis 29/06    52 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 30/06    52 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  tors 01/07   Vila
+  fre 02/07    46 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 03/07    30 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 04/07    Vila
+
+Vecka 10 — 2027-07-05
+  Nedtrappning mot Vansbrosimningen
+  Planerad tid 4 h 25 min varav lopp 1 h 15 min
+
+  mån 05/07    1 h 3 min  Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tis 06/07    1 h 2 min  Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 07/07    20 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  tors 08/07   20 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  fre 09/07    25 min     Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 10/07    1 h 15 min Lopp — Simning
+               I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver. Den första dryga kilometern simmar du motströms i Vanån. Gå inte ut för hårt där — får du mjölksyra i armarna direkt blir resten av loppet långt. Sedan vänder det och du får strömmen med dig.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+  sön 11/07    Vila
+
+Vecka 11 — 2027-07-12
+  Återhämtning mot Vansbrosimningen
+  Planerad tid 4 h
+
+  mån 12/07    1 h 30 min Simteknik — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Korta längder med fokus på en sak i taget: armtag, andning, position i vattnet. Vila mellan längderna så att tekniken håller. Öva också på att lyfta blicken framåt mitt i ett armtag — det är så du håller kursen i öppet vatten.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+  tis 13/07    39 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 14/07    46 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 15/07   Vila
+  fre 16/07    1 h 5 min  Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 17/07    Vila
+  sön 18/07    Vila
+
+Vecka 12 — 2027-07-19
+  Bas mot Lidingöloppet
+  Planerad tid 6 h
+
+  mån 19/07    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 20/07    1 h 15 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 21/07    1 h 15 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 22/07   Vila
+  fre 23/07    1 h 15 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 24/07    1 h 15 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 25/07    Vila
+
+Vecka 13 — 2027-07-26
+  Specifik mot Lidingöloppet
+  Planerad tid 8 h
+
+  mån 26/07    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 27/07    1 h 50 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 28/07    1 h 51 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 29/07   Vila
+  fre 30/07    1 h 49 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  lör 31/07    1 h 30 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 01/08    Vila
+
+Vecka 14 — 2027-08-02
+  Specifik mot Lidingöloppet
+  Planerad tid 8 h
+
+  mån 02/08    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 03/08    1 h 47 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 04/08    1 h 56 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 05/08   Vila
+  fre 06/08    1 h 30 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 07/08    1 h 47 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 08/08    Vila
+
+Vecka 15 — 2027-08-09
+  Specifik mot Lidingöloppet, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 09/08    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 10/08    1 h        Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 11/08    1 h 43 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 12/08   Vila
+  fre 13/08    58 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 14/08    55 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 15/08    Vila
+
+Vecka 16 — 2027-08-16
+  Specifik mot Lidingöloppet
+  Planerad tid 8 h
+
+  mån 16/08    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 17/08    1 h 41 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 18/08    2 h 8 min  Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 19/08   Vila
+  fre 20/08    1 h 41 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  lör 21/08    1 h 30 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 22/08    Vila
+
+Vecka 17 — 2027-08-23
+  Specifik mot Lidingöloppet
+  Planerad tid 8 h
+
+  mån 23/08    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 24/08    1 h 39 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 25/08    2 h 13 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 26/08   Vila
+  fre 27/08    1 h 30 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 28/08    1 h 38 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 29/08    Vila
+
+Vecka 18 — 2027-08-30
+  Specifik mot Lidingöloppet
+  Planerad tid 8 h
+
+  mån 30/08    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 31/08    1 h 30 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               OBS: Simma aldrig ensam i öppet vatten. Använd en synlig boj och gå i gradvis – kallt vatten kan ge köldchock. Att simma i öppet vatten med våtdräkt är något annat än att simma i bassäng: dräkten bär dig högre i vattnet och ändrar både andning och armtag. Prova den i öppet vatten före loppet, inte på loppdagen.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 01/09    2 h 19 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 02/09   Vila
+  fre 03/09    1 h 36 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 04/09    1 h 35 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 05/09    Vila
+
+Vecka 19 — 2027-09-06
+  Specifik mot Lidingöloppet, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 06/09    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 07/09    34 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 08/09    2 h 21 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 09/09   Vila
+  fre 10/09    34 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 11/09    1 h 7 min  Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 12/09    Vila
+
+Vecka 20 — 2027-09-13
+  Specifik mot Lidingöloppet
+  Planerad tid 8 h
+
+  mån 13/09    1 h        Styrka — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten.
+  tis 14/09    1 h 30 min Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  ons 15/09    2 h 30 min Långpass i terräng — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Lägg passet i kuperad terräng på stig eller grusväg om du kan — Lidingöloppet går på mjukt och ojämnt underlag, och det är något annat att springa på än asfalt. Öva på utförsbackarna också, inte bara uppför: det är nedför som låren tar emot mest, och det är där tröttheten sitter mot slutet. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tors 16/09   Vila
+  fre 17/09    1 h 30 min Lugnt pass i vattnet — Simning, zon 2 (Lugnt – du andas var tredje tag och håller samma rytm hela passet)
+               Jämnt och lugnt hela passet. Andas var tredje tag och håll samma rytm från första till sista längden. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 18/09    1 h 30 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 19/09    Vila
+
+Vecka 21 — 2027-09-20
+  Nedtrappning mot Lidingöloppet
+  Planerad tid 4 h 15 min varav lopp 3 h 30 min
+
+  mån 20/09    20 min     Tröskelpass — Löpning, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tis 21/09    Vila
+  ons 22/09    Vila
+  tors 23/09   Vila
+  fre 24/09    25 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 25/09    3 h 30 min Lopp — Löpning
+               I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver. Loppet avgörs på sista milen. Går du ut hårt första milen får du betala för det i backarna mot slutet.
+  sön 26/09    Vila
+
+Vecka 22 — 2027-09-27
+  Återhämtning mot Lidingöloppet
+  Planerad tid 4 h
+
+  mån 27/09    1 h 11 min Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  tis 28/09    1 h 10 min Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  ons 29/09    36 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  tors 30/09   Vila
+  fre 01/10    36 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  lör 02/10    27 min     Lugnt pass — Cykel, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Löpning
+  sön 03/10    Vila
+
+Vecka 23 — 2027-10-04
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 04/10    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 05/10    1 h 19 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 06/10    1 h 19 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  tors 07/10   Vila
+  fre 08/10    1 h 3 min  Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 09/10    1 h 19 min Rullskidor — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 10/10    Vila
+
+Vecka 24 — 2027-10-11
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 11/10    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 12/10    1 h 23 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 13/10    1 h 23 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  tors 14/10   Vila
+  fre 15/10    51 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 16/10    1 h 23 min Rullskidor — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 17/10    Vila
+
+Vecka 25 — 2027-10-18
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 18/10    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 19/10    1 h 26 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 20/10    1 h 26 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  tors 21/10   Vila
+  fre 22/10    42 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 23/10    1 h 26 min Rullskidor — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 24/10    Vila
+
+Vecka 26 — 2027-10-25
+  Bas mot Vasaloppet, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 25/10    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 26/10    45 min     Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  ons 27/10    1 h 20 min Rullskidor — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  tors 28/10   Vila
+  fre 29/10    23 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Cykel (sliter mindre på kroppen)
+  lör 30/10    44 min     Rullskidor — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer.
+  sön 31/10    Vila
+
+Vecka 27 — 2027-11-01
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 01/11    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 02/11    1 h 28 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 03/11    1 h 34 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 04/11   Vila
+  fre 05/11    30 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 06/11    1 h 28 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 07/11    Vila
+
+Vecka 28 — 2027-11-08
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 08/11    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 09/11    1 h 26 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 10/11    1 h 38 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 11/11   Vila
+  fre 12/11    30 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 13/11    1 h 26 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 14/11    Vila
+
+Vecka 29 — 2027-11-15
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 15/11    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 16/11    1 h 25 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 17/11    1 h 41 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 18/11   Vila
+  fre 19/11    30 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 20/11    1 h 24 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 21/11    Vila
+
+Vecka 30 — 2027-11-22
+  Bas mot Vasaloppet, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 22/11    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 23/11    31 min     Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 24/11    1 h 40 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 25/11   Vila
+  fre 26/11    30 min     Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 27/11    31 min     Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 28/11    Vila
+
+Vecka 31 — 2027-11-29
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 29/11    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 30/11    1 h 21 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 01/12    1 h 49 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 02/12   Vila
+  fre 03/12    30 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 04/12    1 h 20 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 05/12    Vila
+
+Vecka 32 — 2027-12-06
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 06/12    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 07/12    1 h 19 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 08/12    1 h 53 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 09/12   Vila
+  fre 10/12    30 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 11/12    1 h 18 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 12/12    Vila
+
+Vecka 33 — 2027-12-13
+  Bas mot Vasaloppet
+  Planerad tid 6 h
+
+  mån 13/12    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 14/12    1 h 17 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 15/12    1 h 56 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 16/12   Vila
+  fre 17/12    30 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 18/12    1 h 17 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 19/12    Vila
+
+Vecka 34 — 2027-12-20
+  Bas mot Vasaloppet, avlastningsvecka
+  Planerad tid 4 h 12 min
+
+  mån 20/12    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 21/12    24 min     Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 22/12    2 h        Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 23/12   Vila
+  fre 24/12    24 min     Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 25/12    24 min     Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 26/12    Vila
+
+Vecka 35 — 2027-12-27
+  Specifik mot Vasaloppet
+  Planerad tid 8 h
+
+  mån 27/12    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 28/12    2 h 6 min  Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 29/12    2 h 15 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 30/12   Vila
+  fre 31/12    33 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 01/01    2 h 6 min  Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 02/01    Vila
+
+Vecka 36 — 2028-01-03
+  Specifik mot Vasaloppet
+  Planerad tid 8 h
+
+  mån 03/01    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 04/01    1 h 57 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 05/01    2 h 30 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 06/01   Vila
+  fre 07/01    36 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 08/01    1 h 57 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 09/01    Vila
+
+Vecka 37 — 2028-01-10
+  Specifik mot Vasaloppet
+  Planerad tid 8 h
+
+  mån 10/01    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 11/01    1 h 48 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 12/01    2 h 45 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 13/01   Vila
+  fre 14/01    39 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 15/01    1 h 48 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 16/01    Vila
+
+Vecka 38 — 2028-01-17
+  Specifik mot Vasaloppet, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 17/01    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 18/01    34 min     Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 19/01    3 h        Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 20/01   Vila
+  fre 21/01    28 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 22/01    34 min     Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 23/01    Vila
+
+Vecka 39 — 2028-01-24
+  Specifik mot Vasaloppet
+  Planerad tid 8 h
+
+  mån 24/01    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 25/01    1 h 32 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 26/01    3 h 15 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 27/01   Vila
+  fre 28/01    42 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 29/01    1 h 31 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 30/01    Vila
+
+Vecka 40 — 2028-01-31
+  Specifik mot Vasaloppet
+  Planerad tid 8 h
+
+  mån 31/01    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 01/02    1 h 24 min Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 02/02    3 h 30 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 03/02   Vila
+  fre 04/02    42 min     Lugn löptur — Löpning, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Välj stig eller grusväg framför asfalt när du har möjlighet — underlaget är både mer likt loppet och skonsammare att springa på.
+               Kan också göras som: Längdskidor (om det finns snö), Cykel (sliter mindre på kroppen)
+  lör 05/02    1 h 24 min Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 06/02    Vila
+
+Vecka 41 — 2028-02-07
+  Specifik mot Vasaloppet
+  Planerad tid 8 h
+
+  mån 07/02    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 08/02    1 h 5 min  Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 09/02    3 h 45 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 10/02   Vila
+  fre 11/02    1 h 5 min  Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 12/02    1 h 5 min  Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 13/02    Vila
+
+Vecka 42 — 2028-02-14
+  Specifik mot Vasaloppet, avlastningsvecka
+  Planerad tid 5 h 36 min
+
+  mån 14/02    1 h        Styrka med vikt på överkropp — Styrka
+               Värm upp i 10 minuter. Kör övningarna i tur och ordning, 3 set med 8–12 repetitioner. Vila 60–90 sekunder mellan seten. Lägg lite extra på överkropp och bål i den här perioden — stakningen i Vasaloppet kommer därifrån, och det är ofta det som tar slut först.
+  tis 15/02    28 min     Skidteknik — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Växla mellan stakning och diagonal i lugnt tempo. Fokusera på att få tyngden framåt över foten och på att få kraft ur hela kroppen, inte bara armarna.
+  ons 16/02    3 h 13 min Långpass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Långt och jämnt i lugnt tempo. Ta med dryck och något att äta, och prova det du tänkt använda på loppet. Tiden i kroppen är viktigare än farten.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 17/02   Vila
+  fre 18/02    27 min     Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 19/02    28 min     Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 20/02    Vila
+
+Vecka 43 — 2028-02-21
+  Nedtrappning mot Vasaloppet
+  Planerad tid 4 h 48 min
+
+  mån 21/02    1 h 7 min  Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tis 22/02    20 min     Tröskelpass — Längdskidor, zon 3 (Måttligt – du kan prata korta meningar)
+               Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  ons 23/02    1 h 7 min  Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  tors 24/02   Vila
+  fre 25/02    1 h 7 min  Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  lör 26/02    1 h 7 min  Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 27/02    Vila
+
+Vecka 44 — 2028-02-28
+  Nedtrappning mot Vasaloppet
+  Planerad tid 7 h 25 min varav lopp 7 h
+
+  mån 28/02    Vila
+  tis 29/02    Vila
+  ons 01/03    Vila
+  tors 02/03   Vila
+  fre 03/03    Vila
+  lör 04/03    25 min     Lugnt pass — Längdskidor, zon 2 (Lugnt – du ska kunna prata hela meningar)
+               Jämnt och lugnt hela passet. Du ska kunna prata i hela meningar. Känns det för lätt är det rätt — det är de här passen som bygger grunden.
+               Kan också göras som: Cykel (sliter mindre på kroppen), Löpning
+  sön 05/03    7 h        Lopp — Längdskidor
+               I dag är det lopp. Ingen annan träning. Ät och drick som du övat på, och börja lugnare än du tror att du behöver. Nio mil är lång tid. Ät och drick vid kontrollerna från början, också när det känns lätt — det är svårt att hämta igen energi som tagit slut.
