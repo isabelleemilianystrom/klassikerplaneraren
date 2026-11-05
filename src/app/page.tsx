@@ -23,7 +23,7 @@ import PlanForm from '../ui/PlanForm.tsx';
 import PlanView from '../ui/PlanView.tsx';
 import type { FormState } from '../ui/form-state.ts';
 import { clear, parseStored, readRaw, save } from '../ui/storage.ts';
-import { FIXED, HOME, STORAGE } from '../ui/texts.ts';
+import { FORM, FIXED, HOME, STORAGE } from '../ui/texts.ts';
 
 /** Dagens datum som ISO-sträng, i användarens egen tidszon. */
 function idag(): string {
@@ -70,7 +70,15 @@ function byggPlan(input: PlanInput, form: FormState): Plan | null {
   try {
     const plans = buildWeekPlans(input);
     return { input, plans, warnings: allaVarningar(input, plans), form };
-  } catch {
+  } catch (fel) {
+    // Felet loggas men sväljs. Att låta det passera vore en vit sida, och det
+    // är precis vad K-15 finns för att förhindra — men ett tomt `catch` gjorde
+    // felet osynligt också för den som ska rätta det. Anroparen visar ett
+    // meddelande; här hamnar orsaken.
+    //
+    // Bara felet loggas, aldrig indatan: den är användarens svar om sin egen
+    // träning och hör inte i en konsol.
+    console.error('Planen kunde inte byggas:', fel);
     return null;
   }
 }
@@ -89,14 +97,24 @@ export default function Home() {
   // Användarens egna val väger tyngre än det sparade.
   const [eget, setEget] = useState<{ vy: Vy; plan: Plan | null } | null>(null);
 
+  // Satt när motorn inte klarade svaren. Visas i formuläret.
+  const [byggfel, setByggfel] = useState<string | null>(null);
+
   const vy: Vy = eget?.vy ?? sparat.vy;
   const plan: Plan | null = eget !== null ? eget.plan : sparat.plan;
   const kastadPlan = eget === null ? sparat.discarded : null;
 
   function skapaPlan(input: PlanInput, form: FormState) {
     const byggd = byggPlan(input, form);
-    if (byggd === null) return;
 
+    // Klarar motorn inte svaren ska användaren få veta det. Förut returnerade
+    // den här raden tyst, och knappen gjorde ingenting utan ett ord.
+    if (byggd === null) {
+      setByggfel(FORM.step3.errors.couldNotBuild);
+      return;
+    }
+
+    setByggfel(null);
     setEget({ vy: 'plan', plan: byggd });
     // Misslyckas lagringen fungerar appen ändå — planen finns på skärmen.
     save(input, form);
@@ -126,7 +144,7 @@ export default function Home() {
   if (vy === 'formulär') {
     return (
       <main>
-        <PlanForm today={today} initial={plan?.form} onSubmit={skapaPlan} />
+        <PlanForm today={today} initial={plan?.form} byggfel={byggfel} onSubmit={skapaPlan} />
       </main>
     );
   }

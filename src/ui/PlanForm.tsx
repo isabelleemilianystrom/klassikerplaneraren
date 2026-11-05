@@ -34,10 +34,12 @@ interface Props {
   today: string;
   /** Ifyllt tillstånd att börja från, för "Ändra svar" (K-13). */
   initial?: FormState | undefined;
+  /** Satt när motorn inte klarade svaren. Visas vid knappen. */
+  byggfel?: string | null | undefined;
   onSubmit: (input: PlanInput, state: FormState) => void;
 }
 
-export default function PlanForm({ today, initial, onSubmit }: Props) {
+export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
   const [state, setState] = useState<FormState>(initial ?? initialState(today));
   const [steg, setSteg] = useState(1);
   const [visaFel, setVisaFel] = useState(false);
@@ -76,6 +78,15 @@ export default function PlanForm({ today, initial, onSubmit }: Props) {
       {steg === 1 && <Steg1 state={state} setState={setState} felFör={felFör} />}
       {steg === 2 && <Steg2 state={state} setState={setState} felFör={felFör} />}
       {steg === 3 && <Steg3 state={state} setState={setState} felFör={felFör} />}
+
+      {byggfel !== null && byggfel !== undefined && byggfel !== '' && (
+        <p
+          role="alert"
+          className="mt-8 rounded-lg bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          {byggfel}
+        </p>
+      )}
 
       <div className="mt-10 flex gap-3">
         {steg > 1 && (

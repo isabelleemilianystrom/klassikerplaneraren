@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { rules } from '../src/engine/config.ts';
+import { FORM } from '../src/ui/texts.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
 import {
   hoursRange,
@@ -256,5 +257,29 @@ describe('formuläret till en plan', () => {
 
     const planer = buildWeekPlans(toPlanInput(alla, IDAG) as never);
     expect(planer.length).toBeGreaterThan(40);
+  });
+});
+
+describe('K-15: motorn kan misslyckas, och då ska användaren få veta', () => {
+  it('har en text för att programmet inte kunde skapas', () => {
+    // Förut returnerade skapaPlan tyst när motorn kastade, och knappen
+    // "Skapa programmet" gjorde ingenting utan ett ord till användaren.
+    const text = FORM.step3.errors.couldNotBuild;
+
+    expect(text.length).toBeGreaterThan(40);
+    expect(text).toMatch(/[åäö]/);
+    expect(text).toMatch(/\.$/);
+
+    // Tonen: säg att svaren finns kvar och vad man kan göra. Skyll inte.
+    expect(text).toContain('finns kvar');
+    expect(text).not.toMatch(/fel på dig|du gjorde|ogiltig|invalid/i);
+  });
+
+  it('kastar på indata som formuläret aldrig släpper igenom', () => {
+    // Det är den här vägen meddelandet finns för. Ett okänt lopp-id kan bara
+    // komma från en handskriven localStorage, och då ska appen säga något.
+    const trasig = { ...toPlanInput(ifyllt(), IDAG), races: [{ id: 'tour-de-france', date: '2027-03-07', goal: 'finish' }] };
+
+    expect(() => buildWeekPlans(trasig as never)).toThrow(/tour-de-france/);
   });
 });

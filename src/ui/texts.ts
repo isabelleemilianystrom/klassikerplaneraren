@@ -172,6 +172,12 @@ export const FORM = {
       'nödlösning.',
     errors: {
       sameDay: 'Långpasset och vilodagen kan inte vara samma dag.',
+      // Visas när motorn inte klarar svaren. Den ska aldrig behöva visas —
+      // formuläret validerar först — men förut gjorde knappen ingenting alls
+      // när det hände, utan ett ord till användaren.
+      couldNotBuild:
+        'Programmet kunde inte skapas av de här svaren. Dina svar finns kvar – prova att ' +
+        'ändra ett loppdatum eller antalet timmar och försök igen.',
       // Siffrorna kommer ur konfigurationen (R-41), så texten inte kan säga
       // en sak och valideringen en annan.
       hours: (min: number, max: number): string => `Välj mellan ${min} och ${max} timmar.`,
