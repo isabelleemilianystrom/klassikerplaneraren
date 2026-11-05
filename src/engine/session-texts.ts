@@ -157,7 +157,12 @@ interface Substitute {
 }
 
 function substituteFor(session: Session, input: PlanInput): Substitute | undefined {
-  if (session.sport === null) return undefined;
+  // Styrkepasset är vikter på gymmet och har ingen gren att ersätta. I v0 ärvde
+  // det veckans gren, och raden skrev ut "Längdskidor (stakmaskin) · Styrka" —
+  // gymstyrka presenterad som stakmaskin. Här har det alltid haft sporten
+  // 'strength', men spärren var en slump: `substitutions.bySport` råkar sakna
+  // nyckeln. En rad i konfigurationen hade återinfört buggen.
+  if (session.sport === null || session.sport === 'strength') return undefined;
 
   const utrustning = input.equipment as Record<string, boolean>;
   const har = (flaggor: readonly string[]): boolean =>
@@ -239,7 +244,10 @@ export function withSafetyNote(session: Session, input: PlanInput): Session {
 export function alternativesFor(session: Session, input: PlanInput): SessionAlternative[] {
   const regler = rules.sessionAlternatives;
 
-  if (session.sport === null) return [];
+  // Samma skäl som i `substituteFor`: styrkepasset har ingen gren, så det har
+  // inga alternativa grenar heller. Skyddades förut bara av att
+  // `sessionAlternatives.forTypes` inte listar 'strength'.
+  if (session.sport === null || session.sport === 'strength') return [];
   if (!regler.forTypes.includes(session.type)) return [];
 
   const månad = monthOf(session.date);

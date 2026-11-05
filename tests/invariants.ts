@@ -1211,6 +1211,34 @@ export const INVARIANTS: readonly Invariant[] = [
   },
 
   {
+    name: 'styrkepasset är gymstyrka och bär ingen gren',
+    rule: 'R-42',
+    check: (_input, plans) => {
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        for (const s of p.sessions) {
+          if (s.type !== 'strength') continue;
+
+          // Det var precis så v0 gick fel: styrkepasset ärvde veckans gren och
+          // skrev ut "Längdskidor (stakmaskin) · Styrka".
+          if (s.sport !== 'strength') {
+            brott.push(`v${p.week.index} ${s.id}: styrkepass med grenen ${s.sport}`);
+          }
+          if (s.substitutedAs !== undefined) {
+            brott.push(`v${p.week.index} ${s.id}: styrkepass med ersättningen ${s.substitutedAs}`);
+          }
+          if (s.alternatives.length > 0) {
+            brott.push(`v${p.week.index} ${s.id}: styrkepass med ${s.alternatives.length} alternativ`);
+          }
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
     name: 'samma indata ger samma plan',
     rule: 'determinism',
     check: (input, plans) => {
