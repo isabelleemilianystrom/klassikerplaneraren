@@ -1206,9 +1206,15 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 ### Fynd ur den slumpade egenskapstestningen *(2026-11-04)*
 
-Första körningen: 34 invarianter mot 200 slumpade indata plus de sex profilerna. **Sex invarianter brutna.** Sviten på 462 tester var grön samtidigt — det är hela skälet att slumptestningen stod i kravspecen.
+Första körningen *(2026-11-04)*: 34 invarianter mot 200 slumpade indata plus de sex profilerna. **Sex invarianter brutna.** Sviten på 462 tester var grön samtidigt — det är hela skälet att slumptestningen stod i kravspecen.
 
-Ingen av dem är åtgärdad. Etapp 1 skulle hitta, inte fixa.
+**Andra körningen *(2026-11-05)*: 46 invarianter.** Genomgången visade att tolv av avsnittets invarianter aldrig kommit med i harnessen, och inte de minsta — veckans tid mot fasens tak, att andelarna summerar till veckans tid, och att en avklarad gren slutar tränas hör till det mest grundläggande motorn gör. De tolv lades till, och två av dem hittade brott: **F-7 och F-8**.
+
+**Metoden kostade tre felformuleringar innan den gav fynd.** Varje ny invariant prövades först mot de sex profilerna, eftersom de är genomgångna för hand. Tre var röda där, och alla tre var mina egna fel: R-32 tog inte hänsyn till att ett avklarat skidlopp flyttar tiden med flit (R-36), och inte till att nybörjarbonusen (R-09) tar tio procentenheter från den vana grenen — är man van på skidor och ny på cykel går cykeln om i en vintervecka, som den ska. R-21 missade att en gren med ett enda pass kvar inte har plats för både långpass och teknik.
+
+**Men R-36 var röd mot profilerna och är ändå ett fynd.** Det var premissen i `scripts/check-invariants.ts` som föll: skriptet påstod att röd mot profilerna betyder felformulerad invariant. Oftast gör det det, och nu säger skriptet "oftast" i stället.
+
+F-1 är åtgärdad. Resten är inte. Etapp 1 skulle hitta, inte fixa.
 
 | # | Invariant | Omfattning | Vad det är |
 | --- | --- | --- | --- |
@@ -1218,6 +1224,8 @@ Ingen av dem är åtgärdad. Etapp 1 skulle hitta, inte fixa.
 | **F-4** | Löpningens långpass växer högst 15 %/vecka (R-46) | 56 planer, upp till +29 % | Korta faser tvingar kurvan att klättra snabbare än taket |
 | **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
 | **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
+| **F-7** | En avklarad gren tränas bara i sin egen säsong (R-36) | **130 av 200 planer**, 826 brott, upp till 44 % av veckan | Nybörjartakets överskott delas ut till grenen med mest utrymme, och det är den gren R-36 just nollat |
+| **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | Alla sex profilerna, avlastningsveckorna | Grenen har bara ett pass kvar och långpasset tar det. Teknikpasset förlorar platsen |
 
 **F-1 förklarade varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
 
@@ -1230,6 +1238,14 @@ Längs vägen rättades tre buggar som inte hade med F-1 att göra: platsräknin
 **F-3 och F-6 är samma sak**, och den stod redan i kodanalysen 2026-11-03: `bestDateFor` faller tillbaka på vilken dag som helst när inget villkor går att uppfylla, utan att signalera. Det är etapp 2 i planen.
 
 **F-5 är en regelkrock, inte en bugg.** Den behöver samma sorts beslut som Lidingöloppet fick: vilken regel som ger vika. Hör till Isabelle.
+
+**F-7 är en ordningsbugg, och R-14 har redan spärren skriven.** `applyFinishedRaces` i `src/engine/budget.ts:708` gör rätt: den nollar den avklarade grenen och ger tiden till veckans fokusgren. Men `applyNewLevelLimits` på rad 267 körs efteråt, och den delar ut nybörjartakets överskott "en i taget till den sport som har mest utrymme kvar" — utan att veta något om R-36. Grenen med mest utrymme *är* den R-36 just nollat.
+
+Det syns tydligast i en loppvecka: i P1:s vecka 36 går Vansbrosimningen, simningens nybörjartak på 80 minuter äts upp av loppet och öppningspasset, och de frigjorda minuterna går till skidor, cykel och löpning med 35 minuter var. Skidor i juli, ett halvår efter Vasaloppet. R-36 säger "utanför sin säsong får den ingenting".
+
+Spärren finns redan formulerad en gång, för R-14:s löptak: "aldrig till en gren vars lopp är avklarat och som är utanför sin säsong (R-36)". Nybörjartaket behöver samma mening. Det är inte ett regelbeslut — det är två ställen som ska bete sig likadant och inte gör det.
+
+**F-8 är ett regelbeslut.** I en avlastningsvecka har skidorna 76 minuter och ett enda pass, och långpasset (R-13) tar det. Teknikpasset (R-21) förlorar platsen. Båda reglerna är "ska", och en av dem måste ge vika i den veckan. För en nybörjare på skidor talar mycket för teknik — men det är inte mitt beslut. Hör till Isabelle.
 
 ## 10. Backlog i ordning
 

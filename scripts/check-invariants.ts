@@ -88,8 +88,10 @@ function main(): void {
 
   const alla: Brott[] = [];
 
-  // Profilerna först: en invariant som är röd där är felformulerad, inte ett
-  // fynd om motorn.
+  // Profilerna först. En invariant som är röd där är oftast felformulerad —
+  // profilerna är genomgångna för hand — men inte alltid: R-36 är röd mot alla
+  // sex och är ändå ett riktigt fynd (F-7). Skillnaden går bara att avgöra
+  // genom att läsa regeln mot planen.
   for (const [namn, profil] of Object.entries(PROFILES)) {
     alla.push(...prövaEn(namn, profil));
   }
@@ -126,10 +128,10 @@ function main(): void {
     console.log('');
   }
 
-  console.log(
-    `${frånProfiler} brott kom från referensprofilerna — de är felformulerade invarianter,\n` +
-      `inte fynd om motorn. Resten kommer från slumpad indata.`,
-  );
+  console.log(`${frånProfiler} av brotten kom från referensprofilerna.`);
+  console.log('Där är en invariant oftast felformulerad — men läs regeln mot planen');
+  console.log('innan du antar det. R-36 är röd mot alla sex och är ändå ett fynd.');
+  console.log('Resten kommer från slumpad indata.');
 }
 
 main();

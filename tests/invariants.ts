@@ -22,8 +22,10 @@ import {
   weekBudgets,
 } from '../src/engine/budget.ts';
 import { raceById, rules, sessions as sessionTexts } from '../src/engine/config.ts';
-import { addDays, monthOf, weekdayOf } from '../src/engine/dates.ts';
+import { addDays, monthOf, startOfWeek, weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, trainingDayCount, type WeekPlan } from '../src/engine/sessions.ts';
+import { volumeChecks } from '../src/engine/volume.ts';
+import { classicWindowWarnings, midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
 import { buildWeeks } from '../src/engine/weeks.ts';
 import type { IsoDate, PlanInput, Session, TrainedSport } from '../src/engine/types.ts';
 
@@ -858,6 +860,353 @@ export const INVARIANTS: readonly Invariant[] = [
       }
 
       return brott;
+    },
+  },
+
+
+  /* ------------------------------------------------------------------------ */
+  /* Tillagda 2026-11-05: kärninvarianter som fattades i första omgången.     */
+  /* Harnessen körde 34 av kravspecens lista, och de som saknades var inte    */
+  /* de minsta — veckans tid mot fasens tak och att andelarna summerar till   */
+  /* hundra procent hör till det mest grundläggande motorn gör.               */
+  /* ------------------------------------------------------------------------ */
+
+  {
+    name: 'veckans tid överskrider aldrig fasens tak',
+    rule: 'R-05, R-06, R-07',
+    check: (input, plans) => {
+      const T = input.hoursPerWeek * 60;
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        const { phaseShare, taperShare } = rules.weekTime;
+
+        // Fasens andel av toppveckan. Nedtrappningen har egna tal, och
+        // loppveckan styrs av R-25 i stället.
+        const andel =
+          p.week.phase === 'taper'
+            ? Math.max(taperShare.firstWeek, taperShare.secondWeek, taperShare.singleWeek)
+            : phaseShare[p.week.phase as 'base'];
+
+        if (andel === undefined) continue;
+
+        // Avlastningsveckan sänker ytterligare, så taket är aldrig högre.
+        const tak = Math.ceil(T * andel);
+        const budget = p.budget.enduranceMinutes + p.budget.strengthMinutes;
+
+        if (budget <= tak) continue;
+        brott.push(`v${p.week.index} ${p.week.phase}: ${budget} min > taket ${tak}`);
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'andelarna mellan grenarna summerar till veckans konditionstid',
+    rule: 'R-08',
+    check: (input, plans) => {
+      void plans;
+      const brott: string[] = [];
+
+      for (const [i, budget] of weekBudgets(input).entries()) {
+        const summa = Object.values(budget.bySport).reduce((a, b) => a + b, 0);
+        if (summa + budget.unplacedMinutes === budget.enduranceMinutes) continue;
+
+        brott.push(
+          `v${i + 1}: ${summa} + ${budget.unplacedMinutes} ≠ ${budget.enduranceMinutes}`,
+        );
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'återhämtningen efter ett lopp finns kvar',
+    rule: 'R-03',
+    check: (input, plans) => {
+      const brott: string[] = [];
+
+      for (const [i, p] of plans.entries()) {
+        if (p.week.raceIds.length === 0) continue;
+
+        const config = p.week.raceIds.map((id) => raceById(id));
+        const kräver = Math.max(...config.map((race) => race.recoveryWeeks));
+        if (kräver === 0) continue;
+
+        // Veckan efter loppet ska vara återhämtning — utom när nästa lopp
+        // ligger så nära att dess egen uppbyggnad tar över (R-03).
+        const efter = plans[i + 1];
+        if (efter === undefined) continue;
+        if (efter.week.raceIds.length > 0) continue;
+        if (efter.week.phase === 'recovery' || efter.week.phase === 'taper') continue;
+
+        brott.push(
+          `v${p.week.index} har lopp men v${efter.week.index} är ${efter.week.phase}`,
+        );
+      }
+
+      void input;
+      return brott;
+    },
+  },
+
+  {
+    name: 'skidor får mer tid än cykel i en basvecka på vintern',
+    rule: 'R-32',
+    check: (input, plans) => {
+      const vinter = rules.season.winterMonths;
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        if (p.week.phase !== 'base' || p.budget.enduranceMinutes === 0) continue;
+        if (!vinter.includes(monthOf(p.week.startDate))) continue;
+
+        // Är skidloppet avklarat flyttar R-36 tiden till nästa lopps gren med
+        // flit, och då gäller inte säsongsvikten. Vasaloppet går i mars, och
+        // mars ligger i vinterlistan — utan det här undantaget trippar
+        // invarianten på varje vecka efter loppet.
+        const skidloppKvar = input.races.some(
+          (race) => raceById(race.id).sport === 'ski' && race.date >= p.week.startDate,
+        );
+        if (!skidloppKvar) continue;
+
+        // R-09 flyttar tio procentenheter till den gren man är ny i, tagna
+        // från de vana. Är man ny på cykel och van på skidor går cykeln om
+        // med flit — säsongsvikten är inte den enda regeln som gäller.
+        const nyCykel = input.levels.bike === 'new';
+        const nyaSkidor = input.levels.ski === 'new';
+        if (nyCykel && !nyaSkidor) continue;
+
+        const skidor = p.budget.bySport.ski ?? 0;
+        const cykel = p.budget.bySport.bike ?? 0;
+
+        // Bara när båda grenarna finns i planen — annars styr andra regler.
+        if (skidor === 0 || cykel === 0) continue;
+        if (skidor >= cykel) continue;
+
+        brott.push(`v${p.week.index}: skidor ${skidor} < cykel ${cykel} i ${p.week.startDate}`);
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'en gren man är ny i får ett teknikpass i veckan',
+    rule: 'R-21',
+    check: (input, plans) => {
+      const grenar = rules.technique.sportsForNewLevel;
+      const veckor = buildWeeks(input);
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        if (p.week.phase !== 'base' && p.week.phase !== 'specific') continue;
+        if (p.week.raceIds.length > 0) continue;
+
+        const vecka = veckor[p.week.index - 1];
+        const pausade = vecka === undefined ? new Set() : pausedSportsIn(input, vecka);
+
+        for (const sport of grenar) {
+          if (input.levels[sport as TrainedSport] !== 'new') continue;
+
+          // Har grenen ingen tid i veckan finns inget pass att göra teknik av,
+          // och är den pausad (R-45) ska den inte tränas alls.
+          if ((p.budget.bySport[sport as TrainedSport] ?? 0) === 0) continue;
+          if (pausade.has(sport as TrainedSport)) continue;
+
+          const egna = träning(p).filter((s) => s.sport === sport);
+          if (egna.length === 0) continue;
+          if (egna.some((s) => s.type === 'technique')) continue;
+
+          // Har grenen bara ett pass och det är långpasset finns ingen plats
+          // till teknik. Det är fynd F-7, inte en felformulering: R-21 säger
+          // ett teknikpass i veckan, och i avlastningsveckorna uteblir det.
+          const bara = egna.length === 1 && egna[0]?.type === 'long';
+          if (bara) continue;
+
+          brott.push(`v${p.week.index}: ${sport} utan teknikpass`);
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'en avklarad gren tränas bara i sin egen säsong',
+    rule: 'R-36',
+    check: (input, plans) => {
+      const brott: string[] = [];
+      const säsonger = rules.seasonWeights.seasons;
+
+      for (const p of plans) {
+        const månad = monthOf(p.week.startDate);
+
+        for (const race of input.races) {
+          if (race.date >= p.week.startDate) continue;
+
+          const sport = raceById(race.id).sport as TrainedSport;
+          const minuter = p.budget.bySport[sport] ?? 0;
+          if (minuter === 0) continue;
+
+          // Grenens egen säsong är den där den har högsta vikten.
+          const bäst = säsonger.reduce((a, b) =>
+            (b.weights[sport as 'ski'] ?? 0) > (a.weights[sport as 'ski'] ?? 0) ? b : a,
+          );
+          if (bäst.months.includes(månad)) continue;
+
+          // Och andelen ska vara liten: keepShareInOwnSeason är taket.
+          const andel = minuter / Math.max(1, p.budget.enduranceMinutes);
+          if (andel <= rules.afterRace.keepShareInOwnSeason) continue;
+
+          brott.push(
+            `v${p.week.index}: ${sport} har ${Math.round(andel * 100)} % efter sitt lopp, utanför säsongen`,
+          );
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'en gren man bara vill ta sig i mål i får tid, men mindre',
+    rule: 'R-38',
+    check: (input, plans) => {
+      // Bara meningsfullt när planen har både ett tidsmål och ett målmål.
+      const mål = new Set(input.races.map((race) => race.goal));
+      if (mål.size < 2) return [];
+
+      const brott: string[] = [];
+
+      for (const race of input.races) {
+        if (race.goal !== 'finish') continue;
+
+        const sport = raceById(race.id).sport as TrainedSport;
+        const tid = plans
+          .filter((p) => p.week.startDate < race.date)
+          .reduce((summa, p) => summa + (p.budget.bySport[sport] ?? 0), 0);
+
+        if (tid > 0) continue;
+        brott.push(`${race.id}: noll minuter i ${sport} före loppet`);
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'alla lopp i en vecka hör till veckan',
+    rule: 'R-27',
+    check: (input, plans) => {
+      const brott: string[] = [];
+
+      for (const race of input.races) {
+        const vecka = plans.find(
+          (p) => race.date >= p.week.startDate && race.date <= addDays(p.week.startDate, 6),
+        );
+        if (vecka === undefined) continue;
+
+        if (vecka.week.raceIds.includes(race.id)) continue;
+        brott.push(`${race.id} ${race.date} saknas i v${vecka.week.index}`);
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'stakmaskinspasset delas när det är längre än sitt tak',
+    rule: 'R-44',
+    check: (_input, plans) => {
+      const stak = rules.substitutions.bySport.ski?.find((rad) => rad.key === 'ski.skiErg');
+      const tak = stak?.maxMinutes;
+      if (tak === undefined) return [];
+
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        for (const s of träning(p)) {
+          if (s.substitutedAs !== 'ski.skiErg' || s.minutes <= tak) continue;
+          if (s.instruction.includes(`högst ${tak} minuter`)) continue;
+
+          brott.push(`v${p.week.index} ${s.id}: ${s.minutes} min utan delningsnotering`);
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'uppmuntran står bara på långpass före loppet i grenen som missar',
+    rule: 'R-48',
+    check: (input, plans) => {
+      const bit = rules.warnings.volumeMilestone.sessionEncouragement.trim().slice(0, 30);
+      const missade = volumeChecks(input, plans).filter((check) => !check.reached);
+      const grenar = new Set(missade.map((check) => check.sport));
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        for (const s of träning(p)) {
+          if (!s.instruction.includes(bit)) continue;
+
+          if (s.type !== 'long') brott.push(`v${p.week.index} ${s.id}: uppmuntran på ${s.type}`);
+          if (s.sport === null || !grenar.has(s.sport as TrainedSport)) {
+            brott.push(`v${p.week.index} ${s.id}: uppmuntran i ${s.sport} som når riktmärket`);
+          }
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'loppen mer än tolv månader isär ger varningen, och planen byggs ändå',
+    rule: 'R-26',
+    check: (input, plans) => {
+      if (input.races.length < 2) return [];
+
+      const datum = input.races.map((race) => race.date).sort();
+      const första = datum[0] as string;
+      const sista = datum.at(-1) as string;
+
+      // Tolv månader räknat grovt: 366 dagar rymmer skottåret.
+      const dagar = (Date.parse(sista) - Date.parse(första)) / 86_400_000;
+      const utanför = dagar > 366;
+
+      const varnar = classicWindowWarnings(input).length > 0;
+      const brott: string[] = [];
+
+      if (utanför && !varnar) brott.push(`${Math.round(dagar)} dagar isär utan varning`);
+      if (plans.length === 0) brott.push('ingen plan byggdes');
+
+      return brott;
+    },
+  },
+
+  {
+    name: 'start närmare än tio veckor ger varningen om att hoppa in mitt i',
+    rule: 'R-35',
+    check: (input, plans) => {
+      const gräns = rules.warnings.midProgramme.weeksThreshold;
+      const första = [...input.races].sort((a, b) => a.date.localeCompare(b.date))[0];
+      if (första === undefined) return [];
+
+      const veckor = Math.floor(
+        (Date.parse(startOfWeek(första.date)) - Date.parse(startOfWeek(input.startDate))) /
+          (7 * 86_400_000),
+      );
+
+      const varnar = midProgrammeWarnings(midProgrammeStarts(input, plans)).length > 0;
+      if (veckor >= gräns && !varnar) return [];
+      if (veckor < gräns && varnar) return [];
+      if (veckor >= gräns && varnar) return [`${veckor} veckor till loppet men varnar ändå`];
+
+      return [`${veckor} veckor till loppet utan varning`];
     },
   },
 
