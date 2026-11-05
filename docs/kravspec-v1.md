@@ -813,6 +813,22 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   att ligga i på en trainer.
 - **R-21** Nivå Ny i skidor eller simning: ett teknikpass per vecka i den sporten under bas och specifik fas, och en rekommendation om kurs i översikten. *(preciserad 2026-10-28)* Teknikpasset tas **före** veckans hårda pass — är man nybörjare avgör tekniken mer än intensiteten. Kursrekommendationen ges bara för grenar vars lopp faktiskt ingår i planen; ett simråd till den som inte ska simma Vansbrosimningen är bara brus. Texterna ligger i `technique.courseAdvice` i `config/rules.json`.
 
+  **Teknikpasset går före långpasset också** *(preciserad 2026-11-05, beslut om fynd F-8)*. Meningen
+  ovan nämnde bara det hårda passet, och motorn gav därför grenens enda pass till långpasset.
+  Hur det löses skiljer sig mellan grenarna, eftersom bara simningen har ett nybörjartak:
+
+  - **Simning: det enda passet är teknikpasset.** R-31 ger nybörjaren ett simpass i veckan, och
+    två går inte att få in — R-40:s golv på 60 minuter mot R-31:s tak på 80 gör det aritmetiskt
+    omöjligt. Då ska passet vara teknik. Tekniken är det som gör 3 km i Vansbroån görbart, och
+    ett nybörjarprogram som ger 28 veckor långpass och aldrig ett teknikpass tränar fel sak.
+    Grenen har alltså **inget långpass** medan nivån är Ny.
+  - **Skidor: båda passen, och långpasset krymper.** Skidor har inget nybörjartak, så tiden finns.
+    Teknikpasset tar `session.minMinutes` och långpasset resten, men aldrig under sitt eget golv
+    `longSession.minMinutes` — 76 minuter blir alltså 45 + 31, inte ett enda pass. **Långpasset
+    får inte utgå.** Tekniken avgör i Vasaloppet, men loppet tar tio timmar, och den som inte
+    byggt uthållighet klarar det inte hur fin stakning hon än har. Räcker inte tiden till båda
+    golven (65 minuter) behåller långpasset veckan.
+
 **Varningar**
 
 - **R-22** Mindre än 8 veckor från start till första lopp: "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
@@ -1105,7 +1121,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Fokus växlar till nästa lopp i datumordning när det förras återhämtning är slut (R-02, R-47) *(tillagd 2026-11-04)*
 - En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
-- En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*
+- En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*. Är man ny i simning är det grenens **enda** pass, och grenen har inget långpass; är man ny på skidor finns båda, och långpasset ligger på eller över sitt golv *(preciserad 2026-11-05)*
 - Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
 - Sparad data valideras fält för fält och **till innehåll**, inte bara på versionsnumret och typen, och kastas när något inte stämmer (K-15) *(skärpt 2026-11-05)*
 - Utrustningsfrågorna i formuläret och flaggorna i datamodellen är exakt samma mängd (K-04) *(tillagd 2026-11-05)*
@@ -1210,7 +1226,7 @@ Första körningen *(2026-11-04)*: 34 invarianter mot 200 slumpade indata plus d
 
 **Andra körningen *(2026-11-05)*: 46 invarianter.** Genomgången visade att tolv av avsnittets invarianter aldrig kommit med i harnessen, och inte de minsta — veckans tid mot fasens tak, att andelarna summerar till veckans tid, och att en avklarad gren slutar tränas hör till det mest grundläggande motorn gör. De tolv lades till, och två av dem hittade brott: **F-7 och F-8**.
 
-**Metoden kostade tre felformuleringar innan den gav fynd.** Varje ny invariant prövades först mot de sex profilerna, eftersom de är genomgångna för hand. Tre var röda där, och alla tre var mina egna fel: R-32 tog inte hänsyn till att ett avklarat skidlopp flyttar tiden med flit (R-36), och inte till att nybörjarbonusen (R-09) tar tio procentenheter från den vana grenen — är man van på skidor och ny på cykel går cykeln om i en vintervecka, som den ska. R-21 missade att en gren med ett enda pass kvar inte har plats för både långpass och teknik.
+**Metoden kostade tre felformuleringar innan den gav fynd.** Varje ny invariant prövades först mot de sex profilerna, eftersom de är genomgångna för hand. Tre var röda där, och alla tre var mina egna fel: R-32 tog inte hänsyn till att ett avklarat skidlopp flyttar tiden med flit (R-36), och inte till att nybörjarbonusen (R-09) tar tio procentenheter från den vana grenen — är man van på skidor och ny på cykel går cykeln om i en vintervecka, som den ska. R-21 trodde jag också var felformulerad av samma skäl, men den var det inte: att grenen bara har ett pass är just problemet, och vilket pass det ska vara blev beslutet nedan.
 
 **Men R-36 var röd mot profilerna och är ändå ett fynd.** Det var premissen i `scripts/check-invariants.ts` som föll: skriptet påstod att röd mot profilerna betyder felformulerad invariant. Oftast gör det det, och nu säger skriptet "oftast" i stället.
 
@@ -1225,7 +1241,7 @@ F-1 är åtgärdad. Resten är inte. Etapp 1 skulle hitta, inte fixa.
 | **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
 | **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
 | **F-7** | En avklarad gren tränas bara i sin egen säsong (R-36) | **130 av 200 planer**, 826 brott, upp till 44 % av veckan | Nybörjartakets överskott delas ut till grenen med mest utrymme, och det är den gren R-36 just nollat |
-| **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | Alla sex profilerna, avlastningsveckorna | Grenen har bara ett pass kvar och långpasset tar det. Teknikpasset förlorar platsen |
+| **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | **45 av 200 planer, 522 veckor** — 436 simning, 86 skidor | Grenen har bara ett pass och långpasset tar det. I simningen är det R-31:s tak mot R-40:s golv; i skidorna att långpasset tar hela grenens tid. **Avgjord 2026-11-05** — se R-21 |
 
 **F-1 förklarade varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
 
@@ -1245,7 +1261,24 @@ Det syns tydligast i en loppvecka: i P1:s vecka 36 går Vansbrosimningen, simnin
 
 Spärren finns redan formulerad en gång, för R-14:s löptak: "aldrig till en gren vars lopp är avklarat och som är utanför sin säsong (R-36)". Nybörjartaket behöver samma mening. Det är inte ett regelbeslut — det är två ställen som ska bete sig likadant och inte gör det.
 
-**F-8 är ett regelbeslut.** I en avlastningsvecka har skidorna 76 minuter och ett enda pass, och långpasset (R-13) tar det. Teknikpasset (R-21) förlorar platsen. Båda reglerna är "ska", och en av dem måste ge vika i den veckan. För en nybörjare på skidor talar mycket för teknik — men det är inte mitt beslut. Hör till Isabelle.
+**F-8 mättes fel först, och den felmätningen är värd att minnas.** Den första beskrivningen sa
+"avlastningsveckorna" och utgick från P1:s vecka 4. En riktig mätning gav **522 veckor i 45 av 200
+planer**, varav bara 106 är avlastningsveckor — och **436 av 522 är simning, inte skidor**. Felet
+var att generalisera från den profil jag råkade titta på. Det är samma fel som F-1 handlade om.
+
+**I simningen var det ingen regelkrock.** R-31 ger nybörjaren ett simpass i veckan med avsikt, och
+R-40:s golv på 60 minuter mot taket på 80 gör ett andra pass aritmetiskt omöjligt. Båda reglerna
+går att uppfylla samtidigt — om det enda passet *är* teknikpasset. Motorn lade det på långpasset.
+Seed 17 visar vad det kostade: en nybörjare på simning med 13 timmar i veckan fick **28 veckor i
+rad** med ett 75-minuters simlångpass och fyra lugna löppass, och aldrig ett teknikpass, inför
+3 km i Vansbroån.
+
+**I skidorna fanns tiden till båda.** 76 minuter rymmer långpassets golv på 45 plus ett teknikpass
+på 31. Det var platsfördelningen som gav långpasset allt.
+
+**Avgjord 2026-11-05.** Simningens enda pass blir teknik; skidorna får båda och långpasset krymper
+mot sitt golv men utgår aldrig — loppet tar tio timmar, och teknik utan uthållighet bär inte dit.
+Preciseringen står i R-21.
 
 ## 10. Backlog i ordning
 
