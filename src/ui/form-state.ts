@@ -27,7 +27,15 @@ export interface FormState {
   startDate: string;
   races: RaceChoice[];
   levels: Partial<Record<TrainedSport, Level>>;
-  hoursPerWeek: number;
+  /**
+   * Timmarna som text, precis som de står i fältet.
+   *
+   * Ett tal här gjorde att `Number('')` skrev en nolla i tillståndet så fort
+   * fältet tömdes, och nästa siffra hamnade efter den: "012". Texten får vara
+   * tom och ogiltig medan man skriver — `validateStep3` avgör om den duger,
+   * och `toPlanInput` gör den till ett tal.
+   */
+  hoursPerWeek: string;
   longSessionDay: Weekday;
   restDay: Weekday;
   equipment: Record<string, boolean>;
@@ -49,7 +57,7 @@ export function initialState(today: string): FormState {
       goal: 'finish',
     })),
     levels: {},
-    hoursPerWeek: 6,
+    hoursPerWeek: '6',
     longSessionDay: 7,
     restDay: 1,
     // Härleds ur frågorna i steg 3, inte ur en egen lista. Listan stod kvar
@@ -135,16 +143,29 @@ export function validateStep2(state: FormState): FieldErrors {
   return saknas.length === 0 ? {} : { levels: FORM.step2.error };
 }
 
+/**
+ * Timmarna som ett heltal, eller null när fältet inte går att använda.
+ *
+ * Tomt fält, bokstäver och "6,5" ger null — det är `validateStep3` som
+ * avgör vad som händer då, inte den här funktionen. `Number` ensam dög inte:
+ * `Number('')` är 0 och `Number('6.5')` är 6,5, och båda såg ut som giltiga
+ * timmar.
+ */
+function hoursValue(state: FormState): number | null {
+  const text = state.hoursPerWeek.trim();
+  if (text === '') return null;
+
+  const tal = Number(text);
+  return Number.isInteger(tal) ? tal : null;
+}
+
 /** Felen i steg 3 (K-04). */
 export function validateStep3(state: FormState): FieldErrors {
   const fel: FieldErrors = {};
 
   const { min, max } = hoursRange();
-  if (
-    !Number.isInteger(state.hoursPerWeek) ||
-    state.hoursPerWeek < min ||
-    state.hoursPerWeek > max
-  ) {
+  const timmar = hoursValue(state);
+  if (timmar === null || timmar < min || timmar > max) {
     fel.hoursPerWeek = FORM.step3.errors.hours(min, max);
   }
 
@@ -194,7 +215,7 @@ export function toPlanInput(state: FormState, today: string): PlanInput | null {
     levels: Object.fromEntries(
       sportsToRate(state).map((sport) => [sport, state.levels[sport] as Level]),
     ),
-    hoursPerWeek: state.hoursPerWeek,
+    hoursPerWeek: hoursValue(state) ?? hoursRange().min,
     preferredDays: { longSession: state.longSessionDay, rest: state.restDay },
     equipment: {
       snow: state.equipment.snow === true,

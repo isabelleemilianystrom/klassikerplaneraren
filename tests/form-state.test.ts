@@ -145,7 +145,7 @@ describe('K-04: steg 3, tid, dagar och utrustning', () => {
   it('har standardvärdena från kravspecen', () => {
     const state = initialState(IDAG);
 
-    expect(state.hoursPerWeek).toBe(6);
+    expect(state.hoursPerWeek).toBe('6');
     expect(state.longSessionDay).toBe(7);
     expect(state.restDay).toBe(1);
     expect(Object.values(state.equipment).every((värde) => värde === false)).toBe(true);
@@ -160,11 +160,40 @@ describe('K-04: steg 3, tid, dagar och utrustning', () => {
     expect(min).toBe(rules.weeklyHours.min);
 
     for (const timmar of [min, 10, max]) {
-      expect(validateStep3({ ...ifyllt(), hoursPerWeek: timmar }).hoursPerWeek).toBeUndefined();
+      expect(
+        validateStep3({ ...ifyllt(), hoursPerWeek: String(timmar) }).hoursPerWeek,
+      ).toBeUndefined();
     }
     // Tre och fem timmar var tillåtet förut och ska nu underkännas (R-41).
     for (const timmar of [min - 1, 3, 5, max + 1, 0, 6.5]) {
-      expect(validateStep3({ ...ifyllt(), hoursPerWeek: timmar }).hoursPerWeek).toBeDefined();
+      expect(
+        validateStep3({ ...ifyllt(), hoursPerWeek: String(timmar) }).hoursPerWeek,
+      ).toBeDefined();
+    }
+  });
+
+  it('underkänner ett timfält som inte är ett tal', () => {
+    // Fältet håller text sedan 2026-11-05, så det kan vara tomt eller halvt
+    // ifyllt medan man skriver. Förut gjorde `Number('')` det till en nolla,
+    // och ett tomt fält blev tyst till noll timmar i stället för ett fel.
+    for (const text of ['', '   ', 'tolv', '6,5', '--8', '8 timmar']) {
+      expect(
+        validateStep3({ ...ifyllt(), hoursPerWeek: text }).hoursPerWeek,
+        `"${text}" ska underkännas`,
+      ).toBeDefined();
+    }
+  });
+
+  it('godtar ledande nollor och mellanslag', () => {
+    // "012" är precis vad det gamla fältet skrev av sig självt. Som text är
+    // det tolv timmar och fullt läsbart — det ska inte vara ett fel.
+    // "1e1" är tio och godtas av både Number och fältet självt. Konstigt
+    // skrivet, men inte fel, och det finns ingen regel som motiverar ett nej.
+    for (const text of ['012', ' 12 ', '06', '1e1']) {
+      expect(
+        validateStep3({ ...ifyllt(), hoursPerWeek: text }).hoursPerWeek,
+        `"${text}" ska godtas`,
+      ).toBeUndefined();
     }
   });
 

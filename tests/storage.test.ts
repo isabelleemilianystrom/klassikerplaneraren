@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { clear, load, save } from '../src/ui/storage.ts';
+import { clear, load, save, STORAGE_VERSION } from '../src/ui/storage.ts';
 import {
   initialState,
   toPlanInput,
@@ -171,7 +171,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     // Det här är v0-felet: versionen stämde, formen gjorde det inte.
     const { form, input } = ifyllt();
     const svar = läs(
-      JSON.stringify({ storageVersion: 4, input: { ...input, schemaVersion: 1 }, form }),
+      JSON.stringify({ storageVersion: STORAGE_VERSION, input: { ...input, schemaVersion: 1 }, form }),
     );
 
     expect(svar).toEqual({ status: 'discarded', reason: 'bad-input' });
@@ -184,7 +184,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
       const trasig = { ...input };
       delete (trasig as Record<string, unknown>)[fält];
 
-      const svar = läs(JSON.stringify({ storageVersion: 4, input: trasig, form }));
+      const svar = läs(JSON.stringify({ storageVersion: STORAGE_VERSION, input: trasig, form }));
       expect(svar.status, fält).toBe('discarded');
     }
   });
@@ -192,7 +192,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
   it('kastar indata med ett ogiltigt datum', () => {
     const { form, input } = ifyllt();
     const svar = läs(
-      JSON.stringify({ storageVersion: 4, input: { ...input, startDate: 'i går' }, form }),
+      JSON.stringify({ storageVersion: STORAGE_VERSION, input: { ...input, startDate: 'i går' }, form }),
     );
 
     expect(svar).toEqual({ status: 'discarded', reason: 'bad-input' });
@@ -200,7 +200,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
 
   it('kastar indata utan lopp', () => {
     const { form, input } = ifyllt();
-    const svar = läs(JSON.stringify({ storageVersion: 4, input: { ...input, races: [] }, form }));
+    const svar = läs(JSON.stringify({ storageVersion: STORAGE_VERSION, input: { ...input, races: [] }, form }));
 
     expect(svar.status).toBe('discarded');
   });
@@ -210,7 +210,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     const { form, input } = ifyllt();
     const svar = läs(
       JSON.stringify({
-        storageVersion: 4,
+        storageVersion: STORAGE_VERSION,
         input: { ...input, preferredDays: { longSession: 3, rest: 3 } },
         form,
       }),
@@ -223,7 +223,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     const { form, input } = ifyllt();
     const svar = läs(
       JSON.stringify({
-        storageVersion: 4,
+        storageVersion: STORAGE_VERSION,
         input: { ...input, equipment: { rollerSkis: 'ja' } },
         form,
       }),
@@ -232,9 +232,44 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
     expect(svar.status).toBe('discarded');
   });
 
+  it('har en version som höjs när formen ändras', () => {
+    // Siffran står med flit också här och inte bara i modulen. Ändras formen
+    // utan att någon tänker efter ska det här testet tvinga fram ett beslut:
+    // höj versionen och lyft datan i `upgrade`, eller låt bli att ändra formen.
+    // I v0 ändrades formatet fem gånger med samma versionsnummer, och alla som
+    // hade ett sparat program fick en vit sida.
+    expect(STORAGE_VERSION).toBe(5);
+  });
+
+  it('lyfter en sparad plan från version 4 i stället för att kasta den', () => {
+    // Version 4 höll formulärets timmar som ett tal, version 5 som text. Det
+    // är hela skillnaden, och den får inte kosta användaren hennes plan.
+    const { form, input } = ifyllt();
+    const svar = läs(
+      JSON.stringify({ storageVersion: 4, input, form: { ...form, hoursPerWeek: 11 } }),
+    );
+
+    expect(svar.status).toBe('ok');
+    if (svar.status !== 'ok') return;
+
+    expect(svar.form.hoursPerWeek).toBe('11');
+    expect(svar.input).toEqual(input);
+  });
+
+  it('kastar en version 4 som inte går att lyfta', () => {
+    // Går timmarna inte att göra om till text är datan inte den vi tror, och
+    // då kastas den som vanligt i stället för att gissas fram.
+    const { form, input } = ifyllt();
+    const svar = läs(
+      JSON.stringify({ storageVersion: 4, input, form: { ...form, hoursPerWeek: 'elva' } }),
+    );
+
+    expect(svar).toEqual({ status: 'discarded', reason: 'old-version' });
+  });
+
   it('kastar ett trasigt formulärtillstånd', () => {
     const { input } = ifyllt();
-    const svar = läs(JSON.stringify({ storageVersion: 4, input, form: { startDate: 42 } }));
+    const svar = läs(JSON.stringify({ storageVersion: STORAGE_VERSION, input, form: { startDate: 42 } }));
 
     expect(svar).toEqual({ status: 'discarded', reason: 'bad-form' });
   });
@@ -256,7 +291,7 @@ describe('K-15: sparad plan valideras vid inläsning', () => {
 
   it('släpper igenom en giltig plan', () => {
     const { form, input } = ifyllt();
-    const svar = läs(JSON.stringify({ storageVersion: 4, input, form }));
+    const svar = läs(JSON.stringify({ storageVersion: STORAGE_VERSION, input, form }));
 
     expect(svar.status).toBe('ok');
     expect(lagring.har(NYCKEL)).toBe(true);
@@ -281,7 +316,7 @@ describe('K-13: ändra svar', () => {
     const egna: FormState = {
       ...ifyllt().form,
       startDate: '2026-11-16',
-      hoursPerWeek: 11,
+      hoursPerWeek: '11',
       longSessionDay: 6,
       restDay: 3,
       levels: { ski: 'new', run: 'advanced' },
@@ -297,7 +332,7 @@ describe('K-13: ändra svar', () => {
     const läst = tillbaka(egna, input) as FormState;
 
     expect(läst.startDate).toBe('2026-11-16');
-    expect(läst.hoursPerWeek).toBe(11);
+    expect(läst.hoursPerWeek).toBe('11');
     expect(läst.longSessionDay).toBe(6);
     expect(läst.restDay).toBe(3);
     expect(läst.levels).toEqual({ ski: 'new', run: 'advanced' });
@@ -354,7 +389,7 @@ describe('K-13: ändra svar', () => {
 
     expect(läst.races.some((race) => race.selected)).toBe(true);
     expect(Object.keys(läst.levels).length).toBeGreaterThan(0);
-    expect(läst.hoursPerWeek).toBeGreaterThan(0);
+    expect(Number(läst.hoursPerWeek)).toBeGreaterThan(0);
   });
 });
 
@@ -368,7 +403,7 @@ describe('K-15: lagringen är lika sträng som formuläret', () => {
   /** En sparad post med ett fält bytt mot något formuläret inte kan skapa. */
   function medÄndradIndata(ändring: Record<string, unknown>): string {
     const { form, input } = ifyllt();
-    return JSON.stringify({ storageVersion: 4, input: { ...input, ...ändring }, form });
+    return JSON.stringify({ storageVersion: STORAGE_VERSION, input: { ...input, ...ändring }, form });
   }
 
   it('kastar ett okänt lopp-id i stället för att låta motorn kasta', () => {
@@ -404,7 +439,7 @@ describe('K-15: lagringen är lika sträng som formuläret', () => {
   it('kastar ett formulärtillstånd med ett datum som inte är ett datum', () => {
     const { form, input } = ifyllt();
     const trasigtForm = { ...form, startDate: 'i tisdags' };
-    const svar = läs(JSON.stringify({ storageVersion: 4, input, form: trasigtForm }));
+    const svar = läs(JSON.stringify({ storageVersion: STORAGE_VERSION, input, form: trasigtForm }));
 
     expect(svar.status).toBe('discarded');
     expect(svar.status === 'discarded' && svar.reason).toBe('bad-form');
@@ -418,6 +453,6 @@ describe('K-15: lagringen är lika sträng som formuläret', () => {
       races: form.races.map((race, i) => (i === 0 ? { ...race, date: '' } : race)),
     };
 
-    expect(läs(JSON.stringify({ storageVersion: 4, input, form: medTomt })).status).toBe('ok');
+    expect(läs(JSON.stringify({ storageVersion: STORAGE_VERSION, input, form: medTomt })).status).toBe('ok');
   });
 });

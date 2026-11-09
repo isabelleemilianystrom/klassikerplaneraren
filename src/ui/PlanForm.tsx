@@ -285,7 +285,7 @@ function Steg3({ state, setState, felFör }: StegProps) {
           max={max}
           step={1}
           value={state.hoursPerWeek}
-          onChange={(e) => setState({ ...state, hoursPerWeek: Number(e.target.value) })}
+          onChange={(e) => setState({ ...state, hoursPerWeek: e.target.value })}
           className="w-24 rounded-lg border border-neutral-300 px-3 py-2.5"
         />
       </Fält>

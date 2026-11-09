@@ -31,7 +31,7 @@ const KEY = 'klassikerplaneraren';
  * 4 — snötillgången tillbaka som eget fält: snö kräver både vintermånad och
  *     ett spår att åka i (R-17). `PlanInput` är nu schemaVersion 5.
  */
-const STORAGE_VERSION = 4;
+export const STORAGE_VERSION = 5;
 
 /** Det som sparas. Planen räknas om vid inläsning, den sparas inte. */
 interface Saved {
@@ -129,10 +129,12 @@ export function parseStored(rått: string | null): LoadResult {
     return { status: 'discarded', reason: 'unreadable' };
   }
 
-  const fel = validate(tolkat);
+  const uppgraderat = upgrade(tolkat);
+
+  const fel = validate(uppgraderat);
   if (fel !== null) return { status: 'discarded', reason: fel };
 
-  const data = tolkat as Saved;
+  const data = uppgraderat as Saved;
   return { status: 'ok', input: data.input, form: data.form };
 }
 
@@ -154,6 +156,30 @@ export function clear(): void {
  * versionsnumret. Det var precis det v0 gjorde fel: versionen stämde, formen
  * gjorde det inte, och appen kraschade på första renderingen.
  */
+/**
+ * Lyfter äldre sparad data till den form vi läser i dag.
+ *
+ * Version 4 höll formulärets timmar som ett tal; version 5 håller dem som
+ * text. Det är hela skillnaden, och att kasta hela planen för den skull vore
+ * att straffa användaren för en ändring i formuläret. Går uppgraderingen inte
+ * att göra returneras datan orörd, och valideringen kastar den som vanligt.
+ */
+function upgrade(data: unknown): unknown {
+  if (typeof data !== 'object' || data === null) return data;
+
+  const sparat = data as Partial<Saved> & { form?: { hoursPerWeek?: unknown } };
+  if (sparat.storageVersion !== 4) return data;
+
+  const timmar = sparat.form?.hoursPerWeek;
+  if (typeof timmar !== 'number' || !Number.isInteger(timmar)) return data;
+
+  return {
+    ...sparat,
+    storageVersion: STORAGE_VERSION,
+    form: { ...sparat.form, hoursPerWeek: String(timmar) },
+  };
+}
+
 function validate(data: unknown): string | null {
   if (typeof data !== 'object' || data === null) return 'unreadable';
 
@@ -233,7 +259,7 @@ function isFormState(värde: unknown): värde is FormState {
     if (race.goal !== 'finish' && race.goal !== 'time') return false;
   }
 
-  if (typeof form.hoursPerWeek !== 'number') return false;
+  if (typeof form.hoursPerWeek !== 'string') return false;
   if (!isWeekday(form.longSessionDay) || !isWeekday(form.restDay)) return false;
   if (!ärNivåer(form.levels)) return false;
   if (typeof form.equipment !== 'object' || form.equipment === null) return false;
