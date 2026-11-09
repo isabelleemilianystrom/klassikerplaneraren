@@ -1267,6 +1267,7 @@ F-1 är åtgärdad. Resten är inte. Etapp 1 skulle hitta, inte fixa.
 | **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
 | **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
 | **F-7** | En avklarad gren tränas bara i sin egen säsong (R-36) | 130 planer, 826 brott → **77 planer, 412 brott** | Nybörjartakets överskott delas ut till grenen med mest utrymme, och det är den gren R-36 just nollat. **Halvt åtgärdad 2026-11-05** — resten blockerad bakom F-3, se nedan |
+| **F-9** | Veckan har ett kvalitetspass (R-15, R-42) | **2 044 av 6 556 bas- och specifikveckor (31 %)** | Långpasset tar fokusgrenens hela tid, och kvalitetspasset ska ligga i samma gren. Samma rotorsak som F-8 |
 | **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | **45 av 200 planer, 522 veckor** — 436 simning, 86 skidor | Grenen har bara ett pass och långpasset tar det. I simningen är det R-31:s tak mot R-40:s golv; i skidorna att långpasset tar hela grenens tid. **Avgjord 2026-11-05** — se R-21 |
 
 **F-1 förklarade varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
@@ -1280,6 +1281,36 @@ Längs vägen rättades tre buggar som inte hade med F-1 att göra: platsräknin
 **F-3 och F-6 är samma sak**, och den stod redan i kodanalysen 2026-11-03: `bestDateFor` faller tillbaka på vilken dag som helst när inget villkor går att uppfylla, utan att signalera. Det är etapp 2 i planen.
 
 **F-5 är en regelkrock, inte en bugg.** Den behöver samma sorts beslut som Lidingöloppet fick: vilken regel som ger vika. Hör till Isabelle.
+
+**F-9 hittades 2026-11-05 vid en granskning mot SPÅRAT:s längdguide**, inte av harnessen. Guiden
+säger att en träningsvecka har ett kvalitetspass, och att det är det *sista* man stryker när tiden
+inte räcker. Vår motor stryker det först. Av 6 556 bas- och specifikveckor saknar **2 044** både
+intervaller och tröskelpass.
+
+Delvis är det med flit: R-21 säger att teknikpasset går före veckans hårda pass, och för en
+nybörjare med sex timmar saknar 63 procent av veckorna kvalitetspass. Men en femtedel av veckorna
+**utan någon nybörjargren alls** saknar det också, och det förklarar ingen regel.
+
+**Orsaken är inte den jag först läste ur koden.** `hardSessionPlan` returnerar tomt när veckan
+saknar fokuslopp (`src/engine/endurance.ts:536`), och det såg ut som den troliga förklaringen.
+Mätningen av 777 sådana veckor gav **noll** av det slaget. Det som faktiskt händer:
+
+| | andel |
+| --- | --- |
+| Fokusgrenen har exakt ett pass, och det är långpasset | **92 %** |
+| Långpasset är längre än fokusgrenens hela veckobudget | **91 %** |
+| Långpasset är minst två passgolv långt, så ett kvalitetspass hade rymts om det delat med sig | **95 %** |
+| Fokusgrenens andel av veckan, i snitt | **26 %** |
+
+Kedjan är: långpasset dimensioneras ur hela veckan (R-13) och lånar från andra grenar när grenens
+egen tid inte räcker; både långpasset och kvalitetspasset ska ligga i fokusgrenen; långpasset
+placeras först och tar allt. Kvar blir en vecka där fokusgrenen har ett enda pass och resten av
+tiden ligger som lugna pass i andra grenar — i en vecka vars hela syfte är fokusgrenen.
+
+**Det är samma rotorsak som F-8.** Där trängde långpasset undan teknikpasset i en nybörjargren;
+här tränger det undan kvalitetspasset i fokusgrenen. Beslutet du tog för F-8:s skidor — båda passen
+ryms, långpasset krymper mot sitt golv men utgår aldrig — har samma form som det som behövs här.
+Det talar för att lösa dem tillsammans.
 
 **F-7 är halvt åtgärdad 2026-11-05.** Säsongsdelen är gjord: en avklarad gren utanför sin säsong
 får nu taket noll i `applyNewLevelLimits`, vilket både trimmar bort tid den fått och hindrar den
