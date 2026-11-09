@@ -1239,6 +1239,57 @@ export const INVARIANTS: readonly Invariant[] = [
   },
 
   {
+    name: 'generalrepet står på ett pass per lopp, före nedtrappningen',
+    rule: 'R-49',
+    check: (input, plans) => {
+      const bit = 'Generalrep inför';
+      const brott: string[] = [];
+
+      for (const race of input.races) {
+        const sport = raceById(race.id).sport as TrainedSport;
+        const namn = raceById(race.id).name;
+
+        const träffar: { vecka: number; session: Session }[] = [];
+        for (const p of plans) {
+          for (const session of p.sessions) {
+            if (!session.instruction.includes(`${bit} ${namn}`)) continue;
+            träffar.push({ vecka: p.week.index, session });
+          }
+        }
+
+        // Noll är giltigt: har grenen bara ersatta pass finns inget att
+        // generalrepa på, och P4 utan snö är just det fallet.
+        if (träffar.length === 0) continue;
+
+        if (träffar.length > 1) {
+          brott.push(`${race.id}: ${träffar.length} generalrep, ska vara ett`);
+        }
+
+        for (const { vecka, session } of träffar) {
+          if (session.sport !== sport) {
+            brott.push(`${race.id}: generalrepet ligger i ${session.sport}`);
+          }
+          if (session.substitutedAs !== undefined) {
+            brott.push(`${race.id}: generalrepet ligger på ett ersatt pass`);
+          }
+          if (session.date >= race.date) {
+            brott.push(`${race.id}: generalrepet ${session.date} ligger inte före loppet`);
+          }
+
+          const nedtrappning = plans.find(
+            (p) => p.week.phase === 'taper' && p.week.focusRaceId === race.id,
+          );
+          if (nedtrappning !== undefined && vecka >= nedtrappning.week.index) {
+            brott.push(`${race.id}: generalrepet i v${vecka} ligger i nedtrappningen`);
+          }
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
     name: 'samma indata ger samma plan',
     rule: 'determinism',
     check: (input, plans) => {

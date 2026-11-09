@@ -427,6 +427,13 @@ export const sessionsSchema = z.object({
     note: z.string(),
     byRace: z.partialRecord(raceId, z.string().min(1)),
   }),
+  /** R-49: generalrepet, lagt på grenens sista pass före nedtrappningen. */
+  rehearsalNotes: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    text: z.string().min(1),
+    bySport: z.partialRecord(z.enum(['ski', 'bike', 'swim', 'run']), z.string().min(1)),
+  }),
   safetyNotes: z.object({
     openWater: z.object({ _rule: z.string(), text: z.string().min(1) }),
   }),

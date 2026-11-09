@@ -56,6 +56,7 @@ import {
   type CarriedOver,
 } from './placement.ts';
 import { withTitleAndInstruction } from './session-texts.ts';
+import { withRaceRehearsal } from './rehearsal.ts';
 import { withVolumeEncouragement } from './volume.ts';
 import type { WeekContext, WeekDays } from './week-context.ts';
 import { buildWeeks, placeRaces, type PlacedRace, type WeekSkeleton } from './weeks.ts';
@@ -143,10 +144,10 @@ export function buildWeekPlans(input: PlanInput): WeekPlan[] {
     före = carryOver(plan);
   }
 
-  // R-48: sist läggs uppmuntran på långpassen i de grenar där planen inte når
-  // sitt volymriktmärke. Den behöver hela planen för att räknas ut, så den
-  // kommer efter att veckorna är byggda — inte inne i dem.
-  return withVolumeEncouragement(resultat, input);
+  // R-48 och R-49 läggs sist. Båda behöver hela planen för att veta var texten
+  // hör hemma — R-48 summerar kilometrarna, R-49 letar grenens sista pass före
+  // nedtrappningen — så de kommer efter att veckorna är byggda, inte inne i dem.
+  return withRaceRehearsal(withVolumeEncouragement(resultat, input), input);
 }
 
 function buildWeekPlan(

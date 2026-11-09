@@ -829,6 +829,31 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
     byggt uthållighet klarar det inte hur fin stakning hon än har. Räcker inte tiden till båda
     golven (65 minuter) behåller långpasset veckan.
 
+- **R-49** (tillagd 2026-11-05) **Generalrep före loppet.** Grenens sista pass före
+  nedtrappningen mot ett lopp bär en påminnelse om att köra passet i den utrustning man tänkt
+  tävla i. **Ett pass per lopp**, aldrig fler.
+
+  **Varför just det passet.** Upptäcker man att skorna skaver, att gelen inte går ner eller att
+  våtdräkten stryper över halsen ska det finnas tid kvar att göra något åt det. Ligger
+  generalrepet inne i nedtrappningen återstår bara att hoppas. Står det på varje långpass slutar
+  man läsa det — samma lärdom som ligger bakom att fokusloppet står på veckan och aldrig på ett
+  enskilt pass.
+
+  **Aldrig på ett ersatt pass.** Utrustningen går inte att prova i en ersättning: "kör passet i
+  din Vasaloppsutrustning" på en stavgångsrunda i backe är ett råd som inte går att följa. Har
+  grenen bara ersatta pass — ingen snö alls — blir det **inget** generalrep i den grenen, och
+  det är avsiktligt. P4 har noll av den anledningen.
+
+  **Saknar grenen långpass** tas grenens sista pass i stället. Den som är ny på simning har bara
+  ett teknikpass (R-21), och det är just hon som behöver prova våtdräkten före Vansbro.
+
+  Texterna ligger i `sessions.json` som `rehearsalNotes`, en per gren. De säger med flit
+  ingenting om mat och dryck — det står redan i långpassets instruktion.
+
+  Idén är hämtad ur SPÅRAT:s längdguide, som kör ett genrep två veckor före Vasaloppet. Här är
+  den generaliserad till alla fyra loppen, eftersom en klassiker har fyra uppsättningar
+  utrustning att prova.
+
 **Varningar**
 
 - **R-22** Mindre än 8 veckor från start till första lopp: "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
@@ -1121,6 +1146,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Fokus växlar till nästa lopp i datumordning när det förras återhämtning är slut (R-02, R-47) *(tillagd 2026-11-04)*
 - En gren som äger hela veckan delar sin tid på veckans dagar, inte på två pass (R-12, R-45) *(tillagd 2026-11-04)*
 - Varje simpass juni till augusti har säkerhetstexten, och inget pass utanför dem har den (R-19)
+- Generalrepet står på högst ett pass per lopp, i loppets gren, före nedtrappningen, och aldrig på ett ersatt pass (R-49) *(tillagd 2026-11-05)*
 - En gren användaren är ny i har ett teknikpass i veckan under bas och specifik fas (R-21) *(tillagd 2026-10-28)*. Är man ny i simning är det grenens **enda** pass, och grenen har inget långpass; är man ny på skidor finns båda, och långpasset ligger på eller över sitt golv *(preciserad 2026-11-05)*
 - Ett alternativ erbjuds bara när grenen är i säsong och användaren har utrustningen, och aldrig för lopp, vila, styrka eller teknik (R-37) *(tillagd 2026-10-28)*
 - Sparad data valideras fält för fält och **till innehåll**, inte bara på versionsnumret och typen, och kastas när något inte stämmer (K-15) *(skärpt 2026-11-05)*

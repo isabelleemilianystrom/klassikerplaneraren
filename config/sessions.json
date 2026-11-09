@@ -171,5 +171,16 @@
       "lidingoloppet": "Loppet avgörs på sista milen. Går du ut hårt första milen får du betala för det i backarna mot slutet.",
       "vasaloppet": "Nio mil är lång tid. Ät och drick vid kontrollerna från början, också när det känns lätt — det är svårt att hämta igen energi som tagit slut."
     }
+  },
+  "rehearsalNotes": {
+    "_rule": "R-49",
+    "note": "Generalrepet: läggs till på grenens sista pass före nedtrappningen mot loppet. Ett pass per lopp, aldrig fler — står påminnelsen på varje långpass slutar man läsa den. Aldrig på ett ersatt pass: utrustningen går inte att prova i en ersättning. Texten säger med flit inget om mat och dryck — det står redan i långpassets instruktion.",
+    "text": " Generalrep inför {race}: kör passet i den utrustning du tänkt tävla i, medan det finns tid att byta det som skaver. {sport}",
+    "bySport": {
+      "ski": "Stavarna, pjäxorna och kläderna — och ha energin i den ficka du tänkt ha den i.",
+      "bike": "Stället, skorna, hjälmen och flaskorna.",
+      "swim": "Våtdräkten och simglasögonen, i vatten, så du vet hur de sitter innan loppdagen.",
+      "run": "Skorna, strumporna och kläderna — och ryggsäcken eller bältet om du tänkt bära ett."
+    }
   }
 }
