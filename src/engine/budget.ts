@@ -498,14 +498,134 @@ function splitBetweenSports(
   // R-36: en gren vars lopp är avklarat lämnar plats åt nästa lopps gren.
   const andelar = applyFinishedRaces(grund, sports, week, races, månad);
 
-  return applyNewLevelLimits(
-      distribute(minutes, sports, andelar),
-      input,
-      sports,
-      week,
-      races,
-      minutes,
-    );
+  // F-9: fokusgrenen måste rymma sina egna obligatoriska pass.
+  const medGolv = withFocusSportFloor(
+    distribute(minutes, sports, andelar),
+    minutes,
+    week,
+    input,
+    sports,
+  );
+
+  return applyNewLevelLimits(medGolv, input, sports, week, races, minutes);
+}
+
+/**
+ * Passets golv i en gren — kopia av `sessionFloor` i `session-limits.ts`.
+ *
+ * Den filen importerar `newLevelLimit` härifrån, så ett import åt andra
+ * hållet blir en cykel. Båda läser samma två tal ur konfigurationen och kan
+ * inte glida isär utan att konfigurationen ändras.
+ */
+function passgolv(sport: TrainedSport): number {
+  const perGren = rules.session.minMinutesBySport as Partial<Record<TrainedSport, number>>;
+  return perGren[sport] ?? rules.session.minMinutes;
+}
+
+/** Sant när grenen ska ha ett teknikpass (R-21). Tvilling i `session-limits.ts`. */
+function nyITeknikgren(sport: TrainedSport, phase: Phase, input: PlanInput): boolean {
+  if (phase !== 'base' && phase !== 'specific') return false;
+
+  const grenar: readonly string[] = rules.technique.sportsForNewLevel;
+  return grenar.includes(sport) && input.levels[sport] === 'new';
+}
+
+/**
+ * Fokusgrenens golv: tillräckligt för långpasset och kvalitetspasset (F-9).
+ *
+ * Veckans fokusgren är den veckan handlar om, men säsongsvikterna i R-32 vet
+ * inget om det. En basvecka i mars med Vasaloppet som fokus gav skidorna
+ * **64 minuter av 255**, och långpasset ensamt ville ha 87. Resultatet blev en
+ * vecka där fokusgrenen hade ett enda pass och resten låg som lugna pass i
+ * andra grenar — i en vecka vars hela syfte var fokusgrenen.
+ *
+ * Mätt över 777 sådana veckor: fokusgrenen hade bara långpasset i 92 procent,
+ * långpasset var längre än grenens hela budget i 91, och ett kvalitetspass
+ * hade rymts i 95 om det funnits plats. Fokusgrenens andel låg i snitt på 26
+ * procent av veckan.
+ *
+ * Golvet är långpassets golv plus ett passgolv till kvalitetspasset, och ett
+ * till när grenen också ska ha teknikpass (R-21). Minuterna tas från de övriga
+ * grenarna i proportion till deras tid, så veckans totala tid är oförändrad
+ * (R-29) — det var beslutet 2026-11-05: minuterna går till kvalitetspasset.
+ *
+ * Golvet gäller bara i bas och specifik fas, där långpasset finns, och tar
+ * aldrig mer än halva veckan. Fokus är inte ensamrätt — R-45 finns för de
+ * veckor där grenen *ska* ha allt.
+ */
+function withFocusSportFloor(
+  bySport: Partial<Record<TrainedSport, number>>,
+  minutes: number,
+  week: WeekSkeleton,
+  input: PlanInput,
+  sports: readonly TrainedSport[],
+): Partial<Record<TrainedSport, number>> {
+  if (week.phase !== 'base' && week.phase !== 'specific') return bySport;
+  if (week.focusRaceId === null || week.raceIds.length > 0) return bySport;
+  if (rules.intensity.byPhase[week.phase].hardSessionsPerWeek === 0) return bySport;
+
+  const gren = raceById(week.focusRaceId).sport as TrainedSport;
+  if (!sports.includes(gren)) return bySport;
+
+  const tak = newLevelLimit(gren, input);
+  const teknik = nyITeknikgren(gren, week.phase, input);
+
+  // Är nybörjartaket ett pass i veckan är teknikpasset grenens enda pass
+  // (F-8), och då räcker ett passgolv.
+  const ettendaPass = teknik && (tak?.maxSessionsPerWeek ?? Number.POSITIVE_INFINITY) <= 1;
+
+  let golv = passgolv(gren);
+  if (!ettendaPass) golv += rules.longSession.minMinutes;
+  if (!ettendaPass && teknik) golv += passgolv(gren);
+
+  golv = Math.min(golv, Math.floor(minutes / 2));
+  if (tak !== null) golv = Math.min(golv, tak.maxMinutesPerWeek);
+
+  const har = bySport[gren] ?? 0;
+  if (har >= golv) return bySport;
+
+  // Minuterna tas från de övriga grenarna, men aldrig under R-09:s golv på
+  // halva den jämna andelen. Den regeln finns för att en gren inte ska
+  // försvinna ur veckan, och den väger tyngre än fokusgrenens golv — en vecka
+  // där fokus tagit all tid från de andra är R-45:s sak, inte den här.
+  //
+  // En gren som väntar (R-39) eller är avklarad utanför sin säsong (R-36)
+  // står redan på noll och har ingenting att ge.
+  const r09golv = minutes / (2 * sports.length);
+  const kanGe = new Map<TrainedSport, number>();
+
+  for (const kandidat of sports) {
+    if (kandidat === gren) continue;
+    const har_de = bySport[kandidat] ?? 0;
+    const utrymme = Math.floor(Math.max(0, har_de - r09golv));
+    if (utrymme > 0) kanGe.set(kandidat, utrymme);
+  }
+
+  const tillgängligt = [...kanGe.values()].reduce((a, b) => a + b, 0);
+  if (tillgängligt === 0) return bySport;
+
+  // Räcker det inte hela vägen tas det som finns. Ett kortare kvalitetspass
+  // är bättre än inget — och golvet är en riktlinje, inte ett krav som får
+  // bryta mot R-09.
+  const attTa = Math.min(golv - har, tillgängligt);
+  const resultat: Partial<Record<TrainedSport, number>> = { ...bySport, [gren]: har + attTa };
+
+  let kvar = attTa;
+  const givare = [...kanGe.entries()];
+  for (const [i, [kandidat, utrymme]] of givare.entries()) {
+    const sist = i === givare.length - 1;
+    const del = sist
+      ? Math.min(kvar, utrymme)
+      : Math.min(kvar, utrymme, Math.round(attTa * (utrymme / tillgängligt)));
+    resultat[kandidat] = (bySport[kandidat] ?? 0) - del;
+    kvar -= del;
+  }
+
+  // Blev något kvar på grund av avrundning får fokusgrenen bara det som
+  // faktiskt togs, så summan stämmer (R-29).
+  if (kvar > 0) resultat[gren] = har + attTa - kvar;
+
+  return resultat;
 }
 
 /**

@@ -1267,8 +1267,8 @@ F-1 är åtgärdad. Resten är inte. Etapp 1 skulle hitta, inte fixa.
 | **F-5** | Fokusveckan ger loppets gren veckan (R-45) | 29 planer, ner till 13 % | R-31:s nybörjartak (80 min simning) krockar med R-45 — samma klass som R-14-krocken inför Lidingöloppet |
 | **F-6** | Högst två belastade dagar, aldrig två inom två (R-43) | 1 plan, 4 brott | Samma reservutgång som F-3 |
 | **F-7** | En avklarad gren tränas bara i sin egen säsong (R-36) | 130 planer, 826 brott → **77 planer, 412 brott** | Nybörjartakets överskott delas ut till grenen med mest utrymme, och det är den gren R-36 just nollat. **Halvt åtgärdad 2026-11-05** — resten blockerad bakom F-3, se nedan |
-| **F-9** | Veckan har ett kvalitetspass (R-15, R-42) | **2 044 av 6 556 bas- och specifikveckor (31 %)** | Långpasset tar fokusgrenens hela tid, och kvalitetspasset ska ligga i samma gren. Samma rotorsak som F-8 |
-| **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | **45 av 200 planer, 522 veckor** — 436 simning, 86 skidor | Grenen har bara ett pass och långpasset tar det. I simningen är det R-31:s tak mot R-40:s golv; i skidorna att långpasset tar hela grenens tid. **Avgjord 2026-11-05** — se R-21 |
+| **F-9** | Veckan har ett kvalitetspass (R-15, R-42) | 31 % → **28 %** av bas- och specifikveckorna | Långpasset tar fokusgrenens hela tid. **Delvis åtgärdad 2026-11-05** — resten kräver ett beslut, se nedan |
+| **F-8** | En gren man är ny i får ett teknikpass i veckan (R-21) | 24 % → **6 %** av veckorna med en nybörjargren. **Åtgärdad 2026-11-05** | Grenen har bara ett pass och långpasset tar det. I simningen är det R-31:s tak mot R-40:s golv; i skidorna att långpasset tar hela grenens tid. **Avgjord 2026-11-05** — se R-21 |
 
 **F-1 förklarade varför profiler inte räcker.** Alla sex startar på en måndag — 2026-11-02 och 2027-05-03 — så de prövar aldrig en start mitt i veckan. Av 200 slumpade startdatum låg 21 på en måndag.
 
@@ -1281,6 +1281,38 @@ Längs vägen rättades tre buggar som inte hade med F-1 att göra: platsräknin
 **F-3 och F-6 är samma sak**, och den stod redan i kodanalysen 2026-11-03: `bestDateFor` faller tillbaka på vilken dag som helst när inget villkor går att uppfylla, utan att signalera. Det är etapp 2 i planen.
 
 **F-5 är en regelkrock, inte en bugg.** Den behöver samma sorts beslut som Lidingöloppet fick: vilken regel som ger vika. Hör till Isabelle.
+
+**F-8 är åtgärdad 2026-11-05 och F-9 delvis.** Två ändringar:
+
+1. **Simningen har inget långpass medan nivån är Ny** (`long-session.ts`). Nybörjartaket ger ett
+   simpass i veckan, och det ska vara teknikpasset.
+2. **Fokusgrenen har ett golv i veckobudgeten** (`withFocusSportFloor` i `budget.ts`):
+   långpassets golv plus ett passgolv till kvalitetspasset, plus ett till när grenen också ska ha
+   teknikpass. Minuterna tas från de övriga grenarna, så veckans tid är oförändrad (R-29) — men
+   **aldrig under R-09:s golv på halva den jämna andelen**. Den regeln väger tyngre; en vecka där
+   fokus tar all tid från de andra är R-45:s sak.
+
+Utfall: teknikpasset saknas nu i **6 procent** av veckorna i stället för 24. Kvalitetspasset
+saknas i **28 procent** i stället för 31. Oplacerad tid (F-2) sjönk från 1 340 till 1 103 brott
+och R-14 från 637 till 563.
+
+**Priset: fem nya brott mot R-32 i en plan av 200.** Fokusgrenens golv kan ge cykeln mer tid än
+skidorna i en vintervecka när Vätternrundan är nästa lopp. Golvet går före säsongsvikten, och det
+är en avsiktlig avvägning — men den är mätt och står här.
+
+**Varför F-9 inte blev klar.** Det naturliga nästa steget vore att låta långpasset krympa så det
+lämnar plats — det var också det du valde den 2026-11-05 ("minuterna går till kvalitetspasset").
+Det provades och **bröt mot tre regler du redan beslutat**:
+
+| Regel | Vad som gick sönder |
+| --- | --- |
+| **R-13** | Långpasset får överstiga grenens andel när grenen är smal — ett tak tar bort lånet, och då blir cykelns långpass för kort inför 315 km |
+| **R-46** | Långpasset krymper aldrig inom en fas — taket varierar med veckans budget och fick passet att gå 105 → 92 minuter |
+| **R-13** | Långpasset ska nå grenens tak före loppet — med ett tak gör det inte det |
+
+Fyra riktade tester gick röda. Att krympa långpasset är alltså fel lever: beslutet förutsatte att
+det gick, och reglerna säger att det inte gör det. **Det som återstår av F-9 kräver att du avgör
+vilken av R-13 och R-46 som får ge vika, eller om 28 procent är acceptabelt.** Hör till Isabelle.
 
 **F-9 hittades 2026-11-05 vid en granskning mot SPÅRAT:s längdguide**, inte av harnessen. Guiden
 säger att en träningsvecka har ett kvalitetspass, och att det är det *sista* man stryker när tiden

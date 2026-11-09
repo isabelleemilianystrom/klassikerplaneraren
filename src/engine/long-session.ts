@@ -12,7 +12,8 @@
 import { type WeekBudget } from './budget.ts';
 import { raceById, rules } from './config.ts';
 import { weekdayOf } from './dates.ts';
-import { hasWeeklyRequirement, sessionFloor } from './session-limits.ts';
+import { newLevelLimit } from './budget.ts';
+import { hasWeeklyRequirement, needsTechnique, sessionFloor } from './session-limits.ts';
 import type { IsoDate, PlanInput, TrainedSport } from './types.ts';
 import type { WeekContext, WeekDays } from './week-context.ts';
 import type { PlacedRace, WeekSkeleton } from './weeks.ts';
@@ -107,6 +108,22 @@ export function longSession(ctx: WeekContext, days: WeekDays): PendingSession | 
 
   // Har grenen ingen tid i veckan finns inget långpass att lägga.
   if ((budget.bySport[sport] ?? 0) === 0) return null;
+
+  // F-8: är man ny i en teknikgren vars nybörjartak ger ett enda pass i
+  // veckan ska det passet vara teknikpasset, inte långpasset. Två pass går
+  // ändå inte att få in — R-40:s golv på sextio minuter mot R-31:s tak på
+  // åttio gör det aritmetiskt omöjligt. Tekniken är det som gör 3 km i
+  // Vansbroån görbart, och ett program som ger nybörjaren tjugoåtta veckor
+  // långpass och aldrig ett teknikpass tränar fel sak. Grenen har alltså
+  // inget långpass medan nivån är Ny. Beslut 2026-11-05, se R-21.
+  const nybörjartak = newLevelLimit(sport, ctx.input);
+  if (
+    needsTechnique(sport, week.phase, ctx.input) &&
+    nybörjartak !== null &&
+    nybörjartak.maxSessionsPerWeek <= 1
+  ) {
+    return null;
+  }
 
   const cap = rules.longSession.capMinutesBySport[sport];
   const average = ctx.slots <= 0 ? 0 : Math.ceil(budget.enduranceMinutes / ctx.slots);
