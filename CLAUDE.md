@@ -47,7 +47,14 @@ Enligt kravspecen avsnitt 7. **Fråga innan du lägger till något som inte stå
 | Drift | Vercel, kopplat till GitHub-repot |
 | Lagring | localStorage, alltid i try/catch |
 
-Kräver Node och npm lokalt. Node ligger på `C:\Program Files\nodejs` men syns inte alltid på PATH — prefixa anrop om `npm` inte hittas.
+Kräver Node och npm lokalt. Node ligger på `C:\Program Files\nodejs`. Två olika saker kan göra att `npm` inte går att köra, och de har olika lösningar — blanda inte samman dem:
+
+- **PATH.** I Bash-miljön syns `C:\Program Files\nodejs` inte alltid på PATH. Prefixa anropet när `npm` inte *hittas* (`command not found`).
+- **Exekveringspolicyn.** I PowerShell *hittas* npm, men `npm run …` faller med "npm.ps1 cannot be loaded because running scripts is disabled on this system". Det är Windows standardpolicy `Restricted` som blockerar `.ps1`-skalet, inte ett PATH-problem. Kör `npm.cmd run …` eller sätt `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`. README har detaljerna.
+
+Noten blandade ihop de två fram till 2026-11-05, och resultatet blev att policyfelet såg ut som ett PATH-fel. **Exekveringspolicyn är en säkerhetsinställning på användarens dator — ändra den aldrig åt henne, föreslå kommandot.**
+
+Ingetdera syns i CI, som kör `ubuntu-latest`. En hel klass av problem finns bara på utvecklingsmaskinen.
 
 ## Arkitekturprinciper
 

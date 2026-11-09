@@ -34,6 +34,34 @@ npm run dev     # utvecklingsserver på http://localhost:3000
 npm run check   # typkontroll + lint + tester (kör detta före commit)
 ```
 
+### I PowerShell på Windows
+
+Står du i PowerShell kan `npm run dev` falla med
+*"npm.ps1 cannot be loaded because running scripts is disabled on this system"*.
+Det är inte ett fel i projektet — appen har inte ens startat. npm installerar tre
+skal (`npm` för bash, `npm.cmd` för cmd och `npm.ps1` för PowerShell), och
+PowerShell väljer `.ps1`-varianten. Är Windows exekveringspolicy `Restricted`,
+vilket är standard på klientutgåvor när ingen policy satts, vägrar den läsa in
+filen.
+
+Kör `.cmd`-skalet i stället, så behöver ingenting i Windows ändras:
+
+```powershell
+npm.cmd run dev
+```
+
+Eller sätt policyn en gång för ditt användarkonto. Inget administratörsläge
+behövs, och det påverkar bara dig:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Kontrollera att det tog med `Get-ExecutionPolicy -List` — `CurrentUser` ska nu
+stå som `RemoteSigned`. Därefter fungerar `npm run dev` rakt av.
+
+Git Bash och cmd berörs inte av det här.
+
 ## Visa appen i mobilen
 
 Appen är helt statisk och behöver ingen server. Till demon körs den lokalt.
@@ -44,6 +72,8 @@ inte bara på den här datorn:
 ```bash
 npm run dev -- --hostname 0.0.0.0
 ```
+
+I PowerShell: `npm.cmd run dev -- --hostname 0.0.0.0` (se ovan).
 
 Öppna sedan `http://<datorns IP>:3000` i telefonen — datorn och telefonen måste
 vara på samma wifi. IP-adressen skrivs ut när servern startar, som `Network:`.
