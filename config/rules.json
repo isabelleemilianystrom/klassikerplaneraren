@@ -191,24 +191,25 @@
   "intensity": {
     "_rule": "R-15, R-16",
     "zoneText": {
-      "1": "Mycket lugnt",
+      "1": "Mycket lugnt – återhämtning",
       "2": "Lugnt – du ska kunna prata hela meningar",
-      "3": "Måttligt – du kan prata korta meningar",
-      "4": "Hårt – bara några ord i taget"
+      "3": "Måttligt – ansträngande men kontrollerat",
+      "4": "Tröskel – du kan bara säga korta meningar",
+      "5": "Hårt – bara några ord i taget"
     },
     "byPhase": {
       "base": {
         "hardSessionsPerWeek": 1,
-        "maxZone": 3
+        "maxZone": 4
       },
       "specific": {
         "hardSessionsPerWeek": 1,
-        "maxZone": 4,
-        "maxZoneForNewLevel": 3
+        "maxZone": 5,
+        "maxZoneForNewLevel": 4
       },
       "taper": {
         "hardSessionsPerWeek": 1,
-        "maxZone": 3,
+        "maxZone": 4,
         "maxHardMinutes": 20
       },
       "recovery": {
@@ -225,10 +226,12 @@
       "swim": {
         "1": "Mycket lugnt",
         "2": "Lugnt – du andas var tredje tag och håller samma rytm hela passet",
-        "3": "Måttligt – du behöver andas varannat tag",
-        "4": "Hårt – du andas varje tag"
+        "3": "Måttligt – du andas oftare men håller rytmen",
+        "4": "Tröskel – du behöver andas varannat tag",
+        "5": "Hårt – du andas varje tag"
       }
-    }
+    },
+    "_zones": "Fem zoner, samma skala som pulsklockor och träningsappar använder. Vi hade fyra fram till 2026-11-10, och då betydde vår \"zon 3\" tröskel medan zon 3 på användarens klocka är en hel zon lättare — kvalitetspasset kördes för lugnt av den som följde siffran. Zon 3 används inte av motorn: polariserad träning ligger lugnt eller hårt, inte däremellan. Den finns med för att numreringen ska stämma med klockan."
   },
   "blocks": {
     "_rule": "R-03, R-27",

@@ -62,7 +62,7 @@ function öppningspass(plan: WeekPlan): Session[] {
 /** Passen som bär veckans belastning: hårt pass eller långpass (R-43). */
 function belastade(plan: WeekPlan): Session[] {
   return träning(plan).filter(
-    (s) => s.type === 'long' || (s.zone !== null && s.zone >= 3),
+    (s) => s.type === 'long' || (s.zone !== null && s.zone >= 4),
   );
 }
 
@@ -314,7 +314,7 @@ export const INVARIANTS: readonly Invariant[] = [
   },
 
   {
-    name: 'varje pass i zon 3–4 ligger i veckans fokusgren',
+    name: 'varje pass i zon 4–5 ligger i veckans fokusgren',
     rule: 'R-42',
     check: (_input, plans) => {
       const brott: string[] = [];

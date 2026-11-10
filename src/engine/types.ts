@@ -26,7 +26,7 @@ export type SessionType =
   | 'race';
 
 /** Pulszon 1–4. Vila och styrka har ingen zon. */
-export type Zone = 1 | 2 | 3 | 4;
+export type Zone = 1 | 2 | 3 | 4 | 5;
 
 /** Datum som `YYYY-MM-DD`, lokalt och utan klockslag. */
 export type IsoDate = string;

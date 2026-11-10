@@ -549,8 +549,8 @@ function hardSessionPlan(
   // hårt pass ska det vara intervallerna — en dag i veckan ska vara
   // intervaller (R-42). Tröskelpasset i zon 3 är det hårda passet i
   // grundperioden, där zon 4 inte hör hemma än.
-  if (maxZone >= 4) hårda.push({ type: 'intervals', zone: 4 });
-  if (maxZone >= 3) hårda.push({ type: 'tempo', zone: 3 });
+  if (maxZone >= 5) hårda.push({ type: 'intervals', zone: 5 });
+  if (maxZone >= 4) hårda.push({ type: 'tempo', zone: 4 });
 
   plan.set(sport, hårda.slice(0, fas.hardSessionsPerWeek));
   return plan;

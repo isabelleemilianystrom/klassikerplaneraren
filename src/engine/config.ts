@@ -232,6 +232,7 @@ export const rulesSchema = z.object({
       '2': z.string().min(1),
       '3': z.string().min(1),
       '4': z.string().min(1),
+      '5': z.string().min(1),
     }),
     /** R-15: grenar där pratprovet inte fungerar, som simning. */
     zoneTextBySport: z.object({
@@ -242,22 +243,23 @@ export const rulesSchema = z.object({
         '2': z.string().min(1),
         '3': z.string().min(1),
         '4': z.string().min(1),
+        '5': z.string().min(1),
       }),
     }),
     byPhase: z.object({
-      base: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
+      base: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(5) }),
       specific: z.object({
         hardSessionsPerWeek: z.number().int().nonnegative(),
-        maxZone: z.number().int().min(1).max(4),
-        maxZoneForNewLevel: z.number().int().min(1).max(4),
+        maxZone: z.number().int().min(1).max(5),
+        maxZoneForNewLevel: z.number().int().min(1).max(5),
       }),
       taper: z.object({
         hardSessionsPerWeek: z.number().int().nonnegative(),
-        maxZone: z.number().int().min(1).max(4),
-        /** R-15: "korta inslag i zon 3". Utan tak blir det ett helt pass. */
+        maxZone: z.number().int().min(1).max(5),
+        /** R-15: "korta inslag i zon 4". Utan tak blir det ett helt pass. */
         maxHardMinutes: z.number().int().positive(),
       }),
-      recovery: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(4) }),
+      recovery: z.object({ hardSessionsPerWeek: z.number().int().nonnegative(), maxZone: z.number().int().min(1).max(5) }),
     }),
     noHardDaysBackToBack: z.boolean(),
     _minEasyDaysAfterHard: z.string(),
@@ -272,7 +274,7 @@ export const rulesSchema = z.object({
   raceDay: z.object({
     _rule: z.string(),
     openerMinutesDayBefore: z.number().int().nonnegative(),
-    openerMaxZone: z.number().int().min(1).max(4),
+    openerMaxZone: z.number().int().min(1).max(5),
   }),
   season: z.object({
     _rule: z.string(),

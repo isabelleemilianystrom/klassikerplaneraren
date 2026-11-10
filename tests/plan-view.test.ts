@@ -56,7 +56,8 @@ describe('tid och datum', () => {
 describe('K-07: intensiteten i vardagsspråk', () => {
   it('skriver beskrivningen först och zonen inom parentes', () => {
     expect(formatZone(2)).toBe('Lugnt – du ska kunna prata hela meningar (zon 2)');
-    expect(formatZone(4)).toBe('Hårt – bara några ord i taget (zon 4)');
+    expect(formatZone(4)).toBe('Tröskel – du kan bara säga korta meningar (zon 4)');
+    expect(formatZone(5)).toBe('Hårt – bara några ord i taget (zon 5)');
   });
 
   it('använder texterna ur konfigurationen', () => {

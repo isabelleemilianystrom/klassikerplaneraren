@@ -46,14 +46,14 @@ export const INGET_FÖRE: CarriedOver = {
  */
 export function isLoadDay(session: { zone: number | null; type: SessionType }): boolean {
   if (session.type === 'race' || session.type === 'long') return session.type === 'long';
-  return session.zone !== null && session.zone >= 3;
+  return session.zone !== null && session.zone >= 4;
 }
 
 export function carryOver(plan: WeekPlan): CarriedOver {
   return {
     hardDates: new Set(
       plan.sessions
-        .filter((session) => session.zone !== null && session.zone >= 3)
+        .filter((session) => session.zone !== null && session.zone >= 4)
         .map((session) => session.date),
     ),
     loadDates: new Set(

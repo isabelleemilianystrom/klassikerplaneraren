@@ -164,14 +164,19 @@ describe('config/rules.json', () => {
 
   it('har zontexterna ordagrant från avsnitt 5', () => {
     expect(rules.intensity.zoneText['2']).toBe('Lugnt – du ska kunna prata hela meningar');
-    expect(rules.intensity.zoneText['4']).toBe('Hårt – bara några ord i taget');
+    expect(rules.intensity.zoneText['4']).toBe('Tröskel – du kan bara säga korta meningar');
+    expect(rules.intensity.zoneText['5']).toBe('Hårt – bara några ord i taget');
   });
 
   it('håller intensiteten nere i återhämtning och uppe i specifik fas (R-15)', () => {
     expect(rules.intensity.byPhase.recovery.maxZone).toBe(2);
-    expect(rules.intensity.byPhase.specific.maxZone).toBe(4);
-    // Nivå Ny får aldrig zon 4, ens i specifik fas.
-    expect(rules.intensity.byPhase.specific.maxZoneForNewLevel).toBe(3);
+    expect(rules.intensity.byPhase.specific.maxZone).toBe(5);
+    // Nivå Ny får aldrig zon 5, ens i specifik fas.
+    expect(rules.intensity.byPhase.specific.maxZoneForNewLevel).toBe(4);
+    // Zon 3 finns i skalan men används inte av motorn: polariserad träning
+    // ligger lugnt eller hårt, inte däremellan. Numreringen ska bara stämma
+    // med användarens pulsklocka.
+    expect(rules.intensity.byPhase.base.maxZone).toBe(4);
   });
 
   it('planerar öppet vatten bara under sommaren (R-19)', () => {

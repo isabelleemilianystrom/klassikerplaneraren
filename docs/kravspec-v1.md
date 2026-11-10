@@ -487,8 +487,8 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   2. **Långpassdagen** ligger på den dag användaren valt (R-13) och bär veckans längsta pass.
      Inget annat pass i veckan får vara längre än långpasset — i någon gren.
   3. **Kvalitetsdagen** bär veckans hårda pass, och det ligger **alltid i veckans fokusgren**
-     *(skärpt 2026-11-04)*. I specifik fas är det **intervallpasset i zon 4**; i grundperioden
-     tröskelpasset i zon 3, eftersom zon 4 inte hör hemma där än. Passet får en egen plats i
+     *(skärpt 2026-11-04)*. I specifik fas är det **intervallpasset i zon 5**; i grundperioden
+     tröskelpasset i zon 4, eftersom zon 5 inte hör hemma där än. Passet får en egen plats i
      fokusgrenen — utöver teknikpasset om grenen har ett — och ligger först i kön när dagarna
      delas ut.
 
@@ -756,7 +756,15 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 | 3 | Måttligt – du kan prata korta meningar |
 | 4 | Hårt – bara några ord i taget |
 
-- **R-15** Bas: alla pass i zon 1–2 utom ett pass i zon 3 per vecka. Specifik: ett pass i zon 3 och ett intervallpass i zon 4 per vecka; nivå Ny i sporten får bara zon 3. Nedtrappning: korta inslag i zon 3 — **högst 20 minuter**, `maxHardMinutes` i `config/rules.json` *(preciserad 2026-10-28)*. Utan en siffra blev det ett helt tröskelpass på upp till två timmar veckan före loppet, vilket motsäger både regelns ord och arrangörens råd att träna mindre och lugnare den sista veckan. De minuter som kapas bort flyttas till lugna pass, så veckans tid är oförändrad (R-29). Återhämtning: bara zon 1–2.
+- **R-15** Bas: alla pass i zon 1–2 utom ett tröskelpass i zon 4 per vecka. Specifik: ett tröskelpass i zon 4 och ett intervallpass i zon 5 per vecka; nivå Ny i sporten får bara zon 4. Nedtrappning: korta inslag i zon 4 — **högst 20 minuter**, `maxHardMinutes` i `config/rules.json` *(preciserad 2026-10-28)*.
+
+  **Skalan har fem zoner sedan 2026-11-10.** Fram till dess hade vi fyra, och då betydde vår
+  "zon 3" tröskel medan zon 3 på användarens pulsklocka är en hel zon lättare. Den som följde
+  siffran körde alltså sitt kvalitetspass för lugnt, varje vecka. Jämförelsen mot SPÅRAT:s
+  längdguide avslöjade det: guiden använder fem zoner, och dess zon 4 motsvarade vår zon 3.
+  Omräkningen var 1→1, 2→2, 3→4 och 4→5. **Zon 3 används inte av motorn** — polariserad träning
+  ligger lugnt eller hårt, inte däremellan — men den finns i skalan för att numreringen ska
+  stämma med klockan. Utan en siffra blev det ett helt tröskelpass på upp till två timmar veckan före loppet, vilket motsäger både regelns ord och arrangörens råd att träna mindre och lugnare den sista veckan. De minuter som kapas bort flyttas till lugna pass, så veckans tid är oförändrad (R-29). Återhämtning: bara zon 1–2.
 
   **Pratprovet fungerar inte i vattnet** *(tillagt 2026-10-29)*. Zontexterna i tabellen ovan beskriver ansträngning med hur mycket man kan prata, vilket går på skidor, cykel och i löpning — men inte när man simmar. Simningen har därför egna zontexter i `intensity.zoneTextBySport.swim`, som mäter på **andningen** i stället:
 
@@ -768,7 +776,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   | 4 | Hårt – du andas varje tag |
 
   Simningens lugna pass har också en egen instruktion, av samma skäl.
-- **R-16** Aldrig pass i zon 3–4 två dagar i rad. *(utökad 2026-10-29: numera två lugna dagar, och långpasset räknas som belastning — se R-43. R-16 är kvar som den undre gränsen.)*
+- **R-16** Aldrig pass i zon 4–5 två dagar i rad. *(utökad 2026-10-29: numera två lugna dagar, och långpasset räknas som belastning — se R-43. R-16 är kvar som den undre gränsen.)*
 
 **Ersättningar, teknik och säsong**
 
@@ -794,7 +802,7 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-18** ~~Simning utan simhall: simpass ersätts med torrövningar för simteknik utanför
   `season.openWaterMonths`.~~ **Borttagen 2026-11-04.** Simpass ersätts inte längre. Kan man
   inte simma behöver man lära sig det, och det görs i en simhall — gummiband och rörlighet för
-  axlarna är inte simträning, och ett pass som heter "Simträning på land" i zon 4 är en
+  axlarna är inte simträning, och ett pass som heter "Simträning på land" i zon 5 är en
   motsägelse. Saknas simhall är det användarens sak att lösa. Simpassen planeras som simpass,
   och R-21:s kursråd står kvar för den som är ny i grenen.
 
@@ -1106,7 +1114,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 
 - Veckans totala tid överskrider aldrig fasens tid enligt R-05–R-07
 - Minst en vilodag per vecka (R-11)
-- Aldrig pass i zon 3–4 två dagar i rad (R-16)
+- Aldrig pass i zon 4–5 två dagar i rad (R-16)
+- Motorn planerar aldrig zon 3 — skalan har den för klockans skull, träningen är polariserad (R-15) *(tillagd 2026-11-10)*
 - Återhämtningen efter ett lopp finns kvar och kortas bara så att den inte går in i nästa loppvecka (R-03) *(tillagd 2026-10-28)*
 - En gren man bara vill ta sig i mål i får mindre tid än en man siktar på en tid i, men aldrig noll (R-38) *(tillagd 2026-10-29)*
 - Inget simpass beskriver ansträngningen med hur mycket man kan prata (R-15) *(tillagd 2026-10-29)*
@@ -1120,7 +1129,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Passen plus den oplacerade tiden är exakt veckans budget, och oplacerad tid är alltid mindre än ett pass (R-29, R-40) *(tillagd 2026-10-29)*
 - En gren som måste tränas får sitt pass varje vecka där veckan har tid alls (R-31, R-39, R-40) *(tillagd 2026-10-29)*
 - Pass i simning och längdskidor är teknikpass under återhämtningsveckorna (R-33) *(tillagd 2026-10-28)*
-- Inget pass i zon 3 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
+- Inget pass i zon 4 överskrider 20 minuter i en nedtrappningsvecka, och veckans totala tid är ändå oförändrad (R-15) *(tillagd 2026-10-28)*
 - Den valda vilodagen är helt fri varje vecka, med lopp och öppningspass som enda undantag (R-11) *(tillagd 2026-10-28)*
 - En sport där nivån är Ny håller sitt veckotak i både minuter och antal pass, loppet och öppningspasset inräknade (R-31) *(tillagd 2026-10-28)*
 - Summan av minuterna per sport plus de oplacerade minuterna är alltid exakt veckans konditionstid (R-29, R-31) *(tillagd 2026-10-28)*
@@ -1133,7 +1142,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Planen är aldrig längre än `weekTime.maxPlanWeeks`, och varken formulär, lagring eller motor släpper igenom indata som skulle bli det (R-01) *(tillagd 2026-11-05)*
 - Ett skidpass står som skidpass bara när det finns snö — vintermånad och ett spår. Annars görs det som rullskidor, stakmaskin eller stavgång i backe, med tid och zon kvar (R-17) *(ändrad 2026-11-04)*
 - Ett pass som bytt gren har inga alternativ; ett som bara bytt plats behåller dem (R-20, R-37) *(tillagd 2026-11-04)*
-- Varje pass i zon 3–4 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
+- Varje pass i zon 4–5 ligger i veckans fokusgren (R-42) *(tillagd 2026-11-04)*
 - De sista veckorna före ett lopp med `fullFocusWeeks` får loppets gren hela konditionstiden, och de övriga noll (R-45) *(tillagd 2026-11-04)*
 - Fokusveckorna ligger omedelbart före loppveckan oavsett var i planen loppet hamnar, och loppveckan själv är aldrig en av dem (R-02, R-45) *(tillagd 2026-11-04)*
 - En pausad vecka blir aldrig referens för löptaket i R-14 *(tillagd 2026-11-04)*
@@ -1191,7 +1200,7 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Sparad plan med `hoursPerWeek` utanför intervallet kastas vid inläsning (R-41, K-15) (tillagt 2026-11-05)
 - Sparad plan med okänt lopp-id, dubblett, ogiltig nivå eller ogiltigt datum kastas vid inläsning (K-15) (tillagt 2026-11-05)
 - Varje utrustningsfråga har ett standardvärde och når hela vägen till planen (K-04) (tillagt 2026-11-05)
-- Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 4 (R-42) (tillagt 2026-10-29)
+- Vecka i specifik fas: en styrkedag à 60 min, en långpassdag och en kvalitetsdag med intervaller i zon 5 (R-42) (tillagt 2026-10-29)
 - Kvalitetspasset ligger i fokusgrenen i varje vecka som har ett, och veckan är utan hellre än att passet flyttar (R-42) (tillagt 2026-11-04)
 - De tre veckorna före Vasaloppet: allt är skidor, och simning och cykel är noll — också för nybörjaren (R-45) (tillagt 2026-11-04)
 - Fyra veckor före Vasaloppet: ingenting pausat (R-45) (tillagt 2026-11-04)

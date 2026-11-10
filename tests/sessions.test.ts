@@ -249,23 +249,35 @@ describe('R-15: intensiteten per fas', () => {
     }
   });
 
-  it('ger aldrig zon 4 till den som är ny i sporten', () => {
+  it('ger aldrig zon 5 till den som är ny i sporten', () => {
     // P1 är ny i skidor och simning. Tekniken håller inte för den intensiteten.
     for (const plan of buildWeekPlans(P1)) {
       for (const session of träning(plan)) {
         if (session.sport !== 'ski' && session.sport !== 'swim') continue;
         if (session.zone === null) continue;
-        expect(session.zone, `v${plan.week.index} ${session.sport}`).toBeLessThanOrEqual(3);
+        expect(session.zone, `v${plan.week.index} ${session.sport}`).toBeLessThanOrEqual(4);
       }
     }
   });
 
-  it('ger zon 4 till den som är erfaren, i specifik fas', () => {
-    const harZon4 = buildWeekPlans(P2).some(
+  it('ger zon 5 till den som är erfaren, i specifik fas', () => {
+    const harZon5 = buildWeekPlans(P2).some(
       ({ week, sessions }) =>
-        week.phase === 'specific' && sessions.some((session) => session.zone === 4),
+        week.phase === 'specific' && sessions.some((session) => session.zone === 5),
     );
-    expect(harZon4).toBe(true);
+    expect(harZon5).toBe(true);
+  });
+
+  it('planerar aldrig zon 3', () => {
+    // Skalan har fem zoner för att stämma med användarens pulsklocka, men
+    // motorn planerar polariserat: lugnt eller hårt, aldrig däremellan.
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of träning(plan)) {
+          expect(session.zone, `${namn} v${plan.week.index}`).not.toBe(3);
+        }
+      }
+    }
   });
 });
 

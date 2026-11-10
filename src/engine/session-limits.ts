@@ -63,7 +63,7 @@ export function maxZoneFor(phase: Phase, level: Level | undefined): number {
 }
 
 export function isHard(session: PendingSession): boolean {
-  return session.zone !== null && session.zone >= 3;
+  return session.zone !== null && session.zone >= 4;
 }
 
 /**
