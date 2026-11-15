@@ -187,7 +187,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-09 | Varningar enligt avsnitt 5 visas överst i planen; planen skapas ändå | Måste | Givet Vasaloppet om 6 veckor, när planen skapas, så visas varningen om kort förberedelsetid och en plan |
 | K-10 | Den senaste planen sparas i webbläsaren och visas vid återbesök, med knappen "Gör en ny plan". Formuläret står aldrig tomt bredvid en sparad plan *(förtydligad 2026-10-27)* | Måste | Efter omladdning visas samma plan; fungerar inte lagringen visas planen ändå utan fel; en ändring i formuläret kan aldrig radera planen oavsiktligt |
 | K-11 | Säkerhetstexter från avsnitt 8: ansvarsfriskrivning, röda flaggor, smärtregel och sjukdomsregel i planen; säkerhetstext på varje pass i öppet vatten | Måste | Varje pass i öppet vatten har säkerhetstexten; övriga texter syns i planen |
-| K-12 | Fungerar i mobil från 360 px bredd | Måste | Ingen vågrät scroll och alla tryckytor minst 44 × 44 px vid 360 px *(preciserad 2026-10-29: gränsen 44 px är den vanliga minimigränsen för en tryckyta på pekskärm)* |
+| K-12 | Fungerar i mobil från 360 px bredd *(kontroll på riktig telefon uppskjuten till efter demon, 2026-11-15 — kravet står kvar)* | Måste | Ingen vågrät scroll och alla tryckytor minst 44 × 44 px vid 360 px *(preciserad 2026-10-29: gränsen 44 px är den vanliga minimigränsen för en tryckyta på pekskärm)* |
 | K-13 | Ändra svar: tillbaka till formuläret med tidigare svar ifyllda | **Måste** *(höjd från Bra att ha 2026-10-27)* | Givet en sparad plan, när jag trycker "Ändra svar", så är formuläret ifyllt med mina svar |
 | K-14 | Utskrift: planen går att skriva ut snyggt via webbläsarens utskrift | Bra att ha | Utskriften visar översikt och alla veckor utan knappar och menyer |
 | K-15 | Sparad plan valideras vid inläsning. Går den inte att använda kastas den, lagringen rensas och användaren får veta varför. Formuläret ritas alltid, även om planen är trasig | Måste *(tillagd 2026-10-27)* | Givet en sparad plan från en äldre version, när jag öppnar appen, så ser jag formuläret och ett meddelande om att den gamla planen inte kunde läsas — aldrig en tom sida |
@@ -1245,12 +1245,19 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 **Definition of done för v1.0**
 
 - [x] Alla Måste-krav är klara och testade *(2026-10-29)*
-- [ ] Appen går att köra lokalt med `npm run dev` och fungerar i mobil *(ändrad 2026-10-28:
-      demon körs lokalt, drift skjuts till efter demon)*
-      **Återstår: prova på en riktig telefon.** Layouten är verifierad vid 360 px i en
-      iframe, utan vågrät scroll och med alla tryckytor minst 44 px, men det ersätter inte
-      en riktig skärm. Se *Visa appen i mobilen* i README.
-- [x] Isabelle har granskat P1–P5 som text (via `scripts/print-profiles.ts`) och godkänt planerna *(2026-10-29)*
+- [x] Appen går att köra lokalt med `npm run dev` *(2026-11-15)* och är publicerad på
+      https://isabelleemilianystrom.github.io/klassikerplaneraren/ *(2026-11-15)*. Hela
+      flödet verifierat mot den publika adressen: fyra lopp, 45 veckor, inga fel.
+      *(Ändrad 2026-10-28: demon körs lokalt, drift skjuts till efter demon — drift gjordes
+      ändå 2026-11-15 på Isabelles begäran.)*
+- [ ] **Prova på en riktig telefon.** *(Skjuten till efter demon, beslut 2026-11-15:
+      "i mobilen behöver inte funka innan demo utan endast på webben".)* Layouten är
+      verifierad vid 360 px i en iframe, utan vågrät scroll och med alla tryckytor minst
+      44 px, men det ersätter inte en riktig skärm. Se *Visa appen i mobilen* i README.
+- [x] Isabelle har granskat P1–P6 som text (via `scripts/print-profiles.ts`) *(omgranskat 2026-11-15)*.
+      **Skelettet godkänt, detaljerna inte.** Granskningen gav fjorton fynd, F-10 till F-23
+      ovan, varav F-10 och F-20 är åtgärdade. Den första granskningen 2026-10-29 gällde
+      planer som sedan dess ändrats av R-40 till R-49 och av F-1, F-7 och F-8
 - [x] Varje fas har en granskad förklaring *(2026-10-29; en text per fas enligt A-02, krympt från en per fas och lopp)*
 - [x] Varje passtyp har en granskad instruktion *(2026-10-29)*
 - [x] README beskriver idé, hur man kör projektet och var kravspecen finns *(2026-10-29)*
