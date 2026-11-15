@@ -181,6 +181,14 @@ function Steg1({ state, setState, felFör }: StegProps) {
                     />
                   </label>
 
+                  {/* F-15: appen kan inte validera datumet, men den kan be
+                      användaren göra det. Står alltid, inte bara när ett
+                      datum saknas — ett fel datum som redan är ifyllt är
+                      svårare att upptäcka än ett tomt fält. */}
+                  <p className="mt-2 text-sm text-neutral-600">
+                    {FORM.step1.dateCheckHelp}
+                  </p>
+
                   {/* Arrangören har inte publicerat något datum som passar. */}
                   {nextRaceDate(race.id, state.startDate) === null && (
                     <p className="mt-2 text-sm text-neutral-600">
