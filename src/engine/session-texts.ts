@@ -71,11 +71,33 @@ export function withTitleAndInstruction(
   const grund: Session = {
     ...session,
     title: text.title,
-    instruction: text.instruction,
+    instruction:
+      session.type === 'strength'
+        ? text.instruction + strengthExerciseNote(week)
+        : text.instruction,
     alternatives: alternativesFor(session, input),
   };
 
   return withRaceNote(withSafetyNote(withSubstitution(grund, input), input));
+}
+
+/**
+ * Övningarna i styrkepasset, som en mening (R-10).
+ *
+ * Instruktionen sa "kör övningarna i tur och ordning" utan att någonsin säga
+ * vilka. Övningarna har funnits i `config/sessions.json` hela tiden — med en
+ * egen lista per lopp — men ingen kod läste dem, och `strengthExercises` var
+ * död konfiguration. Isabelles granskning av profilerna 2026-11-15 hittade
+ * det: texten lovade en lista som aldrig visades.
+ *
+ * Loppets egen lista går före den allmänna. Inför Vasaloppet är överkroppen
+ * det som avgör, och då ska rodd och dips stå där, inte utfallssteg.
+ */
+function strengthExerciseNote(week: WeekSkeleton): string {
+  const { exercises, byRace } = sessionTexts.strengthExercises;
+  const valda = (week.focusRaceId === null ? undefined : byRace[week.focusRaceId]) ?? exercises;
+
+  return ` Övningarna: ${valda.map((övning) => övning.name).join(', ')}.`;
 }
 
 /**
