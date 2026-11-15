@@ -1404,6 +1404,60 @@ på 31. Det var platsfördelningen som gav långpasset allt.
 mot sitt golv men utgår aldrig — loppet tar tio timmar, och teknik utan uthållighet bär inte dit.
 Preciseringen står i R-21.
 
+### Fynd ur Isabelles granskning av profilerna *(2026-11-15)*
+
+**Omfattning, så att listans täckning är ärlig.** P1, P3 och P4 lästa i sin helhet. P2, P5 och P6
+lästa till ungefär rad 300 av 800–1 100; resten av dem körda genom ett skript som kontrollerar
+passlängder, vilodagar, veckoramp och loppvecka. **Passtexterna i P2, P5 och P6 är alltså inte
+genomlästa**, och listan kan därför vara ofullständig just där.
+
+**Helhetsomdömet: skelettet håller.** Fyra veckor i taget med en avlastningsvecka, två veckors
+nedtrappning, generalrepet med utrustning, tipsen om utförslöpning, klunga och öppet vatten, och
+ärliga varningar i P4 och P6. Det som skaver är detaljerna nedan.
+
+**Det här är den granskning som hittade mest i hela projektet**, och nästan ingenting av den
+kunde harnessen ha hittat. Textens innehåll jämförs inte mot passets längd av någon invariant;
+död konfiguration syns inte alls; och P2 v17 är grön mot "minst en vilodag" trots sex
+träningsdagar i rad. Invarianterna mäter det jag tänkt på att mäta — en människa som läser
+planen ser det jag inte tänkt på.
+
+| # | Fynd | Status |
+| --- | --- | --- |
+| **F-10** | **Passlängden matchar inte passtexten.** Tröskeltexten ("4 × 8 min, 3 min vila, 10 min upp och ner") kräver ~61 min, intervalltexten (2 × 10 × 30/30 s) ~43 min. Planerna ger ofta 20–35 min | **Verifierat: 77 pass** — P3 20, P1 12, P2 12, P5 18, P6 10, P4 5 |
+| **F-11** | **P5:s tröskelpass inomhus saknar struktur.** 21 pass i ett enda block på upp till 72 min i zon 4, med den generiska texten "Samma tid och samma zon som cykelpasset" — och det finns inget cykelpass att referera till | Öppet |
+| **F-12** | **Löpning två dagar efter ett 30 km terränglopp.** P6 v22: 71 + 70 min löpning på måndag och tisdag efter Lidingöloppet på lördagen | **Verifierat** |
+| **F-13** | **Loppveckan.** Skidprofilerna har fem vilodagar i rad och sedan 25 min. Simveckan är det omvända: P5 v35 har 83 + 82 + 25 min simning före ett lopp på fredagen, mot 60 min veckan före — ingen nedtrappning alls | Öppet |
+| **F-14** | **Rampen utgår från budgeten, inte från vad användaren gör i dag.** P4 går 3 h 36 → 6 h och P6 4 h 48 → 8 h mellan v2 och v3, **+67 %** | Öppet. Kräver ett nytt fält: nuvarande veckotimmar |
+| **F-15** | **Loppdatum valideras inte.** P4 har Vasaloppet 2026-12-13, P5 har Vansbro på en fredag mot de andras lördag. `races.json` har redan en lista `dates` att validera mot | **Verifierat — datan finns, den används inte** |
+| **F-16** | **P4:s långpass är 3 h 30 min stavgång i uppförsbacke**, vilket varken är realistiskt eller snällt mot axlar och armbågar. Texten refererar dessutom till ett skidpass som inte finns. Planen borde lyfta skidtunnel eller att skjuta fram till 2027 hårdare | Öppet |
+| **F-17** | **Fasta måltider för alla nivåer.** Vasaloppet 7 h, Vätternrundan 11 h, Lidingö 3 h 30, Vansbro 1 h 15 — oavsett om användaren är nybörjare eller van. Tiden styr loppveckan och pacingtexten, så den bör bero på nivån | Öppet |
+| **F-18** | **Långa simuppehåll.** P3 simmar inte alls v4–v29 och P5 inte v1–v27 — ett halvår utan vatten för nivån Erfaren. P5 saknar dessutom simning fyra veckor kring Vätternrundan. P1 (nybörjare) får ett pass på 60–80 min och ingen simning v15–v18; två pass på 40 min vore bättre | Öppet |
+| **F-19** | **Längsta cykelpass för sextimmarsprofilerna.** P1 och P3 toppar på 3 h 30 inför 30 mil, och passet är 58–70 % av veckans cykeltid. Riktmärket "1008 km, nått" ger falsk trygghet | Öppet |
+| **F-20** | **Styrkepasset listade inga övningar** trots att texten sa "kör övningarna i tur och ordning". Passet är dessutom alltid exakt 60 min, även i avlastningsveckor | **Övningarna åtgärdade 2026-11-15.** Avlastningsveckan öppen |
+| **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | Öppet |
+| **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | Öppet. Hör till F-2 |
+| **F-23** | **P2 v17: sex träningsdagar i rad i en nedtrappningsvecka** | **Verifierat.** Invarianten kräver bara *en* vilodag och är därför grön |
+
+**F-20 är åtgärdad 2026-11-15.** `strengthExercises` fanns i schemat och i `config/sessions.json`
+— med en egen lista per lopp — men **ingen kod läste den**. Det var död konfiguration, och
+instruktionen lovade en lista som aldrig visades. Övningarna står nu i passet, med loppets egen
+lista när veckan har ett fokuslopp. Inga nya träningstal: övningarna var redan skrivna och
+granskade.
+
+**F-10 har bara en framkomlig lösning av de två föreslagna.** Ett golv på passlängden skulle
+bryta mot R-15, som säger att nedtrappningens hårda inslag är **högst 20 minuter** — P1 och P3
+v17 är alltså regeln som fungerar, inte felet. Kvar blir att **skala strukturen efter tiden**, så
+att 20 minuter blir 2 × 6 i stället för 4 × 8. Det kräver att motorn räknar fram repetitionerna
+och att passtexterna blir mallar med platshållare, plus nya tal som ska beslutas. Det är samma
+arbete som "intervallerna trappas upp" ur SPÅRAT-guiden, och de två bör göras tillsammans.
+
+**F-13, F-14, F-16, F-17 och F-18 kräver beslut**, inte bara kod. F-14 kräver dessutom ett nytt
+fält i datamodellen (avsnitt 7): nuvarande veckotimmar.
+
+**Inget av F-10 till F-19 och F-21 till F-23 är åtgärdat.** Besluten togs fyra dagar före demon,
+och en regeländring så nära den är större risk än vinsten — särskilt eftersom varje ändrad
+passtext måste läsas igenom på nytt, och den läsningen är flaskhalsen.
+
 ## 10. Backlog i ordning
 
 Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, eftersom allt annat vilar på den.
