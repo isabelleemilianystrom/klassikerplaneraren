@@ -1444,6 +1444,8 @@ instruktionen lovade en lista som aldrig visades. Övningarna står nu i passet,
 lista när veckan har ett fokuslopp. Inga nya träningstal: övningarna var redan skrivna och
 granskade.
 
+**F-10 görs efter demon som T-19** *(beslutat 2026-11-15)*.
+
 **F-10 har bara en framkomlig lösning av de två föreslagna.** Ett golv på passlängden skulle
 bryta mot R-15, som säger att nedtrappningens hårda inslag är **högst 20 minuter** — P1 och P3
 v17 är alltså regeln som fungerar, inte felet. Kvar blir att **skala strukturen efter tiden**, så
@@ -1484,6 +1486,7 @@ Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, efters
 | T-16 | Utskrift (Bra att ha) | Acceptanskriteriet för K-14 uppfyllt | K-14 | 0,5 h |  |
 | T-18 | Avslut när planen är genomförd (Bra att ha) | Acceptanskriteriet för K-17 uppfyllt | K-17 | 0,25 h |  |
 | T-17 | README och förberedelse för demon | Definition of done för v1.0 uppfylld | Avsnitt 9 | 1 h | **M3 Klar för demo** |
+| T-19 | **Passlängden ska matcha passtexten (F-10).** Motorn räknar fram antal repetitioner ur passets minuter, och tröskel- och intervalltexterna blir mallar med platshållare i stället för fasta "4 × 8 min". Görs tillsammans med intervallupptrappningen ur SPÅRAT-guiden, eftersom det är samma arbete | Inget pass har en text som kräver mer tid än passet har. Invarianten finns och är grön för P1–P6 och 200 slumpade planer | R-15, R-30, F-10 | 3 h | **Efter demon** *(beslutad 2026-11-15)* |
 
 Tiderna avser Isabelles tid med Claude Code och har en osäkerhet på ungefär ±30 %.
 
