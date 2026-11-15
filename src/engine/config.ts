@@ -225,6 +225,27 @@ export const rulesSchema = z.object({
     maxWeeklyIncrease: share,
     noBackToBackForNewLevel: z.boolean(),
   }),
+  /** F-10: hur ett hårt pass delas upp när tiden inte räcker till fullängdsblocken. */
+  hardSession: z.object({
+    _rule: z.string(),
+    note: z.string(),
+    warmUpMinutes: z.number().int().positive(),
+    minWarmUp: z.number().int().positive(),
+    warmUpShareWhenShort: share,
+    blockMinutes: z.number().int().positive(),
+    minBlockMinutes: z.number().int().positive(),
+    restMinutes: z.number().int().nonnegative(),
+    minRestMinutes: z.number().int().nonnegative(),
+    minBlocks: z.number().int().min(2),
+    intervals: z.object({
+      _note: z.string(),
+      repsPerSet: z.number().int().positive(),
+      minReps: z.number().int().positive(),
+      restMinutes: z.number().int().nonnegative(),
+      minRestMinutes: z.number().int().nonnegative(),
+      minSets: z.number().int().min(2),
+    }),
+  }),
   intensity: z.object({
     _rule: z.string(),
     zoneText: z.object({

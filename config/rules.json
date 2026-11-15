@@ -416,5 +416,25 @@
     "sports": [
       "swim"
     ]
+  },
+  "hardSession": {
+    "_rule": "R-15, R-30, F-10",
+    "note": "Hur ett hårt pass delas upp när tiden inte räcker till fullängdsblocken. Texten räknas fram ur passets minuter i stället för att vara en fast sträng — tröskeltexten krävde 61 minuter och passen var ofta 20–35, vilket var fynd F-10. Uppvärmning och nedvarvning kortas först, sedan blocken, sist vilan. Alltid minst två block, annars är det inget intervallpass. Regeln ger upptrappningen på köpet: ett längre pass rymmer fler block.",
+    "warmUpMinutes": 10,
+    "minWarmUp": 5,
+    "warmUpShareWhenShort": 0.25,
+    "blockMinutes": 8,
+    "minBlockMinutes": 4,
+    "restMinutes": 3,
+    "minRestMinutes": 1,
+    "minBlocks": 2,
+    "intervals": {
+      "_note": "Serierna är 30 sekunder hårt och 30 sekunder vila, alltså en minut per repetition. repsPerSet är antalet repetitioner i en serie.",
+      "repsPerSet": 10,
+      "minReps": 4,
+      "restMinutes": 3,
+      "minRestMinutes": 1,
+      "minSets": 2
+    }
   }
 }

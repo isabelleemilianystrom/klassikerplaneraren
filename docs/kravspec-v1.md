@@ -1423,7 +1423,7 @@ planen ser det jag inte tänkt på.
 
 | # | Fynd | Status |
 | --- | --- | --- |
-| **F-10** | **Passlängden matchar inte passtexten.** Tröskeltexten ("4 × 8 min, 3 min vila, 10 min upp och ner") kräver ~61 min, intervalltexten (2 × 10 × 30/30 s) ~43 min. Planerna ger ofta 20–35 min | **Verifierat: 77 pass** — P3 20, P1 12, P2 12, P5 18, P6 10, P4 5 |
+| **F-10** | **Passlängden matchar inte passtexten.** Tröskeltexten ("4 × 8 min, 3 min vila, 10 min upp och ner") kräver ~61 min, intervalltexten (2 × 10 × 30/30 s) ~43 min. Planerna ger ofta 20–35 min | **Åtgärdad 2026-11-15.** Var 77 pass; nu 0 av 5 082 granskade |
 | **F-11** | **P5:s tröskelpass inomhus saknar struktur.** 21 pass i ett enda block på upp till 72 min i zon 4, med den generiska texten "Samma tid och samma zon som cykelpasset" — och det finns inget cykelpass att referera till | Öppet |
 | **F-12** | **Löpning två dagar efter ett 30 km terränglopp.** P6 v22: 71 + 70 min löpning på måndag och tisdag efter Lidingöloppet på lördagen | **Verifierat** |
 | **F-13** | **Loppveckan.** Skidprofilerna har fem vilodagar i rad och sedan 25 min. Simveckan är det omvända: P5 v35 har 83 + 82 + 25 min simning före ett lopp på fredagen, mot 60 min veckan före — ingen nedtrappning alls | Öppet |
@@ -1444,7 +1444,35 @@ instruktionen lovade en lista som aldrig visades. Övningarna står nu i passet,
 lista när veckan har ett fokuslopp. Inga nya träningstal: övningarna var redan skrivna och
 granskade.
 
-**F-10 görs efter demon som T-19** *(beslutat 2026-11-15)*.
+**F-10 är åtgärdad 2026-11-15.** Tröskel- och intervalltexterna är mallar, och
+`src/engine/session-structure.ts` räknar fram strukturen ur passets minuter.
+
+**Skalningsregeln, beslutad av Isabelle 2026-11-15.** Uppvärmning och nedvarvning är tio minuter
+var, men kortas till en fjärdedel av passet var när det blir trångt — aldrig under fem. Blocken
+behåller åtta minuter och tre minuters vila så länge det går; räcker tiden inte kortas **blocket
+först och vilan sist**, ned mot fyra respektive en minut. Alltid minst två block.
+
+| Passet | Blir |
+| --- | --- |
+| 61 min | 10 upp, 4 × 8 min, 3 min vila, 10 ner *(oförändrat)* |
+| 35 min | 9 upp, 2 × 7 min, 3 min vila, 9 ner |
+| 20 min | 5 upp, 2 × 4 min, 2 min vila, 5 ner |
+
+Talen står i `hardSession` i `config/rules.json` och de tre exemplen är låsta av ett test, så en
+ändring av regeln blir ett beslut och inte en glidning.
+
+**Upptrappningen kom på köpet.** Ett längre pass rymmer fler block, så antalet växer genom fasen
+av sig självt: 45 min ger 2 × 8, 61 min ger 4 × 8, 95 min ger 7 × 8. Det var SPÅRAT-guidens egen
+idé — 4 × 5, sedan 5 × 5, sedan 6 × 5 — och den behövde ingen egen regel.
+
+**Två fel på vägen, båda fångade innan de nådde en plan.** Första försöket kortade vilan före
+blocket och gav 35 minuter som "2 × 8 min, 1 min vila" i stället för beslutets "2 × 7 min, 3 min
+vila". Andra försöket lämnade mallen orörd när passet var för kort, vilket hade visat `{upp}` för
+användaren — värre än felet den skulle rätta. Nu kastas det i stället, och ett test går igenom
+alla profiler plus 60 slumpade planer och letar efter platshållare.
+
+**Verifierat:** 0 av 5 082 hårda pass har en text som kräver mer tid än passet har. Invarianterna
+visar samma åtta brott som före ändringen — fixen rör texten, inte planerna.
 
 **F-10 har bara en framkomlig lösning av de två föreslagna.** Ett golv på passlängden skulle
 bryta mot R-15, som säger att nedtrappningens hårda inslag är **högst 20 minuter** — P1 och P3
@@ -1486,7 +1514,7 @@ Uppgifterna görs i den här ordningen. Motorn byggs och granskas först, efters
 | T-16 | Utskrift (Bra att ha) | Acceptanskriteriet för K-14 uppfyllt | K-14 | 0,5 h |  |
 | T-18 | Avslut när planen är genomförd (Bra att ha) | Acceptanskriteriet för K-17 uppfyllt | K-17 | 0,25 h |  |
 | T-17 | README och förberedelse för demon | Definition of done för v1.0 uppfylld | Avsnitt 9 | 1 h | **M3 Klar för demo** |
-| T-19 | **Passlängden ska matcha passtexten (F-10).** Motorn räknar fram antal repetitioner ur passets minuter, och tröskel- och intervalltexterna blir mallar med platshållare i stället för fasta "4 × 8 min". Görs tillsammans med intervallupptrappningen ur SPÅRAT-guiden, eftersom det är samma arbete | Inget pass har en text som kräver mer tid än passet har. Invarianten finns och är grön för P1–P6 och 200 slumpade planer | R-15, R-30, F-10 | 3 h | **Efter demon** *(beslutad 2026-11-15)* |
+| ~~T-19~~ **Klar 2026-11-15.** | **Passlängden ska matcha passtexten (F-10).** Motorn räknar fram antal repetitioner ur passets minuter, och tröskel- och intervalltexterna blir mallar med platshållare i stället för fasta "4 × 8 min". Görs tillsammans med intervallupptrappningen ur SPÅRAT-guiden, eftersom det är samma arbete | Inget pass har en text som kräver mer tid än passet har. Invarianten finns och är grön för P1–P6 och 200 slumpade planer | R-15, R-30, F-10 | 3 h | **Efter demon** *(beslutad 2026-11-15)* |
 
 Tiderna avser Isabelles tid med Claude Code och har en osäkerhet på ungefär ±30 %.
 

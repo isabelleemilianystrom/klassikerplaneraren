@@ -10,6 +10,7 @@
  * Motorn hanterar nycklar, inte färdiga meningar.
  */
 import { rules, sessions as sessionTexts } from './config.ts';
+import { intervalStructure, tempoStructure } from './session-structure.ts';
 import { monthOf } from './dates.ts';
 import { hasEquipmentFor, hasSnow, inSeason, isOpenWater, isWinter } from './season.ts';
 import type {
@@ -71,14 +72,49 @@ export function withTitleAndInstruction(
   const grund: Session = {
     ...session,
     title: text.title,
-    instruction:
-      session.type === 'strength'
-        ? text.instruction + strengthExerciseNote(week)
-        : text.instruction,
+    instruction: instructionFor(session, text.instruction, week),
     alternatives: alternativesFor(session, input),
   };
 
   return withRaceNote(withSafetyNote(withSubstitution(grund, input), input));
+}
+
+/**
+ * Instruktionen med passets egna tal ifyllda (F-10, R-10).
+ *
+ * Tröskel- och intervalltexterna är mallar: hur många block och hur långa de
+ * är beror på hur många minuter passet faktiskt har. Förut stod "4 × 8
+ * minuter" fast i texten, och ett pass på tjugo minuter bad då om något som
+ * tog sextioen.
+ *
+ * Går strukturen inte att räkna fram är det ett fel, inte ett specialfall:
+ * `session.minMinutes` är tjugo och tjugo minuter räcker till två block. Att
+ * returnera mallen orörd skulle visa `{upp}` för användaren, vilket är värre
+ * än felet modulen finns för. Därför kastas det i stället, och att det aldrig
+ * händer är låst av ett test över alla profiler och 200 slumpade planer.
+ */
+function instructionFor(session: Session, mall: string, week: WeekSkeleton): string {
+  if (session.type === 'strength') return mall + strengthExerciseNote(week);
+
+  // Bara de hårda passen har en struktur att räkna fram. Övriga texter är
+  // vanliga strängar utan platshållare och lämnas som de är.
+  if (session.type !== 'tempo' && session.type !== 'intervals') return mall;
+
+  const struktur =
+    session.type === 'tempo' ? tempoStructure(session.minutes) : intervalStructure(session.minutes);
+
+  if (struktur === null) {
+    throw new Error(
+      `Passet på ${session.minutes} minuter är för kort för en ${session.type}-struktur`,
+    );
+  }
+
+  return mall
+    .replace('{upp}', String(struktur.warmUp))
+    .replace('{antal}', String(struktur.blocks))
+    .replace('{block}', String(struktur.blockMinutes))
+    .replace('{vila}', String(struktur.restMinutes))
+    .replace('{ner}', String(struktur.coolDown));
 }
 
 /**

@@ -12,11 +12,11 @@
     },
     "tempo": {
       "title": "Tröskelpass",
-      "instruction": "Värm upp i 10 minuter. Kör sedan 4 × 8 minuter i ett tempo där du kan säga korta meningar, med 3 minuter lugnt emellan. Varva ner 10 minuter."
+      "instruction": "Värm upp i {upp} minuter. Kör sedan {antal} × {block} minuter i ett tempo där du kan säga korta meningar, med {vila} minuter lugnt emellan. Varva ner {ner} minuter."
     },
     "intervals": {
       "title": "Intervaller",
-      "instruction": "Värm upp i 10 minuter. Kör 2 × 10 × 30 sekunder hårt med 30 sekunders vila, och 3 minuter lugnt mellan serierna. Varva ner 10 minuter."
+      "instruction": "Värm upp i {upp} minuter. Kör {antal} × {block} × 30 sekunder hårt med 30 sekunders vila, och {vila} minuter lugnt mellan serierna. Varva ner {ner} minuter."
     },
     "technique": {
       "title": "Teknikpass",
@@ -182,5 +182,6 @@
       "swim": "Våtdräkten och simglasögonen, i vatten, så du vet hur de sitter innan loppdagen.",
       "run": "Skorna, strumporna och kläderna — och ryggsäcken eller bältet om du tänkt bära ett."
     }
-  }
+  },
+  "_hardSessionTemplates": "Tröskel- och intervalltexterna är mallar sedan 2026-11-15 (fynd F-10). Platshållarna fylls av session-structure.ts ur passets minuter: {upp}, {antal}, {block}, {vila}, {ner}. Skriv aldrig fasta tal i dem igen — texten måste kunna följas på den tid passet har."
 }
