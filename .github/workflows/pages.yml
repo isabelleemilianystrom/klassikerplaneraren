@@ -1,0 +1,72 @@
+# Publicerar appen på GitHub Pages.
+#
+# Appen är helt statisk — regelmotorn kör i webbläsaren och det finns inga
+# anrop ut — så den kan serveras av vilken filserver som helst. Pages är
+# gratis för publika repon, vilket nollkostnadskravet i kravspecens avsnitt 8
+# kräver.
+#
+# `PAGES=1` slår på `output: 'export'` och `basePath` i next.config.ts. Utan
+# variabeln bygger och körs projektet precis som lokalt.
+#
+# Kontrollerna körs före publiceringen: en trasig app ska inte kunna nå
+# adressen bara för att någon pushade.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Läsrättigheter till koden, skrivrättigheter till Pages-publiceringen.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# En publicering i taget. En påbörjad körning avbryts inte — annars kan en
+# halvfärdig utgåva bli den som ligger kvar.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Kontroller före publicering
+        run: npm run check
+
+      - name: Bygg statiskt
+        run: npm run build
+        env:
+          PAGES: '1'
+
+      # Jekyll filtrerar bort kataloger som börjar med understreck, och hela
+      # bygget ligger i _next/. Actions-publiceringen kör inte Jekyll, men
+      # filen kostar inget och tar bort ett klassiskt misslyckande.
+      - run: touch out/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

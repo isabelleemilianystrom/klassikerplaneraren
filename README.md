@@ -81,6 +81,25 @@ vara på samma wifi. IP-adressen skrivs ut när servern startar, som `Network:`.
 Brandväggen i Windows frågar första gången om Node får ta emot anslutningar.
 Svara ja för privata nätverk.
 
+## Publicering
+
+Appen ligger på **https://isabelleemilianystrom.github.io/klassikerplaneraren/** och
+publiceras av `.github/workflows/pages.yml` vid varje push till `main`. Workflowen kör
+`npm run check` först — en app som inte klarar testerna når aldrig adressen.
+
+Bygget till Pages slås på med miljövariabeln `PAGES=1`, som sätter `output: 'export'` och
+`basePath` i `next.config.ts`. Utan den beter sig `npm run dev` och `npm run build` precis
+som förut, så demon lokalt påverkas inte.
+
+Vill du prova exportbygget lokalt:
+
+```powershell
+$env:PAGES = '1'; npm.cmd run build
+```
+
+Resultatet hamnar i `out/`. **Profiltexterna ligger i `profiles/`**, inte i `out/` — Next
+rensar `out/` vid varje exportbygge, och innan flytten hade ett bygge raderat dem.
+
 ## Granska planerna
 
 Appen visar en plan i taget. För att läsa alla sex referensprofiler som text —
@@ -90,9 +109,9 @@ hela året, varje pass — kör:
 npm run profiles
 ```
 
-Det skriver en fil per referensprofil till `out/` — en översikt vecka för vecka
+Det skriver en fil per referensprofil till `profiles/` — en översikt vecka för vecka
 med tid och fördelning mellan sporterna, och därefter varje enskilt pass med
-dag, längd, zon och instruktion. `out/oversikt.txt` sammanfattar alla sex.
+dag, längd, zon och instruktion. `profiles/oversikt.txt` sammanfattar alla sex.
 
 Profilerna står i kravspecens avsnitt 9: från P1 som är ny i skidor och simning
 med sex timmar i veckan, till P4 som har sex veckor på sig till Vasaloppet. Det
@@ -106,7 +125,7 @@ med sex timmar i veckan, till P4 som har sex veckor på sig till Vasaloppet. Det
 | `npm run test:run` | kör testerna en gång |
 | `npm run typecheck` | TypeScript utan att bygga |
 | `npm run lint` | ESLint |
-| `npm run profiles` | skriver referensprofilernas planer till `out/` |
+| `npm run profiles` | skriver referensprofilernas planer till `profiles/` |
 
 ## Så är koden uppdelad
 

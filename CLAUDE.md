@@ -126,7 +126,7 @@ Appen är helt statisk, så den kan driftas var som helst som serverar filer. Bl
 
 ## Hemligheter
 
-**Det finns ingen API-nyckel, och appen behöver ingen.** Öppen fråga 3 i kravspecen avgjordes den 2026-10-27: förklaringarna förgenereras under utvecklingen och sparas i appen, så det görs inga AI-anrop i körtid. Det finns varken `.env.local`, `process.env` eller något anrop ut i hela kodbasen — kontrollerat 2026-11-05. *(Det här avsnittet beskrev fram till dess en nyckel som aldrig funnits; texten skrevs före beslutet och uppdaterades inte.)*
+**Det finns ingen API-nyckel, och appen behöver ingen.** Öppen fråga 3 i kravspecen avgjordes den 2026-10-27: förklaringarna förgenereras under utvecklingen och sparas i appen, så det görs inga AI-anrop i körtid. Det finns ingen `.env.local` och inget anrop ut i hela kodbasen — kontrollerat 2026-11-05. `process.env` förekommer på ett enda ställe: `next.config.ts` läser `PAGES` för att slå på det statiska bygget till GitHub Pages *(tillagt 2026-11-15)*. Det är byggkonfiguration, inte körtid, och ingen kod i `src/` rör miljövariabler. *(Det här avsnittet beskrev fram till dess en nyckel som aldrig funnits; texten skrevs före beslutet och uppdaterades inte.)*
 
 Det som gäller i stället:
 

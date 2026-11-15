@@ -4,7 +4,7 @@
  * Det här är verktyget Isabelle granskar planerna med vid M1, innan
  * gränssnittet finns. Körs med `npm run profiles`.
  *
- * Filerna hamnar i `out/`, en per profil, plus en översikt. Katalogen är
+ * Filerna hamnar i `profiles/`, en per profil, plus en översikt. Katalogen är
  * ignorerad av git — texten är genererad och hör inte i repot.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -206,7 +206,7 @@ function skrivÖversikt(input: PlanInput, planer: readonly WeekPlan[]): string[]
 }
 
 function main(): void {
-  mkdirSync('out', { recursive: true });
+  mkdirSync('profiles', { recursive: true });
 
   const sammanfattning: string[] = ['Referensprofiler', '================', ''];
 
@@ -253,7 +253,7 @@ function main(): void {
       ...planer.flatMap((plan) => skrivVecka(plan)),
     ].join('\n');
 
-    const fil = `out/${namn}.txt`;
+    const fil = `profiles/${namn}.txt`;
     writeFileSync(fil, text, 'utf8');
 
     const totalt = planer.reduce((summa, plan) => summa + plan.totalMinutes, 0);
@@ -263,7 +263,7 @@ function main(): void {
     );
   }
 
-  writeFileSync('out/oversikt.txt', sammanfattning.join('\n') + '\n', 'utf8');
+  writeFileSync('profiles/oversikt.txt', sammanfattning.join('\n') + '\n', 'utf8');
 
   // Enda stället i projektet där utskrift till terminalen är meningen.
   console.log(sammanfattning.join('\n'));

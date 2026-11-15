@@ -49,3 +49,4 @@ next-env.d.ts
 
 # Genererade planer från npm run profiles
 out/
+profiles/
