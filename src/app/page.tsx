@@ -177,8 +177,6 @@ export default function Home() {
         </p>
       )}
 
-      <p className="mt-6 rounded-lg bg-neutral-100 p-4 text-sm text-neutral-700">{HOME.beta}</p>
-
       <button
         type="button"
         onClick={börjaFrånStart}
@@ -187,8 +185,16 @@ export default function Home() {
         {HOME.start}
       </button>
 
-      {/* Texterna i avsnitt 8 används ordagrant. */}
-      <div className="mt-12 space-y-3 border-t border-neutral-200 pt-6 text-sm text-neutral-600">
+      {/*
+        Ordningen ändrad 2026-11-16 efter designgenomgången: tre stycken
+        ansvarsfriskrivning stod före knappen, alltså innan användaren fått
+        veta varför appen är värd att använda. Texterna är ordagranna enligt
+        avsnitt 8 och orörda — bara var de står har flyttats, och de står
+        fortfarande före första klicket.
+      */}
+      <p className="mt-10 rounded-lg bg-neutral-100 p-4 text-sm text-neutral-700">{HOME.beta}</p>
+
+      <div className="mt-6 space-y-3 text-sm text-neutral-600">
         <p>{FIXED.ageLimit}</p>
         <p>{FIXED.disclaimer}</p>
         <p>{FIXED.independence}</p>

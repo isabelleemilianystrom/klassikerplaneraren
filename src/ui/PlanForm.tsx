@@ -74,7 +74,7 @@ export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-10">
-      <p className="text-sm font-medium text-neutral-500">{FORM.stepLabel(steg, STEG)}</p>
+      <Steginikator steg={steg} av={STEG} />
 
       {steg === 1 && <Steg1 state={state} setState={setState} felFör={felFör} />}
       {steg === 2 && <Steg2 state={state} setState={setState} felFör={felFör} />}
@@ -121,6 +121,34 @@ interface StegProps {
   state: FormState;
   setState: (state: FormState) => void;
   felFör: (fält: string) => string | undefined;
+}
+
+/**
+ * Var i formuläret man är (K-02 till K-04).
+ *
+ * Texten "Steg 1 av 3" stod som liten grå rad och var den enda antydan om hur
+ * mycket som återstod. Markörerna svarar på samma fråga utan att läsas.
+ *
+ * Texten står kvar som enda källa för skärmläsare: tre streck utan ord säger
+ * ingenting för den som inte ser dem, och markörerna är därför `aria-hidden`.
+ */
+function Steginikator({ steg, av }: { steg: number; av: number }) {
+  return (
+    <div className="flex items-center gap-3">
+      <p className="text-sm font-medium text-neutral-500">{FORM.stepLabel(steg, av)}</p>
+
+      <div aria-hidden="true" className="flex flex-1 gap-1.5">
+        {Array.from({ length: av }, (_, i) => (
+          <span
+            key={i}
+            className={`h-1 flex-1 rounded-full ${
+              i < steg ? 'bg-neutral-900' : 'bg-neutral-200'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /** Steg 1: loppen och deras datum (K-02). */
