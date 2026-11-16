@@ -1507,8 +1507,8 @@ planen ser det jag inte tänkt på.
 | **F-18** | **Långa simuppehåll.** P3 simmar inte alls v4–v29 och P5 inte v1–v27 — ett halvår utan vatten för nivån Erfaren. P5 saknar dessutom simning fyra veckor kring Vätternrundan. P1 (nybörjare) får ett pass på 60–80 min och ingen simning v15–v18; två pass på 40 min vore bättre | Öppet |
 | **F-19** | **Längsta cykelpass för sextimmarsprofilerna.** P1 och P3 toppar på 3 h 30 inför 30 mil, och passet är 58–70 % av veckans cykeltid. Riktmärket "1008 km, nått" ger falsk trygghet | Öppet |
 | **F-20** | **Styrkepasset listade inga övningar** trots att texten sa "kör övningarna i tur och ordning". Passet är dessutom alltid exakt 60 min, även i avlastningsveckor | **Övningarna åtgärdade 2026-11-15.** Avlastningsveckan öppen |
-| **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | Öppet |
-| **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | Öppet. Hör till F-2 |
+| **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | **Åtgärdad 2026-11-16** |
+| **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | **Förklarad 2026-11-16.** Beteendet är rätt, texten saknades |
 | **F-23** | **P2 v17: sex träningsdagar i rad i en nedtrappningsvecka** | **Verifierat.** Invarianten kräver bara *en* vilodag och är därför grön |
 
 **F-20 är åtgärdad 2026-11-15.** `strengthExercises` fanns i schemat och i `config/sessions.json`
@@ -1516,6 +1516,25 @@ planen ser det jag inte tänkt på.
 instruktionen lovade en lista som aldrig visades. Övningarna står nu i passet, med loppets egen
 lista när veckan har ett fokuslopp. Inga nya träningstal: övningarna var redan skrivna och
 granskade.
+
+**F-21 och F-22 är åtgärdade 2026-11-16**, båda i `scripts/print-profiles.ts`.
+
+**F-21 var en riktig lucka.** Loppet och öppningspasset låg utanför alla sportkolumner medan
+tidskolumnen räknade med dem, så P4:s loppvecka saknade **445 av 445 minuter**. Öppningspasset
+ligger nu i sin grens kolumn — det är tjugo till trettio minuter lugn träning, inte en del av
+loppet — och loppet har fått en egen kolumn. Raden går ihop:
+
+    tid = skidor + cykel + simning + löpning + styrka + lopp
+
+Kontrollerat på de veckor Isabelle pekade ut: P1 v36 (205 = 53 + 25 + 52 + 75), P5 v35
+(265 = 190 + 75), P4 v6 (445 = 25 + 420) och P6 v21 (255 = 45 + 210).
+
+**F-22 var inget fel i planen.** P6 v21 har en konditionsbudget på trettio minuter, eftersom R-25
+redan räknat av Lidingöloppet som veckans belastning. De trettio fördelas som skidor 3, cykel 3,
+simning 2 och löpning 22. De åtta första kan aldrig bli pass, och löpningens hårda pass är
+dessutom begränsat till tjugo minuter i nedtrappningen (R-15) — alltså tio minuter kvar.
+Beteendet är rätt; det var förklaringen som saknades. Översikten säger nu att oplacerade minuter
+i en loppvecka är väntade.
 
 **F-11 är åtgärdad 2026-11-16**, och den hade två fel i sig.
 

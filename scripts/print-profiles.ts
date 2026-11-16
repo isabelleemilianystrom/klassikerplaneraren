@@ -9,7 +9,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { raceById, rules } from '../src/engine/config.ts';
-import { addDays, weekdayOf } from '../src/engine/dates.ts';
+import { weekdayOf } from '../src/engine/dates.ts';
 import { buildWeekPlans, type WeekPlan } from '../src/engine/sessions.ts';
 import { volumeChecks, volumeWarnings } from '../src/engine/volume.ts';
 import { courseAdvice, midProgrammeStarts, midProgrammeWarnings } from '../src/engine/warnings.ts';
@@ -152,8 +152,16 @@ function skrivVecka(plan: WeekPlan): string[] {
  * två tredjedelar av siffrorna inte med veckan längre ner i filen — en gren
  * kunde visa tid utan att ha ett enda pass.
  *
- * Loppet och öppningspasset räknas inte med: de ligger utanför budgeten
- * (R-04, R-25), och veckans tid står ändå i tidskolumnen.
+ * **Loppveckan går ihop sedan 2026-11-16** (fynd F-21). Förut låg loppet och
+ * öppningspasset utanför alla kolumner medan tidskolumnen räknade med dem, så
+ * en loppvecka saknade upp till 445 minuter utan att något sa varför. Nu
+ * ligger öppningspasset i sin grens kolumn — det är ett träningspass som alla
+ * andra — och loppet har en egen kolumn. Raden stämmer:
+ *
+ *     tid = skidor + cykel + simning + löpning + styrka + lopp
+ *
+ * Den oplacerade tiden står utanför den summan: det är budget som aldrig blev
+ * något pass.
  */
 function skrivÖversikt(input: PlanInput, planer: readonly WeekPlan[]): string[] {
   void input;
@@ -163,24 +171,26 @@ function skrivÖversikt(input: PlanInput, planer: readonly WeekPlan[]): string[]
     '--------',
     '',
     '  Minuterna är passens, inte budgetens. "oplac." är tid som inte fick plats (R-29).',
+    '  Raden går ihop: tid = skidor + cykel + simning + löpning + styrka + lopp.',
     '',
-    '  v  datum       fas            tid         skidor  cykel   simning löpning styrka  oplac.',
+    '  I en loppvecka är konditionsbudgeten liten — R-25 har redan räknat av loppet som',
+    '  veckans belastning — och de minuter som blir över är smulor under ett passgolv.',
+    '  Tio oplacerade minuter i en vecka med ett lopp på tre och en halv timme är alltså',
+    '  väntat, inte ett fel.',
+    '',
+    '  v  datum       fas            tid         skidor  cykel   simning löpning styrka  lopp    oplac.',
   ];
 
   for (const plan of planer) {
-    const öppningspass = plan.sessions.filter((session) =>
-      plan.sessions.some(
-        (kandidat) =>
-          kandidat.type === 'race' &&
-          kandidat.sport === session.sport &&
-          kandidat.date === addDays(session.date, 1),
-      ),
+    // Öppningspasset hör till sin gren: det är tjugo till trettio minuter
+    // lugn träning dagen före loppet, inte en del av loppet.
+    const träning = plan.sessions.filter(
+      (session) => session.type !== 'rest' && session.type !== 'race',
     );
 
-    const träning = plan.sessions.filter(
-      (session) =>
-        session.type !== 'rest' && session.type !== 'race' && !öppningspass.includes(session),
-    );
+    const loppminuter = plan.sessions
+      .filter((session) => session.type === 'race')
+      .reduce((summa, session) => summa + session.minutes, 0);
 
     const minuterI = (gren: string): number =>
       träning
@@ -197,6 +207,7 @@ function skrivÖversikt(input: PlanInput, planer: readonly WeekPlan[]): string[]
         kol(minuterI('swim')) +
         kol(minuterI('run')) +
         kol(minuterI('strength')) +
+        kol(loppminuter) +
         (plan.budget.unplacedMinutes === 0 ? '-' : String(plan.budget.unplacedMinutes)),
     );
   }
