@@ -1008,11 +1008,19 @@ describe('R-13: långpasset lånar tid de sista veckorna', () => {
   });
 
   it('låter långpasset överstiga grenens andel när grenen är smal', () => {
-    // En plan på sex timmar i veckan: skidorna får inte 55 procent nog för ett
-    // långpass på fyra timmar, så lånet måste träda in.
+    // En plan på sex timmar i veckan: cykeln får inte 55 procent nog för ett
+    // långpass på fem timmar, så lånet måste träda in.
+    //
+    // Prövades på Vasaloppets veckor fram till 2026-11-15. Sedan fokuset
+    // utökades till åtta veckor får skidorna hela veckan där, och då finns
+    // ingen smal gren att låna åt. Vätternrundan har kvar sina tre veckor och
+    // prövar samma mekanism — lånet träder in i 415 av 1 905 veckor med
+    // långpass, så det är inte en kvarleva.
     const sista = buildWeekPlans(P1).filter(
       ({ week, budget }) =>
-        week.phase === 'specific' && week.focusRaceId === 'vasaloppet' && budget.enduranceMinutes > 0,
+        week.phase === 'specific' &&
+        week.focusRaceId === 'vatternrundan' &&
+        budget.enduranceMinutes > 0,
     );
 
     const lånade = sista.filter((plan) => {

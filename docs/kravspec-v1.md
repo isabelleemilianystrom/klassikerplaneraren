@@ -562,8 +562,31 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
 - **R-45** (tillagd 2026-11-04) **Fullt fokus de sista veckorna före ett lopp.** Ett lopp kan ha
   ett tal för hur många veckor före loppveckan som hela konditionstiden går till loppets gren.
   De övriga grenarna **pausas** de veckorna. Talet står per lopp i `races.json` som
-  `fullFocusWeeks`, och talet är **`taperWeeks` + 1**: nedtrappningen plus den sista
-  loppspecifika veckan. *(Utökad 2026-11-04 från bara Vasaloppet till alla lopp.)*
+  `fullFocusWeeks`. För Vätternrundan och Vansbrosimningen är talet **`taperWeeks` + 1**:
+  nedtrappningen plus den sista loppspecifika veckan. *(Utökad 2026-11-04 från bara Vasaloppet
+  till alla lopp.)*
+
+  **Vasaloppet har hela den specifika fasen — åtta veckor** *(beslut 2026-11-15)*. Med tre veckor
+  gav en vecka sex veckor före loppet tre cykelpass och ett skidpass, i en vecka vars hela syfte
+  var Vasaloppet. Fokuset låg i minuterna men inte i passen. Vasaloppet är därmed det enda loppet
+  där talet inte är `taperWeeks` + 1.
+
+  **Undantaget: teknikpasset pausas aldrig.** Är användaren nybörjare i skidor eller simning
+  behåller den grenen sitt enda teknikpass i veckan (R-21), även under fullt fokus. Utan
+  undantaget sjönk P1:s simtid de första arton veckorna från över åtta timmar till fem och tio —
+  och hon ska simma 3 km i Vansbroån i juli. Projektets äldsta lärdom gäller: teknikgrenar går
+  inte att komma ikapp på slutet. Med undantaget blir simtiden 12,2 timmar.
+
+  Undantaget gäller **bara grenar vars lopp återstår**. Är loppet avklarat behövs tekniken inte,
+  och R-36 nollar grenen ändå — minuterna läckte då vidare till en gren som är pausad.
+
+  Nedtrappningen berörs inte av undantaget: R-21 gäller bas och specifik fas, så de sista
+  veckorna före loppet är rena.
+
+  **Det löser inte F-9 i de magraste veckorna.** P1:s vecka 12 har 192 konditionsminuter: 60 går
+  till simteknik och 132 till skidor — men långpasset tar alla 132, så skidorna får ett enda pass
+  ändå. Fokuset är rätt, passfördelningen inte. Se F-9 och förslaget att sänka
+  `longSession.maxShareOfWeek`.
 
   | Lopp | Veckor | Varför |
   | --- | --- | --- |

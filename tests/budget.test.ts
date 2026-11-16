@@ -843,11 +843,19 @@ describe('R-14: löptiden ökar högst tio procent i veckan', () => {
     for (const { vecka, budget } of rader) {
       resultat.push({ index: vecka.index, run: budget.bySport.run ?? 0, ref });
 
+      // R-45: en vecka där löpningen är pausad säger ingenting om vad kroppen
+      // är van vid, och duger därför inte som referens. Motorn gör samma
+      // avdrag i `budget.ts`; utan det här blev testets modell en annan än
+      // regelns, och den skillnaden syntes först när Vasaloppets fokus gick
+      // från tre veckor till åtta.
+      const pausad = pausedSportsIn(input, vecka).has('run');
+
       const normal =
         (vecka.phase === 'base' || vecka.phase === 'specific') &&
         !vecka.isDeload &&
         vecka.raceIds.length === 0 &&
-        budget.enduranceMinutes > 0;
+        budget.enduranceMinutes > 0 &&
+        !pausad;
 
       if (normal) ref = budget.bySport.run ?? ref;
     }
@@ -1120,13 +1128,16 @@ describe('R-39: grenar som får vänta', () => {
 describe('R-45: fullt fokus de sista veckorna före loppet', () => {
   const VECKOR = raceById('vasaloppet').fullFocusWeeks as number;
 
-  it('har talet i konfigurationen för varje lopp, som taperWeeks plus en', () => {
-    // Nedtrappningen plus den sista loppspecifika veckan. De två långa loppen
-    // får tre veckor, de två korta två.
-    expect(VECKOR).toBe(3);
+  it('har talet i konfigurationen för varje lopp', () => {
+    // Vasaloppet fick hela den specifika fasen 2026-11-15: sex veckor före
+    // loppet gav den gamla regeln tre cykelpass och ett skidpass i en vecka
+    // som skulle handla om Vasaloppet. De övriga följer fortfarande
+    // nedtrappningen plus en vecka.
+    expect(VECKOR).toBe(8);
+    expect(VECKOR, 'hela den specifika fasen').toBe(raceById('vasaloppet').specificWeeks);
 
     const väntat = {
-      vasaloppet: 3,
+      vasaloppet: 8,
       vatternrundan: 3,
       vansbrosimningen: 2,
     } as const;
@@ -1134,7 +1145,9 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
     for (const [id, tal] of Object.entries(väntat)) {
       const race = raceById(id as RaceId);
       expect(race.fullFocusWeeks, id).toBe(tal);
-      expect(race.fullFocusWeeks, `${id}: taperWeeks + 1`).toBe(race.taperWeeks + 1);
+      if (id !== 'vasaloppet') {
+        expect(race.fullFocusWeeks, `${id}: taperWeeks + 1`).toBe(race.taperWeeks + 1);
+      }
     }
 
     // Lidingöloppet saknar talet med flit: R-14 begränsar hur mycket löptiden
@@ -1144,7 +1157,7 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
     expect(raceById('lidingoloppet').fullFocusWeeks).toBeUndefined();
   });
 
-  it('ger skidorna hela veckan de tre veckorna före Vasaloppet', () => {
+  it('ger skidorna veckan de åtta veckorna före Vasaloppet, utom teknikpasset', () => {
     // Tre veckor före Vasaloppet gör ingen nytta i bassängen. Det som avgör
     // är skidtid, och de timmarna gör mer nytta där.
     const vasaVecka = veckorMedBudget(P1).find(({ vecka }) =>
@@ -1159,12 +1172,29 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
     );
 
     expect(fokusveckor.length).toBe(VECKOR);
-    for (const { vecka, budget } of fokusveckor) {
-      expect(budget.bySport.ski, `v${vecka.index} skidor`).toBe(budget.enduranceMinutes);
 
-      for (const sport of ['bike', 'swim', 'run'] as const) {
+    for (const { vecka, budget } of fokusveckor) {
+      // Cykel och löpning pausas helt.
+      for (const sport of ['bike', 'run'] as const) {
         expect(budget.bySport[sport] ?? 0, `v${vecka.index} ${sport}`).toBe(0);
       }
+
+      // Simningen är undantaget: P1 är nybörjare, och teknik går inte att ta
+      // igen på slutet. Ett pass i veckan, resten skidor. I nedtrappningen
+      // gäller inte R-21, så där är veckan ren.
+      const sim = budget.bySport.swim ?? 0;
+      const teknikfas = vecka.phase === 'base' || vecka.phase === 'specific';
+
+      if (!teknikfas) {
+        expect(sim, `v${vecka.index} simning i nedtrappningen`).toBe(0);
+      } else {
+        expect(sim, `v${vecka.index} simning`).toBeGreaterThan(0);
+        expect(sim, `v${vecka.index} simning är ett pass`).toBeLessThanOrEqual(
+          Math.floor(budget.enduranceMinutes / 2),
+        );
+      }
+
+      expect(budget.bySport.ski, `v${vecka.index} skidor`).toBe(budget.enduranceMinutes - sim);
     }
   });
 
@@ -1196,11 +1226,28 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
 
         expect(pausade.has(fokus as never), `${namn} v${vecka.index}`).toBe(false);
 
-        // Fokusgrenen har merparten av veckan. Full hundra procent går inte
-        // att kräva: löptaket i R-14 får skära bort minuter och lägga dem i
-        // en pausad gren, eftersom skaderisken väger tyngre än fokus.
+        // Fokusgrenen har merparten av veckan, och allt som ligger kvar i en
+        // annan gren har ett skäl. Ett tal att jämföra mot duger inte: i P1:s
+        // magraste fokusvecka är konditionstiden 192 minuter och ett simpass
+        // 60 av dem, alltså 31 procent — R-40:s golv, inte ett fel.
         const andel = (budget.bySport[fokus as never] ?? 0) / budget.enduranceMinutes;
-        expect(andel, `${namn} v${vecka.index} ${fokus}`).toBeGreaterThan(0.85);
+        expect(andel, `${namn} v${vecka.index} ${fokus}`).toBeGreaterThan(0.5);
+
+        for (const gren of ['ski', 'bike', 'swim', 'run'] as const) {
+          if (gren === fokus || (budget.bySport[gren] ?? 0) === 0) continue;
+
+          // Antingen en nybörjargren som behåller sitt teknikpass (R-21) och
+          // vars lopp återstår, eller löpning som R-14 skurit minuter till.
+          const teknikgren = profil.levels[gren] === 'new' && (gren === 'ski' || gren === 'swim');
+          const kvarVarandeLopp = profil.races.some(
+            (lopp) => raceById(lopp.id).sport === gren && lopp.date >= vecka.startDate,
+          );
+
+          expect(
+            (teknikgren && kvarVarandeLopp) || gren === 'run',
+            `${namn} v${vecka.index}: ${gren} har ${budget.bySport[gren]} min utan skäl`,
+          ).toBe(true);
+        }
       }
     }
 
@@ -1211,8 +1258,9 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
     expect([...sedda].sort()).toEqual(['vasaloppet', 'vatternrundan']);
   });
 
-  it('ger fokusgrenen hela veckan när löptaket inte är i vägen', () => {
-    // Skidor och cykel har inget tak som R-14, så där blir det hundra procent.
+  it('ger fokusgrenen hela veckan när inget annat krav är i vägen', () => {
+    // Skidor och cykel har inget tak som R-14, så där blir det hundra procent
+    // — utom när en nybörjargren behåller sitt teknikpass (R-21).
     for (const [namn, profil] of Object.entries(PROFILES)) {
       for (const { vecka, budget } of veckorMedBudget(profil)) {
         if (pausedSportsIn(profil, vecka).size === 0) continue;
@@ -1220,8 +1268,13 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
         const fokus = raceById(vecka.focusRaceId as RaceId).sport;
         if (fokus === 'run') continue;
 
+        // Teknikpasset i en nybörjargren pausas aldrig, så dra av det.
+        const teknik = (['ski', 'swim'] as const)
+          .filter((gren) => gren !== fokus && profil.levels[gren] === 'new')
+          .reduce((summa, gren) => summa + (budget.bySport[gren] ?? 0), 0);
+
         expect(budget.bySport[fokus as never], `${namn} v${vecka.index}`).toBe(
-          budget.enduranceMinutes,
+          budget.enduranceMinutes - teknik,
         );
       }
     }
@@ -1263,7 +1316,7 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
     return veckorMedBudget(input).filter(({ vecka }) => pausedSportsIn(input, vecka).size > 0);
   }
 
-  it('ger tre fokusveckor oavsett var Vasaloppet ligger i planen', () => {
+  it('ger åtta fokusveckor oavsett var Vasaloppet ligger i planen', () => {
     const ordningar: [string, string, [RaceId, string][]][] = [
       ['Vasaloppet först', '2026-11-02', [
         ['vasaloppet', '2027-03-07'],
@@ -1293,10 +1346,19 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
 
       expect(flaggade.length, namn).toBe(VECKOR);
 
-      // Varje fokusvecka har Vasaloppet som fokus och bara skidor kvar.
+      // Varje fokusvecka har Vasaloppet som fokus, och skidorna får veckan
+      // utom teknikpasset i en gren användaren är nybörjare i (R-21).
       for (const { vecka, budget } of flaggade) {
         expect(vecka.focusRaceId, `${namn} v${vecka.index}`).toBe('vasaloppet');
-        expect(budget.bySport.ski, `${namn} v${vecka.index}`).toBe(budget.enduranceMinutes);
+
+        const annat = (['bike', 'swim', 'run'] as const).reduce(
+          (summa, gren) => summa + (budget.bySport[gren] ?? 0),
+          0,
+        );
+
+        expect(budget.bySport.ski, `${namn} v${vecka.index}`).toBe(
+          budget.enduranceMinutes - annat,
+        );
       }
 
       // Fokusveckorna ligger omedelbart före loppveckan, var den än hamnar.
@@ -1305,7 +1367,8 @@ describe('R-45: fullt fokus de sista veckorna före loppet', () => {
       )?.vecka.index as number;
 
       const index = flaggade.map(({ vecka }) => vecka.index).sort((a, b) => a - b);
-      expect(index, namn).toEqual([loppveckan - 3, loppveckan - 2, loppveckan - 1]);
+      const väntat = Array.from({ length: VECKOR }, (_, i) => loppveckan - VECKOR + i);
+      expect(index, namn).toEqual(väntat);
     }
   });
 

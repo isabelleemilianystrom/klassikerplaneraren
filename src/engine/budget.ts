@@ -479,7 +479,7 @@ function splitBetweenSports(
   // Då finns inget att fördela och inget att vikta — övriga grenar pausas.
   const fulltFokus = fullFocusSportIn(week, sports, races);
   if (fulltFokus !== null) {
-    const andelar = sports.map((sport) => (sport === fulltFokus ? 1 : 0));
+    const andelar = fullFocusShares(fulltFokus, minutes, week, input, sports, races);
     return applyNewLevelLimits(
       distribute(minutes, sports, andelar),
       input,
@@ -508,6 +508,68 @@ function splitBetweenSports(
   );
 
   return applyNewLevelLimits(medGolv, input, sports, week, races, minutes);
+}
+
+/**
+ * Andelarna i en vecka med fullt fokus (R-45, R-21).
+ *
+ * Hela veckan går till loppets gren — **utom** det enda teknikpasset i en gren
+ * användaren är nybörjare i. Undantaget kom till 2026-11-15, när Vasaloppets
+ * fokus utökades från tre veckor till åtta: med åtta veckors rent skidfokus
+ * sjönk nybörjarens simtid de första arton veckorna från över åtta timmar till
+ * fem och tio, och hon ska simma 3 km i Vansbroån i juli.
+ *
+ * Det hade motsagt projektets äldsta lärdom, den som står i CLAUDE.md sedan
+ * v0: teknikgrenar går inte att komma ikapp på slutet. Fokus före Vasaloppet
+ * och teknik som inte går att ta igen är båda sanna, och åtta veckor rymmer
+ * dem båda — ett simpass i veckan är en timme av sex.
+ *
+ * Nedtrappningen berörs inte: `needsTechnique` gäller bara bas och specifik
+ * fas, så de sista veckorna före loppet är rena.
+ */
+function fullFocusShares(
+  focus: TrainedSport,
+  minutes: number,
+  week: WeekSkeleton,
+  input: PlanInput,
+  sports: readonly TrainedSport[],
+  races: readonly PlacedRace[],
+): number[] {
+  if (minutes <= 0) return sports.map((sport) => (sport === focus ? 1 : 0));
+
+  const klara = finishedSports(week, races);
+
+  const reserverat = new Map<TrainedSport, number>();
+  for (const sport of sports) {
+    if (sport === focus) continue;
+    if (!nyITeknikgren(sport, week.phase, input)) continue;
+
+    // Undantaget finns för att man inte ska tappa en teknik man fortfarande
+    // behöver. Är grenens lopp redan kört behövs den inte, och R-36 nollar
+    // grenen ändå — minuterna läckte då vidare till en gren som är pausad.
+    if (klara.has(sport)) continue;
+
+    reserverat.set(sport, passgolv(sport));
+  }
+
+  const summa = [...reserverat.values()].reduce((a, b) => a + b, 0);
+  if (summa === 0) return sports.map((sport) => (sport === focus ? 1 : 0));
+
+  // Fokusgrenen behåller alltid merparten. Är veckan så kort att teknikpassen
+  // skulle ta över är det fokuset som gäller — regeln finns för loppet.
+  const tak = Math.floor(minutes / 2);
+  const faktor = summa > tak ? tak / summa : 1;
+
+  const andelar = sports.map((sport) => {
+    const egen = reserverat.get(sport);
+    return egen === undefined ? 0 : (egen * faktor) / minutes;
+  });
+
+  const tillAndra = andelar.reduce((a, b) => a + b, 0);
+  const i = sports.indexOf(focus);
+  if (i !== -1) andelar[i] = 1 - tillAndra;
+
+  return andelar;
 }
 
 /**
