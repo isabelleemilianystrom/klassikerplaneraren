@@ -1261,14 +1261,78 @@ describe('R-37: passet är det primära, grenen är ett val', () => {
     }
   });
 
-  it('har aldrig passets egen gren som alternativ', () => {
+  it('har passets egen gren som alternativ bara som ett annat redskap', () => {
+    // Ett alternativ utan `substitutedAs` är ett byte av gren, och ett byte
+    // till samma gren är inget byte. Sedan beslutet 2026-11-16 får grenen
+    // däremot stå där som en utrustningsvariant — stakmaskinen på ett snöpass
+    // — och då ska den vara just passets egen gren, aldrig någon annans.
     for (const [namn, planer] of alla()) {
       for (const plan of planer) {
         for (const session of plan.sessions) {
+          const grenbyten = session.alternatives.filter((a) => a.substitutedAs === undefined);
+          const redskap = session.alternatives.filter((a) => a.substitutedAs !== undefined);
+
           expect(
-            session.alternatives.map((a) => a.sport),
+            grenbyten.map((a) => a.sport),
             `${namn} ${session.id}`,
           ).not.toContain(session.sport);
+
+          for (const variant of redskap) {
+            expect(variant.sport, `${namn} ${session.id} ${variant.substitutedAs}`).toBe(
+              session.sport,
+            );
+          }
+        }
+      }
+    }
+  });
+
+  it('erbjuder stakmaskinen på snöpass till den som har en', () => {
+    // Fyndet bakom beslutet 2026-11-16: svarade användaren ja på snö syntes
+    // stakmaskinen aldrig i planen, eftersom R-17 bara ersätter när snön
+    // fattas och nästan all skidträning ligger i november–mars.
+    const snöpass = buildWeekPlans(P2)
+      .flatMap((plan) => plan.sessions)
+      .filter(
+        (session) =>
+          session.sport === 'ski' &&
+          session.substitutedAs === undefined &&
+          rules.sessionAlternatives.forTypes.includes(session.type),
+      );
+
+    expect(snöpass.length).toBeGreaterThan(0);
+
+    const med = snöpass.filter((session) =>
+      session.alternatives.some((a) => a.substitutedAs === 'ski.skiErg'),
+    );
+    expect(med.length).toBeGreaterThan(0);
+    expect(med[0]?.alternatives.find((a) => a.substitutedAs === 'ski.skiErg')?.title).toBe(
+      'Stakmaskin',
+    );
+  });
+
+  it('erbjuder inte stakmaskinen till den som inte har en', () => {
+    const utan: PlanInput = { ...P2, equipment: { ...P2.equipment, skiErg: false } };
+
+    for (const session of buildWeekPlans(utan).flatMap((plan) => plan.sessions)) {
+      expect(
+        session.alternatives.map((a) => a.substitutedAs),
+        `${session.id}`,
+      ).not.toContain('ski.skiErg');
+    }
+  });
+
+  it('erbjuder inte stakmaskinen på pass längre än R-44:s tak', () => {
+    // Taket gäller lika mycket för ett erbjudande som för en ersättning: samma
+    // rörelse i två och en halv timme sliter på armbågar och axlar.
+    const tak = rules.substitutions.bySport.ski?.find((k) => k.key === 'ski.skiErg')?.maxMinutes;
+    expect(tak).toBeDefined();
+
+    for (const [namn, planer] of alla()) {
+      for (const plan of planer) {
+        for (const session of plan.sessions) {
+          if (!session.alternatives.some((a) => a.substitutedAs === 'ski.skiErg')) continue;
+          expect(session.minutes, `${namn} ${session.id}`).toBeLessThanOrEqual(tak as number);
         }
       }
     }

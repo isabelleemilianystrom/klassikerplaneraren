@@ -131,7 +131,12 @@ function skrivVecka(plan: WeekPlan): string[] {
     // R-37: grenarna passet också kan göras i.
     if (session.alternatives.length > 0) {
       const alternativ = session.alternatives
-        .map((a) => (a.note === '' ? SPORTNAMN[a.sport] : `${SPORTNAMN[a.sport]} (${a.note})`))
+        .map((a) => {
+          // En utrustningsvariant är samma gren med ett annat redskap, och det
+          // är redskapets namn som säger något — inte grenens en gång till.
+          const namn = a.substitutedAs === undefined ? SPORTNAMN[a.sport] : a.title;
+          return a.note === '' ? namn : `${namn} (${a.note})`;
+        })
         .join(', ');
       rader.push(`  ${' '.repeat(12)} Kan också göras som: ${alternativ}`);
     }

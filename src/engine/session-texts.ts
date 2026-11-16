@@ -317,8 +317,10 @@ export function alternativesFor(session: Session, input: PlanInput): SessionAlte
 
   const månad = monthOf(session.date);
 
-  return regler.interchangeable
-    .filter((kandidat): kandidat is TrainedSport => kandidat !== session.sport)
+  const gren = session.sport;
+
+  const grenar = regler.interchangeable
+    .filter((kandidat): kandidat is TrainedSport => kandidat !== gren)
     .filter((kandidat) => inSeason(kandidat, månad))
     .filter((kandidat) => hasEquipmentFor(kandidat, input, session.date))
     .map((kandidat) => ({
@@ -326,6 +328,76 @@ export function alternativesFor(session: Session, input: PlanInput): SessionAlte
       title: alternativeTitle(kandidat, session.type),
       note: regler.notes[kandidat] ?? '',
     }));
+
+  return [...grenar, ...equipmentAlternativesFor(gren, session, input)];
+}
+
+/**
+ * Redskapen passet också går att göra med (R-37).
+ *
+ * Samma gren, samma tid, samma zon — ett annat redskap. Stakmaskinen är det
+ * R-17 väljer när snön fattas, men den som har en kan vilja använda den en dag
+ * när spåret inte går att åka, och då ska den stå i planen.
+ *
+ * Förut gjorde den inte det: svarade användaren ja på snö nämnde inget av 74
+ * skidpass stakmaskinen, eftersom nästan all skidträning ligger i
+ * november–mars och R-17 bara ersätter när snön saknas. Rutan i formuläret
+ * kunde alltså inte påverka något.
+ *
+ * Erbjuds bara när passet går att genomföra i redskapet: R-44:s tak gäller
+ * lika mycket för ett erbjudande som för en ersättning, så ett långpass på två
+ * och en halv timme får inget stakmaskinsalternativ.
+ *
+ * Ett pass som redan *är* en ersättning får inga alternativ alls — det rensar
+ * `withSubstitution`, och därför står det aldrig "Stakmaskin (om spåret inte
+ * går att åka)" på ett pass som redan görs i stakmaskinen.
+ */
+function equipmentAlternativesFor(
+  sport: TrainedSport,
+  session: Session,
+  input: PlanInput,
+): SessionAlternative[] {
+  const utrustning = input.equipment as Record<string, boolean>;
+  const alternativ: SessionAlternative[] = [];
+
+  for (const variant of rules.sessionAlternatives.equipmentVariants[sport] ?? []) {
+    const regel = substituteRuleFor(sport, variant.key);
+
+    if (!regel.needs.every((flagga) => utrustning[flagga] === true)) continue;
+    if (regel.maxMinutes !== undefined && session.minutes > regel.maxMinutes) continue;
+
+    const text = sessionTexts.substitutes[variant.key];
+    if (text === undefined) {
+      throw new Error(`config/sessions.json saknar ersättningen "${variant.key}"`);
+    }
+
+    alternativ.push({
+      sport,
+      title: text.title,
+      note: variant.note,
+      substitutedAs: variant.key,
+    });
+  }
+
+  return alternativ;
+}
+
+/**
+ * Ersättningen med den nyckeln ur R-17:s prioritetsordning.
+ *
+ * Utrustningskravet och R-44:s tak står där, och ska stå på ett enda ställe:
+ * ett alternativ med egna siffror skulle kunna erbjuda det R-17 säger nej till.
+ */
+function substituteRuleFor(
+  sport: TrainedSport,
+  key: string,
+): { needs: readonly string[]; maxMinutes?: number | undefined } {
+  const regel = rules.substitutions.bySport[sport]?.find((kandidat) => kandidat.key === key);
+  if (regel === undefined) {
+    throw new Error(`config/rules.json saknar ersättningen "${key}" för grenen "${sport}"`);
+  }
+
+  return regel;
 }
 
 /** Alternativets titel, med grenens egen variant om det finns en. */

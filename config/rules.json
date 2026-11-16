@@ -341,6 +341,15 @@
       "bike": "sliter mindre på kroppen",
       "run": ""
     },
+    "_equipmentVariants": "R-37, beslut 2026-11-16: redskap användaren har och som gör samma pass på ett annat sätt, erbjudna som alternativ också när grenen går att göra som den är. Förut syntes stakmaskinen bara som ersättning när snön fattades (R-17), och för den som svarat ja på snö nämnde 0 av 74 skidpass den — rutan i formuläret kunde aldrig påverka planen, eftersom nästan all skidträning ligger i november–mars och Vasaloppet avslutar grenen i mars (R-36). Nyckeln pekar på samma ersättning som R-17 använder i substitutions.bySport, så utrustningskravet och R-44:s tak står på ett enda ställe.",
+    "equipmentVariants": {
+      "ski": [
+        {
+          "key": "ski.skiErg",
+          "note": "om spåret inte går att åka"
+        }
+      ]
+    },
     "_requiresAnyEquipment": "Skidor som alternativ kräver något att åka på. Finns snö (vintermånad plus tillgång) krävs ingenting. Cykel står inte med: alla som gör en klassiker har cykel."
   },
   "substitutions": {

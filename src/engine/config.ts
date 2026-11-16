@@ -363,6 +363,20 @@ export const rulesSchema = z.object({
     _requiresAnyEquipment: z.string(),
     requiresAnyEquipment: z.partialRecord(sport, z.array(z.string().min(1)).min(1)),
     notes: z.partialRecord(sport, z.string()),
+    _equipmentVariants: z.string(),
+    /** Redskap samma pass också går att göra med (R-37). */
+    equipmentVariants: z.partialRecord(
+      sport,
+      z
+        .array(
+          z.object({
+            /** Nyckel i `substitutions.bySport` för grenen, och i sessions.json. */
+            key: z.string().min(1),
+            note: z.string(),
+          }),
+        )
+        .min(1),
+    ),
   }),
   /** R-39: grenar som kan vänta tills deras egen uppbyggnad börjar. */
   deferredSports: z.object({

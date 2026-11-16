@@ -364,6 +364,20 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   - **med utrustning användaren har** — minst en av grenens flaggor räcker. Skidor går med snö
     eller rullskidor, men också med en stakmaskin.
 
+  **Redskap räknas också som ett alternativ** *(tillagt 2026-11-16, fynd F-24)*. Ett pass kan
+  också stå kvar i sin gren och göras med något annat: ett skidpass på snö bär **Stakmaskin *(om
+  spåret inte går att åka)*** för den som har en. Alternativet är samma gren, samma tid och samma
+  zon — bara ett annat redskap — och bär därför ersättningens nyckel i `substitutedAs`, så att
+  gränssnittet visar redskapets namn i stället för grenens.
+
+  Villkoren är R-17:s och R-44:s, och de står på ett enda ställe: redskapet hämtas ur
+  `substitutions.bySport`, så utrustningskravet och den längsta tiden i redskapet är desamma för
+  ett erbjudande som för en ersättning. Ett långpass över nittio minuter får alltså inget
+  stakmaskinsalternativ.
+
+  Ett pass som **redan är** en ersättning får inga alternativ alls (R-17), så det står aldrig
+  "Stakmaskin" på ett pass som redan görs i stakmaskinen.
+
   **Loppet, vilan, styrkan och teknikpassen har inga alternativ.** Ett teknikpass i simning kan
   inte bytas mot cykel — då är det inte längre samma pass.
 
@@ -1280,6 +1294,8 @@ Regelmotorn testas mot regler som alltid ska gälla, inte mot exakta planer. Tes
 - Profil utan spår och utan komplement: skidpassen blir stavgång i backe, också i januari (R-17) *(ändrat 2026-11-04)*
 - Profil med spår: skidpassen i november–mars är orörda, och först utanför dem ersätts de (R-17) (tillagt 2026-11-04)
 - Profil med rullskidor och stakmaskin: rullskidorna väljs först (R-17) (tillagt 2026-11-04)
+- Profil med spår **och** stakmaskin: skidpassen i november–mars är snöpass, och bär stakmaskinen som alternativ så länge passet håller R-44:s tak (R-37) *(tillagt 2026-11-16)*
+- Ett utrustningsalternativ erbjuds aldrig till den som saknar utrustningen, aldrig över redskapets tak, och alltid i passets egen gren (R-37, R-44) *(tillagt 2026-11-16)*
 - Cykelpass i januari med trainer: inomhus. Samma pass i juni: ute. Utan trainer: ute året om (R-20) (tillagt 2026-11-04)
 - Samma profil med stakmaskin: skidpassen blir stakmaskin i stället för stavgång (R-17) (tillagt 2026-10-28)
 - Simpass utan simhall ersätts aldrig, någon månad (R-18 borttagen 2026-11-04)
@@ -1535,6 +1551,23 @@ planen ser det jag inte tänkt på.
 | **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | **Åtgärdad 2026-11-16** |
 | **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | **Förklarad 2026-11-16.** Beteendet är rätt, texten saknades |
 | **F-23** | **P2 v17: sex träningsdagar i rad i en nedtrappningsvecka** | **Verifierat.** Invarianten kräver bara *en* vilodag och är därför grön |
+| **F-24** | **Stakmaskinen i formuläret kunde inte påverka något.** R-17 använder den bara som ersättning när snön fattas, och nästan all skidträning ligger i november–mars, så för den som svarat ja på snö nämnde **0 av 74** skidpass den | **Åtgärdad 2026-11-16.** Den erbjuds nu som alternativ på snöpass: 47 av 72 pass i P2, resten är teknikpass eller längre än R-44:s tak |
+
+**F-24 kom inte ur den här granskningen** utan ur appen, 2026-11-16: varför föreslår inget
+pass stakmaskinen fast rutan är ikryssad? Svaret var att den inte kunde göra det. R-17 använder
+redskapen bara som *ersättning* när snön fattas, och mätningen visar vad det betyder: med snö och
+stakmaskin ersattes 0 av 74 skidpass, utan snö 73 av 74. Eftersom R-36 avslutar skidorna i mars
+ligger i stort sett all skidträning i november–mars, så för den som kommer åt ett spår var rutan
+verkningslös. **Beslut 2026-11-16:** R-17:s ersättningsordning rörs inte, men redskapet erbjuds
+som *alternativ* på snöpass. Planen blir identisk — det är bara ett val mer som syns, och det
+täcker det vanliga fallet att spåret inte går att åka just den dagen.
+
+Två saker höll emot i koden och var värda att veta. **"Kan också göras som" kände bara till
+grenar:** båda vyerna byggde raden ur `alternativ.sport` och använde aldrig `title`, så en
+utrustningsvariant hade blivit "Längdskidor" en gång till. Och **invarianten "aldrig passets egen
+gren som alternativ" gick sönder**, vilket den skulle: den var skriven när ett alternativ alltid
+var ett grenbyte. Förväntningen är nu den skarpare — passets egen gren får bara stå där som ett
+redskap, och ett redskap får bara stå i passets egen gren.
 
 **F-20 är åtgärdad 2026-11-15.** `strengthExercises` fanns i schemat och i `config/sessions.json`
 — med en egen lista per lopp — men **ingen kod läste den**. Det var död konfiguration, och

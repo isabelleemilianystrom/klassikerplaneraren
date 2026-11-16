@@ -675,6 +675,44 @@ export const INVARIANTS: readonly Invariant[] = [
   },
 
   {
+    name: 'ett utrustningsalternativ kräver utrustningen och håller R-44:s tak',
+    rule: 'R-37, R-44',
+    check: (input, plans) => {
+      const utrustning = input.equipment as Record<string, boolean>;
+      const brott: string[] = [];
+
+      for (const p of plans) {
+        for (const s of träning(p)) {
+          for (const a of s.alternatives) {
+            if (a.substitutedAs === undefined) continue;
+
+            const regel = rules.substitutions.bySport[a.sport]?.find(
+              (kandidat) => kandidat.key === a.substitutedAs,
+            );
+            if (regel === undefined) {
+              brott.push(`v${p.week.index} ${s.id}: okänt redskap ${a.substitutedAs}`);
+              continue;
+            }
+            if (!regel.needs.every((flagga) => utrustning[flagga] === true)) {
+              brott.push(`v${p.week.index} ${s.id}: ${a.substitutedAs} utan utrustningen`);
+            }
+            if (regel.maxMinutes !== undefined && s.minutes > regel.maxMinutes) {
+              brott.push(
+                `v${p.week.index} ${s.id}: ${a.substitutedAs} på ${s.minutes} min, tak ${regel.maxMinutes}`,
+              );
+            }
+            if (a.sport !== s.sport) {
+              brott.push(`v${p.week.index} ${s.id}: redskap i grenen ${a.sport}`);
+            }
+          }
+        }
+      }
+
+      return brott;
+    },
+  },
+
+  {
     name: 'varje långpass i löpning erbjuder cykel som alternativ',
     rule: 'R-37, R-47',
     check: (_input, plans) => {

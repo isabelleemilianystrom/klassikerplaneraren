@@ -278,11 +278,14 @@ function Pass({ session }: { session: Session }) {
       {session.alternatives.length > 0 && (
         <p className="mt-2 text-sm text-neutral-600">
           {PLAN.alternatives(
-            session.alternatives.map((alternativ) =>
-              alternativ.note === ''
-                ? (sessionSport({ ...session, sport: alternativ.sport }) as string)
-                : `${sessionSport({ ...session, sport: alternativ.sport })} (${alternativ.note})`,
-            ),
+            session.alternatives.map((alternativ) => {
+              // R-37: en utrustningsvariant bär redskapets namn, inte grenens.
+              const namn =
+                alternativ.substitutedAs === undefined
+                  ? (sessionSport({ ...session, sport: alternativ.sport }) as string)
+                  : alternativ.title;
+              return alternativ.note === '' ? namn : `${namn} (${alternativ.note})`;
+            }),
           )}
         </p>
       )}

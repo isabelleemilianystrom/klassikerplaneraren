@@ -105,10 +105,18 @@ export interface PlanInput {
  * byta ska kunna göra det utan att tappa poängen med passet.
  */
 export interface SessionAlternative {
+  /** Grenen alternativet görs i. Passets egen gren för en utrustningsvariant. */
   sport: TrainedSport;
   title: string;
   /** Kort skäl, t.ex. "om det finns snö". Tom när inget villkor gäller. */
   note: string;
+  /**
+   * Satt när alternativet är samma gren med ett annat redskap (R-37):
+   * nyckeln i `sessions.json`, precis som `Session.substitutedAs`. Då är
+   * `title` redskapets namn, och gränssnittet visar det i stället för grenens
+   * — "Stakmaskin", inte "Längdskidor" en gång till.
+   */
+  substitutedAs?: string;
 }
 
 export interface Session {
