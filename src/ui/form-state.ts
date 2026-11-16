@@ -125,6 +125,36 @@ export function validateStep1(state: FormState): FieldErrors {
 }
 
 /**
+ * Anmärkningar om loppdatumen, per fält (F-15).
+ *
+ * Skilt från `validateStep1`, och det är hela poängen: det här **hindrar
+ * ingen**. `races.json` innehåller de datum arrangörerna hade publicerat när
+ * appen byggdes, och i oktober 2026 slutade de vid 2027. Den som planerar för
+ * 2028 har rätt och appen fel, så svaret får inte avvisas.
+ *
+ * Men en felskrivning ska synas. Fyndet var en referensprofil med Vasaloppet
+ * den 13 december och en Vansbrosimning på en fredag, utan att något sa ifrån.
+ * Första halvan av F-15 blev uppmaningen att kontrollera datumet mot
+ * arrangören; det här är andra halvan, som säger *vad vi tror att det är*.
+ */
+export function raceDateNotices(state: FormState): Record<string, string> {
+  const anmärkningar: Record<string, string> = {};
+
+  for (const val of selectedRaces(state)) {
+    if (!isIsoDate(val.date)) continue;
+
+    const lopp = raceById(val.id);
+    if (lopp.dates.includes(val.date)) continue;
+
+    anmärkningar[`date-${val.id}`] = FORM.step1.dateNotPublished(lopp.name, [
+      ...lopp.dates,
+    ]);
+  }
+
+  return anmärkningar;
+}
+
+/**
  * Sista loppdatum som går att bygga en plan till (R-01).
  *
  * Planen går från startdatumets vecka till veckan med sista loppet, och taket

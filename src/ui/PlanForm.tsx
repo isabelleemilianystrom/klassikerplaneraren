@@ -18,6 +18,7 @@ import {
   initialState,
   sportsToRate,
   toPlanInput,
+  raceDateNotices,
   validateStep1,
   validateStep2,
   validateStep3,
@@ -153,6 +154,11 @@ function Steginikator({ steg, av }: { steg: number; av: number }) {
 
 /** Steg 1: loppen och deras datum (K-02). */
 function Steg1({ state, setState, felFör }: StegProps) {
+  // F-15: visas medan man skriver, inte först när man trycker på Nästa. Det
+  // är ingen spärr — det är upplysningen att vi tror att loppet går en annan
+  // dag, och den hjälper bara om den kommer vid datumet man just valde.
+  const anmärkningar = raceDateNotices(state);
+
   function byggOm(
     id: string,
     ändring: Partial<{ selected: boolean; date: string; goal: RaceChoice['goal'] }>,
@@ -209,10 +215,9 @@ function Steg1({ state, setState, felFör }: StegProps) {
                     />
                   </label>
 
-                  {/* F-15: appen kan inte validera datumet, men den kan be
-                      användaren göra det. Står alltid, inte bara när ett
-                      datum saknas — ett fel datum som redan är ifyllt är
-                      svårare att upptäcka än ett tomt fält. */}
+                  {/* F-15: uppmaningen att kontrollera datumet står alltid,
+                      inte bara när ett datum saknas — ett fel datum som redan
+                      är ifyllt är svårare att upptäcka än ett tomt fält. */}
                   <p className="mt-2 text-sm text-neutral-600">
                     {FORM.step1.dateCheckHelp}
                   </p>
@@ -227,6 +232,18 @@ function Steg1({ state, setState, felFör }: StegProps) {
                   {felFör(`date-${race.id}`) !== undefined && (
                     <Fel text={felFör(`date-${race.id}`) as string} />
                   )}
+
+                  {/* F-15, andra halvan: datumet är inget av dem vi känner
+                      till. En anmärkning som inte hindrar — listan slutar vid
+                      2027, och den som planerar längre fram har rätt. Ett
+                      felmeddelande på fältet går före: det är mer akut, och
+                      två rader om samma datum är en för mycket. */}
+                  {felFör(`date-${race.id}`) === undefined &&
+                    anmärkningar[`date-${race.id}`] !== undefined && (
+                      <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                        {anmärkningar[`date-${race.id}`]}
+                      </p>
+                    )}
 
                   {/* R-38: vad användaren vill med loppet. */}
                   <fieldset className="mt-4">

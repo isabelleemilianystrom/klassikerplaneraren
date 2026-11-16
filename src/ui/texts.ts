@@ -160,6 +160,12 @@ export const FORM = {
     goalHelp:
       'Svaret styr hur mycket tid grenen får. Vill du bara ta dig i mål räcker det med att bli trygg och hålla tekniken — då går tiden till de lopp du siktar på i stället.',
     datePlaceholderMissing: 'Arrangören har inte publicerat något datum som passar – skriv in det själv',
+    // F-15, andra halvan: appen känner till de datum arrangörerna publicerat,
+    // och kan säga när svaret inte är något av dem. En anmärkning, inte ett
+    // fel: listan slutar vid 2027, och den som planerar längre fram har rätt.
+    dateNotPublished: (lopp: string, kända: string[]): string =>
+      `Vi har ${lopp} på ${kända.join(' och ')}. Stämmer ditt datum? Lopp flyttas, och vår lista ` +
+      `kan vara inaktuell – men kontrollera årtalet och dagen mot arrangören.`,
     errors: {
       noRace: 'Välj minst ett lopp för att komma vidare.',
       dateMissing: 'Ange ett datum för loppet.',

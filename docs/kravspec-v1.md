@@ -1543,7 +1543,7 @@ planen ser det jag inte tänkt på.
 | **F-12** | **Löpning två dagar efter ett 30 km terränglopp.** P6 v22: 71 + 70 min löpning på måndag och tisdag efter Lidingöloppet på lördagen. Gäller **alla lopp**, inte bara Lidingö | **Verifierat. Tre lösningar prövade 2026-11-16, alla bryter mot en befintlig regel — se nedan** |
 | **F-13** | **Loppveckan.** Skidprofilerna har fem vilodagar i rad och sedan 25 min. Simveckan är det omvända: P5 v35 har 83 + 82 + 25 min simning före ett lopp på fredagen, mot 60 min veckan före — ingen nedtrappning alls | Öppet |
 | **F-14** | **Rampen utgår från budgeten, inte från vad användaren gör i dag.** P4 går 3 h 36 → 6 h och P6 4 h 48 → 8 h mellan v2 och v3, **+67 %** | Öppet. Kräver ett nytt fält: nuvarande veckotimmar |
-| **F-15** | **Loppdatum valideras inte.** P4 har Vasaloppet 2026-12-13, P5 har Vansbro på en fredag mot de andras lördag. `races.json` har redan en lista `dates` att validera mot | **Halvt åtgärdad 2026-11-15:** varje loppdatum i formuläret bär nu en uppmaning att kontrollera mot arrangören. Valideringen mot `dates` återstår |
+| **F-15** | **Loppdatum valideras inte.** P4 har Vasaloppet 2026-12-13, P5 har Vansbro på en fredag mot de andras lördag. `races.json` har redan en lista `dates` att validera mot | **Åtgärdad 2026-11-16.** Uppmaningen att kontrollera mot arrangören kom 2026-11-15; nu säger formuläret också vilka datum vi känner till när svaret inte är ett av dem |
 | **F-16** | **P4:s långpass är 3 h 30 min stavgång i uppförsbacke**, vilket varken är realistiskt eller snällt mot axlar och armbågar. Texten refererar dessutom till ett skidpass som inte finns. Planen borde lyfta skidtunnel eller att skjuta fram till 2027 hårdare | Öppet |
 | **F-17** | **Fasta måltider för alla nivåer.** Vasaloppet 7 h, Vätternrundan 11 h, Lidingö 3 h 30, Vansbro 1 h 15 — oavsett om användaren är nybörjare eller van. Tiden styr loppveckan och pacingtexten, så den bör bero på nivån | Öppet |
 | **F-18** | **Långa simuppehåll.** P3 simmar inte alls v4–v29 och P5 inte v1–v27 — ett halvår utan vatten för nivån Erfaren. P5 saknar dessutom simning fyra veckor kring Vätternrundan. P1 (nybörjare) får ett pass på 60–80 min och ingen simning v15–v18; två pass på 40 min vore bättre | Öppet |
@@ -1554,6 +1554,14 @@ planen ser det jag inte tänkt på.
 | **F-23** | **P2 v17: sex träningsdagar i rad i en nedtrappningsvecka** | **Verifierat.** Invarianten kräver bara *en* vilodag och är därför grön |
 | **F-25** | **Planvyn öppnades på mitten.** K-16:s effekt centrerade innevarande vecka vid varje montering, också för en nyskapad plan — rubriken, sammanfattningen, varningarna och säkerhetstexten hamnade ovanför skärmens kant. Vyn behöll dessutom formulärets rullning, eftersom den inte byter sida | **Åtgärdad 2026-11-16** |
 | **F-24** | **Stakmaskinen i formuläret kunde inte påverka något.** R-17 använder den bara som ersättning när snön fattas, och nästan all skidträning ligger i november–mars, så för den som svarat ja på snö nämnde **0 av 74** skidpass den | **Åtgärdad 2026-11-16.** Den erbjuds nu som alternativ på snöpass: 47 av 72 pass i P2, resten är teknikpass eller längre än R-44:s tak |
+
+**F-15 är klar 2026-11-16.** Andra halvan är `raceDateNotices` i `form-state.ts`: är det valda
+datumet inte ett av dem i `races.json` står det vid fältet vilka vi har. Att det är en
+**anmärkning och inte ett valideringsfel** är hela poängen — listan innehöll bara 2027 när appen
+byggdes, så den som planerar för 2028 har rätt och appen fel, och ett svar som avvisas vore
+värre än inget svar alls. Ett riktigt fel på fältet går före, så samma datum aldrig får två
+rader. Prövat i appen: Vasaloppet den 13 december 2026 ger anmärkningen och släpper ändå vidare
+till steg 2.
 
 **F-25 är åtgärdad 2026-11-16.** K-16:s acceptanskriterium gäller *återbesöket* — "givet en
 sparad plan där några veckor passerat" — men effekten i vyn skilde inte på det och en nyskapad

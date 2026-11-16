@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rules } from '../src/engine/config.ts';
+import { races, rules } from '../src/engine/config.ts';
 import { addWeeks } from '../src/engine/dates.ts';
 import { weekCount } from '../src/engine/weeks.ts';
 import { PROFILES } from './profiles.ts';
@@ -9,6 +9,7 @@ import type { PlanInput } from '../src/engine/types.ts';
 import {
   hoursRange,
   initialState,
+  raceDateNotices,
   selectedRaces,
   sportsToRate,
   toPlanInput,
@@ -111,6 +112,63 @@ describe('K-02: steg 1, lopp och datum', () => {
 
   it('underkänner en ogiltig första träningsdag', () => {
     expect(validateStep1({ ...ifyllt(), startDate: 'i morgon' }).startDate).toBeDefined();
+  });
+});
+
+describe('F-15: anmärkning när loppdatumet inte är ett publicerat', () => {
+  function medDatum(datum: string): FormState {
+    const state = ifyllt();
+
+    return {
+      ...state,
+      races: state.races.map((race) =>
+        race.id === 'vasaloppet' ? { ...race, date: datum } : race,
+      ),
+    };
+  }
+
+  it('säger ingenting om det förifyllda datumet', () => {
+    // Förvalet kommer ur samma lista och ska aldrig ifrågasättas.
+    expect(raceDateNotices(ifyllt())).toEqual({});
+  });
+
+  it('anmärker på ett datum som inte står i races.json', () => {
+    // Fyndet: en profil hade Vasaloppet den 13 december utan att något sa
+    // ifrån. Nu nämns de datum vi känner till.
+    const anmärkning = raceDateNotices(medDatum('2026-12-13'))['date-vasaloppet'];
+
+    expect(anmärkning).toBeDefined();
+    expect(anmärkning).toContain('2027-03-07');
+  });
+
+  it('hindrar ingen — anmärkningen är inget valideringsfel', () => {
+    // Listan slutar vid 2027. Den som planerar för 2028 har rätt och appen
+    // fel, så svaret får inte avvisas.
+    const state = medDatum('2028-03-05');
+
+    expect(raceDateNotices(state)['date-vasaloppet']).toBeDefined();
+    expect(validateStep1(state)['date-vasaloppet']).toBeUndefined();
+  });
+
+  it('säger ingenting om ett lopp som inte är valt', () => {
+    const state = initialState(IDAG);
+    expect(raceDateNotices(state)).toEqual({});
+  });
+
+  it('säger ingenting om ett datum som inte går att läsa', () => {
+    // Då är det formatfelet som ska visas, inte en gissning om vilket lopp
+    // det kunde ha varit.
+    expect(raceDateNotices(medDatum('inget datum'))).toEqual({});
+    expect(raceDateNotices(medDatum(''))).toEqual({});
+  });
+
+  it('nämner varje publicerat datum för loppet', () => {
+    const vasa = races.races.find((race) => race.id === 'vasaloppet');
+    const anmärkning = raceDateNotices(medDatum('2026-12-13'))['date-vasaloppet'] as string;
+
+    for (const datum of vasa?.dates ?? []) {
+      expect(anmärkning).toContain(datum);
+    }
   });
 });
 
