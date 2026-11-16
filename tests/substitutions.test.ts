@@ -259,7 +259,21 @@ describe('ersättningarna i stort', () => {
         const text = sessionTexts.substitutes[session.substitutedAs];
         expect(text, `${namn} ${session.substitutedAs}`).toBeDefined();
         expect(session.title).toBe(text?.title);
-        expect(session.instruction).toBe(text?.instruction);
+
+        // Ersättningens text står alltid med. Ett hårt pass behåller dessutom
+        // sin struktur före den (F-11): "zon 4 i 72 minuter" går inte att
+        // genomföra, och hur passet delas upp hör till träningen, inte till
+        // platsen man gör den på.
+        expect(session.instruction, `${namn} ${session.id}`).toContain(
+          text?.instruction as string,
+        );
+
+        const hårt = session.type === 'tempo' || session.type === 'intervals';
+        if (hårt) {
+          expect(session.instruction, `${namn} ${session.id}`).toMatch(/^Värm upp i [0-9]+ minuter/);
+        } else {
+          expect(session.instruction, `${namn} ${session.id}`).toBe(text?.instruction);
+        }
       }
     }
   });

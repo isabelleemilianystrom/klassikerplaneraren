@@ -132,12 +132,24 @@ function färdig(
   restMinutes: number,
   minutes: number,
 ): HardStructure {
-  const arbete = blocks * blockMinutes + (blocks - 1) * restMinutes;
+  // Överskottet går till blocken, inte till nedvarvningen. Ett pass på 49
+  // minuter rymmer två åttaminutersblock och fick därmed tio minuter över —
+  // de hamnade i nedvarvningen, som blev tjugo minuter efter sexton minuters
+  // tröskelarbete. Tiden hör till arbetet.
+  //
+  // Tillskottet är begränsat av sig självt: hade överskottet räckt till ett
+  // block till hade ett block till fått plats, så det är alltid mindre än
+  // blocket plus vilan. Med två block kan de alltså växa med högst fem
+  // minuter, och inget nytt tal behövs i konfigurationen.
+  const tillgängligt = minutes - upp * 2 - (blocks - 1) * restMinutes;
+  const längd = Math.max(blockMinutes, Math.floor(tillgängligt / blocks));
+
+  const arbete = blocks * längd + (blocks - 1) * restMinutes;
 
   return {
     warmUp: upp,
     blocks,
-    blockMinutes,
+    blockMinutes: längd,
     restMinutes,
     coolDown: minutes - upp - arbete,
   };

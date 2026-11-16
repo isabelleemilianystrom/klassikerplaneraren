@@ -254,10 +254,17 @@ export function withSubstitution(session: Session, input: PlanInput): Session {
     throw new Error(`config/sessions.json saknar ersättningen "${vald.key}"`);
   }
 
+  // F-11: ett hårt pass förlorade sin struktur när det ersattes. P5 hade 22
+  // tröskelpass som blev "zon 4" i ett enda block på upp till 72 minuter,
+  // vilket inte går att genomföra. Strukturen hör till träningen och inte till
+  // platsen — den följer därför med, och ersättningens text läggs efter.
+  const hårt = session.type === 'tempo' || session.type === 'intervals';
+  const grund = hårt ? `${session.instruction} ` : '';
+
   return {
     ...session,
     title: text.title,
-    instruction: text.instruction + splitNoteFor(vald, text, session.minutes),
+    instruction: grund + text.instruction + splitNoteFor(vald, text, session.minutes),
     substitutedAs: vald.key,
     // En riktig ersättning är redan ett byte av gren. Att dessutom lista
     // alternativ skulle ge tre sätt att göra samma pass, vilket är ett för

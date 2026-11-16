@@ -1497,7 +1497,7 @@ planen ser det jag inte tänkt på.
 | # | Fynd | Status |
 | --- | --- | --- |
 | **F-10** | **Passlängden matchar inte passtexten.** Tröskeltexten ("4 × 8 min, 3 min vila, 10 min upp och ner") kräver ~61 min, intervalltexten (2 × 10 × 30/30 s) ~43 min. Planerna ger ofta 20–35 min | **Åtgärdad 2026-11-15.** Var 77 pass; nu 0 av 5 082 granskade |
-| **F-11** | **P5:s tröskelpass inomhus saknar struktur.** 21 pass i ett enda block på upp till 72 min i zon 4, med den generiska texten "Samma tid och samma zon som cykelpasset" — och det finns inget cykelpass att referera till | Öppet |
+| **F-11** | **P5:s tröskelpass inomhus saknar struktur.** 22 pass i ett enda block på upp till 72 min i zon 4, med den generiska texten "Samma tid och samma zon som cykelpasset" — och det finns inget cykelpass att referera till | **Åtgärdad 2026-11-16** |
 | **F-12** | **Löpning två dagar efter ett 30 km terränglopp.** P6 v22: 71 + 70 min löpning på måndag och tisdag efter Lidingöloppet på lördagen | **Verifierat** |
 | **F-13** | **Loppveckan.** Skidprofilerna har fem vilodagar i rad och sedan 25 min. Simveckan är det omvända: P5 v35 har 83 + 82 + 25 min simning före ett lopp på fredagen, mot 60 min veckan före — ingen nedtrappning alls | Öppet |
 | **F-14** | **Rampen utgår från budgeten, inte från vad användaren gör i dag.** P4 går 3 h 36 → 6 h och P6 4 h 48 → 8 h mellan v2 och v3, **+67 %** | Öppet. Kräver ett nytt fält: nuvarande veckotimmar |
@@ -1516,6 +1516,28 @@ planen ser det jag inte tänkt på.
 instruktionen lovade en lista som aldrig visades. Övningarna står nu i passet, med loppets egen
 lista när veckan har ett fokuslopp. Inga nya träningstal: övningarna var redan skrivna och
 granskade.
+
+**F-11 är åtgärdad 2026-11-16**, och den hade två fel i sig.
+
+**Strukturen försvann vid ersättning.** `withSubstitution` ersatte hela instruktionen, så
+uppdelningen F-10 räknat fram gick förlorad: P5 hade 22 tröskelpass som blev "zon 4" i ett enda
+block på upp till 72 minuter. Strukturen hör till träningen och inte till platsen, så den följer
+nu med, och ersättningens text läggs efter:
+
+> Värm upp i 10 minuter. Kör sedan 3 × 8 minuter i ett tempo där du kan säga korta meningar, med
+> 3 minuter lugnt emellan. Varva ner 10 minuter. Trainer, spinning eller motionscykel fungerar
+> lika bra för konditionen …
+
+**Den dinglande referensen.** Alla fyra ersättningstexterna inledde med "Samma tid och samma zon
+som skidpasset" — men ersättningen *är* passet, det finns inget annat att jämföra med. Samma fel
+står i F-16. Meningen är borttagen ur alla fyra; minuterna och zonen står ändå på raden i
+gränssnittet.
+
+**Och fixen avslöjade ett tredje fel i F-10:s egen avrundning.** Ett pass på 49 minuter rymmer två
+åttaminutersblock och fick tio minuter över — de hamnade i nedvarvningen, som blev **tjugo
+minuter efter sexton minuters tröskelarbete**. Överskottet går nu till blocken i stället, och
+49 minuter blir 10 upp, 2 × 13 min, 3 min vila, 10 ner. Tillskottet är begränsat av sig självt:
+hade överskottet räckt till ett block till hade ett block till fått plats. Inget nytt tal behövdes.
 
 **F-10 är åtgärdad 2026-11-15.** Tröskel- och intervalltexterna är mallar, och
 `src/engine/session-structure.ts` räknar fram strukturen ur passets minuter.

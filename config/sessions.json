@@ -69,24 +69,24 @@
     "ski.skiErg": {
       "_rule": "R-17",
       "title": "Stakmaskin",
-      "instruction": "Samma tid och samma zon som skidpasset. Håll lätt böjda knän och tyngden framåt, och dra med hela kroppen.",
+      "instruction": "Håll lätt böjda knän och tyngden framåt, och dra med hela kroppen.",
       "_splitNote": "R-44: läggs till när passet är längre än taket. {minutes} är tiden som blir över och {other} är vad den görs som.",
       "splitNote": " Ta högst 90 minuter i maskinen och de sista {minutes} minuterna som {other} — samma rörelse längre än så sliter på armbågar och axlar, och är tungt att hålla ut. Går det inte fungerar den tiden på trainern inomhus lika bra."
     },
     "ski.poleWalk": {
       "_rule": "R-17",
       "title": "Stavgång i backe",
-      "instruction": "Samma tid och samma zon som skidpasset. Gå i uppförsbacke med stavar och tryck ifrån med armarna i varje steg."
+      "instruction": "Gå i uppförsbacke med stavar och tryck ifrån med armarna i varje steg."
     },
     "bike.indoor": {
       "_rule": "R-20",
       "title": "Cykel inomhus",
-      "instruction": "Samma tid och samma zon som cykelpasset. Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret."
+      "instruction": "Trainer, spinning eller motionscykel fungerar lika bra för konditionen, och inomhus är tiden i sadeln lättare att styra än ute i vintermörkret."
     },
     "ski.rollerSkis": {
       "_rule": "R-17",
       "title": "Rullskidor",
-      "instruction": "Samma tid och samma zon som skidpasset. Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer."
+      "instruction": "Rullskidor ligger närmast snö av allt du kan göra utan den — tekniken är densamma, och staklängden sitter kvar när snön kommer."
     }
   },
   "strengthExercises": {
@@ -183,5 +183,6 @@
       "run": "Skorna, strumporna och kläderna — och ryggsäcken eller bältet om du tänkt bära ett."
     }
   },
-  "_hardSessionTemplates": "Tröskel- och intervalltexterna är mallar sedan 2026-11-15 (fynd F-10). Platshållarna fylls av session-structure.ts ur passets minuter: {upp}, {antal}, {block}, {vila}, {ner}. Skriv aldrig fasta tal i dem igen — texten måste kunna följas på den tid passet har."
+  "_hardSessionTemplates": "Tröskel- och intervalltexterna är mallar sedan 2026-11-15 (fynd F-10). Platshållarna fylls av session-structure.ts ur passets minuter: {upp}, {antal}, {block}, {vila}, {ner}. Skriv aldrig fasta tal i dem igen — texten måste kunna följas på den tid passet har.",
+  "_substitutes": "Texterna inledde med \"Samma tid och samma zon som skidpasset\" fram till 2026-11-16. Det var en dinglande referens: ersättningen *är* passet, det finns inget annat pass att jämföra med. Minuterna och zonen står dessutom på raden i gränssnittet. Skriv bara hur ersättningen görs."
 }
