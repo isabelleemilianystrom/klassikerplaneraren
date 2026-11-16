@@ -182,7 +182,7 @@ export default function Home() {
       <button
         type="button"
         onClick={börjaFrånStart}
-        className="mt-8 rounded-lg bg-neutral-900 px-6 py-3 text-lg font-medium text-white hover:bg-neutral-700"
+        className="mt-8 rounded-lg bg-neutral-900 px-6 py-3 text-lg font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
       >
         {HOME.start}
       </button>

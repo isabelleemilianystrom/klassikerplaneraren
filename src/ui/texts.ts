@@ -40,6 +40,24 @@ export const SPORT_NAMES: Record<TrainedSport | 'strength', string> = {
   strength: 'Styrka',
 };
 
+/**
+ * Grenens färg i gränssnittet.
+ *
+ * Används som en liten prick på passet och som vänsterkant, aldrig som enda
+ * bärare av betydelse: grenens namn står alltid utskrivet bredvid. Gul är
+ * reserverad för varningar och förekommer inte här.
+ *
+ * Tillagd 2026-11-16 efter en designgenomgång: en vecka med fyra pass var helt
+ * grå, och man fick läsa varje rad för att se vad som var vad.
+ */
+export const SPORT_COLORS: Record<TrainedSport | 'strength', { dot: string; edge: string }> = {
+  ski: { dot: 'bg-sky-500', edge: 'border-l-sky-500' },
+  bike: { dot: 'bg-violet-500', edge: 'border-l-violet-500' },
+  swim: { dot: 'bg-teal-500', edge: 'border-l-teal-500' },
+  run: { dot: 'bg-emerald-500', edge: 'border-l-emerald-500' },
+  strength: { dot: 'bg-neutral-400', edge: 'border-l-neutral-400' },
+};
+
 /** Nivåernas beskrivningar, ordagrant ur avsnitt 5. */
 export const LEVELS: { value: Level; name: string; description: string }[] = [
   {

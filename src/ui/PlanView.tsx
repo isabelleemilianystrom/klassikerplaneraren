@@ -26,7 +26,7 @@ import {
   weekFocus,
 } from './plan-view.ts';
 import { explanations } from '../engine/config.ts';
-import { FIXED, PLAN, STORAGE } from './texts.ts';
+import { FIXED, PLAN, SPORT_COLORS, STORAGE } from './texts.ts';
 
 interface Props {
   input: PlanInput;
@@ -57,7 +57,7 @@ export default function PlanView({
   const grupper = groupByPhase(plans);
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-10">
+    <div className="mx-auto max-w-2xl px-5 py-10">
       <header>
         <h1 className="text-3xl font-bold">{PLAN.heading}</h1>
         <p className="mt-3 text-neutral-700">
@@ -171,7 +171,7 @@ function Vecka({ plan, öppen, aktuell, ref, onToggle }: VeckaProps) {
         type="button"
         onClick={onToggle}
         aria-expanded={öppen}
-        className="flex w-full items-baseline gap-3 px-4 py-3 text-left"
+        className="flex w-full items-baseline gap-3 rounded-lg px-4 py-3 text-left hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
       >
         <span className="w-14 shrink-0 text-sm font-medium text-neutral-500">
           {PLAN.weekNumber(plan.week.index)}
@@ -220,7 +220,14 @@ function Veckovy({ plan }: { plan: WeekPlan }) {
 
             <ul className="mt-1 space-y-2">
               {sessions.map((session) => (
-                <li key={session.id} className="rounded-lg bg-white p-3 ring-1 ring-neutral-200">
+                <li
+                  key={session.id}
+                  className={`rounded-lg border-l-4 bg-white p-3 ring-1 ring-neutral-200 ${
+                    session.sport === null
+                      ? 'border-l-neutral-200'
+                      : SPORT_COLORS[session.sport].edge
+                  }`}
+                >
                   <Pass session={session} />
                 </li>
               ))}
@@ -250,7 +257,16 @@ function Pass({ session }: { session: Session }) {
     <div>
       <p className="font-medium">
         {session.title}
-        {gren !== null && <span className="font-normal text-neutral-600"> — {gren}</span>}
+        {gren !== null && session.sport !== null && (
+          <span className="font-normal text-neutral-600">
+            {' — '}
+            <span
+              aria-hidden="true"
+              className={`mr-1 inline-block size-2 rounded-full align-middle ${SPORT_COLORS[session.sport].dot}`}
+            />
+            {gren}
+          </span>
+        )}
         <span className="ml-2 text-sm font-normal text-neutral-600">
           {formatMinutes(session.minutes)}
         </span>

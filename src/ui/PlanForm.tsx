@@ -94,7 +94,7 @@ export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
           <button
             type="button"
             onClick={bakåt}
-            className="rounded-lg border border-neutral-300 px-5 py-3 font-medium hover:bg-neutral-50"
+            className="rounded-lg border border-neutral-300 px-5 py-3 font-medium hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
           >
             {FORM.back}
           </button>
@@ -102,7 +102,7 @@ export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
         <button
           type="button"
           onClick={framåt}
-          className="rounded-lg bg-neutral-900 px-5 py-3 font-medium text-white hover:bg-neutral-700"
+          className="rounded-lg bg-neutral-900 px-5 py-3 font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
         >
           {steg === STEG ? FORM.submit : FORM.next}
         </button>
@@ -145,7 +145,7 @@ function Steg1({ state, setState, felFör }: StegProps) {
           type="date"
           value={state.startDate}
           onChange={(e) => setState({ ...state, startDate: e.target.value })}
-          className="rounded-lg border border-neutral-300 px-3 py-2.5"
+          className="rounded-lg border border-neutral-300 px-3 py-2.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
         />
       </Fält>
 
@@ -155,9 +155,9 @@ function Steg1({ state, setState, felFör }: StegProps) {
 
         <ul className="mt-3 space-y-3">
           {state.races.map((race) => (
-            <li key={race.id} className="rounded-lg border border-neutral-200">
+            <li key={race.id} className="rounded-lg border border-neutral-200 transition-colors has-[:checked]:border-neutral-400 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-900">
               {/* Etiketten täcker hela kortet, så tryckytan blir stor nog. */}
-              <label className="flex cursor-pointer items-start gap-3 p-4">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-4 hover:bg-neutral-50">
                 <input
                   type="checkbox"
                   checked={race.selected}
@@ -253,7 +253,7 @@ function Steg2({ state, setState, felFör }: StegProps) {
               {LEVELS.map((nivå) => (
                 <label
                   key={nivå.value}
-                  className="flex items-start gap-3 rounded-lg border border-neutral-200 p-3"
+                  className="flex cursor-pointer items-start gap-3 rounded-lg border border-neutral-200 p-3 hover:bg-neutral-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-900"
                 >
                   <input
                     type="radio"
@@ -317,7 +317,7 @@ function Steg3({ state, setState, felFör }: StegProps) {
           {EQUIPMENT.map((del) => (
             <label
               key={del.key}
-              className="flex items-start gap-3 rounded-lg border border-neutral-200 p-3"
+              className="flex cursor-pointer items-start gap-3 rounded-lg border border-neutral-200 p-3 hover:bg-neutral-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-900"
             >
               <input
                 type="checkbox"
@@ -347,7 +347,7 @@ function Dagval({ value, onChange }: { value: Weekday; onChange: (dag: Weekday) 
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value) as Weekday)}
-      className="rounded-lg border border-neutral-300 px-3 py-2.5"
+      className="rounded-lg border border-neutral-300 px-3 py-2.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
     >
       {WEEKDAYS.map((dag) => (
         <option key={dag.value} value={dag.value}>
