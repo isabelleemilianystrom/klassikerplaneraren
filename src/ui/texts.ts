@@ -143,8 +143,7 @@ export const FORM = {
     // referensprofilerna hade Vasaloppet i december, och ingenting i appen
     // sa ifrån. Datumen i `races.json` är de som var publicerade när appen
     // byggdes, och lopp flyttas.
-    dateCheckHelp:
-      'Kontrollera datumet mot arrangörens sida innan du planerar efter det. Appen känner bara till de datum som var publicerade när den byggdes, och loppdatum ändras.',
+    dateCheckHelp: 'Kontrollera datumet mot arrangörens sida.',
     goalLabel: 'Vad vill du med loppet?',
     goals: [
       {
