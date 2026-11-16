@@ -1353,6 +1353,42 @@ Fyra riktade tester gick röda. Att krympa långpasset är alltså fel lever: be
 det gick, och reglerna säger att det inte gör det. **Det som återstår av F-9 kräver att du avgör
 vilken av R-13 och R-46 som får ge vika, eller om 28 procent är acceptabelt.** Hör till Isabelle.
 
+**`longSession.maxShareOfWeek` prövades 2026-11-16 och duger inte.** Efter att Vasaloppet fått
+åtta fokusveckor (R-45) syntes F-9 tydligare: veckan handlar om rätt gren, men i de magraste
+veckorna tar långpasset hela grenens tid ändå. Taket på 70 procent såg ut som den enkla
+hävstången — det rör varken lånet i R-13 eller upptrappningen i R-46, och vid större budgetar
+binder grenens eget tak långt innan andelen gör det, så ändringen skulle bara träffa dem som
+tränar lite. Mätt över de sex profilerna och 200 slumpade planer:
+
+| | 0,7 *(gällande)* | 0,6 | 0,5 |
+| --- | --- | --- | --- |
+| Veckor utan kvalitetspass | 27 % | – | 26 % |
+| Fokusgrenen har bara långpasset | 18 % | – | 16 % |
+| Oplacerade minuter | 172 941 | 172 865 | 172 829 |
+| P1 v12 *(192 min kondition)* | ski/långpass 132 | ski/långpass 115 | **ski/teknik 36 + ski/långpass 96** |
+| Tester | gröna | 4 röda | 5 röda |
+
+**Slutsatsen: ingen siffra fungerar.** Vid 0,5 får P1:s vecka 12 äntligen två skidpass — men
+vinsten i stort är en procentenhet, och ett riktigt krav faller: *"ger de två långa loppen
+långpass på minst halva loppets tid"*. Vätternrundan beräknas till elva timmar, kravet är att
+det längsta cykelpasset når 40 procent av den tiden, och vid 0,5 kommer det bara till 0,318 —
+3 timmar 30 i stället för 4 timmar 24. Det är samma sak Isabelle påpekade i profilgranskningen:
+sextimmarsprofilerna toppar för lågt inför 30 mil.
+
+Vid 0,6 uteblir till och med vinsten: långpasset blir 115 minuter, 17 blir kvar, och passgolvet
+är 20 — skidorna får ett enda pass ändå, och Vätternrundan går sönder likafullt.
+
+**Konflikten är verklig och går inte att lösa med ett tal:**
+
+- Veckan i exemplet kräver att långpasset tar **högst 58 procent** för att grenen ska få två pass.
+- Vätternrundan kräver att det tar **minst omkring 62 procent** i den profil som ligger närmast
+  gränsen.
+
+Det som skulle krävas är en **villkorad** regel — att långpasset lämnar plats bara de veckor
+grenen faktiskt har ett till obligatoriskt pass, i stället för alltid. Det är i praktiken den
+`egetUtrymme`-spärr som provades och rullades tillbaka den 2026-11-05, och den kräver att R-13:s
+lån och R-46:s upptrappning får ett uttalat undantag. **Det beslutet är inte taget.**
+
 **F-9 hittades 2026-11-05 vid en granskning mot SPÅRAT:s längdguide**, inte av harnessen. Guiden
 säger att en träningsvecka har ett kvalitetspass, och att det är det *sista* man stryker när tiden
 inte räcker. Vår motor stryker det först. Av 6 556 bas- och specifikveckor saknar **2 044** både
