@@ -1,9 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import { raceById, rules, sessions as sessionTexts } from '../src/engine/config.ts';
 import { addDays, weekdayOf } from '../src/engine/dates.ts';
+import { placeRaces } from '../src/engine/weeks.ts';
 import { buildWeekPlans, trainingDayCount, type WeekPlan } from '../src/engine/sessions.ts';
 import type { PlanInput, Session, Weekday } from '../src/engine/types.ts';
 import { P1, P2, P3, P4, P5, P6, PROFILES } from './profiles.ts';
+
+/**
+ * Sant i veckan där långpasset når grenens tak (R-50).
+ *
+ * Toppveckan är den sista specifika veckan före nedtrappningen, och där viker
+ * R-28:s andelstak. Veckan blir i praktiken ett enda pass, och det är
+ * avsikten: Vätternrundans 315 kilometer förbereds med ett långt pass, inte
+ * med summan av korta.
+ */
+function profilen(namn: string): PlanInput {
+  return (PROFILES as Record<string, PlanInput>)[namn] as PlanInput;
+}
+
+function ärToppvecka(plan: WeekPlan, input: PlanInput): boolean {
+  if (plan.week.phase !== 'specific' || plan.week.focusRaceId === null) return false;
+
+  const lopp = placeRaces(input).find(
+    (kandidat: { id: string; weekIndex: number }) => kandidat.id === plan.week.focusRaceId,
+  );
+  if (lopp === undefined) return false;
+
+  const kvar = lopp.weekIndex - (plan.week.index - 1);
+  return kvar === raceById(plan.week.focusRaceId).taperWeeks;
+}
 
 /** Passen som är riktig träning — vila räknas inte som ett pass. */
 function träning(plan: WeekPlan): Session[] {
@@ -147,6 +172,9 @@ describe('R-13 och R-28: långpasset', () => {
       for (const plan of planer) {
         const lång = träning(plan).find((session) => session.type === 'long');
         if (lång === undefined) continue;
+
+        // R-50: toppveckan är undantagen — där får långpasset hela veckan.
+        if (ärToppvecka(plan, profilen(namn))) continue;
 
         const andel = lång.minutes / plan.budget.enduranceMinutes;
         expect(andel, `${namn} v${plan.week.index}`).toBeLessThanOrEqual(
@@ -1037,6 +1065,9 @@ describe('R-13: långpasset lånar tid de sista veckorna', () => {
       for (const plan of planer) {
         const lång = träning(plan).find((session) => session.type === 'long');
         if (lång === undefined) continue;
+
+        // R-50: toppveckan är undantagen.
+        if (ärToppvecka(plan, profilen(namn))) continue;
 
         expect(
           lång.minutes / plan.budget.enduranceMinutes,

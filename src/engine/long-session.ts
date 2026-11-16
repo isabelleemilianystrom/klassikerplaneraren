@@ -135,10 +135,17 @@ export function longSession(ctx: WeekContext, days: WeekDays): PendingSession | 
   const reserv = reservedForRequiredSports(sport, week, budget, ctx.input, ctx.races);
   const utrymme = Math.max(budget.enduranceMinutes - reserv, golv);
 
+  // R-50: i toppveckan viker R-28:s andelstak för grenens eget tak. Veckan
+  // blir då i praktiken ett enda pass, och det är avsikten — ett långlopp
+  // förbereds med ett långt pass, inte med summan av korta.
+  const andelstak = isPeakWeek(ctx, sport)
+    ? budget.enduranceMinutes
+    : Math.floor(budget.enduranceMinutes * rules.longSession.maxShareOfWeek);
+
   const minuter = Math.min(
     Math.round(growthMinutes(ctx, cap, average)),
     cap,
-    Math.floor(budget.enduranceMinutes * rules.longSession.maxShareOfWeek),
+    andelstak,
     rules.session.maxMinutes,
     utrymme,
   );
@@ -149,6 +156,41 @@ export function longSession(ctx: WeekContext, days: WeekDays): PendingSession | 
   if (dag === null) return null;
 
   return { sport, type: 'long', minutes: minuter, zone: 2, fixedDate: dag };
+}
+
+/**
+ * Sant i veckan där långpasset ska nå grenens tak (R-50, fynd F-19).
+ *
+ * **Varför det behövdes.** `longSession.maxShareOfWeek` är sjuttio procent av
+ * veckans konditionstid. För den som tränar sex timmar blir cykelns längsta
+ * pass därmed 3 h 30 — inför Vätternrundans 315 kilometer. Samtidigt sa
+ * översikten "1008 km, nått", vilket ger falsk trygghet: kilometrarna finns,
+ * men aldrig i ett sammanhängande pass.
+ *
+ * **Varför just den här veckan.** Den sista specifika veckan före
+ * nedtrappningen är den enda plats ett toppass kan ligga utan att krocka med
+ * R-46, som säger att långpasset aldrig krymper inom en fas. Ligger toppen
+ * tidigare måste veckorna efter vara minst lika långa, och då är det ingen
+ * topp. Här tar nedtrappningen vid direkt, och fasbytet bryter kedjan.
+ *
+ * Det är också samma vecka som generalrepet (R-49), vilket passar: det längsta
+ * passet körs i tävlingsutrustning med tävlingsenergin. SPÅRAT-guiden gör
+ * likadant — dess genrep är säsongens längsta pass.
+ */
+function isPeakWeek(ctx: WeekContext, sport: TrainedSport): boolean {
+  const { week } = ctx;
+  if (week.phase !== 'specific' || week.focusRaceId === null) return false;
+  if (raceById(week.focusRaceId).sport !== sport) return false;
+
+  const lopp = ctx.races.find((kandidat) => kandidat.id === week.focusRaceId);
+  if (lopp === undefined) return false;
+
+  // Veckor kvar till loppveckan. Loppveckan räknas som nedtrappningens sista
+  // vecka, så den sista specifika veckan ligger exakt taperWeeks veckor före
+  // den — inte en till. Med fel på ett hamnade toppen en vecka för tidigt,
+  // och veckan efter krympte långpasset inom samma fas, vilket bryter R-46.
+  const kvar = lopp.weekIndex - (week.index - 1);
+  return kvar === raceById(week.focusRaceId).taperWeeks;
 }
 
 /**

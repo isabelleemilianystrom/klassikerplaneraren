@@ -892,6 +892,31 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   den generaliserad till alla fyra loppen, eftersom en klassiker har fyra uppsättningar
   utrustning att prova.
 
+- **R-50** (tillagd 2026-11-16, fynd F-19) **Toppasset.** Den sista specifika veckan före
+  nedtrappningen får långpasset nå **grenens eget tak**, utan att R-28:s andelstak på sjuttio
+  procent gäller. Veckan blir då i praktiken ett enda pass plus styrkan.
+
+  **Varför.** `longSession.maxShareOfWeek` gjorde att den som tränar sex timmar fick ett längsta
+  cykelpass på **3 h 30 inför Vätternrundans 315 kilometer**, medan översikten samtidigt sa
+  "1008 km, nått". Kilometrarna fanns, men aldrig i ett sammanhängande pass — ett långlopp
+  förbereds med ett långt pass, inte med summan av korta.
+
+  **Varför just den veckan.** Den sista specifika veckan är den enda plats en topp kan ligga utan
+  att krocka med R-46, som säger att långpasset aldrig krymper inom en fas. Ligger toppen tidigare
+  måste veckorna efter vara minst lika långa, och då är det ingen topp. Här tar nedtrappningen vid
+  direkt, och fasbytet bryter kedjan.
+
+  Det är också samma vecka som generalrepet i R-49: säsongens längsta pass körs i
+  tävlingsutrustning med tävlingsenergin. SPÅRAT-guiden gör likadant.
+
+  **Utfall:** P3, P5 och P6 når nu 5 timmar på cykel, mot 3 h 30 respektive 4 h 54 förut. P1
+  stannar på 4 timmar, eftersom hennes simteknikpass (R-45:s undantag) tar sextio minuter av
+  veckan — det är avvägningen från beslutet 2026-11-15.
+
+  **Loppveckan räknas som nedtrappningens sista vecka**, så toppveckan ligger exakt `taperWeeks`
+  veckor före loppveckan. Ett fel på ett i den räkningen la toppen en vecka för tidigt och fick
+  långpasset att krympa inom den specifika fasen — det bröt R-46 och fångades av ett test.
+
 **Varningar**
 
 - **R-22** Mindre än 8 veckor från start till första lopp: "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
@@ -1505,7 +1530,7 @@ planen ser det jag inte tänkt på.
 | **F-16** | **P4:s långpass är 3 h 30 min stavgång i uppförsbacke**, vilket varken är realistiskt eller snällt mot axlar och armbågar. Texten refererar dessutom till ett skidpass som inte finns. Planen borde lyfta skidtunnel eller att skjuta fram till 2027 hårdare | Öppet |
 | **F-17** | **Fasta måltider för alla nivåer.** Vasaloppet 7 h, Vätternrundan 11 h, Lidingö 3 h 30, Vansbro 1 h 15 — oavsett om användaren är nybörjare eller van. Tiden styr loppveckan och pacingtexten, så den bör bero på nivån | Öppet |
 | **F-18** | **Långa simuppehåll.** P3 simmar inte alls v4–v29 och P5 inte v1–v27 — ett halvår utan vatten för nivån Erfaren. P5 saknar dessutom simning fyra veckor kring Vätternrundan. P1 (nybörjare) får ett pass på 60–80 min och ingen simning v15–v18; två pass på 40 min vore bättre | Öppet |
-| **F-19** | **Längsta cykelpass för sextimmarsprofilerna.** P1 och P3 toppar på 3 h 30 inför 30 mil, och passet är 58–70 % av veckans cykeltid. Riktmärket "1008 km, nått" ger falsk trygghet | Öppet |
+| **F-19** | **Längsta cykelpass för sextimmarsprofilerna.** P1 och P3 toppar på 3 h 30 inför 30 mil, och passet är 58–70 % av veckans cykeltid. Riktmärket "1008 km, nått" ger falsk trygghet | **Åtgärdad 2026-11-16** med R-50 |
 | **F-20** | **Styrkepasset listade inga övningar** trots att texten sa "kör övningarna i tur och ordning". Passet är dessutom alltid exakt 60 min, även i avlastningsveckor | **Övningarna åtgärdade 2026-11-15.** Avlastningsveckan öppen |
 | **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | **Åtgärdad 2026-11-16** |
 | **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | **Förklarad 2026-11-16.** Beteendet är rätt, texten saknades |
