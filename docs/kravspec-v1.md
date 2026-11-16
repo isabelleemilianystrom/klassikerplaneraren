@@ -1523,7 +1523,7 @@ planen ser det jag inte tänkt på.
 | --- | --- | --- |
 | **F-10** | **Passlängden matchar inte passtexten.** Tröskeltexten ("4 × 8 min, 3 min vila, 10 min upp och ner") kräver ~61 min, intervalltexten (2 × 10 × 30/30 s) ~43 min. Planerna ger ofta 20–35 min | **Åtgärdad 2026-11-15.** Var 77 pass; nu 0 av 5 082 granskade |
 | **F-11** | **P5:s tröskelpass inomhus saknar struktur.** 22 pass i ett enda block på upp till 72 min i zon 4, med den generiska texten "Samma tid och samma zon som cykelpasset" — och det finns inget cykelpass att referera till | **Åtgärdad 2026-11-16** |
-| **F-12** | **Löpning två dagar efter ett 30 km terränglopp.** P6 v22: 71 + 70 min löpning på måndag och tisdag efter Lidingöloppet på lördagen | **Verifierat** |
+| **F-12** | **Löpning två dagar efter ett 30 km terränglopp.** P6 v22: 71 + 70 min löpning på måndag och tisdag efter Lidingöloppet på lördagen. Gäller **alla lopp**, inte bara Lidingö | **Verifierat. Tre lösningar prövade 2026-11-16, alla bryter mot en befintlig regel — se nedan** |
 | **F-13** | **Loppveckan.** Skidprofilerna har fem vilodagar i rad och sedan 25 min. Simveckan är det omvända: P5 v35 har 83 + 82 + 25 min simning före ett lopp på fredagen, mot 60 min veckan före — ingen nedtrappning alls | Öppet |
 | **F-14** | **Rampen utgår från budgeten, inte från vad användaren gör i dag.** P4 går 3 h 36 → 6 h och P6 4 h 48 → 8 h mellan v2 och v3, **+67 %** | Öppet. Kräver ett nytt fält: nuvarande veckotimmar |
 | **F-15** | **Loppdatum valideras inte.** P4 har Vasaloppet 2026-12-13, P5 har Vansbro på en fredag mot de andras lördag. `races.json` har redan en lista `dates` att validera mot | **Halvt åtgärdad 2026-11-15:** varje loppdatum i formuläret bär nu en uppmaning att kontrollera mot arrangören. Valideringen mot `dates` återstår |
@@ -1541,6 +1541,31 @@ planen ser det jag inte tänkt på.
 instruktionen lovade en lista som aldrig visades. Övningarna står nu i passet, med loppets egen
 lista när veckan har ett fokuslopp. Inga nya träningstal: övningarna var redan skrivna och
 granskade.
+
+**F-12 är verifierad och bredare än den såg ut, men inte åtgärdad.** Problemet finns efter
+*varje* lopp, inte bara Lidingöloppet: skidteknik 88 minuter dagen efter Vasaloppets nio mil,
+simteknik 90 minuter dagen efter Vansbrosimningen, löpning 71 + 70 minuter dag två och tre efter
+Lidingöloppet. Orsaken är R-33, som behåller teknikpass under återhämtningen — rätt tanke, fel
+dag.
+
+Isabelles regel: *"Efter 30 km i terräng ska den veckan vara vila, simning eller lugn cykel.
+Löpning kan komma tillbaka runt dag 7."*
+
+**Tre lösningar prövades, och var och en bryter mot något som redan är beslutat:**
+
+| Lösning | Vad som gick sönder |
+| --- | --- |
+| **Nolla grenens budget**, minuterna till de andra grenarna | P5 fick **fyra timmars simning** veckan efter Vätternrundan, och löpningen sköt över R-14:s tak. Bryter dessutom mot R-33, som uttryckligen behåller teknikpass i återhämtningen. Sju tester röda |
+| **Placeringsregel i `allowedOn`** | Föll tyst bort i **sex av tretton lopp** — `bestDateFor`:s reservutgång tar vilken dag som helst när ingen är tillåten. Det är fynd F-3, och den gör R-51 verkningslös |
+| **Absolut placeringsregel**, reservutgången stängd | Fungerar: 0 av 13 lopp har pass före dag 7, inga dubbla pass. Men **389 oplacerade minuter** uppstår i återhämtningsveckorna, och testet "håller den oplacerade tiden sällsynt och liten" faller — P1 v19 får 78 minuter mot ett tak på 20. Det testet kodar v0-lärdomen *"timmar som inte får plats ska fördelas, inte försvinna"* |
+
+**Den fjärde vägen är förmodligen den rätta, och den är inte prövad:** låt
+återhämtningsveckan bli **kortare** i stället för att flytta tiden. Efter nio mil på skidor ska
+veckan vara kort, inte lika lång med tiden omfördelad till simning. Det kräver att veckans tid
+får vara mindre än vad användaren valt, vilket är ett eget beslut — och det är det beslutet som
+återstår.
+
+Arbetet från den tredje varianten finns sparat som ett git-stash.
 
 **F-21 och F-22 är åtgärdade 2026-11-16**, båda i `scripts/print-profiles.ts`.
 
