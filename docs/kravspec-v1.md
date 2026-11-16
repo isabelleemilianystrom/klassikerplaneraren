@@ -580,8 +580,15 @@ Listan innehåller bara datum som är kontrollerade mot arrangörens sida. I okt
   Undantaget gäller **bara grenar vars lopp återstår**. Är loppet avklarat behövs tekniken inte,
   och R-36 nollar grenen ändå — minuterna läckte då vidare till en gren som är pausad.
 
-  Nedtrappningen berörs inte av undantaget: R-21 gäller bas och specifik fas, så de sista
-  veckorna före loppet är rena.
+  **Nedtrappningen berörs inte av undantaget.** R-21 gäller bas och specifik fas, så de sista
+  veckorna före loppet innehåller bara fokusgrenen — inte ens styrka, eftersom
+  `strength.sessionsByPhase.taper` är noll. *(Granskat och bekräftat 2026-11-16: "simningen
+  behöver inte finnas med i nedtrappningsveckan, då är det fullt fokus på loppet.")*
+
+  Undantaget för simning sköter sig självt: är loppet Vansbrosimningen **är** simning
+  fokusgrenen, och nedtrappningen blir simning. Det kräver ingen egen regel.
+
+  Kontrollerat över alla sex profilerna — varje nedtrappningsvecka innehåller exakt en gren.
 
   **Det löser inte F-9 i de magraste veckorna.** P1:s vecka 12 har 192 konditionsminuter: 60 går
   till simteknik och 132 till skidor — men långpasset tar alla 132, så skidorna får ett enda pass
