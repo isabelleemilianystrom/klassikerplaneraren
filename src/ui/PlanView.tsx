@@ -22,6 +22,7 @@ import {
   groupByPhase,
   racesInWeek,
   sessionSport,
+  shouldScrollToCurrentWeek,
   totalHours,
   weekFocus,
 } from './plan-view.ts';
@@ -35,6 +36,12 @@ interface Props {
   today: IsoDate;
   onChangeAnswers: () => void;
   onStartOver: () => void;
+  /**
+   * Sant när planen lästes ur lagringen, alltså ett återbesök (K-16).
+   *
+   * Falskt för en plan som just skapats: då ska vyn börja högst upp.
+   */
+  isReturningVisit: boolean;
 }
 
 export default function PlanView({
@@ -44,15 +51,26 @@ export default function PlanView({
   today,
   onChangeAnswers,
   onStartOver,
+  isReturningVisit,
 }: Props) {
   const aktuell = currentWeekIndex(plans, today);
   const [öppen, setÖppen] = useState<number | null>(aktuell);
   const aktuellRef = useRef<HTMLLIElement | null>(null);
+  const rullaFram = shouldScrollToCurrentWeek(plans, today, isReturningVisit);
 
-  // K-16: rulla fram innevarande vecka så att den syns utan att man letar.
   useEffect(() => {
-    aktuellRef.current?.scrollIntoView({ block: 'center' });
-  }, []);
+    // K-16: vid återbesöket ska veckan man är i synas utan att man letar.
+    if (rullaFram) {
+      // `start`, inte `center`: veckan man är i är utfälld och därmed hög, och
+      // att centrera den lade rubriken med "Nu" 75 px ovanför skärmkanten.
+      aktuellRef.current?.scrollIntoView({ block: 'start' });
+      return;
+    }
+
+    // Annars högst upp. Vyn byter inte sida, så webbläsaren behåller
+    // formulärets rullning — och då öppnas programmet på mitten.
+    window.scrollTo({ top: 0 });
+  }, [rullaFram]);
 
   const grupper = groupByPhase(plans);
 

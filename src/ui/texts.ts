@@ -216,6 +216,17 @@ export const FORM = {
   submit: 'Skapa programmet',
 } as const;
 
+/**
+ * Väntevyn medan programmet läggs upp (K-18).
+ *
+ * Texten säger vad som händer, inte att något tänker: motorn räknar ut
+ * veckorna, och förklaringarna är skrivna i förväg och granskade (A-08).
+ */
+export const GENERATING = {
+  heading: 'Lägger upp ditt program',
+  body: 'Veckorna räknas ut utifrån dina svar: faser, pass, intensitet och vila.',
+} as const;
+
 /** Planvyn. */
 export const PLAN = {
   heading: 'Ditt träningsprogram',

@@ -146,6 +146,34 @@ export function currentWeekIndex(plans: readonly WeekPlan[], today: IsoDate): nu
 }
 
 /**
+ * Sant när vyn ska rulla fram innevarande vecka i stället för att börja
+ * högst upp (K-16).
+ *
+ * K-16 gäller **återbesöket**: "givet en sparad plan där några veckor
+ * passerat". Två fall ska alltså *inte* rullas:
+ *
+ *  1. **En nygenererad plan.** Man har just tryckt på knappen och ska se vad
+ *     man fick — rubriken, sammanfattningen, varningarna och säkerhetstexten
+ *     står överst, och de ska läsas före vecka 1. Förut centrerades veckan
+ *     alltid, vilket sköt hela huvudet ur bild och såg ut som att sidan
+ *     öppnats på mitten.
+ *  2. **Första veckan.** Är man i planens första vecka finns ingenting att
+ *     leta efter, och att centrera den döljer bara det som står ovanför.
+ */
+export function shouldScrollToCurrentWeek(
+  plans: readonly WeekPlan[],
+  today: IsoDate,
+  isReturningVisit: boolean,
+): boolean {
+  if (!isReturningVisit) return false;
+
+  const aktuell = currentWeekIndex(plans, today);
+  if (aktuell === null) return false;
+
+  return aktuell !== plans[0]?.week.index;
+}
+
+/**
  * Veckorna grupperade i sina faser, för översikten (K-06, K-08).
  *
  * Grupperingen följer `phaseId`, som är samma för sammanhängande veckor i samma

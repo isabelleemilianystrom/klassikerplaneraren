@@ -191,8 +191,9 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-13 | Ändra svar: tillbaka till formuläret med tidigare svar ifyllda | **Måste** *(höjd från Bra att ha 2026-10-27)* | Givet en sparad plan, när jag trycker "Ändra svar", så är formuläret ifyllt med mina svar |
 | K-14 | Utskrift: planen går att skriva ut snyggt via webbläsarens utskrift | Bra att ha | Utskriften visar översikt och alla veckor utan knappar och menyer |
 | K-15 | Sparad plan valideras vid inläsning. Går den inte att använda kastas den, lagringen rensas och användaren får veta varför. Formuläret ritas alltid, även om planen är trasig | Måste *(tillagd 2026-10-27)* | Givet en sparad plan från en äldre version, när jag öppnar appen, så ser jag formuläret och ett meddelande om att den gamla planen inte kunde läsas — aldrig en tom sida |
-| K-16 | Innevarande vecka är markerad i översikten, och vyn visar den när jag kommer tillbaka | Måste *(tillagd 2026-10-27)* | Givet en sparad plan där några veckor passerat, när jag öppnar appen, så är veckan jag är i markerad och syns utan att jag letar |
+| K-16 | Innevarande vecka är markerad i översikten, och vyn visar den när jag kommer tillbaka | Måste *(tillagd 2026-10-27)* | Givet en sparad plan där några veckor passerat, när jag öppnar appen, så är veckan jag är i markerad och syns utan att jag letar. **Och:** givet att jag just skapat programmet, så börjar vyn högst upp — markeringen finns, men vyn rullar inte *(preciserad 2026-11-16, fynd F-25)* |
 | K-17 | Är alla veckor passerade visas ett avslut i stället för en tom lista | Bra att ha *(tillagd 2026-10-27)* | Givet att sista loppet varit, när jag öppnar planen, så står det att programmet är genomfört och hur jag planerar om |
+| K-18 | Mellan formuläret och planen visas en väntevy i fem sekunder, med en symbol som rör sig och en rad om vad som räknas ut | Måste *(tillagd 2026-11-16)* | Givet att jag fyllt i formuläret, när jag trycker på "Skapa programmet", så ser jag i fem sekunder att programmet läggs upp, och därefter planen från dess början. Väntevyn visas bara när ett program just skapats — aldrig när jag öppnar en sparad plan, och aldrig före ett felmeddelande |
 
 ## 5. Träningsregler för regelmotorn
 
@@ -1551,7 +1552,24 @@ planen ser det jag inte tänkt på.
 | **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | **Åtgärdad 2026-11-16** |
 | **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | **Förklarad 2026-11-16.** Beteendet är rätt, texten saknades |
 | **F-23** | **P2 v17: sex träningsdagar i rad i en nedtrappningsvecka** | **Verifierat.** Invarianten kräver bara *en* vilodag och är därför grön |
+| **F-25** | **Planvyn öppnades på mitten.** K-16:s effekt centrerade innevarande vecka vid varje montering, också för en nyskapad plan — rubriken, sammanfattningen, varningarna och säkerhetstexten hamnade ovanför skärmens kant. Vyn behöll dessutom formulärets rullning, eftersom den inte byter sida | **Åtgärdad 2026-11-16** |
 | **F-24** | **Stakmaskinen i formuläret kunde inte påverka något.** R-17 använder den bara som ersättning när snön fattas, och nästan all skidträning ligger i november–mars, så för den som svarat ja på snö nämnde **0 av 74** skidpass den | **Åtgärdad 2026-11-16.** Den erbjuds nu som alternativ på snöpass: 47 av 72 pass i P2, resten är teknikpass eller längre än R-44:s tak |
+
+**F-25 är åtgärdad 2026-11-16.** K-16:s acceptanskriterium gäller *återbesöket* — "givet en
+sparad plan där några veckor passerat" — men effekten i vyn skilde inte på det och en nyskapad
+plan. Regeln ligger nu i `shouldScrollToCurrentWeek`, ren och testad: rulla fram veckan bara vid
+ett återbesök och bara när det inte är planens första vecka. Annars till toppen, vilket också
+behövdes av ett andra skäl — appen är en sida, så webbläsaren behåller formulärets rullning när
+vyn byts. Markeringen "Nu" är orörd.
+
+**K-18, väntevyn, är byggd 2026-11-16** och är ett önskemål, inte ett fynd. Motorn räknar ut
+planen på någon millisekund, så de fem sekunderna är en avsiktlig väntan: trycker man på knappen
+och programmet står där omedelbart ser det ut som en färdig mall i stället för något som räknats
+ut ur svaren. Tre gränser gäller för att väntan ska vara ärlig och inte i vägen — den visas bara
+när ett program just skapats, aldrig vid återbesök, och aldrig före ett felmeddelande (planen är
+redan byggd när vyn visas, så ett nej kommer direkt). Texten säger att veckorna räknas ut, aldrig
+att något "tänker": förklaringarna är skrivna i förväg och granskade, och appen gör inga
+AI-anrop i körtid (A-08).
 
 **F-24 kom inte ur den här granskningen** utan ur appen, 2026-11-16: varför föreslår inget
 pass stakmaskinen fast rutan är ikryssad? Svaret var att den inte kunde göra det. R-17 använder

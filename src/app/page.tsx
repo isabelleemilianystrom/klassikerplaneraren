@@ -9,7 +9,7 @@
  * **Formuläret ritas alltid** (K-15). Går en sparad plan inte att läsa kastas
  * den, användaren får veta varför, och appen fungerar — aldrig en tom sida.
  */
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { buildWeekPlans, type WeekPlan } from '../engine/sessions.ts';
 import {
   classicWindowWarnings,
@@ -19,6 +19,7 @@ import {
 } from '../engine/warnings.ts';
 import { volumeChecks, volumeWarnings } from '../engine/volume.ts';
 import type { PlanInput } from '../engine/types.ts';
+import Generating, { GENERATING_MS } from '../ui/Generating.tsx';
 import PlanForm from '../ui/PlanForm.tsx';
 import PlanView from '../ui/PlanView.tsx';
 import type { FormState } from '../ui/form-state.ts';
@@ -100,6 +101,22 @@ export default function Home() {
   // Satt när motorn inte klarade svaren. Visas i formuläret.
   const [byggfel, setByggfel] = useState<string | null>(null);
 
+  // K-18: planen är byggd och väntar bakom väntevyn. Se `Generating`.
+  const [väntande, setVäntande] = useState<Plan | null>(null);
+
+  useEffect(() => {
+    if (väntande === null) return;
+
+    const timer = window.setTimeout(() => {
+      setEget({ vy: 'plan', plan: väntande });
+      setVäntande(null);
+    }, GENERATING_MS);
+
+    // Städas om användaren hinner lämna sidan: en timer som sätter tillstånd
+    // på en avmonterad vy är en läcka, inte en funktion.
+    return () => window.clearTimeout(timer);
+  }, [väntande]);
+
   const vy: Vy = eget?.vy ?? sparat.vy;
   const plan: Plan | null = eget !== null ? eget.plan : sparat.plan;
   const kastadPlan = eget === null ? sparat.discarded : null;
@@ -115,17 +132,23 @@ export default function Home() {
     }
 
     setByggfel(null);
-    setEget({ vy: 'plan', plan: byggd });
+
+    // K-18: planen visas när väntevyn gått ut. Den är redan byggd — väntan
+    // gäller bara vad som står på skärmen, aldrig om planen blir av.
+    setVäntande(byggd);
+
     // Misslyckas lagringen fungerar appen ändå — planen finns på skärmen.
     save(input, form);
   }
 
   function börjaOm() {
     clear();
+    setVäntande(null);
     setEget({ vy: 'formulär', plan: null });
   }
 
   function visaFormulär() {
+    setVäntande(null);
     setEget({ vy: 'formulär', plan });
   }
 
@@ -139,6 +162,15 @@ export default function Home() {
   function börjaFrånStart() {
     if (kastadPlan !== null) clear();
     setEget({ vy: 'formulär', plan: null });
+  }
+
+  // K-18: medan väntevyn visas är planen byggd men ännu inte på skärmen.
+  if (väntande !== null) {
+    return (
+      <main>
+        <Generating />
+      </main>
+    );
   }
 
   if (vy === 'formulär') {
@@ -159,6 +191,9 @@ export default function Home() {
           today={today}
           onChangeAnswers={visaFormulär}
           onStartOver={börjaOm}
+          // K-16 gäller återbesöket: planen kom ur lagringen, inte ur
+          // formuläret. En nyskapad plan börjar högst upp.
+          isReturningVisit={eget === null}
         />
       </main>
     );

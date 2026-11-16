@@ -11,6 +11,7 @@ import {
   groupByPhase,
   phaseName,
   racesInWeek,
+  shouldScrollToCurrentWeek,
   totalHours,
   weekFocus,
 } from '../src/ui/plan-view.ts';
@@ -163,6 +164,38 @@ describe('K-16: innevarande vecka', () => {
     // Den som skapat sin plan i förväg ska se var den börjar, inte ingenting.
     const före = addDays(PLANER[0]?.week.startDate as string, -30);
     expect(currentWeekIndex(PLANER, före)).toBe(1);
+  });
+
+  it('rullar fram veckan vid ett återbesök mitt i planen', () => {
+    const vecka = PLANER[10];
+    const mitt = addDays(vecka?.week.startDate as string, 3);
+
+    expect(shouldScrollToCurrentWeek(PLANER, mitt, true)).toBe(true);
+  });
+
+  it('rullar inte fram något i en nygenererad plan', () => {
+    // Buggen 2026-11-16: vyn centrerade alltid innevarande vecka, så den som
+    // just skapat sitt program landade mitt i det och missade rubriken,
+    // sammanfattningen och säkerhetstexten. K-16 gäller återbesöket.
+    const vecka = PLANER[10];
+    const mitt = addDays(vecka?.week.startDate as string, 3);
+
+    expect(shouldScrollToCurrentWeek(PLANER, mitt, false)).toBe(false);
+  });
+
+  it('rullar inte fram planens första vecka', () => {
+    // Är man i den första veckan finns ingenting att leta efter, och att
+    // centrera den döljer bara det som står ovanför.
+    const start = PLANER[0]?.week.startDate as string;
+
+    expect(shouldScrollToCurrentWeek(PLANER, start, true)).toBe(false);
+    expect(shouldScrollToCurrentWeek(PLANER, addDays(start, -30), true)).toBe(false);
+  });
+
+  it('rullar inte fram något när planen är slut', () => {
+    const sista = PLANER.at(-1)?.week.startDate as string;
+
+    expect(shouldScrollToCurrentWeek(PLANER, addDays(sista, 7), true)).toBe(false);
   });
 
   it('pekar ingenstans när planen är slut', () => {
