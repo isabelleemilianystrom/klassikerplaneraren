@@ -18,14 +18,15 @@ import {
   midProgrammeWarnings,
 } from '../engine/warnings.ts';
 import { volumeChecks, volumeWarnings } from '../engine/volume.ts';
-import type { PlanInput } from '../engine/types.ts';
+import type { PlanInput, TrainedSport } from '../engine/types.ts';
+import { races } from '../engine/config.ts';
 import Generating, { GENERATING_MS } from '../ui/Generating.tsx';
 import Intro from '../ui/Intro.tsx';
 import PlanForm from '../ui/PlanForm.tsx';
 import PlanView from '../ui/PlanView.tsx';
 import type { FormState } from '../ui/form-state.ts';
 import { clear, parseStored, readRaw, save } from '../ui/storage.ts';
-import { FORM, FIXED, HOME, STORAGE } from '../ui/texts.ts';
+import { FORM, FIXED, HOME, SPORT_COLORS, SPORT_NAMES, STORAGE } from '../ui/texts.ts';
 
 /** Dagens datum som ISO-sträng, i användarens egen tidszon. */
 function idag(): string {
@@ -229,10 +230,44 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">{HOME.title}</h1>
-      <p className="mt-5 max-w-prose text-lg text-ink-2">{HOME.lead}</p>
-      <p className="mt-4 max-w-prose text-ink-2">{HOME.body}</p>
+    <main className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
+      <h1 className="text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.025em] sm:text-5xl">
+        {HOME.title}
+      </h1>
+
+      {/*
+        Problemet som en rad, inte som en uppräkning. Loppen står i listan
+        under i stället — en mening behöver inte både säga vad appen gör och
+        rabbla fyra egennamn.
+      */}
+      <p className="mt-5 text-xl text-ink-2 sm:text-2xl">{HOME.lead}</p>
+
+      {/*
+        De fyra loppen med gren och distans, ur `races.json`. Det är sidans
+        enda bild, och den är gjord av riktiga tal: nittio kilometer skidor och
+        trehundrafemton på cykel säger på en gång varför ett vanligt
+        träningsprogram inte räcker. Prickarna är samma grenfärger som i
+        planen, så att färgerna betyder samma sak hela vägen igenom.
+      */}
+      <ul className="mt-12 border-t border-rule">
+        {races.races.map((race) => (
+          <li
+            key={race.id}
+            className="flex items-baseline gap-3 border-b border-rule py-3.5"
+          >
+            <span
+              aria-hidden="true"
+              className={`size-2 shrink-0 translate-y-[-1px] rounded-full ${SPORT_COLORS[race.sport as TrainedSport].dot}`}
+            />
+            <span className="font-medium">{race.name}</span>
+            <span className="ml-auto text-right text-sm text-ink-3 tabular-nums">
+              {race.distanceKm} km {SPORT_NAMES[race.sport as TrainedSport].toLowerCase()}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-10 max-w-[56ch] text-ink-2">{HOME.body}</p>
 
       {/* K-15: den som hade en plan som inte gick att läsa ska få veta det. */}
       {kastadPlan !== null && (

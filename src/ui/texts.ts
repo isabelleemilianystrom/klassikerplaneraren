@@ -126,9 +126,12 @@ export function raceLabel(id: RaceId): string {
 /** Startsidan. */
 export const HOME = {
   title: 'Klassikerplaneraren',
-  lead:
-    'Ett träningsprogram vecka för vecka fram till dina lopp i En svensk klassiker: Vasaloppet, ' +
-    'Vätternrundan, Vansbrosimningen och Lidingöloppet.',
+  /*
+   * Ingressen räknade förut upp de fyra loppen i löpande text. Nu står de som
+   * en lista under den, med gren och distans, så meningen behöver inte göra
+   * två saker samtidigt. Kvar blir det som är hela problemet appen finns för.
+   */
+  lead: 'Fyra lopp, fyra grenar, ett år.',
   body:
     'Du svarar på några frågor om vilka lopp du ska göra, hur van du är i varje gren och hur ' +
     'mycket tid du har. Sedan får du ett program som fasar in grenarna över året och toppar ' +
