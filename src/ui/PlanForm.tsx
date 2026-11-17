@@ -15,7 +15,7 @@
  * kort, vilket halverar höjden på steg 2 och gör målvalet till en rad. Färger
  * och radier kommer ur tokens i `globals.css`.
  */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { nextRaceDate } from '../engine/config.ts';
 import type { PlanInput, Weekday } from '../engine/types.ts';
 import {
@@ -224,6 +224,41 @@ function Steg1({ state, setState, felFör }: StegProps) {
   // dag, och den hjälper bara om den kommer vid datumet man just valde.
   const anmärkningar = raceDateNotices(state);
 
+  /*
+   * Loppet som just kryssades i, så att det som fälls ut kan rullas fram.
+   *
+   * Kortet växer nedåt med datum och målval, och för de lopp som ligger långt
+   * ner i listan hamnade allt det utanför skärmen: man kryssade i
+   * Lidingöloppet och ingenting syntes hända. Att användaren själv ska lista
+   * ut att hon behöver rulla är att lägga över vårt problem på henne.
+   *
+   * En ref, inte ett tillstånd: rullningen hör till händelsen, inte till vad
+   * formuläret innehåller, och ska inte orsaka en omrendering.
+   */
+  const kryssatAvAnvändaren = useRef<string | null>(null);
+
+  /**
+   * Rullar fram kortet när dess utfällda del just monterats.
+   *
+   * Anropas av React med elementet i samma stund det dyker upp, vilket är
+   * precis rätt ögonblick — ingen gissning om när renderingen är klar.
+   *
+   * `nearest` rullar så lite som möjligt och gör ingenting alls när kortet
+   * redan syns i sin helhet, så det första loppet i listan hoppar inte.
+   * Utrymmet under kortet kommer från `scroll-mb-28`, så att den klibbiga
+   * knappraden inte lägger sig över det som just visades.
+   */
+  function rullaFramNyttValt(id: string) {
+    if (kryssatAvAnvändaren.current !== id) return;
+    kryssatAvAnvändaren.current = null;
+
+    const kort = document.getElementById(`lopp-${id}`);
+    if (kort === null) return;
+
+    const mjukt = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    kort.scrollIntoView({ block: 'nearest', behavior: mjukt ? 'smooth' : 'auto' });
+  }
+
   function byggOm(
     id: string,
     ändring: Partial<{ selected: boolean; date: string; goal: RaceChoice['goal'] }>,
@@ -260,14 +295,19 @@ function Steg1({ state, setState, felFör }: StegProps) {
           {state.races.map((race) => (
             <li
               key={race.id}
-              className="rounded-card border border-rule bg-surface transition-colors has-[:checked]:border-rule-strong has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
+              id={`lopp-${race.id}`}
+              className="scroll-mb-28 rounded-card border border-rule bg-surface transition-colors has-[:checked]:border-rule-strong has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
             >
               {/* Etiketten täcker hela kortet, så tryckytan blir stor nog. */}
               <label className="flex cursor-pointer items-start gap-3 rounded-card p-4 hover:bg-sunk">
                 <input
                   type="checkbox"
                   checked={race.selected}
-                  onChange={(e) => byggOm(race.id, { selected: e.target.checked })}
+                  onChange={(e) => {
+                    byggOm(race.id, { selected: e.target.checked });
+                    // Bara när man kryssar i: att fälla ihop ska inte flytta sidan.
+                    if (e.target.checked) kryssatAvAnvändaren.current = race.id;
+                  }}
                   className="mt-0.5 h-5 w-5 accent-accent"
                 />
                 <span className="font-medium">{raceLabel(race.id)}</span>
@@ -278,7 +318,12 @@ function Steg1({ state, setState, felFör }: StegProps) {
                   En tunn linje i stället för ett indrag på 48 px: den binder
                   ihop innehållet med kryssrutan och sparar bredd på telefon.
                 */
-                <div className="mr-4 mb-4 ml-8 border-l border-rule pl-4">
+                <div
+                  ref={(el) => {
+                    if (el !== null) rullaFramNyttValt(race.id);
+                  }}
+                  className="mr-4 mb-4 ml-8 border-l border-rule pl-4"
+                >
                   <label className="block text-sm text-ink-3">
                     {FORM.step1.dateLabel}
                     <input
