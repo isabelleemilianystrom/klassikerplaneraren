@@ -193,7 +193,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-15 | Sparad plan valideras vid inläsning. Går den inte att använda kastas den, lagringen rensas och användaren får veta varför. Formuläret ritas alltid, även om planen är trasig | Måste *(tillagd 2026-10-27)* | Givet en sparad plan från en äldre version, när jag öppnar appen, så ser jag formuläret och ett meddelande om att den gamla planen inte kunde läsas — aldrig en tom sida |
 | K-16 | Innevarande vecka är markerad i översikten, och vyn visar den när jag kommer tillbaka | Måste *(tillagd 2026-10-27)* | Givet en sparad plan där några veckor passerat, när jag öppnar appen, så är veckan jag är i markerad och syns utan att jag letar. **Och:** givet att jag just skapat programmet, så börjar vyn högst upp — markeringen finns, men vyn rullar inte *(preciserad 2026-11-16, fynd F-25)* |
 | K-17 | Är alla veckor passerade visas ett avslut i stället för en tom lista | Bra att ha *(tillagd 2026-10-27)* | Givet att sista loppet varit, när jag öppnar planen, så står det att programmet är genomfört och hur jag planerar om |
-| K-18 | Mellan formuläret och planen visas en väntevy i fem sekunder, med en symbol som rör sig och en rad om vad som räknas ut | Måste *(tillagd 2026-11-16)* | Givet att jag fyllt i formuläret, när jag trycker på "Skapa programmet", så ser jag i fem sekunder att programmet läggs upp, och därefter planen från dess början. Väntevyn visas bara när ett program just skapats — aldrig när jag öppnar en sparad plan, och aldrig före ett felmeddelande |
+| K-18 | Mellan formuläret och planen visas en väntevy i tre sekunder, med en symbol som rör sig och en rad om vad som räknas ut *(ändrad 2026-11-17: var fem sekunder, men den betalas varje gång ett program skapas — också vid "Ändra svar" — och tre räcker för att raden ska hinna läsas)* | Måste *(tillagd 2026-11-16)* | Givet att jag fyllt i formuläret, när jag trycker på "Skapa programmet", så ser jag i tre sekunder att programmet läggs upp, och därefter planen från dess början. Väntevyn visas bara när ett program just skapats — aldrig när jag öppnar en sparad plan, och aldrig före ett felmeddelande |
 | K-19 | Mellan startsidan och steg 1 visas en introsida: de tre stegen i ordning med vad var och en frågar om, hur lång tid det tar, och att svaren går att ändra | Måste *(tillagd 2026-11-17)* | Givet startsidan, när jag trycker på "Skapa mitt program", så ser jag vad formuläret kommer att fråga om innan jag börjar, och kommer vidare till steg 1 eller tillbaka till startsidan. Introsidan visas bara på vägen in — "Ändra svar" och "Gör en ny plan" går direkt till formuläret |
 
 ## 5. Träningsregler för regelmotorn
@@ -1572,7 +1572,7 @@ nedan. Den var ingen riktig användartest — ingen utomstående har provat appe
 
 **Svaret låg 726 ord ner i sidan.** Frågan på en tisdagsmorgon är "vad ska jag göra i dag?", och
 det första passet låg på 1 273 pixlar, bakom sammanfattning, AI-förklaring, säkerhetstexter och
-varningar — drygt tre skärmar på telefon, efter fem sekunders väntan. **Ett veckokort ligger nu
+varningar — drygt tre skärmar på telefon, efter väntevyn. **Ett veckokort ligger nu
 överst**: veckans dagar, passens namn och tider, utan instruktionerna, med en knapp till hela
 veckan. Mätt efter ändringen: kortet står på 160 px med **27 ord** före sig, synligt utan att
 rulla. Ingenting togs bort — ordningen ändrades. Kortet visas inte när planen är slut, och säger
@@ -1590,7 +1590,7 @@ behövdes av ett andra skäl — appen är en sida, så webbläsaren behåller f
 vyn byts. Markeringen "Nu" är orörd.
 
 **K-18, väntevyn, är byggd 2026-11-16** och är ett önskemål, inte ett fynd. Motorn räknar ut
-planen på någon millisekund, så de fem sekunderna är en avsiktlig väntan: trycker man på knappen
+planen på någon millisekund, så väntan är avsiktlig: trycker man på knappen
 och programmet står där omedelbart ser det ut som en färdig mall i stället för något som räknats
 ut ur svaren. Tre gränser gäller för att väntan ska vara ärlig och inte i vägen — den visas bara
 när ett program just skapats, aldrig vid återbesök, och aldrig före ett felmeddelande (planen är

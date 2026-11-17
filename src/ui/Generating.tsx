@@ -20,10 +20,13 @@ import { GENERATING } from './texts.ts';
 /**
  * Hur länge väntevyn visas.
  *
- * Fem sekunder, enligt beslutet 2026-11-16. Det är lagom för att hinna läsa
- * raden om vad som räknas ut, och kort nog att inte bli en spärr.
+ * **Tre sekunder sedan 2026-11-17**, ner från fem. Genomgången i användarens
+ * roll räknade efter vad väntan faktiskt kostar: den betalas varje gång ett
+ * program skapas, också när man gått tillbaka med "Ändra svar" och skapar om.
+ * Tre sekunder räcker för att raden om vad som räknas ut ska hinna läsas, och
+ * är kort nog att inte kännas som att något hängt sig.
  */
-export const GENERATING_MS = 5000;
+export const GENERATING_MS = 3000;
 
 /** Punkterna som rör sig. Dämpas för den som valt mindre rörelse. */
 function Punkter() {
