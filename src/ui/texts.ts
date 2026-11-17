@@ -49,13 +49,21 @@ export const SPORT_NAMES: Record<TrainedSport | 'strength', string> = {
  *
  * Tillagd 2026-11-16 efter en designgenomgång: en vecka med fyra pass var helt
  * grå, och man fick läsa varje rad för att se vad som var vad.
+ *
+ * **Värdena bytta 2026-11-17.** De första (sky, violet, teal, emerald) var
+ * valda på känsla och föll i validering: löpningens gröna och simningens
+ * turkosa låg ΔE 5,4 isär i normalseende, alltså under golvet 15 — de gick
+ * inte att skilja åt ens med full färgsyn, och de står oftast bredvid varandra
+ * i samma vecka. Styrka mot löpning föll dessutom vid färgblindhet. De färger
+ * som står i `globals.css` nu klarar samtliga kontroller, också när alla par
+ * prövas mot varandra och inte bara grannarna.
  */
 export const SPORT_COLORS: Record<TrainedSport | 'strength', { dot: string; edge: string }> = {
-  ski: { dot: 'bg-sky-500', edge: 'border-l-sky-500' },
-  bike: { dot: 'bg-violet-500', edge: 'border-l-violet-500' },
-  swim: { dot: 'bg-teal-500', edge: 'border-l-teal-500' },
-  run: { dot: 'bg-emerald-500', edge: 'border-l-emerald-500' },
-  strength: { dot: 'bg-neutral-400', edge: 'border-l-neutral-400' },
+  ski: { dot: 'bg-ski', edge: 'border-l-ski' },
+  bike: { dot: 'bg-bike', edge: 'border-l-bike' },
+  swim: { dot: 'bg-swim', edge: 'border-l-swim' },
+  run: { dot: 'bg-run', edge: 'border-l-run' },
+  strength: { dot: 'bg-strength', edge: 'border-l-strength' },
 };
 
 /** Nivåernas beskrivningar, ordagrant ur avsnitt 5. */
@@ -243,11 +251,23 @@ export const PLAN = {
 
   warningsHeading: 'Att tänka på',
   safetyHeading: 'Innan du börjar',
+  /** Avbryter bekräftelsen i "Gör en ny plan". */
+  cancel: 'Avbryt',
   overviewHeading: 'Vecka för vecka',
 
   weekNumber: (nummer: number) => `v. ${nummer}`,
   currentWeek: 'Nu',
   deload: 'lättare vecka',
+  /** Samma sak som chip på veckoraden, där det ska vara kort. */
+  deloadShort: 'Lättare',
+
+  /* Årsremsan över översikten (designöversynen 2026-11-17). */
+  ribbonHeading: 'Formen på året',
+  ribbonLead: 'En stapel per vecka. Höga staplar är loppveckor, tomma är lättare veckor.',
+  ribbonSummary: (veckor: number, lopp: string[]): string =>
+    `Veckobelastningen över ${veckor} veckor. Topparna är loppen: ${lopp.join(', ')}. ` +
+    'Däremellan stiger veckorna i block med en lättare vecka sist i varje block.',
+
 
   phaseWeeks: (antal: number) => `${antal} ${antal === 1 ? 'vecka' : 'veckor'}`,
 

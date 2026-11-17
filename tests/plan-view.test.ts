@@ -11,6 +11,7 @@ import {
   groupByPhase,
   phaseName,
   racesInWeek,
+  ribbonBars,
   shouldScrollToCurrentWeek,
   totalHours,
   weekFocus,
@@ -141,6 +142,66 @@ describe('veckans fokus', () => {
     if (utanFokus === undefined) return;
 
     expect(weekFocus(utanFokus)).toBe(phaseName(utanFokus.week.phase));
+  });
+});
+
+describe('årsremsan: planens form som en stapel per vecka', () => {
+  it('ger en stapel per vecka', () => {
+    expect(ribbonBars(PLANER)).toHaveLength(PLANER.length);
+    expect(ribbonBars(PLANER).map((stapel) => stapel.index)).toEqual(
+      PLANER.map((plan) => plan.week.index),
+    );
+  });
+
+  it('skalar mot planens tyngsta vecka', () => {
+    // Höjden är relativ, aldrig absolut: en plan på sex timmar i veckan och en
+    // på tolv ska båda fylla remsan.
+    const staplar = ribbonBars(PLANER);
+    const tyngst = Math.max(...PLANER.map((plan) => plan.totalMinutes));
+    const högst = staplar.find(
+      (stapel) =>
+        PLANER.find((plan) => plan.week.index === stapel.index)?.totalMinutes === tyngst,
+    );
+
+    expect(högst?.heightPercent).toBe(100);
+    for (const stapel of staplar) {
+      expect(stapel.heightPercent).toBeLessThanOrEqual(100);
+      expect(stapel.heightPercent).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('märker loppveckor och avlastningsveckor', () => {
+    const staplar = ribbonBars(PLANER);
+
+    for (const plan of PLANER) {
+      const stapel = staplar.find((kandidat) => kandidat.index === plan.week.index);
+
+      if (plan.week.raceIds.length > 0) {
+        expect(stapel?.kind, `v${plan.week.index}`).toBe('race');
+        continue;
+      }
+      expect(stapel?.kind, `v${plan.week.index}`).toBe(plan.week.isDeload ? 'deload' : 'normal');
+    }
+  });
+
+  it('ger varje stapel en läsbar etikett med vecka och tid', () => {
+    for (const stapel of ribbonBars(PLANER)) {
+      expect(stapel.label).toContain(`v. ${stapel.index}`);
+      expect(stapel.label).toMatch(/min|h/);
+    }
+  });
+
+  it('namnger loppet i stället för datumet på en loppvecka', () => {
+    const loppvecka = PLANER.find((plan) => plan.week.raceIds.length > 0);
+    const stapel = ribbonBars(PLANER).find(
+      (kandidat) => kandidat.index === loppvecka?.week.index,
+    );
+
+    expect(stapel?.label).toContain('Vasaloppet');
+  });
+
+  it('ger en tom remsa för en tom plan', () => {
+    expect(ribbonBars([])).toEqual([]);
   });
 });
 

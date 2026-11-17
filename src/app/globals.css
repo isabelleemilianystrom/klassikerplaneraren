@@ -1,1 +1,97 @@
 @import 'tailwindcss';
+
+/**
+ * Designtokens (designöversynen 2026-11-17).
+ *
+ * Före den här filen fanns inget designsystem: varje färg och varje avstånd var
+ * en verktygsklass någonstans i komponenterna, och det fanns ingenting att vara
+ * konsekvent mot. Allt som är ett val står nu här, en gång.
+ *
+ * Neutralerna är dragna mot blått (ton ~220) i stället för Tailwinds `neutral`,
+ * som har noll mättnad. Skillnaden är knappt synlig på en enskild yta och
+ * tydlig över en hel sida — rent grått läser som obestämt, inte som valt. Det
+ * är dessutom rätt håll för ämnet: snö, vatten, vinterljus.
+ */
+@theme {
+  /* Ytor, från sidans botten till det som ligger överst. */
+  --color-ground: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-sunk: #eef1f5;
+
+  /* Linjer. `rule` skiljer rader, `rule-strong` avgränsar. */
+  --color-rule: #dfe4ea;
+  --color-rule-strong: #c3cbd6;
+
+  /* Text, från mest till minst framträdande. */
+  --color-ink: #11161d;
+  --color-ink-2: #3d4857;
+  --color-ink-3: #6b7788;
+
+  /*
+   * Accenten bär det interaktiva: primärknappen, länken, innevarande vecka.
+   * Förut var primärknappen svart och gult fick göra tjänst både som varning
+   * och som uppmärksamhetsfärg, vilket gav en sida utan riktning.
+   */
+  --color-accent: #1f5fa8;
+  --color-accent-soft: #e4edf8;
+
+  /*
+   * Statusfärgerna är reserverade och används aldrig till något annat.
+   * `caution` är varningar och loppveckor, `critical` är säkerhetstexterna ur
+   * kravspecens avsnitt 8.
+   */
+  --color-caution: #8a5a06;
+  --color-caution-soft: #fbf1dd;
+  --color-critical: #9f3330;
+  --color-critical-soft: #fbe9e8;
+
+  /*
+   * Grenfärgerna, validerade 2026-11-17.
+   *
+   * De tidigare (sky, violet, teal, emerald) föll på två kontroller: löpningens
+   * gröna och simningens turkosa låg ΔE 5,4 isär i normalseende, alltså under
+   * golvet 15 — de gick inte att skilja åt ens med full färgsyn, och de står
+   * oftast bredvid varandra i samma vecka. De här fyra klarar samtliga
+   * kontroller, också när alla par prövas mot varandra och inte bara grannarna.
+   *
+   * Färgen är aldrig ensam bärare av betydelse: grenens namn står alltid
+   * utskrivet bredvid.
+   */
+  --color-ski: #2a78d6;
+  --color-swim: #1baf7a;
+  --color-run: #e87ba4;
+  --color-bike: #4a3aa7;
+
+  /* Styrka är ingen gren och ska inte konkurrera med de fyra. Grå med flit. */
+  --color-strength: #9aa4b2;
+
+  /*
+   * Tre radier i stället för samma rundning överallt. Att allt är 8 px är den
+   * vanligaste anledningen till att ett gränssnitt känns generiskt, och mindre
+   * rundning läser som mer precist — vilket är vad appen ska göra.
+   */
+  --radius-field: 4px;
+  --radius-card: 6px;
+
+  --font-sans: var(--font-app), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  /*
+   * Siffror är appens huvudinnehåll — tider, veckonummer, datum — och de ska
+   * sitta i rutnät, inte flyta. Tabellsiffror över hela appen är en rad CSS och
+   * den ändring som ger mest ordning per tecken.
+   */
+  body {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * Rubriker bryts på meningen i stället för att lämna ett ensamt ord sist.
+   */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}

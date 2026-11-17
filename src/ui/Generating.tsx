@@ -32,7 +32,7 @@ function Punkter() {
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="h-3 w-3 animate-bounce rounded-full bg-neutral-400 motion-reduce:animate-none"
+          className="h-2.5 w-2.5 animate-bounce rounded-full bg-rule-strong motion-reduce:animate-none"
           style={{ animationDelay: `${i * 160}ms` }}
         />
       ))}
@@ -54,8 +54,8 @@ export default function Generating() {
       className="mx-auto flex max-w-2xl flex-col items-center px-5 py-24 text-center"
     >
       <Punkter />
-      <h1 className="mt-8 text-2xl font-bold">{GENERATING.heading}</h1>
-      <p className="mt-3 text-neutral-700">{GENERATING.body}</p>
+      <h1 className="mt-8 text-2xl font-semibold tracking-tight">{GENERATING.heading}</h1>
+      <p className="mt-3 max-w-prose text-ink-2">{GENERATING.body}</p>
     </div>
   );
 }

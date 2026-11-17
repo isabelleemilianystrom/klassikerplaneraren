@@ -8,6 +8,11 @@
  * markerad, så att den som kommer tillbaka ser var hon är utan att leta.
  *
  * All formatering ligger i `plan-view.ts`. Den här filen renderar.
+ *
+ * **Omgjord 2026-11-17 efter designöversynen.** Veckoraden var ett kort med ram
+ * bland fyrtiofyra likadana kort; nu är den en rad i en lista, med veckans
+ * belastning som en stapel och lopp och avlastning som chips. Färger och radier
+ * kommer ur tokens i `globals.css` i stället för ur lösa verktygsklasser.
  */
 import { useEffect, useRef, useState } from 'react';
 import type { WeekPlan } from '../engine/sessions.ts';
@@ -21,13 +26,15 @@ import {
   formatZone,
   groupByPhase,
   racesInWeek,
+  ribbonBars,
   sessionSport,
   shouldScrollToCurrentWeek,
   totalHours,
   weekFocus,
 } from './plan-view.ts';
-import { explanations } from '../engine/config.ts';
+import { explanations, raceById } from '../engine/config.ts';
 import { FIXED, PLAN, SPORT_COLORS, STORAGE } from './texts.ts';
+import YearRibbon from './YearRibbon.tsx';
 
 interface Props {
   input: PlanInput;
@@ -74,94 +81,130 @@ export default function PlanView({
 
   const grupper = groupByPhase(plans);
 
+  // Samma skala som årsremsan, så att stapeln på raden och stapeln i remsan
+  // betyder exakt samma sak. Ett tal, ett ställe.
+  const belastning = new Map(
+    ribbonBars(plans).map((stapel) => [stapel.index, stapel.heightPercent]),
+  );
+
+  const loppnamn = plans.flatMap((plan) => plan.week.raceIds.map((id) => raceById(id).name));
+
   return (
-    <div className="mx-auto max-w-2xl px-5 py-10">
-      <header>
-        <h1 className="text-3xl font-bold">{PLAN.heading}</h1>
-        <p className="mt-3 text-neutral-700">
-          {PLAN.summary(plans.length, totalHours(plans), input.hoursPerWeek)}
-        </p>
+    <div className="mx-auto max-w-2xl px-5 pt-8 pb-10">
+        <header>
+          <h1 className="text-3xl font-semibold tracking-tight">{PLAN.heading}</h1>
+          <p className="mt-3 max-w-prose text-ink-2">
+            {PLAN.summary(plans.length, totalHours(plans), input.hoursPerWeek)}
+          </p>
 
-        {/* A-04: sammanfattningen, skriven i förväg och granskad. */}
-        <p className="mt-4 text-neutral-700">{explanations.summary}</p>
-        <p className="mt-2 text-sm text-neutral-500">{FIXED.aiMarking}</p>
-      </header>
+          {/* A-04: sammanfattningen, skriven i förväg och granskad. */}
+          <p className="mt-4 max-w-prose text-ink-2">{explanations.summary}</p>
+          <p className="mt-2 text-sm text-ink-3">{FIXED.aiMarking}</p>
+        </header>
 
-      {/* K-09: varningarna står överst, och planen visas ändå. */}
-      {warnings.length > 0 && (
-        <section className="mt-6" aria-labelledby="varningar">
-          <h2 id="varningar" className="font-bold">
-            {PLAN.warningsHeading}
+        {/*
+          Säkerhetstexterna först, och med den kraftigaste markeringen på sidan.
+          Förut stod de i en grå ruta under varningarnas gula, vilket läste som
+          mindre viktigt än ett volymriktmärke — fast det är det allvarligaste
+          som står här. Vänsterkant i stället för fylld ruta, eftersom tonen
+          inte ska skärpas: appen säger ifrån, den skäller inte.
+        */}
+        <section
+          className="mt-8 border-l-2 border-critical bg-sunk px-4 py-3.5"
+          aria-labelledby="sakerhet"
+        >
+          <h2 id="sakerhet" className="text-sm font-semibold text-ink">
+            {PLAN.safetyHeading}
           </h2>
-          <ul className="mt-2 space-y-2">
-            {warnings.map((varning) => (
-              <li key={varning} className="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
-                {varning}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-2 text-sm text-ink-2">{FIXED.redFlags}</p>
+          <p className="mt-2 text-sm text-ink-2">{FIXED.painRule}</p>
+          <p className="mt-2 text-sm text-ink-2">{FIXED.illness}</p>
         </section>
-      )}
 
-      <section className="mt-6 rounded-lg bg-neutral-100 p-4 text-sm text-neutral-700">
-        <h2 className="font-bold text-neutral-900">{PLAN.safetyHeading}</h2>
-        <p className="mt-2">{FIXED.redFlags}</p>
-        <p className="mt-2">{FIXED.painRule}</p>
-        <p className="mt-2">{FIXED.illness}</p>
-      </section>
-
-      <section className="mt-10" aria-labelledby="oversikt">
-        <h2 id="oversikt" className="text-xl font-bold">
-          {PLAN.overviewHeading}
-        </h2>
-
-        {grupper.map((grupp) => (
-          <section key={grupp.phaseId} className="mt-8">
-            <h3 className="font-bold">{grupp.title}</h3>
-            <p className="text-sm text-neutral-600">
-              {PLAN.phaseWeeks(grupp.weeks.length)}
-            </p>
-
-            {/* K-08: varför fasen finns. En text per fas (A-02). */}
-            <p className="mt-2 text-sm text-neutral-700">
-              {explanations.phases[grupp.phase]}
-            </p>
-
-            <ul className="mt-3 space-y-2">
-              {grupp.weeks.map((plan) => (
-                <Vecka
-                  key={plan.week.index}
-                  plan={plan}
-                  öppen={öppen === plan.week.index}
-                  aktuell={aktuell === plan.week.index}
-                  ref={aktuell === plan.week.index ? aktuellRef : undefined}
-                  onToggle={() =>
-                    setÖppen(öppen === plan.week.index ? null : plan.week.index)
-                  }
-                />
+        {/* K-09: varningarna står överst, och planen visas ändå. */}
+        {warnings.length > 0 && (
+          <section className="mt-4" aria-labelledby="varningar">
+            <h2 id="varningar" className="text-sm font-semibold text-ink">
+              {PLAN.warningsHeading}
+            </h2>
+            <ul className="mt-2 space-y-2">
+              {warnings.map((varning) => (
+                <li
+                  key={varning}
+                  className="border-l-2 border-caution bg-sunk px-4 py-3 text-sm text-ink-2"
+                >
+                  {varning}
+                </li>
               ))}
             </ul>
           </section>
-        ))}
-      </section>
+        )}
 
-      <div className="mt-12 flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={onChangeAnswers}
-          className="rounded-lg border border-neutral-300 px-5 py-3 font-medium hover:bg-neutral-50"
-        >
-          {PLAN.changeAnswers}
-        </button>
+        <YearRibbon plans={plans} raceNames={loppnamn} />
 
-        {/* K-10: det ska gå att börja om, men inte av misstag. */}
-        <StartOver onStartOver={onStartOver} />
-      </div>
+        <section className="mt-10" aria-labelledby="oversikt">
+          <h2 id="oversikt" className="text-xl font-semibold tracking-tight">
+            {PLAN.overviewHeading}
+          </h2>
 
-      <footer className="mt-12 space-y-3 border-t border-neutral-200 pt-6 text-sm text-neutral-600">
-        <p>{FIXED.disclaimer}</p>
-        <p>{FIXED.independence}</p>
-      </footer>
+          {grupper.map((grupp) => (
+            <section key={grupp.phaseId} className="mt-8">
+              {/*
+                Fasrubriken fäster överst medan fasens veckor rullar förbi, så
+                att man alltid ser vilken fas man är i. Rent CSS och med flit:
+                första försöket var en rad som räknade ut fasen ur sektionernas
+                lägen under rullning, och den låg ett steg efter hela vägen ner.
+                Webbläsaren kan det här bättre än vi kan räkna det.
+              */}
+              <h3 className="sticky top-0 z-10 -mx-5 bg-ground/95 px-5 py-2 text-sm font-semibold tracking-wide text-ink uppercase backdrop-blur">
+                {grupp.title}
+              </h3>
+              <p className="mt-1 text-sm text-ink-3">{PLAN.phaseWeeks(grupp.weeks.length)}</p>
+
+              {/* K-08: varför fasen finns. En text per fas (A-02). */}
+              <p className="mt-2 max-w-prose text-sm text-ink-2">
+                {explanations.phases[grupp.phase]}
+              </p>
+
+              {/*
+                Fasens rygg: en tunn linje i marginalen som löper genom fasens
+                veckor, så att indelningen syns medan man rullar i stället för
+                att bara stå som en rubrik man passerat.
+              */}
+              <ul className="mt-4 border-l border-rule">
+                {grupp.weeks.map((plan) => (
+                  <Vecka
+                    key={plan.week.index}
+                    plan={plan}
+                    öppen={öppen === plan.week.index}
+                    aktuell={aktuell === plan.week.index}
+                    belastning={belastning.get(plan.week.index) ?? 0}
+                    ref={aktuell === plan.week.index ? aktuellRef : undefined}
+                    onToggle={() => setÖppen(öppen === plan.week.index ? null : plan.week.index)}
+                  />
+                ))}
+              </ul>
+            </section>
+          ))}
+        </section>
+
+        <div className="mt-12 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onChangeAnswers}
+            className="rounded-field border border-rule-strong px-5 py-3 font-medium hover:bg-sunk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            {PLAN.changeAnswers}
+          </button>
+
+          {/* K-10: det ska gå att börja om, men inte av misstag. */}
+          <StartOver onStartOver={onStartOver} />
+        </div>
+
+        <footer className="mt-12 space-y-3 border-t border-rule pt-6 text-sm text-ink-3">
+          <p className="max-w-prose">{FIXED.disclaimer}</p>
+          <p className="max-w-prose">{FIXED.independence}</p>
+        </footer>
     </div>
   );
 }
@@ -170,50 +213,78 @@ interface VeckaProps {
   plan: WeekPlan;
   öppen: boolean;
   aktuell: boolean;
+  /** Veckans tid i procent av planens tyngsta vecka, till stapeln. */
+  belastning: number;
   ref?: React.Ref<HTMLLIElement> | undefined;
   onToggle: () => void;
 }
 
 /** En vecka i översikten, som går att öppna till en veckovy (K-06, K-07). */
-function Vecka({ plan, öppen, aktuell, ref, onToggle }: VeckaProps) {
+function Vecka({ plan, öppen, aktuell, belastning, ref, onToggle }: VeckaProps) {
   const lopp = racesInWeek(plan);
 
+  // Vänsterkanten bär veckans läge: accent för den man är i, gult för en
+  // loppvecka, inget för en vanlig. Den ersätter ramen som varje vecka hade
+  // förut — fler ramar gjorde ingen vecka viktigare, bara listan rörigare.
+  const kant = aktuell
+    ? 'border-l-accent bg-accent-soft'
+    : lopp.length > 0
+      ? 'border-l-caution'
+      : 'border-l-transparent';
+
   return (
-    <li
-      ref={ref}
-      className={`rounded-lg border ${
-        aktuell ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-200'
-      }`}
-    >
+    <li id={`vecka-${plan.week.index}`} ref={ref} className="scroll-mt-14 border-b border-rule">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={öppen}
-        className="flex w-full items-baseline gap-3 rounded-lg px-4 py-3 text-left hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+        className={`grid w-full grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-l-2 py-2.5 pr-3 text-left hover:bg-sunk focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-accent ${kant}`}
       >
-        <span className="w-14 shrink-0 text-sm font-medium text-neutral-500">
-          {PLAN.weekNumber(plan.week.index)}
+        <span className="pl-2.5 text-xs text-ink-3">{plan.week.index}</span>
+
+        <span className="min-w-0">
+          {/*
+            Radbryt i stället för att kapa. En kapad rad hade tagit bort
+            loppets namn först, och det är det viktigaste som står där — på en
+            telefon lägger sig chipet på egen rad i stället.
+          */}
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+            <span className="font-medium">{formatWeekRange(plan.week.startDate)}</span>
+
+            {aktuell && (
+              <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold tracking-wider text-white uppercase">
+                {PLAN.currentWeek}
+              </span>
+            )}
+
+            {lopp.length > 0 && (
+              <span className="rounded-full border border-caution bg-caution-soft px-2 py-0.5 text-[10px] font-semibold tracking-wider text-caution uppercase">
+                {PLAN.raceWeek(lopp)}
+              </span>
+            )}
+
+            {plan.week.isDeload && (
+              <span className="rounded-full bg-sunk px-2 py-0.5 text-[10px] font-semibold tracking-wider text-ink-3 uppercase">
+                {PLAN.deloadShort}
+              </span>
+            )}
+          </span>
+
+          {/*
+            Veckans belastning som en stapel. Samma tal som står till höger,
+            men läsbart utan att läsas: formen på fyra veckor syns direkt.
+          */}
+          <span aria-hidden="true" className="mt-1.5 block h-1 rounded-full bg-sunk">
+            <span
+              style={{ width: `${belastning}%` }}
+              className={`block h-full rounded-full ${
+                aktuell ? 'bg-accent' : lopp.length > 0 ? 'bg-caution' : 'bg-rule-strong'
+              }`}
+            />
+          </span>
         </span>
-        <span className="flex-1">
-          <span className="font-medium">{formatWeekRange(plan.week.startDate)}</span>
-          {aktuell && (
-            <span className="ml-2 rounded bg-neutral-900 px-2 py-0.5 text-xs font-medium text-white">
-              {PLAN.currentWeek}
-            </span>
-          )}
-          {plan.week.isDeload && (
-            <span className="ml-2 text-xs text-neutral-600">{PLAN.deload}</span>
-          )}
-          {lopp.length > 0 && (
-            <span className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-neutral-900">
-              <span aria-hidden="true">🏁</span>
-              {PLAN.raceWeek(lopp)}
-            </span>
-          )}
-        </span>
-        <span className="shrink-0 text-sm text-neutral-600">
-          {formatMinutes(plan.totalMinutes)}
-        </span>
+
+        <span className="text-right text-sm text-ink-2">{formatMinutes(plan.totalMinutes)}</span>
       </button>
 
       {öppen && <Veckovy plan={plan} />}
@@ -226,23 +297,21 @@ function Veckovy({ plan }: { plan: WeekPlan }) {
   const dagar = grupperaPerDag(plan.sessions);
 
   return (
-    <div className="border-t border-neutral-200 px-4 py-3">
-      <p className="text-sm text-neutral-600">{weekFocus(plan)}</p>
+    <div className="border-t border-rule bg-ground px-4 py-4">
+      <p className="text-xs font-semibold tracking-wide text-ink-3 uppercase">{weekFocus(plan)}</p>
 
       <ul className="mt-3 space-y-3">
         {dagar.map(({ date, sessions }) => (
           <li key={date}>
-            <p className="text-sm font-medium text-neutral-500">
-              {formatDay(date, weekdayOf(date))}
-            </p>
+            <p className="text-sm font-medium text-ink-3">{formatDay(date, weekdayOf(date))}</p>
 
             <ul className="mt-1 space-y-2">
               {sessions.map((session) => (
                 <li
                   key={session.id}
-                  className={`rounded-lg border-l-4 bg-white p-3 ring-1 ring-neutral-200 ${
+                  className={`rounded-r-card border-l-2 bg-surface p-3 ${
                     session.sport === null
-                      ? 'border-l-neutral-200'
+                      ? 'border-l-rule-strong'
                       : SPORT_COLORS[session.sport].edge
                   }`}
                 >
@@ -268,7 +337,7 @@ function Pass({ session }: { session: Session }) {
   const zon = formatZone(session.zone, session.sport);
 
   if (session.type === 'rest') {
-    return <p className="text-neutral-600">{PLAN.rest}</p>;
+    return <p className="text-sm text-ink-3">{PLAN.rest}</p>;
   }
 
   return (
@@ -276,7 +345,7 @@ function Pass({ session }: { session: Session }) {
       <p className="font-medium">
         {session.title}
         {gren !== null && session.sport !== null && (
-          <span className="font-normal text-neutral-600">
+          <span className="font-normal text-ink-3">
             {' — '}
             <span
               aria-hidden="true"
@@ -285,16 +354,16 @@ function Pass({ session }: { session: Session }) {
             {gren}
           </span>
         )}
-        <span className="ml-2 text-sm font-normal text-neutral-600">
+        <span className="ml-2 text-sm font-normal text-ink-3">
           {formatMinutes(session.minutes)}
         </span>
       </p>
 
-      {zon !== null && <p className="mt-1 text-sm text-neutral-600">{zon}</p>}
-      <p className="mt-1 text-sm text-neutral-700">{session.instruction}</p>
+      {zon !== null && <p className="mt-1 text-sm text-ink-3">{zon}</p>}
+      <p className="mt-1 text-sm text-ink-2">{session.instruction}</p>
 
       {session.alternatives.length > 0 && (
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-ink-3">
           {PLAN.alternatives(
             session.alternatives.map((alternativ) => {
               // R-37: en utrustningsvariant bär redskapets namn, inte grenens.
@@ -309,7 +378,9 @@ function Pass({ session }: { session: Session }) {
       )}
 
       {session.safetyNote !== undefined && (
-        <p className="mt-2 rounded bg-amber-50 p-2 text-sm text-amber-900">{session.safetyNote}</p>
+        <p className="mt-2 border-l-2 border-caution bg-sunk px-2.5 py-1.5 text-sm text-ink-2">
+          {session.safetyNote}
+        </p>
       )}
     </div>
   );
@@ -347,7 +418,7 @@ function StartOver({ onStartOver }: { onStartOver: () => void }) {
       <button
         type="button"
         onClick={() => setFrågar(true)}
-        className="rounded-lg px-5 py-3 font-medium text-neutral-600 hover:bg-neutral-50"
+        className="rounded-field px-5 py-3 font-medium text-ink-3 hover:bg-sunk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {STORAGE.startOver}
       </button>
@@ -355,22 +426,22 @@ function StartOver({ onStartOver }: { onStartOver: () => void }) {
   }
 
   return (
-    <div className="rounded-lg border border-neutral-300 p-4">
-      <p className="text-sm text-neutral-700">{STORAGE.startOverConfirm}</p>
+    <div className="rounded-card border border-rule-strong bg-surface p-4">
+      <p className="text-sm text-ink-2">{STORAGE.startOverConfirm}</p>
       <div className="mt-3 flex gap-2">
         <button
           type="button"
           onClick={onStartOver}
-          className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+          className="rounded-field bg-critical px-4 py-2 text-sm font-medium text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-critical"
         >
           {STORAGE.startOver}
         </button>
         <button
           type="button"
           onClick={() => setFrågar(false)}
-          className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium"
+          className="rounded-field border border-rule-strong px-4 py-2 text-sm font-medium hover:bg-sunk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          Avbryt
+          {PLAN.cancel}
         </button>
       </div>
     </div>

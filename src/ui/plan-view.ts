@@ -8,7 +8,7 @@ import { raceById, rules } from '../engine/config.ts';
 import { addDays, monthOf } from '../engine/dates.ts';
 import type { WeekPlan } from '../engine/sessions.ts';
 import type { IsoDate, Phase, Session, Zone } from '../engine/types.ts';
-import { SPORT_NAMES } from './texts.ts';
+import { PLAN, SPORT_NAMES } from './texts.ts';
 
 /** Fasernas namn i gränssnittet. */
 const PHASE_NAMES: Record<Phase, string> = {
@@ -143,6 +143,54 @@ export function currentWeekIndex(plans: readonly WeekPlan[], today: IsoDate): nu
     (plan) => today >= plan.week.startDate && today <= addDays(plan.week.startDate, 6),
   );
   return vecka?.week.index ?? null;
+}
+
+/** En stapel i årsremsan: en vecka, skalad mot den tyngsta veckan. */
+export interface RibbonBar {
+  /** Veckans nummer i planen. */
+  index: number;
+  /** Höjd i procent av remsans höjd, 4–100. */
+  heightPercent: number;
+  /** Vad stapeln är: en vanlig vecka, en avlastningsvecka eller en loppvecka. */
+  kind: 'normal' | 'deload' | 'race';
+  /** Hela stapeln i ord, för pekaren och för skärmläsaren. */
+  label: string;
+}
+
+/**
+ * Planen som en stapel per vecka (designöversynen 2026-11-17).
+ *
+ * Fyrtiofem identiska rader säger inte att programmet har en form. Samma tal
+ * som redan står i varje rad — veckans minuter — säger det direkt när de ligger
+ * bredvid varandra: uppbyggnaden i fyraveckorsblock, avlastningsveckan sist i
+ * varje block, topparna där loppen ligger och dippen efter dem.
+ *
+ * Höjden är relativ till planens tyngsta vecka, aldrig absolut: en plan på sex
+ * timmar i veckan och en på tolv ska båda fylla remsan. Golvet på fyra procent
+ * finns för att en mycket lätt vecka annars försvinner helt.
+ */
+export function ribbonBars(plans: readonly WeekPlan[]): RibbonBar[] {
+  const tyngst = plans.reduce((mest, plan) => Math.max(mest, plan.totalMinutes), 0);
+  if (tyngst === 0) return [];
+
+  return plans.map((plan) => {
+    const lopp = racesInWeek(plan);
+
+    return {
+      index: plan.week.index,
+      heightPercent: Math.max(4, Math.round((plan.totalMinutes / tyngst) * 100)),
+      kind: lopp.length > 0 ? 'race' : plan.week.isDeload ? 'deload' : 'normal',
+      label: ribbonLabel(plan, lopp),
+    };
+  });
+}
+
+/** Stapeln i ord: vecka, datum eller lopp, och tid. */
+function ribbonLabel(plan: WeekPlan, lopp: string[]): string {
+  const vad = lopp.length > 0 ? PLAN.raceWeek(lopp) : formatWeekRange(plan.week.startDate);
+  const tid = formatMinutes(plan.totalMinutes);
+
+  return `${PLAN.weekNumber(plan.week.index)} · ${vad} · ${tid}`;
 }
 
 /**

@@ -155,6 +155,27 @@ Två principer bär upp det:
 - **Siffrorna ligger i konfiguration, inte i koden.** Träningsreglerna i `config/rules.json` går
   att ändra utan att röra motorn.
 
+## Utseendet
+
+Allt som är ett designval står i `src/app/globals.css`, som ett `@theme`-block med tokens.
+Komponenterna använder bara dem: `bg-surface`, `text-ink-3`, `border-rule`, `rounded-card`.
+Vill du ändra en färg eller en radie i hela appen är det en rad där, inte en jakt genom
+komponenterna.
+
+- **Neutralerna är dragna mot blått** i stället för Tailwinds `neutral`, som har noll mättnad.
+- **Tre radier**, inte samma rundning överallt: `rounded-field` (4 px) på knappar och
+  inmatning, `rounded-card` (6 px) på kort, `rounded-full` på chips.
+- **Statusfärgerna är reserverade.** `caution` är varningar och loppveckor, `critical` är
+  säkerhetstexterna. De används aldrig till något annat.
+- **Grenfärgerna är validerade** mot färgblindhet och normalseende. De första var valda på
+  känsla, och löpningens gröna gick inte att skilja från simningens turkosa ens med full
+  färgsyn. Byter du dem: kontrollera paret innan. Färgen är heller aldrig ensam bärare av
+  betydelse — grenens namn står alltid utskrivet bredvid.
+- **Typsnittet laddas med `next/font`**, inte med en länk till Google Fonts. Filerna hämtas när
+  appen byggs och serveras sedan från appen själv, så det görs inga nätverksanrop i körtid.
+  Första bygget på en ny maskin behöver därför nå nätet en gång; efter det ligger filerna i
+  `.next/cache`.
+
 ## Inga AI-anrop i körtid
 
 Förklaringarna till faserna skrivs med hjälp av AI **under utvecklingen**, granskas och sparas i

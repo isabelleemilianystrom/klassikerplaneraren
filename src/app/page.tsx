@@ -200,14 +200,17 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-12">
-      <h1 className="text-3xl font-bold">{HOME.title}</h1>
-      <p className="mt-4 text-lg text-neutral-700">{HOME.lead}</p>
-      <p className="mt-4 text-neutral-700">{HOME.body}</p>
+    <main className="mx-auto max-w-2xl px-5 py-16">
+      <h1 className="text-4xl font-semibold tracking-tight">{HOME.title}</h1>
+      <p className="mt-5 max-w-prose text-lg text-ink-2">{HOME.lead}</p>
+      <p className="mt-4 max-w-prose text-ink-2">{HOME.body}</p>
 
       {/* K-15: den som hade en plan som inte gick att läsa ska få veta det. */}
       {kastadPlan !== null && (
-        <p role="status" className="mt-6 rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
+        <p
+          role="status"
+          className="mt-6 border-l-2 border-caution bg-sunk px-4 py-3 text-sm text-ink-2"
+        >
           {STORAGE.discarded(kastadPlan)}
         </p>
       )}
@@ -215,7 +218,7 @@ export default function Home() {
       <button
         type="button"
         onClick={börjaFrånStart}
-        className="mt-8 rounded-lg bg-neutral-900 px-6 py-3 text-lg font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+        className="mt-8 rounded-field bg-accent px-6 py-3 text-lg font-medium text-white hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {HOME.start}
       </button>
@@ -227,9 +230,11 @@ export default function Home() {
         avsnitt 8 och orörda — bara var de står har flyttats, och de står
         fortfarande före första klicket.
       */}
-      <p className="mt-10 rounded-lg bg-neutral-100 p-4 text-sm text-neutral-700">{HOME.beta}</p>
+      <p className="mt-12 max-w-prose rounded-card bg-sunk px-4 py-3 text-sm text-ink-2">
+        {HOME.beta}
+      </p>
 
-      <div className="mt-6 space-y-3 text-sm text-neutral-600">
+      <div className="mt-6 max-w-prose space-y-3 text-sm text-ink-3">
         <p>{FIXED.ageLimit}</p>
         <p>{FIXED.disclaimer}</p>
         <p>{FIXED.independence}</p>

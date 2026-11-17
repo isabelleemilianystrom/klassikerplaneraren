@@ -9,6 +9,11 @@
  *
  * Felen visas vid fältet de hör till, inte som en samlad lista högst upp: det
  * ska gå att se vad som är fel utan att leta.
+ *
+ * **Omgjord 2026-11-17 efter designöversynen.** Val mellan två eller tre
+ * jämbördiga alternativ är segmenterade kontroller i stället för staplade
+ * kort, vilket halverar höjden på steg 2 och gör målvalet till en rad. Färger
+ * och radier kommer ur tokens i `globals.css`.
  */
 import { useState } from 'react';
 import { nextRaceDate } from '../engine/config.ts';
@@ -30,6 +35,11 @@ import {
 import { EQUIPMENT, FORM, LEVELS, raceLabel, SPORT_NAMES, WEEKDAYS } from './texts.ts';
 
 const STEG = 3;
+
+/** Inmatningsfältens gemensamma utseende. Ett ställe, så att de inte glider isär. */
+const FÄLT =
+  'rounded-field border border-rule-strong bg-surface px-3 py-2.5 text-base text-ink ' +
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 
 interface Props {
   /** Dagens datum som ISO-sträng. Skickas in så att formuläret blir testbart. */
@@ -84,18 +94,23 @@ export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
       {byggfel !== null && byggfel !== undefined && byggfel !== '' && (
         <p
           role="alert"
-          className="mt-8 rounded-lg bg-amber-50 p-4 text-sm text-amber-900"
+          className="mt-8 border-l-2 border-caution bg-sunk px-4 py-3 text-sm text-ink-2"
         >
           {byggfel}
         </p>
       )}
 
-      <div className="mt-10 flex gap-3">
+      {/*
+        Knappraden fäster i underkanten på små skärmar. På telefon hamnade
+        "Nästa" annars under vikningen i steg 2 och 3, och man fick rulla för
+        att komma vidare i ett formulär man just fyllt i.
+      */}
+      <div className="sticky bottom-0 z-10 -mx-5 mt-10 flex gap-3 border-t border-rule bg-ground/95 px-5 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-filter-none">
         {steg > 1 && (
           <button
             type="button"
             onClick={bakåt}
-            className="rounded-lg border border-neutral-300 px-5 py-3 font-medium hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+            className="rounded-field border border-rule-strong px-5 py-3 font-medium hover:bg-sunk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             {FORM.back}
           </button>
@@ -103,7 +118,7 @@ export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
         <button
           type="button"
           onClick={framåt}
-          className="rounded-lg bg-neutral-900 px-5 py-3 font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+          className="rounded-field bg-accent px-5 py-3 font-medium text-white hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {steg === STEG ? FORM.submit : FORM.next}
         </button>
@@ -136,18 +151,63 @@ interface StegProps {
 function Steginikator({ steg, av }: { steg: number; av: number }) {
   return (
     <div className="flex items-center gap-3">
-      <p className="text-sm font-medium text-neutral-500">{FORM.stepLabel(steg, av)}</p>
+      <p className="text-sm font-medium text-ink-3">{FORM.stepLabel(steg, av)}</p>
 
       <div aria-hidden="true" className="flex flex-1 gap-1.5">
         {Array.from({ length: av }, (_, i) => (
           <span
             key={i}
-            className={`h-1 flex-1 rounded-full ${
-              i < steg ? 'bg-neutral-900' : 'bg-neutral-200'
-            }`}
+            className={`h-1 flex-1 rounded-full ${i < steg ? 'bg-accent' : 'bg-rule'}`}
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Ett val mellan två eller tre jämbördiga alternativ.
+ *
+ * Staplade kort säger "det här är en lista att läsa igenom". En segmenterad
+ * kontroll säger "välj ett av de här", vilket är sanningen — och tar en rad i
+ * stället för tre eller fyra.
+ *
+ * Byggd på riktiga radioknappar som ligger dolda under etiketterna: då fungerar
+ * piltangenter, skärmläsare och formulärsemantik utan att något behöver
+ * efterliknas i kod.
+ */
+function Segmenterat<T extends string>({
+  name,
+  value,
+  options,
+  onChange,
+}: {
+  name: string;
+  value: T | undefined;
+  options: readonly { value: T; name: string }[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="flex w-full rounded-field border border-rule-strong bg-surface p-0.5 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent">
+      {options.map((alternativ) => (
+        <label
+          key={alternativ.value}
+          className={`flex-1 cursor-pointer rounded-[2px] px-3 py-2 text-center text-sm font-medium transition-colors motion-reduce:transition-none ${
+            value === alternativ.value
+              ? 'bg-accent text-white'
+              : 'text-ink-2 hover:bg-sunk'
+          }`}
+        >
+          <input
+            type="radio"
+            name={name}
+            checked={value === alternativ.value}
+            onChange={() => onChange(alternativ.value)}
+            className="sr-only"
+          />
+          {alternativ.name}
+        </label>
+      ))}
     </div>
   );
 }
@@ -171,15 +231,19 @@ function Steg1({ state, setState, felFör }: StegProps) {
 
   return (
     <section>
-      <h2 className="mt-2 text-2xl font-bold">{FORM.step1.heading}</h2>
-      <p className="mt-2 text-neutral-600">{FORM.step1.lead}</p>
+      <h2 className="mt-3 text-2xl font-semibold tracking-tight">{FORM.step1.heading}</h2>
+      <p className="mt-2 max-w-prose text-ink-2">{FORM.step1.lead}</p>
 
-      <Fält label={FORM.step1.startDateLabel} help={FORM.step1.startDateHelp} fel={felFör('startDate')}>
+      <Fält
+        label={FORM.step1.startDateLabel}
+        help={FORM.step1.startDateHelp}
+        fel={felFör('startDate')}
+      >
         <input
           type="date"
           value={state.startDate}
           onChange={(e) => setState({ ...state, startDate: e.target.value })}
-          className="rounded-lg border border-neutral-300 px-3 py-2.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+          className={FÄLT}
         />
       </Fält>
 
@@ -187,23 +251,30 @@ function Steg1({ state, setState, felFör }: StegProps) {
         <legend className="font-medium">Lopp</legend>
         {felFör('races') !== undefined && <Fel text={felFör('races') as string} />}
 
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-3 space-y-2">
           {state.races.map((race) => (
-            <li key={race.id} className="rounded-lg border border-neutral-200 transition-colors has-[:checked]:border-neutral-400 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-900">
+            <li
+              key={race.id}
+              className="rounded-card border border-rule bg-surface transition-colors has-[:checked]:border-rule-strong has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
+            >
               {/* Etiketten täcker hela kortet, så tryckytan blir stor nog. */}
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg p-4 hover:bg-neutral-50">
+              <label className="flex cursor-pointer items-start gap-3 rounded-card p-4 hover:bg-sunk">
                 <input
                   type="checkbox"
                   checked={race.selected}
                   onChange={(e) => byggOm(race.id, { selected: e.target.checked })}
-                  className="mt-1 h-5 w-5"
+                  className="mt-0.5 h-5 w-5 accent-accent"
                 />
                 <span className="font-medium">{raceLabel(race.id)}</span>
               </label>
 
               {race.selected && (
-                <div className="px-4 pb-4 pl-12">
-                  <label className="block text-sm text-neutral-600">
+                /*
+                  En tunn linje i stället för ett indrag på 48 px: den binder
+                  ihop innehållet med kryssrutan och sparar bredd på telefon.
+                */
+                <div className="mr-4 mb-4 ml-8 border-l border-rule pl-4">
+                  <label className="block text-sm text-ink-3">
                     {FORM.step1.dateLabel}
                     <input
                       type="date"
@@ -211,22 +282,18 @@ function Steg1({ state, setState, felFör }: StegProps) {
                       min={state.startDate}
                       max={latestRaceDate(state.startDate) ?? undefined}
                       onChange={(e) => byggOm(race.id, { date: e.target.value })}
-                      className="mt-1 block rounded-lg border border-neutral-300 px-3 py-2.5 text-base text-neutral-900"
+                      className={`mt-1 block ${FÄLT}`}
                     />
                   </label>
 
                   {/* F-15: uppmaningen att kontrollera datumet står alltid,
                       inte bara när ett datum saknas — ett fel datum som redan
                       är ifyllt är svårare att upptäcka än ett tomt fält. */}
-                  <p className="mt-2 text-sm text-neutral-600">
-                    {FORM.step1.dateCheckHelp}
-                  </p>
+                  <p className="mt-2 text-sm text-ink-3">{FORM.step1.dateCheckHelp}</p>
 
                   {/* Arrangören har inte publicerat något datum som passar. */}
                   {nextRaceDate(race.id, state.startDate) === null && (
-                    <p className="mt-2 text-sm text-neutral-600">
-                      {FORM.step1.datePlaceholderMissing}
-                    </p>
+                    <p className="mt-2 text-sm text-ink-3">{FORM.step1.datePlaceholderMissing}</p>
                   )}
 
                   {felFör(`date-${race.id}`) !== undefined && (
@@ -240,33 +307,27 @@ function Steg1({ state, setState, felFör }: StegProps) {
                       två rader om samma datum är en för mycket. */}
                   {felFör(`date-${race.id}`) === undefined &&
                     anmärkningar[`date-${race.id}`] !== undefined && (
-                      <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                      <p className="mt-2 border-l-2 border-caution bg-sunk px-3 py-2 text-sm text-ink-2">
                         {anmärkningar[`date-${race.id}`]}
                       </p>
                     )}
 
                   {/* R-38: vad användaren vill med loppet. */}
                   <fieldset className="mt-4">
-                    <legend className="text-sm font-medium text-neutral-900">
+                    <legend className="text-sm font-medium text-ink">
                       {FORM.step1.goalLabel}
                     </legend>
 
-                    <div className="mt-2 space-y-2">
-                      {FORM.step1.goals.map((mål) => (
-                        <label key={mål.value} className="flex items-start gap-3">
-                          <input
-                            type="radio"
-                            name={`goal-${race.id}`}
-                            checked={race.goal === mål.value}
-                            onChange={() => byggOm(race.id, { goal: mål.value })}
-                            className="mt-1 h-5 w-5"
-                          />
-                          <span className="text-sm">
-                            <span className="font-medium">{mål.name}</span>
-                            <span className="block text-neutral-600">{mål.help}</span>
-                          </span>
-                        </label>
-                      ))}
+                    <div className="mt-2">
+                      <Segmenterat
+                        name={`goal-${race.id}`}
+                        value={race.goal}
+                        options={FORM.step1.goals}
+                        onChange={(mål) => byggOm(race.id, { goal: mål })}
+                      />
+                      <p className="mt-2 text-sm text-ink-3">
+                        {FORM.step1.goals.find((mål) => mål.value === race.goal)?.help}
+                      </p>
                     </div>
                   </fieldset>
                 </div>
@@ -285,39 +346,39 @@ function Steg2({ state, setState, felFör }: StegProps) {
 
   return (
     <section>
-      <h2 className="mt-2 text-2xl font-bold">{FORM.step2.heading}</h2>
-      <p className="mt-2 text-neutral-600">{FORM.step2.lead}</p>
+      <h2 className="mt-3 text-2xl font-semibold tracking-tight">{FORM.step2.heading}</h2>
+      <p className="mt-2 max-w-prose text-ink-2">{FORM.step2.lead}</p>
 
       {felFör('levels') !== undefined && <Fel text={felFör('levels') as string} />}
 
-      <div className="mt-6 space-y-6">
-        {grenar.map((sport) => (
-          <fieldset key={sport}>
-            <legend className="font-medium">{SPORT_NAMES[sport]}</legend>
-            <div className="mt-2 space-y-2">
-              {LEVELS.map((nivå) => (
-                <label
-                  key={nivå.value}
-                  className="flex cursor-pointer items-start gap-3 rounded-lg border border-neutral-200 p-3 hover:bg-neutral-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-900"
-                >
-                  <input
-                    type="radio"
-                    name={`level-${sport}`}
-                    checked={state.levels[sport] === nivå.value}
-                    onChange={() =>
-                      setState({ ...state, levels: { ...state.levels, [sport]: nivå.value } })
-                    }
-                    className="mt-1 h-5 w-5"
-                  />
-                  <span>
-                    <span className="font-medium">{nivå.name}</span>
-                    <span className="block text-sm text-neutral-600">{nivå.description}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        ))}
+      <div className="mt-6 space-y-5">
+        {grenar.map((sport) => {
+          const vald = LEVELS.find((nivå) => nivå.value === state.levels[sport]);
+
+          return (
+            <fieldset key={sport}>
+              <legend className="font-medium">{SPORT_NAMES[sport]}</legend>
+
+              <div className="mt-2">
+                <Segmenterat
+                  name={`level-${sport}`}
+                  value={state.levels[sport]}
+                  options={LEVELS}
+                  onChange={(nivå) =>
+                    setState({ ...state, levels: { ...state.levels, [sport]: nivå } })
+                  }
+                />
+
+                {/*
+                  Beskrivningen av den valda nivån står kvar — det är den som
+                  gör svaret ärligt. Men bara den valda: tre beskrivningar
+                  samtidigt var det som gjorde steget till formulärets längsta.
+                */}
+                <p className="mt-2 min-h-10 text-sm text-ink-3">{vald?.description ?? ''}</p>
+              </div>
+            </fieldset>
+          );
+        })}
       </div>
     </section>
   );
@@ -329,7 +390,7 @@ function Steg3({ state, setState, felFör }: StegProps) {
 
   return (
     <section>
-      <h2 className="mt-2 text-2xl font-bold">{FORM.step3.heading}</h2>
+      <h2 className="mt-3 text-2xl font-semibold tracking-tight">{FORM.step3.heading}</h2>
 
       <Fält label={FORM.step3.hoursLabel} help={FORM.step3.hoursHelp} fel={felFör('hoursPerWeek')}>
         <input
@@ -339,7 +400,7 @@ function Steg3({ state, setState, felFör }: StegProps) {
           step={1}
           value={state.hoursPerWeek}
           onChange={(e) => setState({ ...state, hoursPerWeek: e.target.value })}
-          className="w-24 rounded-lg border border-neutral-300 px-3 py-2.5"
+          className={`w-24 ${FÄLT}`}
         />
       </Fält>
 
@@ -356,13 +417,13 @@ function Steg3({ state, setState, felFör }: StegProps) {
 
       <fieldset className="mt-8">
         <legend className="font-medium">{FORM.step3.equipmentHeading}</legend>
-        <p className="mt-1 text-sm text-neutral-600">{FORM.step3.equipmentHelp}</p>
+        <p className="mt-1 max-w-prose text-sm text-ink-3">{FORM.step3.equipmentHelp}</p>
 
         <div className="mt-3 space-y-2">
           {EQUIPMENT.map((del) => (
             <label
               key={del.key}
-              className="flex cursor-pointer items-start gap-3 rounded-lg border border-neutral-200 p-3 hover:bg-neutral-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-900"
+              className="flex cursor-pointer items-start gap-3 rounded-card border border-rule bg-surface p-3 hover:bg-sunk has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
             >
               <input
                 type="checkbox"
@@ -373,11 +434,11 @@ function Steg3({ state, setState, felFör }: StegProps) {
                     equipment: { ...state.equipment, [del.key]: e.target.checked },
                   })
                 }
-                className="mt-1 h-5 w-5"
+                className="mt-0.5 h-5 w-5 accent-accent"
               />
               <span>
                 <span className="font-medium">{del.label}</span>
-                <span className="block text-sm text-neutral-600">{del.help}</span>
+                <span className="block text-sm text-ink-3">{del.help}</span>
               </span>
             </label>
           ))}
@@ -392,7 +453,7 @@ function Dagval({ value, onChange }: { value: Weekday; onChange: (dag: Weekday) 
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value) as Weekday)}
-      className="rounded-lg border border-neutral-300 px-3 py-2.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+      className={FÄLT}
     >
       {WEEKDAYS.map((dag) => (
         <option key={dag.value} value={dag.value}>
@@ -417,7 +478,7 @@ function Fält({
   return (
     <div className="mt-8">
       <label className="block font-medium">{label}</label>
-      {help !== undefined && <p className="mt-1 text-sm text-neutral-600">{help}</p>}
+      {help !== undefined && <p className="mt-1 max-w-prose text-sm text-ink-3">{help}</p>}
       <div className="mt-2">{children}</div>
       {fel !== undefined && <Fel text={fel} />}
     </div>
@@ -427,7 +488,7 @@ function Fält({
 /** Ett fel vid ett fält. `role="alert"` så att skärmläsare läser upp det. */
 function Fel({ text }: { text: string }) {
   return (
-    <p role="alert" className="mt-2 text-sm font-medium text-red-700">
+    <p role="alert" className="mt-2 text-sm font-medium text-critical">
       {text}
     </p>
   );
