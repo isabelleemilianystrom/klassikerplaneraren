@@ -1552,6 +1552,8 @@ planen ser det jag inte tänkt på.
 | **F-21** | **Översiktstabellen räknar inte ihop sig i loppveckan** — öppningspasset dagen före saknas i sportkolumnerna (P1 v36, P5 v35, P4 v6) | **Åtgärdad 2026-11-16** |
 | **F-22** | **P6 v21 har "oplac. 10 min" utan förklaring** | **Förklarad 2026-11-16.** Beteendet är rätt, texten saknades |
 | **F-23** | **P2 v17: sex träningsdagar i rad i en nedtrappningsvecka** | **Verifierat.** Invarianten kräver bara *en* vilodag och är därför grön |
+| **F-27** | **Två döda varningstexter.** `shortPreparation` (R-22) och `skiTechnique` (R-24) låg i konfigurationen och i schemat utan att någon kod läste dem — R-22 ströks för att R-35 säger samma sak bättre, R-24 för att R-21:s kursråd gör det, men texterna blev kvar. Samma sort som F-20 | **Åtgärdad 2026-11-17.** Borttagna, och ett test kräver nu att varje varning i `rules.warnings` läses av någon kod i `src/engine` |
+| **F-26** | **Varningar och råd såg likadana ut.** P1 möttes av tre gulmarkerade rutor innan ett enda pass: en äkta varning om volym och två kursråd. En varning betyder "det här når inte ditt mål"; ett råd om en simkurs är något annat | **Åtgärdad 2026-11-17.** Råden har egen rubrik och neutral yta |
 | **F-25** | **Planvyn öppnades på mitten.** K-16:s effekt centrerade innevarande vecka vid varje montering, också för en nyskapad plan — rubriken, sammanfattningen, varningarna och säkerhetstexten hamnade ovanför skärmens kant. Vyn behöll dessutom formulärets rullning, eftersom den inte byter sida | **Åtgärdad 2026-11-16** |
 | **F-24** | **Stakmaskinen i formuläret kunde inte påverka något.** R-17 använder den bara som ersättning när snön fattas, och nästan all skidträning ligger i november–mars, så för den som svarat ja på snö nämnde **0 av 74** skidpass den | **Åtgärdad 2026-11-16.** Den erbjuds nu som alternativ på snöpass: 47 av 72 pass i P2, resten är teknikpass eller längre än R-44:s tak |
 
@@ -1562,6 +1564,22 @@ byggdes, så den som planerar för 2028 har rätt och appen fel, och ett svar so
 värre än inget svar alls. Ett riktigt fel på fältet går före, så samma datum aldrig får två
 rader. Prövat i appen: Vasaloppet den 13 december 2026 ger anmärkningen och släpper ändå vidare
 till steg 2.
+
+**En genomgång i användarens roll 2026-11-17** gav F-26 och F-27, plus den rättade demoraden
+nedan. Den var ingen riktig användartest — ingen utomstående har provat appen, och det återstår
+— men den mätte vad appen begär av en person, och två tal stack ut.
+
+**Svaret låg 726 ord ner i sidan.** Frågan på en tisdagsmorgon är "vad ska jag göra i dag?", och
+det första passet låg på 1 273 pixlar, bakom sammanfattning, AI-förklaring, säkerhetstexter och
+varningar — drygt tre skärmar på telefon, efter fem sekunders väntan. **Ett veckokort ligger nu
+överst**: veckans dagar, passens namn och tider, utan instruktionerna, med en knapp till hela
+veckan. Mätt efter ändringen: kortet står på 160 px med **27 ord** före sig, synligt utan att
+rulla. Ingenting togs bort — ordningen ändrades. Kortet visas inte när planen är slut, och säger
+"Första veckan" i stället för "Den här veckan" för den som planerar i förväg.
+
+**Och demomanuset stämde inte med formuläret.** Raden sa "Simhall och cykel, inga skidor", men de
+frågorna togs bort 2026-11-04 när K-04 ändrades. Den som följt manuset på scen hade letat efter
+kryssrutor som inte finns. Rättad ovan.
 
 **F-25 är åtgärdad 2026-11-16.** K-16:s acceptanskriterium gäller *återbesöket* — "givet en
 sparad plan där några veckor passerat" — men effekten i vyn skilde inte på det och en nyskapad

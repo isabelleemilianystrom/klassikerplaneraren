@@ -3,12 +3,14 @@ import { rules } from '../src/engine/config.ts';
 import { addDays } from '../src/engine/dates.ts';
 import { buildWeekPlans } from '../src/engine/sessions.ts';
 import {
+  currentWeek,
   currentWeekIndex,
   formatDay,
   formatMinutes,
   formatWeekRange,
   formatZone,
   groupByPhase,
+  hasWeekStarted,
   phaseName,
   racesInWeek,
   ribbonBars,
@@ -142,6 +144,40 @@ describe('veckans fokus', () => {
     if (utanFokus === undefined) return;
 
     expect(weekFocus(utanFokus)).toBe(phaseName(utanFokus.week.phase));
+  });
+});
+
+describe('veckokortet: svaret högst upp i planen', () => {
+  it('ger veckan som innehåller dagens datum', () => {
+    const vecka = PLANER[10];
+    const mitt = addDays(vecka?.week.startDate as string, 3);
+
+    expect(currentWeek(PLANER, mitt)?.week.index).toBe(vecka?.week.index);
+  });
+
+  it('ger inget kort när planen är slut', () => {
+    // Är sista veckan passerad finns ingen vecka att vara i, och då ska kortet
+    // inte visas alls.
+    const sista = PLANER.at(-1)?.week.startDate as string;
+
+    expect(currentWeek(PLANER, addDays(sista, 7))).toBeNull();
+  });
+
+  it('ger första veckan till den som skapat planen i förväg', () => {
+    const före = addDays(PLANER[0]?.week.startDate as string, -30);
+
+    expect(currentWeek(PLANER, före)?.week.index).toBe(1);
+  });
+
+  it('vet om veckan har börjat eller inte', () => {
+    // "Den här veckan" vore fel ord för den som planerar i förväg — veckan har
+    // inte börjat, och kortet säger "Första veckan" i stället.
+    const första = PLANER[0] as (typeof PLANER)[number];
+    const start = första.week.startDate;
+
+    expect(hasWeekStarted(första, start)).toBe(true);
+    expect(hasWeekStarted(första, addDays(start, 3))).toBe(true);
+    expect(hasWeekStarted(första, addDays(start, -1))).toBe(false);
   });
 });
 

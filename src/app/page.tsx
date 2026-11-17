@@ -36,10 +36,16 @@ function idag(): string {
 }
 
 /**
- * Alla varningar och råd som hör till planen (K-09).
+ * Varningarna om planens begränsningar (K-09).
  *
  * I den ordning de bör läsas: först planens förutsättningar, sedan
- * volymriktmärkena, sist råden om kurs.
+ * volymriktmärkena.
+ *
+ * **Kursråden ingår inte**, sedan 2026-11-17. En varning betyder "det här når
+ * inte ditt mål" — ett råd om att gå en simkurs är något annat, och att visa
+ * dem tillsammans gjorde att en nybörjare möttes av tre varningsmarkerade
+ * rutor innan hon sett ett enda pass. De hämtas med `courseAdvice` i stället
+ * och visas för sig.
  */
 function allaVarningar(input: PlanInput, planer: WeekPlan[]): string[] {
   return [
@@ -48,7 +54,6 @@ function allaVarningar(input: PlanInput, planer: WeekPlan[]): string[] {
     ...classicWindowWarnings(input),
     ...midProgrammeWarnings(midProgrammeStarts(input, planer)),
     ...volumeWarnings(volumeChecks(input, planer)),
-    ...courseAdvice(input),
   ];
 }
 
@@ -56,6 +61,8 @@ interface Plan {
   input: PlanInput;
   plans: WeekPlan[];
   warnings: string[];
+  /** Kursråden (R-21). Skilda från varningarna, se `allaVarningar`. */
+  advice: string[];
   /** Formulärets svar, så att "Ändra svar" kan fylla i dem igen (K-13). */
   form: FormState;
 }
@@ -70,7 +77,13 @@ interface Plan {
 function byggPlan(input: PlanInput, form: FormState): Plan | null {
   try {
     const plans = buildWeekPlans(input);
-    return { input, plans, warnings: allaVarningar(input, plans), form };
+    return {
+      input,
+      plans,
+      warnings: allaVarningar(input, plans),
+      advice: courseAdvice(input),
+      form,
+    };
   } catch (fel) {
     // Felet loggas men sväljs. Att låta det passera vore en vit sida, och det
     // är precis vad K-15 finns för att förhindra — men ett tomt `catch` gjorde
@@ -188,6 +201,7 @@ export default function Home() {
           input={plan.input}
           plans={plan.plans}
           warnings={plan.warnings}
+          advice={plan.advice}
           today={today}
           onChangeAnswers={visaFormulär}
           onStartOver={börjaOm}

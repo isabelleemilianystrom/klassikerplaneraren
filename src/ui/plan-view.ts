@@ -145,6 +145,34 @@ export function currentWeekIndex(plans: readonly WeekPlan[], today: IsoDate): nu
   return vecka?.week.index ?? null;
 }
 
+/**
+ * Veckan att svara med högst upp i planen, eller null (designöversynen).
+ *
+ * Frågan en användare har på en tisdagsmorgon är "vad ska jag göra i dag?".
+ * Svaret låg 1 273 pixlar och 726 ord ner i sidan, bakom sammanfattning,
+ * förklaring, säkerhetstexter och varningar. Allt det ska stå kvar — men inte
+ * före svaret.
+ *
+ * Är planen slut finns ingen vecka att visa, och då visas inget kort.
+ */
+export function currentWeek(plans: readonly WeekPlan[], today: IsoDate): WeekPlan | null {
+  const index = currentWeekIndex(plans, today);
+  if (index === null) return null;
+
+  return plans.find((plan) => plan.week.index === index) ?? null;
+}
+
+/**
+ * Sant när veckan har börjat (designöversynen).
+ *
+ * Den som skapar sin plan i förväg får första veckan som "aktuell" (se
+ * `currentWeekIndex`), och då vore "Den här veckan" fel ord — veckan har inte
+ * börjat. Kortet säger "Första veckan" i stället.
+ */
+export function hasWeekStarted(plan: WeekPlan, today: IsoDate): boolean {
+  return today >= plan.week.startDate;
+}
+
 /** En stapel i årsremsan: en vecka, skalad mot den tyngsta veckan. */
 export interface RibbonBar {
   /** Veckans nummer i planen. */

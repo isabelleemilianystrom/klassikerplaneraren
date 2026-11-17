@@ -19,12 +19,14 @@ import type { WeekPlan } from '../engine/sessions.ts';
 import type { IsoDate, PlanInput, Session } from '../engine/types.ts';
 import { weekdayOf } from '../engine/dates.ts';
 import {
+  currentWeek,
   currentWeekIndex,
   formatDay,
   formatMinutes,
   formatWeekRange,
   formatZone,
   groupByPhase,
+  hasWeekStarted,
   racesInWeek,
   ribbonBars,
   sessionSport,
@@ -40,6 +42,8 @@ interface Props {
   input: PlanInput;
   plans: WeekPlan[];
   warnings: string[];
+  /** Kursråden (R-21). Visas för sig, inte som varningar. */
+  advice: string[];
   today: IsoDate;
   onChangeAnswers: () => void;
   onStartOver: () => void;
@@ -55,6 +59,7 @@ export default function PlanView({
   input,
   plans,
   warnings,
+  advice,
   today,
   onChangeAnswers,
   onStartOver,
@@ -96,11 +101,14 @@ export default function PlanView({
           <p className="mt-3 max-w-prose text-ink-2">
             {PLAN.summary(plans.length, totalHours(plans), input.hoursPerWeek)}
           </p>
-
-          {/* A-04: sammanfattningen, skriven i förväg och granskad. */}
-          <p className="mt-4 max-w-prose text-ink-2">{explanations.summary}</p>
-          <p className="mt-2 text-sm text-ink-3">{FIXED.aiMarking}</p>
         </header>
+
+        {/*
+          Svaret först. Frågan på en tisdagsmorgon är "vad ska jag göra i dag?",
+          och den låg 726 ord och tre skärmar ner i sidan, bakom förklaring,
+          säkerhetstexter och varningar. Allt det står kvar — men efter svaret.
+        */}
+        <Veckokort plans={plans} today={today} onOpen={setÖppen} />
 
         {/*
           Säkerhetstexterna först, och med den kraftigaste markeringen på sidan.
@@ -139,6 +147,35 @@ export default function PlanView({
             </ul>
           </section>
         )}
+
+        {/*
+          Kursråden, skilda från varningarna sedan 2026-11-17. De säger inte
+          "det här når inte ditt mål" utan "så här blir du bättre", och ska
+          därför inte bära varningens markering.
+        */}
+        {advice.length > 0 && (
+          <section className="mt-6" aria-labelledby="rad">
+            <h2 id="rad" className="text-sm font-semibold text-ink">
+              {PLAN.adviceHeading}
+            </h2>
+            <ul className="mt-2 space-y-2">
+              {advice.map((råd) => (
+                <li
+                  key={råd}
+                  className="rounded-card bg-sunk px-4 py-3 text-sm text-ink-2"
+                >
+                  {råd}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* A-04: sammanfattningen, skriven i förväg och granskad. */}
+        <section className="mt-8">
+          <p className="max-w-prose text-ink-2">{explanations.summary}</p>
+          <p className="mt-2 text-sm text-ink-3">{FIXED.aiMarking}</p>
+        </section>
 
         <YearRibbon plans={plans} raceNames={loppnamn} />
 
@@ -206,6 +243,97 @@ export default function PlanView({
           <p className="max-w-prose">{FIXED.independence}</p>
         </footer>
     </div>
+  );
+}
+
+/**
+ * Veckan man är i, överst i planen (designöversynen 2026-11-17).
+ *
+ * Kortet upprepar inte veckovyn — det ger dagarna och passens namn, inte
+ * instruktionerna. Frågan det svarar på är "vad gör jag den här veckan?", och
+ * den som vill veta *hur* ett pass görs öppnar veckan längre ner, dit knappen
+ * leder.
+ *
+ * Visas inte när planen är slut: då finns ingen vecka att vara i.
+ */
+function Veckokort({
+  plans,
+  today,
+  onOpen,
+}: {
+  plans: WeekPlan[];
+  today: IsoDate;
+  onOpen: (index: number) => void;
+}) {
+  const vecka = currentWeek(plans, today);
+  if (vecka === null) return null;
+
+  const dagar = grupperaPerDag(vecka.sessions);
+  const lopp = racesInWeek(vecka);
+  const börjat = hasWeekStarted(vecka, today);
+
+  return (
+    <section
+      className="mt-8 rounded-card border border-rule bg-surface p-4"
+      aria-labelledby="veckokort"
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="veckokort" className="font-semibold">
+          {börjat ? PLAN.thisWeekHeading : PLAN.firstWeekHeading}
+          <span className="ml-2 font-normal text-ink-3">
+            {formatWeekRange(vecka.week.startDate)}
+          </span>
+        </h2>
+        <p className="text-sm text-ink-2">{formatMinutes(vecka.totalMinutes)}</p>
+      </div>
+
+      <p className="mt-0.5 text-xs font-semibold tracking-wide text-ink-3 uppercase">
+        {weekFocus(vecka)}
+        {lopp.length > 0 && ` · ${PLAN.raceWeek(lopp)}`}
+      </p>
+
+      <ul className="mt-3 divide-y divide-rule border-t border-rule">
+        {dagar.map(({ date, sessions }) => (
+          <li key={date} className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] gap-3 py-1.5">
+            <span className="text-sm text-ink-3">{formatDay(date, weekdayOf(date))}</span>
+
+            <span className="min-w-0 text-sm">
+              {sessions.map((session) => (
+                <span key={session.id} className="flex items-center gap-1.5">
+                  {session.sport !== null && (
+                    <span
+                      aria-hidden="true"
+                      className={`inline-block size-2 shrink-0 rounded-full ${SPORT_COLORS[session.sport].dot}`}
+                    />
+                  )}
+                  <span className="truncate">
+                    {session.type === 'rest' ? PLAN.restShort : session.title}
+                  </span>
+                </span>
+              ))}
+            </span>
+
+            <span className="text-right text-sm text-ink-3">
+              {sessions
+                .filter((session) => session.type !== 'rest')
+                .map((session) => formatMinutes(session.minutes))
+                .join(', ')}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        onClick={() => {
+          onOpen(vecka.week.index);
+          document.getElementById(`vecka-${vecka.week.index}`)?.scrollIntoView({ block: 'start' });
+        }}
+        className="mt-3 rounded-field text-sm font-medium text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        {PLAN.openWeek}
+      </button>
+    </section>
   );
 }
 

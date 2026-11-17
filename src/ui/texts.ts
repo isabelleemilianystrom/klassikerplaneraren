@@ -250,7 +250,19 @@ export const PLAN = {
     `De flesta veckor blir kortare än så – programmet varvar tyngre och lättare perioder.`,
 
   warningsHeading: 'Att tänka på',
+  /*
+   * Råden skildes från varningarna 2026-11-17. En varning betyder "det här når
+   * inte ditt mål"; ett kursråd är inte det, och att ge dem samma gula ram
+   * gjorde att en nybörjare möttes av tre varningsmarkerade rutor innan hon
+   * sett ett enda pass.
+   */
+  adviceHeading: 'Råd på vägen',
   safetyHeading: 'Innan du börjar',
+
+  /* Veckokortet högst upp: svaret på "vad gör jag den här veckan?". */
+  thisWeekHeading: 'Den här veckan',
+  firstWeekHeading: 'Första veckan',
+  openWeek: 'Se hela veckan',
   /** Avbryter bekräftelsen i "Gör en ny plan". */
   cancel: 'Avbryt',
   overviewHeading: 'Vecka för vecka',
@@ -274,6 +286,8 @@ export const PLAN = {
   raceWeek: (lopp: string[]) => (lopp.length === 1 ? `${lopp[0]}` : lopp.join(' och ')),
 
   rest: 'Vila – ingen planerad träning.',
+  /** Samma sak i veckokortet, där raden ska vara kort. */
+  restShort: 'Vila',
 
   alternatives: (grenar: string[]) => `Kan också göras som: ${grenar.join(', ')}`,
 
