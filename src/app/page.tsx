@@ -20,6 +20,7 @@ import {
 import { volumeChecks, volumeWarnings } from '../engine/volume.ts';
 import type { PlanInput } from '../engine/types.ts';
 import Generating, { GENERATING_MS } from '../ui/Generating.tsx';
+import Intro from '../ui/Intro.tsx';
 import PlanForm from '../ui/PlanForm.tsx';
 import PlanView from '../ui/PlanView.tsx';
 import type { FormState } from '../ui/form-state.ts';
@@ -97,7 +98,7 @@ function byggPlan(input: PlanInput, form: FormState): Plan | null {
   }
 }
 
-type Vy = 'start' | 'formulär' | 'plan';
+type Vy = 'start' | 'intro' | 'formulär' | 'plan';
 
 export default function Home() {
   const [today] = useState(idag);
@@ -166,7 +167,7 @@ export default function Home() {
   }
 
   /**
-   * Startar formuläret från startsidan.
+   * Går från startsidan till introsidan (K-19).
    *
    * Fanns en sparad plan som inte gick att läsa rensas den här. `parseStored`
    * är ren och rensar inte själv — det ska ske när användaren gör något, inte
@@ -174,7 +175,7 @@ export default function Home() {
    */
   function börjaFrånStart() {
     if (kastadPlan !== null) clear();
-    setEget({ vy: 'formulär', plan: null });
+    setEget({ vy: 'intro', plan: null });
   }
 
   // K-18: medan väntevyn visas är planen byggd men ännu inte på skärmen.
@@ -182,6 +183,20 @@ export default function Home() {
     return (
       <main>
         <Generating />
+      </main>
+    );
+  }
+
+  // K-19: introsidan ligger mellan startsidan och steg 1. Den visas bara på
+  // vägen in första gången — "Ändra svar" och "Gör en ny plan" går direkt till
+  // formuläret, eftersom den som varit där redan vet vad som frågas.
+  if (vy === 'intro') {
+    return (
+      <main>
+        <Intro
+          onStart={() => setEget({ vy: 'formulär', plan: null })}
+          onBack={() => setEget({ vy: 'start', plan: null })}
+        />
       </main>
     );
   }

@@ -137,6 +137,49 @@ export const HOME = {
   start: 'Skapa mitt program',
 } as const;
 
+/**
+ * Introsidan mellan startsidan och steg 1 (K-19).
+ *
+ * Tonen är densamma som på startsidan: andra person, konkret, inget sälj. Det
+ * sidan gör är att ta bort tre skäl att tveka — att man inte vet hur mycket
+ * som kommer, att man tror att man måste ha allt klart för sig, och att man
+ * inte vet vad som händer med svaren.
+ */
+export const INTRO = {
+  title: 'Tre steg till ditt program',
+  lead: 'Det tar ett par minuter, och du kan ändra dina svar efteråt.',
+
+  steps: [
+    {
+      title: 'Dina lopp',
+      body:
+        'Vilka av de fyra du ska göra, och när. Datumen är redan ifyllda – men kontrollera dem ' +
+        'mot arrangörens sida, lopp flyttas.',
+    },
+    {
+      title: 'Din nivå',
+      body:
+        'Hur van du är i varje gren. Svaret avgör hur mycket tid grenen får och hur hårt du ' +
+        'tränar i den, så var hellre försiktig än optimistisk.',
+    },
+    {
+      title: 'Din tid',
+      body:
+        'Timmar i veckan, vilken dag långpasset passar och vilken du vill vara ledig. Plus vad ' +
+        'du har tillgång till – snö, rullskidor, stakmaskin eller trainer.',
+    },
+  ],
+
+  after:
+    'Sedan får du ett program vecka för vecka fram till ditt sista lopp. Det sparas i den här ' +
+    'webbläsaren, så du hittar tillbaka till det nästa gång.',
+
+  privacy: 'Inget du svarar lämnar din dator. Appen skickar ingenting till någon server.',
+
+  start: 'Till steg 1',
+  back: 'Tillbaka',
+} as const;
+
 /** Formuläret. */
 export const FORM = {
   stepLabel: (steg: number, av: number) => `Steg ${steg} av ${av}`,
