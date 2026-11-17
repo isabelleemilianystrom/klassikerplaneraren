@@ -101,11 +101,16 @@ export default function PlanForm({ today, initial, byggfel, onSubmit }: Props) {
       )}
 
       {/*
-        Knappraden fäster i underkanten på små skärmar. På telefon hamnade
-        "Nästa" annars under vikningen i steg 2 och 3, och man fick rulla för
-        att komma vidare i ett formulär man just fyllt i.
+        Knappraden fäster i underkanten, på alla skärmar. Den var först bara
+        klibbig på telefon, men med alla fyra loppen valda är steg 1 1 625 px
+        högt och "Nästa" hamnar på 1 537 px — under vikningen också på en
+        laptop. Att behöva rulla för att komma vidare i ett formulär man just
+        fyllt i är samma fel oavsett skärmstorlek.
+
+        På en sida som får plats på skärmen gör `sticky` ingenting, så den
+        korta första vyn påverkas inte.
       */}
-      <div className="sticky bottom-0 z-10 -mx-5 mt-10 flex gap-3 border-t border-rule bg-ground/95 px-5 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-filter-none">
+      <div className="sticky bottom-0 z-10 -mx-5 mt-10 flex gap-3 border-t border-rule bg-ground/95 px-5 py-3 backdrop-blur">
         {steg > 1 && (
           <button
             type="button"

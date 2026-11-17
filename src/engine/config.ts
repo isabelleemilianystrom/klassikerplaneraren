@@ -411,8 +411,7 @@ export const rulesSchema = z.object({
   classicWindow: z.object({ _rule: z.string(), months: z.number().int().positive() }),
   warnings: z.object({
     _rule: z.string(),
-    shortPreparation: z.object({ weeksThreshold: z.number().int().positive(), text: z.string().min(1) }),
-    skiTechnique: z.object({ text: z.string().min(1) }),
+    _borttagna: z.string(),
     outsideClassicWindow: z.object({ text: z.string().min(1) }),
     volumeMilestone: z.object({
       _rule: z.string(),

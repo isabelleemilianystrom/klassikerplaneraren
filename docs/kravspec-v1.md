@@ -184,7 +184,7 @@ Appen har ett enda flöde: startsida, formulär i tre steg och sedan planen. Den
 | K-06 | Översikt: alla veckor från start till sista lopp med veckonummer, datumintervall, fas, total tid och markering av loppveckor | Måste | Antalet veckor stämmer med perioden; varje loppvecka är markerad med loppets namn |
 | K-07 | Veckovy: sju dagar med pass; varje pass visar sport, typ, minuter, intensitet i vardagsspråk och zon samt en kort instruktion; vilodagar visas som vila | Måste | Varje dag i veckan visas; intensitet visas som t.ex. "Lugnt – du ska kunna prata hela meningar (zon 2)" |
 | K-08 | Förklaring per fas: varje sammanhängande fas har en kort förklaring, och planen har en kort sammanfattning överst | Måste | Varje fas i översikten har en förklaring; texten är högst 300 tecken |
-| K-09 | Varningar enligt avsnitt 5 visas överst i planen; planen skapas ändå | Måste | Givet Vasaloppet om 6 veckor, när planen skapas, så visas varningen om kort förberedelsetid och en plan |
+| K-09 | Varningar enligt avsnitt 5 visas överst i planen; planen skapas ändå | Måste | Givet Vasaloppet om 6 veckor, när planen skapas, så visas varningen om att man hoppar in mitt i programmet (R-35) och en plan *(rättat 2026-11-17: kriteriet sa "varningen om kort förberedelsetid", alltså R-22, men den ströks eftersom R-35 säger samma sak och säger det bättre. Den som granskade K-09 mot appen hade underkänt ett krav som är uppfyllt)* |
 | K-10 | Den senaste planen sparas i webbläsaren och visas vid återbesök, med knappen "Gör en ny plan". Formuläret står aldrig tomt bredvid en sparad plan *(förtydligad 2026-10-27)* | Måste | Efter omladdning visas samma plan; fungerar inte lagringen visas planen ändå utan fel; en ändring i formuläret kan aldrig radera planen oavsiktligt |
 | K-11 | Säkerhetstexter från avsnitt 8: ansvarsfriskrivning, röda flaggor, smärtregel och sjukdomsregel i planen; säkerhetstext på varje pass i öppet vatten | Måste | Varje pass i öppet vatten har säkerhetstexten; övriga texter syns i planen |
 | K-12 | Fungerar i mobil från 360 px bredd *(kontroll på riktig telefon uppskjuten till efter demon, 2026-11-15 — kravet står kvar)* | Måste | Ingen vågrät scroll och alla tryckytor minst 44 × 44 px vid 360 px *(preciserad 2026-10-29: gränsen 44 px är den vanliga minimigränsen för en tryckyta på pekskärm)* |
@@ -1789,7 +1789,7 @@ testad, säsongsviktningen, ersättningarna, och vägen framåt i avsnitt 12.
 - Mål: ta mig i mål på alla fyra
 - Ny på längdskidor och simning, van på cykel och löpning
 - Sex timmar i veckan, långpass söndag, ledig måndag
-- Simhall och cykel, inga skidor — då syns stavgången i backe, som är en poäng i sig
+- Utrustning: lämna **snö** omarkerat — då syns stavgången i backe, som är en poäng i sig *(rättad 2026-11-17: raden sa "simhall och cykel, inga skidor", men de frågorna togs bort 2026-11-04 när K-04 ändrades. Steg 3 frågar nu om snö, rullskidor, stakmaskin och trainer, och det är snöfrågan som styr stavgången)*
 
 **Reserv för demon.** Skapa planen i förväg så att den redan ligger sparad i webbläsaren — då syns den direkt om formuläret krånglar. Ta också skärmdumpar. Appen gör inga nätverksanrop alls, så den fungerar utan uppkoppling.
 

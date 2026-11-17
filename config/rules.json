@@ -264,14 +264,8 @@
     "months": 12
   },
   "warnings": {
-    "_rule": "R-22, R-23, R-24, R-26",
-    "shortPreparation": {
-      "weeksThreshold": 8,
-      "text": "Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid."
-    },
-    "skiTechnique": {
-      "text": "Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet."
-    },
+    "_rule": "R-26, R-34, R-35",
+    "_borttagna": "shortPreparation (R-22) och skiTechnique (R-24) låg här fram till 2026-11-17 utan att någon kod läste dem. Båda ströks medvetet när krockarna i avsnitt 5 reddes ut — R-35 säger det R-22 säger, men bättre, och R-21:s kursråd säger det R-24 säger — men texterna blev kvar i konfigurationen. Död konfiguration lovar något som aldrig visas, precis som strengthExercises gjorde i F-20. Läggs en varning till här ska den också läsas någonstans i src/engine; ett test i tests/config.test.ts kontrollerar det.",
     "outsideClassicWindow": {
       "text": "Dina lopp ligger mer än tolv månader isär. För att räknas som En svensk klassiker ska alla fyra genomföras inom tolv månader."
     },

@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { races, raceById, nextRaceDate, rules, sessions } from '../src/engine/config.ts';
 import type { SessionType, Sport } from '../src/engine/types.ts';
@@ -179,17 +180,34 @@ describe('config/rules.json', () => {
     expect(rules.intensity.byPhase.base.maxZone).toBe(4);
   });
 
+  it('har ingen varningstext som ingen kod läser', () => {
+    // Fynd 2026-11-17: `shortPreparation` (R-22) och `skiTechnique` (R-24)
+    // låg kvar i konfigurationen i åtta månader efter att reglerna strukits,
+    // och ingen kod läste dem. Det är samma sort som F-20, där
+    // `strengthExercises` fanns i schemat och i sessions.json men aldrig
+    // visades: konfigurationen lovar något som användaren aldrig ser, och
+    // ingenting säger ifrån.
+    //
+    // Testet läser motorn och kräver att varje varning nämns där. Det hittar
+    // inte död konfiguration i allmänhet, men det hittar den här klassen, och
+    // det är den som har inträffat två gånger.
+    const motorn = readdirSync('src/engine')
+      .filter((fil) => fil.endsWith('.ts'))
+      .map((fil) => readFileSync(`src/engine/${fil}`, 'utf8'));
+
+    for (const nyckel of Object.keys(rules.warnings)) {
+      if (nyckel.startsWith('_')) continue;
+
+      const läses = motorn.some((källa) => källa.includes(`warnings.${nyckel}`));
+      expect(läses, `rules.warnings.${nyckel} läses inte av någon kod`).toBe(true);
+    }
+  });
+
   it('planerar öppet vatten bara under sommaren (R-19)', () => {
     expect(rules.season.openWaterMonths).toEqual([6, 7, 8]);
   });
 
-  it('har varningstexterna ordagrant från R-22, R-24 och R-26', () => {
-    expect(rules.warnings.shortPreparation.text).toBe(
-      'Du har kort tid att förbereda dig. Planen är försiktig – sikta på att genomföra, inte på tid.',
-    );
-    expect(rules.warnings.skiTechnique.text).toBe(
-      'Teknik är avgörande i Vasaloppet. Försök att åka på snö eller gå en skidkurs före loppet.',
-    );
+  it('har varningstexten ordagrant från R-26', () => {
     expect(rules.warnings.outsideClassicWindow.text).toContain('tolv månader');
   });
 
