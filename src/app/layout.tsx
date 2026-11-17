@@ -31,7 +31,23 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="sv" className={instrumentSans.variable}>
-      <body className="bg-ground text-ink antialiased">{children}</body>
+      {/*
+        `suppressHydrationWarning` på <body>, och bara här.
+
+        Webbläsartillägg skriver in egna attribut i <body> innan React hinner
+        hydrera — Grammarly lägger till `data-gr-ext-installed` och
+        `data-new-gr-c-s-check-loaded`. React jämför serverns HTML med det som
+        står i dokumentet, ser attribut som inte fanns, och fäller upp en
+        felruta. Felet är alltså ett tillägg i användarens webbläsare, inte
+        något appen gör, och det går inte att rätta från vår sida.
+
+        Flaggan gäller **bara det här elementets egna attribut och text**, inte
+        någonting under det. Ett riktigt hydreringsfel i en komponent syns
+        därför precis som förut — det här tystar inte appens egna fel.
+      */}
+      <body suppressHydrationWarning className="bg-ground text-ink antialiased">
+        {children}
+      </body>
     </html>
   );
 }
