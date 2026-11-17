@@ -22,6 +22,14 @@ const tillPages = process.env.PAGES === '1';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+
+  /*
+   * Satt av säkerhetsuppgraderingen 2026-11-17 (16.4.3 → 16.4.6).
+   *
+   * Flaggan är Next.js egen markering för att uppgraderingen gjordes av ett
+   * verktyg och inte för hand. Den påverkar inte hur appen byggs eller körs.
+   */
+  experimental: { agentUpgrade: 'security' },
   ...(tillPages
     ? {
         output: 'export' as const,
