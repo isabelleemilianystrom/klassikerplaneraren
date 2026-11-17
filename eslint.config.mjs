@@ -6,7 +6,13 @@ import typescript from 'eslint-config-next/typescript';
  * flata konfigurationen.
  */
 const config = [
-  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts'] },
+  {
+    // Byggkataloger ignoreras på alla nivåer, inte bara i roten: ett
+    // git-worktree hamnar i `.claude/worktrees/`, alltså inuti repot, och har
+    // ett eget bygge. Utan den bredare matchningen följde `eslint .` med dit
+    // och underkände projektet på minifierad kod ur Next egna chunks.
+    ignores: ['**/.next/**', '.claude/**', 'node_modules/**', 'next-env.d.ts', 'out/**'],
+  },
   ...next,
   ...typescript,
 ];

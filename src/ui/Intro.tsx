@@ -11,6 +11,12 @@
  *
  * Numreringen är inte dekoration — stegen *är* en ordning, och den är densamma
  * som stegindikatorn i formuläret visar.
+ *
+ * **Typografin bär sidan, inte ramar** *(omgjord 2026-11-17)*. Första versionen
+ * satte siffrorna i grå cirklar och ramade in listan; det gav tre element som
+ * konkurrerade om uppmärksamheten på en sida vars enda uppgift är att läsas en
+ * gång. Nu finns bara hårfina linjer mellan raderna, siffrorna står i egen
+ * spalt i textens eget snitt, och den enda färgen på sidan är knappen.
  */
 import { INTRO } from './texts.ts';
 
@@ -21,45 +27,61 @@ interface Props {
 
 export default function Intro({ onStart, onBack }: Props) {
   return (
-    <div className="mx-auto max-w-2xl px-5 py-12">
-      <h1 className="text-3xl font-semibold tracking-tight">{INTRO.title}</h1>
-      <p className="mt-4 max-w-prose text-lg text-ink-2">{INTRO.lead}</p>
+    <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
+      {/*
+        Rubriken är sidans enda stora element. Tightare teckenavstånd ju större
+        graden, annars glesnar den optiskt.
+      */}
+      <h1 className="text-[2rem] leading-[1.08] font-semibold tracking-[-0.022em] sm:text-[2.5rem]">
+        {INTRO.title}
+      </h1>
 
-      <ol className="mt-10 space-y-0 border-t border-rule">
+      {/* Ingressen hålls på drygt fyrtio tecken — en rad att vila på, inte ett stycke. */}
+      <p className="mt-5 max-w-[46ch] text-lg leading-relaxed text-ink-2">{INTRO.lead}</p>
+
+      <ol className="mt-14 border-t border-rule">
         {INTRO.steps.map((steg, i) => (
           <li
             key={steg.title}
-            className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-4 border-b border-rule py-4"
+            className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-5 border-b border-rule py-5"
           >
-            <span
-              aria-hidden="true"
-              className="mt-0.5 flex size-7 items-center justify-center rounded-full bg-sunk text-sm font-semibold text-ink-3"
-            >
+            {/*
+              Siffran i sidans eget snitt och vikt, inte i en bricka. Den ska
+              räknas, inte ropa — därför samma gråton som hjälptexten.
+            */}
+            <span aria-hidden="true" className="pt-0.5 text-xl text-ink-3 tabular-nums">
               {i + 1}
             </span>
+
             <span>
               <span className="block font-medium">{steg.title}</span>
-              <span className="mt-1 block max-w-prose text-sm text-ink-2">{steg.body}</span>
+              <span className="mt-1.5 block max-w-[52ch] text-sm leading-relaxed text-ink-3">
+                {steg.body}
+              </span>
             </span>
           </li>
         ))}
       </ol>
 
-      <p className="mt-8 max-w-prose text-ink-2">{INTRO.after}</p>
-      <p className="mt-3 max-w-prose text-sm text-ink-3">{INTRO.privacy}</p>
+      <p className="mt-12 max-w-[52ch] text-ink-2">{INTRO.after}</p>
+      <p className="mt-4 max-w-[52ch] text-sm text-ink-3">{INTRO.privacy}</p>
 
-      <div className="mt-10 flex flex-wrap gap-3">
+      {/*
+        En knapp, inte två. "Tillbaka" är en utväg och ska se ut som en länk —
+        två lika tunga knappar tvingar fram ett val som inte finns.
+      */}
+      <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3">
         <button
           type="button"
           onClick={onStart}
-          className="rounded-field bg-accent px-6 py-3 text-lg font-medium text-white hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-field bg-accent px-6 py-3 font-medium text-white hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {INTRO.start}
         </button>
         <button
           type="button"
           onClick={onBack}
-          className="rounded-field px-5 py-3 font-medium text-ink-3 hover:bg-sunk focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="rounded-field text-sm text-ink-3 underline underline-offset-4 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {INTRO.back}
         </button>

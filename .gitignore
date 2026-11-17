@@ -39,6 +39,9 @@ Desktop.ini
 out/
 next-env.d.ts
 
+# Git-worktrees som verktyget skapar
+.claude/worktrees/
+
 # Miljövariabler
 .env
 .env.*
